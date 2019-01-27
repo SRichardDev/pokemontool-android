@@ -19,10 +19,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import de.orga.richard.poketool.geohash.GeoHash
 
 
 class MapFragment: Fragment() {
@@ -35,6 +33,8 @@ class MapFragment: Fragment() {
     private var lastLocation: Location? = null
     private var currentLocationMarker: Marker? = null
     private val locationListener = MapLocationListener()
+
+    private var geoHashList: MutableList<GeoHash> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +69,9 @@ class MapFragment: Fragment() {
         googleMap?.setOnMapLongClickListener {
 
             if (isLocationPermissionGranted()) {
-                updateLocationMarker(it)
-                updateCameraPosition(it)
+//                updateLocationMarker(it)
+                showGeoHashGrid(it)
+//                updateCameraPosition(it)
             } else {
                 Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
             }
@@ -147,14 +148,36 @@ class MapFragment: Fragment() {
      * Location
      */
 
-//    try {
-//        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        currentLocationMarker = ?
-//    } catch (SecurityException e) {
-//        dialogGPS(this.getContext()); // lets the user know there is a problem with the gps
-//    }
+    private fun showGeoHashGrid(location: Location) {
+        val geoHash = GeoHash(location, GEO_HASH_PRECISION)
+        showGeoHashGrid(geoHash)
+    }
 
-//    mapView.invalidate(); ???
+    private fun showGeoHashGrid(latlng: LatLng) {
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
+        showGeoHashGrid(geoHash)
+    }
+
+    private fun showGeoHashGrid(geoHash: GeoHash) {
+        Log.d(this::class.java.name, "Debug:: showGeoHashGrid: geoHash: $geoHash, location: ${geoHash.toLocation()}")
+
+        val polygonRect = PolygonOptions()
+            .strokeWidth(5.0f)
+            .fillColor(R.color.colorGeoHashArea)
+            .add(
+                LatLng(geoHash.boundingBox.bottomLeft.latitude, geoHash.boundingBox.bottomLeft.longitude),
+                LatLng(geoHash.boundingBox.topLeft.latitude, geoHash.boundingBox.topLeft.longitude),
+                LatLng(geoHash.boundingBox.topRight.latitude, geoHash.boundingBox.topRight.longitude),
+                LatLng(geoHash.boundingBox.bottomRight.latitude, geoHash.boundingBox.bottomRight.longitude),
+                LatLng(geoHash.boundingBox.bottomLeft.latitude, geoHash.boundingBox.bottomLeft.longitude)
+            )
+
+        // Get back the mutable Polygon?
+        googleMap?.addPolygon(polygonRect)
+
+        // update list
+        geoHashList.add(geoHash)
+    }
 
     fun updateCurrentLocation() {
         if (isLocationPermissionGranted()) {
@@ -290,6 +313,8 @@ class MapFragment: Fragment() {
         private const val ZOOM_LEVEL_CITY: Float = 10.0f
         private const val ZOOM_LEVEL_STREET: Float = 15.0f
         private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
+
+        private const val GEO_HASH_PRECISION: Int = 6
 
     }
 }
