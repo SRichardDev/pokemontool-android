@@ -6,16 +6,17 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.layout_activity_drawer.*
+import kotlinx.android.synthetic.main.layout_activity_appbar.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.layout_activity_drawer)
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
@@ -30,6 +31,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        showMapFragment()
+    }
+
+    private fun showMapFragment() {
+
+        val mapFragment = MapFragment()
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, mapFragment).commit()
     }
 
     override fun onBackPressed() {

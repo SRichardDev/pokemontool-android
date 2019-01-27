@@ -1,4 +1,9 @@
 <resources>
+
+    <!-- keys -->
+    <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
+
+    <!-- app -->
     <string name="app_name">PokeTool</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -6,4 +11,13 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- GPS -->
+    <string name="dialog_gps_disabled_message">Your GPS seems to be disabled, do you want to enable it?</string>
+    <string name="dialog_gps_disabled_button_positive">Yes</string>
+    <string name="dialog_gps_disabled_button_negative">No</string>
+
+    <!-- Location -->
+    <string name="location_marker_current_position_title">Your Position</string>
+    <string name="location_marker_current_position_description">Marker description…</string>
 </resources>
