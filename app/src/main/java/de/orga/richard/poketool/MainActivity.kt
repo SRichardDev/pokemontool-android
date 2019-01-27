@@ -1,12 +1,10 @@
 package de.orga.richard.poketool
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.layout_activity_drawer.*
@@ -19,14 +17,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.layout_activity_drawer)
         setSupportActionBar(toolbar)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        fab_location.setOnClickListener {
+            (supportFragmentManager.findFragmentByTag(MapFragment::class.java.name) as MapFragment).updateCurrentLocation()
         }
 
-        val toggle = ActionBarDrawerToggle(
-            this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
-        )
+        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -37,8 +32,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun showMapFragment() {
 
-        val mapFragment = MapFragment()
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, mapFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, MapFragment(), MapFragment::class.java.name).commit()
     }
 
     override fun onBackPressed() {

@@ -12,10 +12,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <!-- GPS -->
+    <!-- Dialog -->
     <string name="dialog_gps_disabled_message">Your GPS seems to be disabled, do you want to enable it?</string>
     <string name="dialog_gps_disabled_button_positive">Yes</string>
     <string name="dialog_gps_disabled_button_negative">No</string>
+    <string name="dialog_location_disabled_message">Please enable location permission to use this feature.</string>
 
     <!-- Location -->
     <string name="location_marker_current_position_title">Your Position</string>

@@ -16,6 +16,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -23,7 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
 
-class MapFragment: Fragment() { // SupportMapFragment ???
+class MapFragment: Fragment() {
 
     private var mapView: MapView? = null
     private var googleMap: GoogleMap? = null
@@ -55,20 +57,28 @@ class MapFragment: Fragment() { // SupportMapFragment ???
 
         activity?.let { MapsInitializer.initialize(it.applicationContext) }
 
-        mapView?.getMapAsync {
+        mapView?.getMapAsync {onMapReadyCallback(it)}
 
-            googleMap = it
+        return fragmentLayout
+    }
+
+    private val onMapReadyCallback = { it: GoogleMap ->
+
+        googleMap = it
+
+        googleMap?.setOnMapLongClickListener {
 
             if (isLocationPermissionGranted()) {
-                Log.d(MapFragment::class.java.name, "Debug:: onCreateView() - isLocationPermissionGranted: true")
-                showCurrentLocation()
+                updateLocationMarker(it)
+                updateCameraPosition(it)
             } else {
-                Log.d(MapFragment::class.java.name, "Debug:: onCreateView() - isLocationPermissionGranted: false")
-                requestLocationPermission()
+                Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
             }
         }
 
-        return fragmentLayout
+        if (isLocationPermissionGranted()) {
+            showCurrentLocation()
+        }
     }
 
     override fun onResume() {
@@ -109,8 +119,6 @@ class MapFragment: Fragment() { // SupportMapFragment ???
                 if (isLocationPermissionGranted()) {
                     Log.d(MapFragment::class.java.name, "Debug:: onRequestPermissionsResult(), isLocationPermissionGranted: true")
                     showCurrentLocation()
-                } else {
-                    Log.d(MapFragment::class.java.name, "Debug:: onRequestPermissionsResult(), isLocationPermissionGranted: false")
                 }
             }
         }
@@ -148,6 +156,13 @@ class MapFragment: Fragment() { // SupportMapFragment ???
 
 //    mapView.invalidate(); ???
 
+    fun updateCurrentLocation() {
+        if (isLocationPermissionGranted()) {
+            showCurrentLocation()
+        } else {
+            requestLocationPermission()
+        }
+    }
 
     @SuppressLint("MissingPermission")
     private fun showCurrentLocation() {
@@ -180,23 +195,30 @@ class MapFragment: Fragment() { // SupportMapFragment ???
     }
 
     private fun updateLocationMarker(location: Location) {
+        val latlng = LatLng(location.latitude, location.longitude)
+        updateLocationMarker(latlng)
+    }
+
+    private fun updateLocationMarker(latLng: LatLng) {
 
         googleMap?.let { _googleMap ->
 
-            val latlng = LatLng(location.latitude, location.longitude)
-
-            currentLocationMarker = _googleMap.addMarker(MarkerOptions().position(latlng)
+            currentLocationMarker = _googleMap.addMarker(MarkerOptions().position(latLng)
                 .title(getString(R.string.location_marker_current_position_title))
                 .snippet(getString(R.string.location_marker_current_position_description)))
         }
     }
 
     private fun updateCameraPosition(location: Location) {
+        val latlng = LatLng(location.latitude, location.longitude)
+        updateCameraPosition(latlng)
+    }
+
+    private fun updateCameraPosition(latLng: LatLng) {
 
         googleMap?.let { _googleMap ->
 
-            val latlng = LatLng(location.latitude, location.longitude)
-            val cameraPosition = CameraPosition.Builder().target(latlng).zoom(ZOOM_LEVEL_STREET).build()
+            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(ZOOM_LEVEL_STREET).build()
             _googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
     }
@@ -224,7 +246,6 @@ class MapFragment: Fragment() { // SupportMapFragment ???
         }
     }
 
-
     /**
      * GPS
      */
@@ -237,7 +258,6 @@ class MapFragment: Fragment() { // SupportMapFragment ???
                 showAlertMessageNoGPS()
             }
         }
-
     }
 
     private fun showAlertMessageNoGPS() {
