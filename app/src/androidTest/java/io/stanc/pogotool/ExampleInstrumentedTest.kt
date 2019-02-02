@@ -1,4 +1,4 @@
-package de.orga.richard.poketool
+package io.stanc.pogotool
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("de.orga.richard.poketool", appContext.packageName)
+        assertEquals("io.stanc.pogotool", appContext.packageName)
     }
 }

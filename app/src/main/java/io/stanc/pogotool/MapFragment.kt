@@ -1,4 +1,4 @@
-package de.orga.richard.poketool
+package io.stanc.pogotool
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,7 +20,8 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
-import de.orga.richard.poketool.geohash.GeoHash
+import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.geohash.GeoHash
 
 
 class MapFragment: Fragment() {
@@ -35,6 +36,9 @@ class MapFragment: Fragment() {
     private val locationListener = MapLocationListener()
 
     private var geoHashList: MutableList<GeoHash> = mutableListOf()
+
+    // firebase
+    private val firebase = FirebaseServer()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +90,7 @@ class MapFragment: Fragment() {
         super.onResume()
         Log.d(this::class.java.name, "Debug:: onResume()")
         mapView?.onResume()
+        firebase.start()
         checkGPS()
     }
 
@@ -298,6 +303,16 @@ class MapFragment: Fragment() {
             builder.create().show()
         }
     }
+
+    /**
+     * Firebase
+     */
+
+    // TODO... -> FirebaseServer.kt
+    fun updateData() {
+        // firebase....
+    }
+
 
     companion object {
 

@@ -1,4 +1,4 @@
-package de.orga.richard.poketool
+package io.stanc.pogotool
 
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
 
         fab_location.setOnClickListener {
-            (supportFragmentManager.findFragmentByTag(MapFragment::class.java.name) as MapFragment).updateCurrentLocation()
+            (supportFragmentManager.findFragmentByTag(MapFragment::class.java.name) as MapFragment).updateData()
         }
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)

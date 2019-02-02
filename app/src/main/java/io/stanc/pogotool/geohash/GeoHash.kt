@@ -1,4 +1,4 @@
-package de.orga.richard.poketool.geohash
+package io.stanc.pogotool.geohash
 
 import android.location.Location
 import android.os.Parcel

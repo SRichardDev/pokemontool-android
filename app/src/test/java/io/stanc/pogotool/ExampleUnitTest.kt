@@ -1,4 +1,4 @@
-package de.orga.richard.poketool
+package io.stanc.pogotool
 
 import org.junit.Test
 
