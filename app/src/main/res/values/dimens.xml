@@ -11,6 +11,6 @@
     <dimen name="layout_margin_end">32dp</dimen>
     <dimen name="layout_margin_start">32dp</dimen>
 
-    <dimen name="button_padding">8dp</dimen>
+    <dimen name="item_padding_default">8dp</dimen>
 
 </resources>

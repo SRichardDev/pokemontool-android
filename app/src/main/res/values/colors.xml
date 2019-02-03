@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#2a75bb</color>
+    <color name="colorPrimaryDark">#3c5aa6</color>
+    <color name="colorAccent">#CC0000</color>
 
     <color name="colorRed">#800000</color>
     <color name="colorGeoHashArea">#80800000</color>
@@ -12,11 +12,15 @@
 
     <color name="colorWhite">#ffffff</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorTransparent">#00000000</color>
     <color name="colorBlackTransparent">#CC000000</color>
     <color name="colorWhiteBlue">#ccccff</color>
 
     <!-- Poke colors -->
     <color name="colorBluePoke">#3B4CCA</color>
+    <color name="colorBlueDarkPoke">#3c5aa6</color>
+    <color name="colorBlueLightPoke">#2a75bb</color>
+
     <color name="colorRedDarkPoke">#CC0000</color>
     <color name="colorRedLightPoke">#FF0000</color>
     <color name="colorYellowPoke">#FFDE00</color>

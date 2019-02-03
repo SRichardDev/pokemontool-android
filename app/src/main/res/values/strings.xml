@@ -12,6 +12,7 @@
 
     <!-- Navigation Drawer -->
     <string name="nav_header_authentication_state">Authentication status:</string>
+    <string name="nav_menu_item_authentication">Authentication</string>
 
     <!-- Authentication -->
     <string name="authentication_state_user"> Email User: %1$s (verified: %2$b)</string>
@@ -19,7 +20,11 @@
     <string name="authentication_state_signed_in">Logged in as %s</string>
     <string name="authentication_state_signed_in_but_missing_verification">Logged in as %s\n(waiting for email verification)</string>
     <string name="authentication_state_signed_out">Logged out.</string>
-    <string name="authentication_state_failed">Authentication failed!</string>
+
+    <string name="authentication_state_synchronization_failed">Synchronization failed!</string>
+    <string name="authentication_state_authentication_failed">Authentication failed!</string>
+    <string name="authentication_state_verification_failed">Failed to send verification email!</string>
+    <string name="authentication_state_verification_successful">Verification email sent to %s</string>
 
     <string name="authentication_button_sign_in">Sign In</string>
     <string name="authentication_button_sign_up">Sign Up</string>
@@ -28,6 +33,9 @@
 
     <string name="authentication_hint_email">type your email here…</string>
     <string name="authentication_hint_password">type your password here…</string>
+
+    <string name="authentication_edittext_email_error">Required!</string>
+    <string name="authentication_edittext_password_error">Required!</string>
 
     <!-- Dialog -->
     <string name="dialog_gps_disabled_message">Your GPS seems to be disabled, do you want to enable it?</string>

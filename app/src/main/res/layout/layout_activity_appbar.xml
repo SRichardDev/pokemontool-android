@@ -23,27 +23,14 @@
 
     <include layout="@layout/layout_activity_content"/>
 
-    <LinearLayout
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
         android:layout_gravity="bottom|end"
-        android:orientation="vertical">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_dialog_map"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_authentication"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_menu_agenda"/>
-
-    </LinearLayout>
+        app:srcCompat="@android:drawable/ic_dialog_map"
+        app:rippleColor="@color/colorRedDarkPoke"/>
 
     <include
         layout="@layout/layout_progress"

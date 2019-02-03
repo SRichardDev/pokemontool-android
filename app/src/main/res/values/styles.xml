@@ -18,7 +18,7 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/colorBlack</item>
         <item name="android:background">@color/colorWhite</item>
-        <item name="android:padding">@dimen/button_padding</item>
+        <item name="android:padding">@dimen/item_padding_default</item>
     </style>
 
 </resources>

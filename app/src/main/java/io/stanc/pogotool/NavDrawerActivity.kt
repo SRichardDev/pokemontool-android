@@ -32,10 +32,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             (supportFragmentManager.findFragmentByTag(MapFragment::class.java.name) as MapFragment).updateData()
         }
 
-        fab_authentication.setOnClickListener {
-            toggleAuthenticationFragment()
-        }
-
         // navigation drawer
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -108,6 +104,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private val delegate = object: NavDrawerDelegate {
 
+//        TODO: at the start of activity: get current authentication state -> FirebaseServer.class::~updateAuthenticationStateText(see AuthenticationFragment)
         override fun changeSubTitle(text: String) {
             Log.d(this.javaClass.name, "Debug:: changeSubTitle(text: $text) for nav_header_subtitle: $nav_header_subtitle")
             nav_header_subtitle.text = text
@@ -117,17 +114,8 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
+            R.id.nav_authentication -> {
+                toggleAuthenticationFragment()
             }
             R.id.nav_share -> {
 

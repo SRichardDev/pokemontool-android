@@ -26,6 +26,10 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        authentication_imageButton_close.setOnClickListener {
+            activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
+        }
+
         authentication_button_sign_in.setOnClickListener(this)
         authentication_button_sign_up.setOnClickListener(this)
         authentication_button_sign_out.setOnClickListener(this)
@@ -37,7 +41,18 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+
         updateUI()
+
+        auth?.currentUser?.reload()?.addOnCompleteListener { task ->
+
+            Log.i(this.javaClass.name, "Debug:: reload.onCompleteListener, isSuccessful: ${task.isSuccessful}")
+            if (task.isSuccessful) {
+                updateUI()
+            } else {
+                Toast.makeText(context, getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onClick(v: View) {
@@ -56,67 +71,44 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     private fun createAccount(email: String, password: String) {
         Log.d(this.javaClass.name, "createAccount:$email")
 
-        if (!validateForm()) {
+        if (!validateEditTextsInput()) {
             return
         }
 
         WaitingSpinner.showProgress()
 
-        // [START create_user_with_email]
         auth?.createUserWithEmailAndPassword(email, password)?.addOnCompleteListener {task ->
+
             if (task.isSuccessful) {
-                // Sign in success, update UI with the signed-in user's information
-                Log.d(this.javaClass.name, "createUserWithEmail:success")
                 updateUI()
             } else {
-                // If sign in fails, display a message to the user.
-                Log.w(this.javaClass.name, "createUserWithEmail:failure", task.exception)
-                Toast.makeText(
-                    context, "Authentication failed.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                updateUI()
+                Toast.makeText(context, getString(R.string.authentication_state_authentication_failed), Toast.LENGTH_LONG).show()
             }
 
-            // [START_EXCLUDE]
             WaitingSpinner.hideProgress()
-            // [END_EXCLUDE]
         }
-        // [END create_user_with_email]
     }
 
     private fun signIn(email: String, password: String) {
+
         Log.d(this.javaClass.name, "signIn:$email")
-        if (!validateForm()) {
+        if (!validateEditTextsInput()) {
             return
         }
 
         WaitingSpinner.showProgress()
 
-        // [START sign_in_with_email]
         auth?.signInWithEmailAndPassword(email, password)?.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(this.javaClass.name, "signInWithEmail:success")
-                    updateUI()
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(this.javaClass.name, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        context, "Authentication failed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateUI()
-                }
 
-                // [START_EXCLUDE]
-                if (!task.isSuccessful) {
-                    authentication_textview_status.setText(R.string.authentication_state_failed)
-                }
-            WaitingSpinner.hideProgress()
-                // [END_EXCLUDE]
+            if (task.isSuccessful) {
+                updateUI()
+
+            } else {
+                Toast.makeText(context, "Authentication failed.", Toast.LENGTH_LONG).show()
             }
-        // [END sign_in_with_email]
+
+            WaitingSpinner.hideProgress()
+        }
     }
 
     private fun signOut() {
@@ -125,53 +117,50 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     }
 
     private fun sendEmailVerification() {
-        // Disable button
-        authentication_button_verify_email.isEnabled = false
-        Log.d(this.javaClass.name, "Debug:: sendEmailVerification()")
-
-        WaitingSpinner.showProgress()
 
         // Send verification email
-        // [START send_email_verification]
-        val user = auth?.currentUser
-        Log.d(this.javaClass.name, "Debug:: sendEmailVerification() for user: ${user?.email}")
-        user?.sendEmailVerification()?.addOnCompleteListener { task ->
-                // [START_EXCLUDE]
-                // Re-enable button
-            authentication_button_verify_email.isEnabled = true
+        auth?.currentUser?.let { user ->
 
-            WaitingSpinner.hideProgress()
+            Log.d(this.javaClass.name, "Debug:: sendEmailVerification() for user: ${user.email}")
+            authentication_button_verify_email?.isEnabled = false
+            WaitingSpinner.showProgress()
 
-            Log.d(this.javaClass.name, "Debug:: sendEmailVerification() onCompleteListener, task.isSuccessful: ${task.isSuccessful}")
+            user.sendEmailVerification().addOnCompleteListener { task ->
+
+                authentication_button_verify_email?.isEnabled = true
+
+                WaitingSpinner.hideProgress()
+
+                Log.d(this.javaClass.name, "Debug:: sendEmailVerification() onCompleteListener, task.isSuccessful: ${task.isSuccessful}")
 
                 if (task.isSuccessful) {
-                    Toast.makeText(context, "Verification email sent to ${user.email} ", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.authentication_state_verification_successful, user.email), Toast.LENGTH_LONG).show()
                 } else {
                     Log.e(this.javaClass.name, "sendEmailVerification", task.exception)
-                    Toast.makeText(context, "Failed to send verification email.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.authentication_state_verification_failed), Toast.LENGTH_LONG).show()
                 }
-                // [END_EXCLUDE]
             }
-        // [END send_email_verification]
+        } ?: kotlin.run { Log.w(this.javaClass.name, "can not send email verification because current user is null!") }
     }
 
-    private fun validateForm(): Boolean {
+    private fun validateEditTextsInput(): Boolean {
+
         var valid = true
 
-        val email = authentication_edittext_email.text.toString()
+        val email = authentication_edittext_email?.text.toString()
         if (TextUtils.isEmpty(email)) {
-            authentication_edittext_email.error = "Required."
+            authentication_edittext_email?.error = getString(R.string.authentication_edittext_email_error)
             valid = false
         } else {
-            authentication_edittext_email.error = null
+            authentication_edittext_email?.error = null
         }
 
-        val password = authentication_edittext_password.text.toString()
+        val password = authentication_edittext_password?.text.toString()
         if (TextUtils.isEmpty(password)) {
-            authentication_edittext_password.error = "Required."
+            authentication_edittext_password?.error = getString(R.string.authentication_edittext_password_error)
             valid = false
         } else {
-            authentication_edittext_password.error = null
+            authentication_edittext_password?.error = null
         }
 
         return valid
@@ -183,17 +172,16 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
         auth?.currentUser?.let { user ->
 
-            updateSignButtons(userHasToSignInOrUp = false)
-            authentication_button_verify_email.isEnabled = !user.isEmailVerified
+            updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = user.isEmailVerified)
 
         } ?: kotlin.run {
             updateSignButtons(userHasToSignInOrUp = true)
         }
 
-        updateAuthenticationState()
+        updateAuthenticationStateText()
     }
 
-    private fun updateAuthenticationState() {
+    private fun updateAuthenticationStateText() {
 
         val statusText = auth?.currentUser?.let { user ->
 
@@ -207,21 +195,21 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
             getString(R.string.authentication_state_signed_out)
         }
 
-        authentication_textview_status.text = statusText
+        authentication_textview_status?.text = statusText
         delegate?.changeSubTitle(statusText)
     }
 
 
-    private fun updateSignButtons(userHasToSignInOrUp: Boolean) {
+    private fun updateSignButtons(userHasToSignInOrUp: Boolean, isEmailVerified: Boolean = false) {
 
-        authentication_button_sign_in.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
-        authentication_button_sign_up.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
+        authentication_button_sign_in?.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
+        authentication_button_sign_up?.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
 
-        authentication_edittext_email.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
-        authentication_edittext_password.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
+        authentication_edittext_email?.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
+        authentication_edittext_password?.visibility = if (userHasToSignInOrUp) View.VISIBLE else View.GONE
 
-        authentication_button_sign_out.visibility = if (userHasToSignInOrUp) View.GONE else View.VISIBLE
-        authentication_button_verify_email.visibility = if (userHasToSignInOrUp) View.GONE else View.VISIBLE
+        authentication_button_sign_out?.visibility = if (userHasToSignInOrUp) View.GONE else View.VISIBLE
+        authentication_button_verify_email?.visibility = if (!userHasToSignInOrUp && !isEmailVerified) View.VISIBLE else View.GONE
     }
 
     companion object {

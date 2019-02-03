@@ -17,7 +17,7 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/authentication_layout_edit_texfield"
         android:background="@color/colorWhiteBlue"
-        android:padding="@dimen/button_padding">
+        android:padding="@dimen/item_padding_default">
 
         <TextView
             android:id="@+id/authentication_textview_status"
@@ -25,7 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
+            android:gravity="center_vertical"
+            android:layout_gravity="start"
             tools:text="auth status"/>
 
         <Button
@@ -87,5 +88,16 @@
             android:inputType="textPassword"/>
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/authentication_imageButton_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/item_padding_default"
+        android:src="@drawable/ic_close"
+        android:background="@color/colorTransparent"
+        tools:ignore="ContentDescription"/>
 
 </android.support.constraint.ConstraintLayout>
