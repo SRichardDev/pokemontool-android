@@ -37,9 +37,6 @@ class MapFragment: Fragment() {
 
     private var geoHashList: MutableList<GeoHash> = mutableListOf()
 
-    // firebase
-    private val firebase = FirebaseServer()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -93,7 +90,6 @@ class MapFragment: Fragment() {
         super.onResume()
         Log.d(this::class.java.name, "Debug:: onResume()")
         mapView?.onResume()
-        firebase.start()
         checkGPS()
     }
 

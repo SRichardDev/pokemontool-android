@@ -5,16 +5,17 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
+import android.view.View
 import io.stanc.pogotool.firebase.AuthenticationFragment
+import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.MapFragment
-import kotlinx.android.synthetic.main.layout_activity_drawer.*
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
+import kotlinx.android.synthetic.main.layout_activity_drawer.*
 import kotlinx.android.synthetic.main.layout_nav_header.*
 import kotlinx.android.synthetic.main.layout_progress.*
+
 
 class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -33,7 +34,14 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
 
         // navigation drawer
-        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        val toggle = object : ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+                updateSubTitle()
+            }
+        }
+
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -44,6 +52,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         // first fragment
         showMapFragment()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateSubTitle()
     }
 
     /**
@@ -64,7 +77,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         } ?: kotlin.run {
 
-            val fragment = AuthenticationFragment.newInstance(delegate)
+            val fragment = AuthenticationFragment()
             supportFragmentManager.beginTransaction().add(R.id.activity_content_framelayout,
                 fragment, fragmentTag).commit()
         }
@@ -102,13 +115,8 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Navigation drawer
      */
 
-    private val delegate = object: NavDrawerDelegate {
-
-//        TODO: at the start of activity: get current authentication state -> FirebaseServer.class::~updateAuthenticationStateText(see AuthenticationFragment)
-        override fun changeSubTitle(text: String) {
-            Log.d(this.javaClass.name, "Debug:: changeSubTitle(text: $text) for nav_header_subtitle: $nav_header_subtitle")
-            nav_header_subtitle.text = text
-        }
+    private fun updateSubTitle() {
+        nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
