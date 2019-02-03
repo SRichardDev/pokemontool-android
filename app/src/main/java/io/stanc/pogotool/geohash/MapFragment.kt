@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.geohash
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,8 +20,8 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
+import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.geohash.GeoHash
 
 
 class MapFragment: Fragment() {
@@ -45,7 +45,10 @@ class MapFragment: Fragment() {
 
         Log.d(this::class.java.name, "Debug:: onCreate()")
         if (!isLocationPermissionGranted()) {
-            requestPermissions(LOCATION_PERMISSIONS, REQUEST_CODE_LOCATION)
+            requestPermissions(
+                LOCATION_PERMISSIONS,
+                REQUEST_CODE_LOCATION
+            )
         }
     }
 
@@ -146,7 +149,8 @@ class MapFragment: Fragment() {
         requestPermissions(arrayOf(
             android.Manifest.permission.ACCESS_FINE_LOCATION,
             android.Manifest.permission.ACCESS_COARSE_LOCATION),
-            REQUEST_CODE_LOCATION)
+            REQUEST_CODE_LOCATION
+        )
     }
 
     /**
@@ -159,7 +163,9 @@ class MapFragment: Fragment() {
     }
 
     private fun showGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude,
+            GEO_HASH_PRECISION
+        )
         showGeoHashGrid(geoHash)
     }
 
@@ -206,7 +212,9 @@ class MapFragment: Fragment() {
                 Log.d(this::class.java.name, "Debug:: showCurrentLocation() -> requestLocationUpdates")
 
                 // Use the location manager through GPS
-                _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATE_MIN_TIME_MILLISECONDS, LOCATION_UPDATE_MIN_DISTANCE_METER, locationListener)
+                _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_UPDATE_MIN_TIME_MILLISECONDS,
+                    LOCATION_UPDATE_MIN_DISTANCE_METER, locationListener)
 
                 //get the current location (last known location) from the location manager
                 lastLocation = _locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)

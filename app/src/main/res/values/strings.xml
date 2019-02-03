@@ -4,13 +4,30 @@
     <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
 
     <!-- app -->
-    <string name="app_name">PokeTool</string>
+    <string name="app_name">PoGoTool</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- Navigation Drawer -->
+    <string name="nav_header_authentication_state">Authentication status:</string>
+
+    <!-- Authentication -->
+    <string name="authentication_state_user"> Email User: %1$s (verified: %2$b)</string>
+
+    <string name="authentication_state_signed_in">Logged in as %s</string>
+    <string name="authentication_state_signed_in_but_missing_verification">Logged in as %s\n(waiting for email verification)</string>
+    <string name="authentication_state_signed_out">Logged out.</string>
+    <string name="authentication_state_failed">Authentication failed!</string>
+
+    <string name="authentication_button_sign_in">Sign In</string>
+    <string name="authentication_button_sign_up">Sign Up</string>
+    <string name="authentication_button_sign_out">Sign Out</string>
+    <string name="authentication_button_verify_email">Verify Email</string>
+
+    <string name="authentication_hint_email">type your email here…</string>
+    <string name="authentication_hint_password">type your password here…</string>
 
     <!-- Dialog -->
     <string name="dialog_gps_disabled_message">Your GPS seems to be disabled, do you want to enable it?</string>

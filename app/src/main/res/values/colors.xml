@@ -6,4 +6,20 @@
 
     <color name="colorRed">#800000</color>
     <color name="colorGeoHashArea">#80800000</color>
+
+    <color name="colorLayoutBackground">#ffffff</color>
+    <color name="colorText">#800000</color>
+
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorBlackTransparent">#CC000000</color>
+    <color name="colorWhiteBlue">#ccccff</color>
+
+    <!-- Poke colors -->
+    <color name="colorBluePoke">#3B4CCA</color>
+    <color name="colorRedDarkPoke">#CC0000</color>
+    <color name="colorRedLightPoke">#FF0000</color>
+    <color name="colorYellowPoke">#FFDE00</color>
+    <color name="colorGoldPoke">#B3A125</color>
+
 </resources>

@@ -1,14 +1,18 @@
 package io.stanc.pogotool.firebase
 
+import android.util.Log
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 
 class FirebaseServer {
 
     private val firebase = FirebaseFirestore.getInstance()
+    private var auth: FirebaseAuth? = null
 
     fun start() {
-//        val db =
+//        val firebase =
     }
 
 //    fun testStoreCollection() {
@@ -19,12 +23,10 @@ class FirebaseServer {
 //        user.put("born", 1815)
 //
 //// Add a new document with a generated ID
-//        db.collection("users")
+//        firebase.collection("users")
 //            .add(user)
 //            .addOnSuccessListener(OnSuccessListener<Any> { documentReference ->
-//                Log.d(
-//                    TAG,
-//                    "DocumentSnapshot added with ID: " + documentReference.getId()
+//                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId()
 //                )
 //            })
 //            .addOnFailureListener(OnFailureListener { e -> Log.w(TAG, "Error adding document", e) })
@@ -39,7 +41,7 @@ class FirebaseServer {
 //        user.put("born", 1912)
 //
 //// Add a new document with a generated ID
-//        db.collection("users")
+//        firebase.collection("users")
 //            .add(user)
 //            .addOnSuccessListener(OnSuccessListener<Any> { documentReference ->
 //                Log.d(
@@ -51,7 +53,7 @@ class FirebaseServer {
 //    }
 //
 //    fun testReadData() {
-//        db.collection("users")
+//        firebase.collection("users")
 //            .get()
 //            .addOnCompleteListener(OnCompleteListener<Any> { task ->
 //                if (task.isSuccessful) {
