@@ -9,15 +9,14 @@
                                              android:layout_marginTop="@dimen/layout_margin_top"
                                              android:layout_marginBottom="@dimen/layout_margin_bottom"
                                              android:layout_marginStart="@dimen/layout_margin_start"
-                                             android:layout_marginEnd="@dimen/layout_margin_end">
+                                             android:layout_marginEnd="@dimen/layout_margin_end"
+                                             android:background="@color/colorWhiteBlue">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/authentication_layout_edit_texfield"
-        android:background="@color/colorWhiteBlue"
-        android:padding="@dimen/item_padding_default">
+        app:layout_constraintBottom_toTopOf="@id/authentication_layout_edit_texfield">
 
         <TextView
             android:id="@+id/authentication_textview_status"
@@ -25,6 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_margin="@dimen/item_padding_default"
             android:gravity="center_vertical"
             android:layout_gravity="start"
             tools:text="auth status"/>
@@ -74,16 +74,16 @@
             android:id="@+id/authentication_edittext_email"
             style="@style/AppButtons"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:hint="@string/authentication_hint_email"/>
+            android:layout_height="wrap_content"
+            android:hint="@string/authentication_hint_email"
+            android:inputType="textEmailAddress|textMultiLine"
+            android:maxLines="2"/>
 
         <EditText
             android:id="@+id/authentication_edittext_password"
             style="@style/AppButtons"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:hint="@string/authentication_hint_password"
             android:inputType="textPassword"/>
 

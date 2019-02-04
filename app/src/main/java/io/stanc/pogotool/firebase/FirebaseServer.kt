@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
 import io.stanc.pogotool.R
 import io.stanc.pogotool.WaitingSpinner
 
@@ -14,6 +15,7 @@ object FirebaseServer {
 //    TODO: refactor: use FirebaseFirestore instaed of FirebaseAuth
 //    private val firebase = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val database = FirebaseDatabase.getInstance().reference
 
     /**
      * authentication methods
@@ -29,6 +31,10 @@ object FirebaseServer {
 
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {task ->
 
+            if (!task.isSuccessful) {
+                Log.w(this.javaClass.name, "signing up failed with error: ${task.exception?.message}")
+            }
+
             onCompletedCallback(task.isSuccessful)
             WaitingSpinner.hideProgress()
         }
@@ -42,8 +48,11 @@ object FirebaseServer {
 
         WaitingSpinner.showProgress()
 
-
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+
+            if (!task.isSuccessful) {
+                Log.w(this.javaClass.name, "signing in failed with error: ${task.exception?.message}")
+            }
 
             onCompletedCallback(task.isSuccessful)
             WaitingSpinner.hideProgress()
@@ -63,6 +72,10 @@ object FirebaseServer {
 
             user.sendEmailVerification().addOnCompleteListener { task ->
 
+                if (!task.isSuccessful) {
+                    Log.w(this.javaClass.name, "email verification failed with error: ${task.exception?.message}")
+                }
+
                 WaitingSpinner.hideProgress()
                 onCompletedCallback(task.isSuccessful)
             }
@@ -78,6 +91,10 @@ object FirebaseServer {
 
         auth.currentUser?.reload()?.addOnCompleteListener { task ->
 
+            if (!task.isSuccessful) {
+                Log.w(this.javaClass.name, "reloading user data failed with error: ${task.exception?.message}")
+            }
+
             onCompletedCallback(task.isSuccessful)
 
             if (!task.isSuccessful) {
@@ -91,6 +108,14 @@ object FirebaseServer {
      */
     fun user(): FirebaseUser? {
         return auth.currentUser
+    }
+
+    fun userName(): String? {
+
+//        return auth.currentUser?.let { user ->
+//            database.child(DATABASE_USERS).child(user.uid).child(DATABASE_USER_TRAINER_NAME).
+//        } ?: kotlin.run { null }
+        return null
     }
 
     fun usersAuthenticationStateText(context: Context): String {
@@ -108,55 +133,32 @@ object FirebaseServer {
         }
     }
 
-//    fun testStoreCollection() {
-//        // Create a new user with a first and last name
-//        val user = HashMap()
-//        user.put("first", "Ada")
-//        user.put("last", "Lovelace")
-//        user.put("born", 1815)
-//
-//// Add a new document with a generated ID
-//        firebase.collection("users")
-//            .add(user)
-//            .addOnSuccessListener(OnSuccessListener<Any> { documentReference ->
-//                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId()
-//                )
-//            })
-//            .addOnFailureListener(OnFailureListener { e -> Log.w(TAG, "Error adding document", e) })
-//    }
-//
-//    fun testAddDocToUsersCollection() {
-//        // Create a new user with a first, middle, and last name
-//        val user = HashMap()
-//        user.put("first", "Alan")
-//        user.put("middle", "Mathison")
-//        user.put("last", "Turing")
-//        user.put("born", 1912)
-//
-//// Add a new document with a generated ID
-//        firebase.collection("users")
-//            .add(user)
-//            .addOnSuccessListener(OnSuccessListener<Any> { documentReference ->
-//                Log.d(
-//                    TAG,
-//                    "DocumentSnapshot added with ID: " + documentReference.getId()
-//                )
-//            })
-//            .addOnFailureListener(OnFailureListener { e -> Log.w(TAG, "Error adding document", e) })
-//    }
-//
-//    fun testReadData() {
-//        firebase.collection("users")
-//            .get()
-//            .addOnCompleteListener(OnCompleteListener<Any> { task ->
-//                if (task.isSuccessful) {
-//                    for (document in task.result!!) {
-//                        Log.d(TAG, document.getId() + " => " + document.getData())
-//                    }
-//                } else {
-//                    Log.w(TAG, "Error getting documents.", task.exception)
-//                }
-//            })
-//    }
+    fun updateUserName(name: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        auth.currentUser?.let { user ->
+
+            val data = HashMap<String, Any>()
+            data[DATABASE_USER_TRAINER_NAME] = name
+
+            database.database.getReference(DATABASE_USERS).child(user.uid).updateChildren(data).addOnCompleteListener { task ->
+
+                if (!task.isSuccessful) {
+                    Log.w(this.javaClass.name, "update user name failed with error: ${task.exception?.message}")
+                }
+
+                onCompletedCallback(task.isSuccessful)
+            }
+        }
+    }
+
+    /**
+     * database
+     */
+
+    private const val DATABASE_USERS = "users"
+    private const val DATABASE_USER_TRAINER_NAME = "trainerName"
+    private const val DATABASE_ARENAS = "arenas"
+    private const val DATABASE_POKESTOPS = "pokestops"
+    private const val DATABASE_RAID_BOSSES = "raidBosses"
 
 }

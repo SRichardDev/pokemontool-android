@@ -38,13 +38,12 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                updateSubTitle()
+                updateNavText()
             }
         }
 
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
-
         nav_view.setNavigationItemSelectedListener(this)
 
         // progress view
@@ -56,7 +55,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     override fun onResume() {
         super.onResume()
-        updateSubTitle()
+        updateNavText()
     }
 
     /**
@@ -115,8 +114,9 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Navigation drawer
      */
 
-    private fun updateSubTitle() {
+    private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
+        nav_info?.text = getString(R.string.user_name, FirebaseServer.userName())
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
