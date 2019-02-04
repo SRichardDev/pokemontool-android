@@ -332,7 +332,7 @@ class MapFragment: Fragment() {
     fun updateData() {
         // firebase....
 
-        FirebaseServer.updateUserName("testName")
+        geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) }
     }
 
 

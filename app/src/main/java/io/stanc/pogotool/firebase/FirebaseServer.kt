@@ -5,9 +5,11 @@ import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import io.stanc.pogotool.R
 import io.stanc.pogotool.WaitingSpinner
+import io.stanc.pogotool.geohash.GeoHash
+import com.google.android.gms.tasks.OnSuccessListener
 
 
 object FirebaseServer {
@@ -110,12 +112,71 @@ object FirebaseServer {
         return auth.currentUser
     }
 
-    fun userName(): String? {
+    /**
+     * data registration
+     */
 
-//        return auth.currentUser?.let { user ->
-//            database.child(DATABASE_USERS).child(user.uid).child(DATABASE_USER_TRAINER_NAME).
-//        } ?: kotlin.run { null }
-        return null
+    fun registerForUserName(onUserNameChanged: (userName: String) -> Unit) {
+        registerForUserData(DATABASE_USER_TRAINER_NAME, onUserNameChanged)
+    }
+
+    private fun registerForUserData(dataKey: String, onDataChanged: (data: String) -> Unit) {
+
+        auth.currentUser?.let { user ->
+            database.child(DATABASE_USERS).child(user.uid).child(dataKey).addValueEventListener(object : ValueEventListener {
+
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.w(this.javaClass.name, "onCancelled(error: ${p0.code}, message: ${p0.message})")
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    Log.d(this.javaClass.name, "onDataChange(data: ${p0.value})")
+                    (p0.value as? String)?.let { onDataChanged(it) }
+                }
+            })
+        }
+    }
+
+    private fun registerForArea(geoHash: GeoHash, onDataChanged: (data: String) -> Unit) {
+
+        auth.currentUser?.let { user ->
+            database.child(DATABASE_ARENAS).child(geoHash.hashCode().toString()).addValueEventListener(object : ValueEventListener {
+
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.w(this.javaClass.name, "onCancelled(error: ${p0.code}, message: ${p0.message})")
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    Log.d(this.javaClass.name, "onDataChange(data: ${p0.value})")
+                    (p0.value as? String)?.let { onDataChanged(it) }
+                }
+            })
+        }
+    }
+
+    fun subscribeForPush(geohash: GeoHash) {
+
+        auth.currentUser?.let { user ->
+
+            user.getIdToken(false).addOnSuccessListener { taskSnapshot ->
+                Log.d(this.javaClass.name, "getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
+                taskSnapshot.token?.let { token ->
+
+                    val data = HashMap<String, String>()
+                    data[token] = user.uid
+
+                    updateData(DATABASE_ARENAS, data, geohash)
+                    updateData(DATABASE_POKESTOPS, data, geohash)
+                    updateData(DATABASE_RAID_BOSSES, data, geohash)
+                }
+
+            }
+        }
+
+    }
+
+    fun updateData(type: String, data: Map<String, String>, geoHash: GeoHash) {
+        database.child(type).child(geoHash.hashCode().toString()).child(DATABASE_REG_USER).updateChildren(data)
     }
 
     fun usersAuthenticationStateText(context: Context): String {
@@ -160,5 +221,6 @@ object FirebaseServer {
     private const val DATABASE_ARENAS = "arenas"
     private const val DATABASE_POKESTOPS = "pokestops"
     private const val DATABASE_RAID_BOSSES = "raidBosses"
+    private const val DATABASE_REG_USER = "registered_user"
 
 }

@@ -116,7 +116,10 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseServer.userName())
+
+        FirebaseServer.registerForUserName(onUserNameChanged = { userName ->
+            nav_info?.text = getString(R.string.user_name, userName)
+        })
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

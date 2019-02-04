@@ -21,6 +21,16 @@
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
             app:headerLayout="@layout/layout_nav_header"
-            app:menu="@menu/menu_nav_drawer"/>
+            app:menu="@menu/menu_nav_drawer">
+
+        <TextView
+            android:id="@+id/nav_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_margin="@dimen/item_padding_default"
+            tools:text="test"/>
+
+    </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>

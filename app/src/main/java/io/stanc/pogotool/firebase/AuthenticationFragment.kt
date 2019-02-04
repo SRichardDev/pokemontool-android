@@ -28,6 +28,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         authentication_button_sign_up.setOnClickListener(this)
         authentication_button_sign_out.setOnClickListener(this)
         authentication_button_verify_email.setOnClickListener(this)
+        authentication_button_user_name.setOnClickListener(this)
     }
 
     override fun onResume() {
@@ -59,6 +60,16 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
             R.id.authentication_button_verify_email -> {
                 authentication_button_verify_email?.isEnabled = false
                 FirebaseServer.sendEmailVerification(onCompletedVerificationRequest)
+            }
+
+            R.id.authentication_button_user_name -> {
+
+                if (authentication_edittext_user_name.visibility == View.VISIBLE) {
+                    FirebaseServer.updateUserName(authentication_edittext_user_name.text.toString())
+                    authentication_edittext_user_name.visibility = View.GONE
+                } else {
+                    authentication_edittext_user_name.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -157,5 +168,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
         authentication_button_sign_out?.visibility = if (userHasToSignInOrUp) View.GONE else View.VISIBLE
         authentication_button_verify_email?.visibility = if (!userHasToSignInOrUp && !isEmailVerified) View.VISIBLE else View.GONE
+
+        authentication_button_user_name.visibility = if (!userHasToSignInOrUp && isEmailVerified) View.VISIBLE else View.GONE
     }
 }
