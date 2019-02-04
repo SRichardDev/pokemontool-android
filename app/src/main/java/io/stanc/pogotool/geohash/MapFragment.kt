@@ -35,7 +35,7 @@ class MapFragment: Fragment() {
     private var currentLocationMarker: Marker? = null
     private val locationListener = MapLocationListener()
 
-    private var geoHashList: MutableList<GeoHash> = mutableListOf()
+    private val geoHashList: HashMap<GeoHash, Polygon> = HashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +73,7 @@ class MapFragment: Fragment() {
         googleMap?.setOnMapLongClickListener {
 
             if (isLocationPermissionGranted()) {
-//                updateLocationMarker(it)
-                showGeoHashGrid(it)
-//                updateCameraPosition(it)
+                toggleGeoHashGrid(it)
             } else {
                 Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
             }
@@ -84,6 +82,8 @@ class MapFragment: Fragment() {
         if (isLocationPermissionGranted()) {
             showCurrentLocation()
         }
+
+        showGeoHashGridList()
     }
 
     override fun onResume() {
@@ -153,20 +153,40 @@ class MapFragment: Fragment() {
      * Location
      */
 
+    private fun toggleGeoHashGrid(latlng: LatLng) {
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
+        toggleGeoHashGrid(geoHash)
+    }
+
+    private fun toggleGeoHashGrid(geoHash: GeoHash) {
+
+        if (geoHashList.contains(geoHash)) {
+            geoHashList.remove(geoHash)?.remove()
+        } else {
+            showGeoHashGrid(geoHash)
+        }
+    }
+
+    private fun showGeoHashGridList() {
+        geoHashList.keys.forEach { showGeoHashGrid(it) }
+    }
+
     private fun showGeoHashGrid(location: Location) {
         val geoHash = GeoHash(location, GEO_HASH_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
     private fun showGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude,
-            GEO_HASH_PRECISION
-        )
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
     private fun showGeoHashGrid(geoHash: GeoHash) {
         Log.d(this::class.java.name, "Debug:: showGeoHashGrid: geoHash: $geoHash, location: ${geoHash.toLocation()}")
+
+        if (geoHashList.contains(geoHash)) {
+            geoHashList[geoHash]?.remove()
+        }
 
         val polygonRect = PolygonOptions()
             .strokeWidth(5.0f)
@@ -179,11 +199,7 @@ class MapFragment: Fragment() {
                 LatLng(geoHash.boundingBox.bottomLeft.latitude, geoHash.boundingBox.bottomLeft.longitude)
             )
 
-        // Get back the mutable Polygon?
-        googleMap?.addPolygon(polygonRect)
-
-        // update list
-        geoHashList.add(geoHash)
+        googleMap?.addPolygon(polygonRect)?.let { geoHashList[geoHash] = it }
     }
 
     fun updateCurrentLocation() {
@@ -315,6 +331,8 @@ class MapFragment: Fragment() {
     // TODO... -> FirebaseServer.kt
     fun updateData() {
         // firebase....
+
+        FirebaseServer.updateUserName("testName")
     }
 
 
