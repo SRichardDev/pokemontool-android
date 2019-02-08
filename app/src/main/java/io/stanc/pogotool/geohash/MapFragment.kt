@@ -40,7 +40,6 @@ class MapFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(this::class.java.name, "Debug:: onCreate()")
         if (!isLocationPermissionGranted()) {
             requestPermissions(
                 LOCATION_PERMISSIONS,
@@ -88,26 +87,23 @@ class MapFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.d(this::class.java.name, "Debug:: onResume()")
         mapView?.onResume()
         checkGPS()
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(this::class.java.name, "Debug:: onPause()")
         mapView?.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(this::class.java.name, "Debug:: onDestroy()")
         mapView?.onDestroy()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        Log.w(this::class.java.name, "Debug:: onLowMemory()")
+        Log.w(this::class.java.name, "onLowMemory()")
         mapView?.onLowMemory()
     }
 
@@ -335,8 +331,9 @@ class MapFragment: Fragment() {
         geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) }
     }
 
-
     companion object {
+
+        private val TAG = this::class.java.name
 
         private val LOCATION_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         private const val REQUEST_CODE_LOCATION = 12349
@@ -352,6 +349,5 @@ class MapFragment: Fragment() {
         private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
 
         private const val GEO_HASH_PRECISION: Int = 6
-
     }
 }

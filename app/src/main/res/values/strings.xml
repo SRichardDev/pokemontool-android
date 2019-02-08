@@ -31,7 +31,8 @@
     <string name="authentication_button_sign_up">Sign Up</string>
     <string name="authentication_button_sign_out">Sign Out</string>
     <string name="authentication_button_verify_email">Verify Email</string>
-    <string name="authentication_button_user_name">Change Username</string>
+    <string name="authentication_button_open_user_name">Change Username</string>
+    <string name="authentication_button_send_user_name">Type to update Username</string>
 
     <string name="authentication_hint_email">type your email here…</string>
     <string name="authentication_hint_password">type your password here…</string>

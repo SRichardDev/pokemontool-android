@@ -5,11 +5,13 @@ import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
-import io.stanc.pogotool.R
+import io.stanc.pogotool.NavDrawerActivity
 import io.stanc.pogotool.WaitingSpinner
 import io.stanc.pogotool.geohash.GeoHash
-import com.google.android.gms.tasks.OnSuccessListener
+import io.stanc.pogotool.R
+import java.lang.ref.WeakReference
 
 
 object FirebaseServer {
@@ -18,6 +20,94 @@ object FirebaseServer {
 //    private val firebase = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
+    private var currentUserLocal: io.stanc.pogotool.firebase.FirebaseUserLocal? = null
+
+    fun start() {
+        auth.addAuthStateListener { onAuthStateChanged(it) }
+    }
+
+    fun stop() {
+        auth.removeAuthStateListener { onAuthStateChanged }
+    }
+
+
+    /**
+     * authentication listener
+     */
+
+    private val authStateObservers = mutableListOf<WeakReference<AuthStateObserver>>()
+
+    enum class AuthState {
+        UserLoggedOut,
+        UserLoggedInButUnverified,
+        UserLoggedIn
+    }
+    interface AuthStateObserver {
+        fun authStateChanged(newAuthState: AuthState)
+    }
+
+//  TODO: see https://firebase.google.com/docs/auth/web/manage-users
+    fun addAuthStateObserver(observer: AuthStateObserver) {
+        val weakObserver = WeakReference(observer)
+        authStateObservers.add(weakObserver)
+    }
+
+    fun removeAuthStateObserver(observer: AuthStateObserver) {
+        val weakObserver = WeakReference(observer)
+
+        val checkCount = authStateObservers.count()
+        authStateObservers.remove(weakObserver)
+        val newCheckCount = authStateObservers.count()
+        if (newCheckCount >= checkCount) {
+            Log.e(TAG, "removing observer failed: checkCount: $checkCount, newCheckCount: $newCheckCount")
+        }
+    }
+
+    private val onAuthStateChanged: (firebaseAuth: FirebaseAuth) -> Unit = { firebaseAuth ->
+
+        updateUserProfile(firebaseAuth.currentUser)
+
+        firebaseAuth.currentUser?.let { firebaseUser ->
+
+            Log.i(TAG, "onAuthStateChanged: $currentUserLocal")
+            if (firebaseUser.isEmailVerified) {
+                authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedIn) }
+            } else {
+                authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedInButUnverified) }
+            }
+
+        } ?: kotlin.run {
+            Log.i(TAG, "onAuthStateChanged: $currentUserLocal")
+            authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedOut) }
+        }
+    }
+
+    /**
+     * user profile listener
+     */
+
+    private val userProfileObservers = mutableListOf<WeakReference<UserProfileObserver>>()
+
+    interface UserProfileObserver {
+        fun userProfileChanged(user: FirebaseUserLocal)
+    }
+
+    //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
+    fun addUserProfileObserver(observer: UserProfileObserver) {
+        val weakObserver = WeakReference(observer)
+        userProfileObservers.add(weakObserver)
+    }
+
+    fun removeUserProfileObserver(observer: UserProfileObserver) {
+        val weakObserver = WeakReference(observer)
+
+        val checkCount = userProfileObservers.count()
+        userProfileObservers.remove(weakObserver)
+        val newCheckCount = userProfileObservers.count()
+        if (newCheckCount >= checkCount) {
+            Log.e(TAG, "removing observer failed: checkCount: $checkCount, newCheckCount: $newCheckCount")
+        }
+    }
 
     /**
      * authentication methods
@@ -34,7 +124,7 @@ object FirebaseServer {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {task ->
 
             if (!task.isSuccessful) {
-                Log.w(this.javaClass.name, "signing up failed with error: ${task.exception?.message}")
+                Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
             }
 
             onCompletedCallback(task.isSuccessful)
@@ -53,7 +143,7 @@ object FirebaseServer {
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
 
             if (!task.isSuccessful) {
-                Log.w(this.javaClass.name, "signing in failed with error: ${task.exception?.message}")
+                Log.w(TAG, "signing in failed with error: ${task.exception?.message}")
             }
 
             onCompletedCallback(task.isSuccessful)
@@ -75,65 +165,91 @@ object FirebaseServer {
             user.sendEmailVerification().addOnCompleteListener { task ->
 
                 if (!task.isSuccessful) {
-                    Log.w(this.javaClass.name, "email verification failed with error: ${task.exception?.message}")
+                    Log.w(TAG, "email verification failed with error: ${task.exception?.message}")
                 }
 
                 WaitingSpinner.hideProgress()
                 onCompletedCallback(task.isSuccessful)
             }
-        } ?: kotlin.run { Log.w(this.javaClass.name, "can not send email verification because current user is null!") }
+        } ?: kotlin.run { Log.w(TAG, "can not send email verification because current currentUserLocal is null!") }
     }
 
+    fun deleteUser() {
+        // TODO...
+//        ...
+//        updateUserProfile()
+    }
 
     /**
-     * user methods
+     * currentUserLocal methods
      */
 
     fun updateUserData(context: Context, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        Log.d(TAG, "Debug:: updateUserData()")
 
         auth.currentUser?.reload()?.addOnCompleteListener { task ->
 
-            if (!task.isSuccessful) {
-                Log.w(this.javaClass.name, "reloading user data failed with error: ${task.exception?.message}")
+            if (task.isSuccessful) {
+                updateUserProfile(auth.currentUser)
+            } else {
+                Log.w(TAG, "reloading currentUserLocal data failed with error: ${task.exception?.message}")
+                Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
             }
 
             onCompletedCallback(task.isSuccessful)
+        }
+    }
 
-            if (!task.isSuccessful) {
-                Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
+    private fun updateUserProfile(user: FirebaseUser?) {
+
+        Log.d(TAG, "Debug:: updateUserProfile(${user?.displayName})")
+        if (user != null) {
+
+            FirebaseUserLocal(
+                user.displayName,
+                user.email,
+                user.photoUrl,
+                user.isEmailVerified
+            ).let { userLocal ->
+
+                currentUserLocal = userLocal
+                userProfileObservers.forEach { it.get()?.userProfileChanged(userLocal) }
             }
+
+        } else {
+            currentUserLocal = null
+            userProfileObservers.forEach { it.get()?.userProfileChanged(FirebaseUserLocal(null, null, null, false)) }
         }
     }
 
     /**
-     * Get user info if logged in, null otherwise
+     * Get currentUserLocal info if logged in, null otherwise
      */
-    fun user(): FirebaseUser? {
-        return auth.currentUser
+    fun user(): FirebaseUserLocal? {
+        return currentUserLocal
     }
 
     /**
      * data registration
      */
 
-    fun registerForUserName(onUserNameChanged: (userName: String) -> Unit) {
-        registerForUserData(DATABASE_USER_TRAINER_NAME, onUserNameChanged)
-    }
+    fun changeUserName(newUserName: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-    private fun registerForUserData(dataKey: String, onDataChanged: (data: String) -> Unit) {
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(newUserName)
+            .setPhotoUri(currentUserLocal?.photoURL)
+            .build()
 
-        auth.currentUser?.let { user ->
-            database.child(DATABASE_USERS).child(user.uid).child(dataKey).addValueEventListener(object : ValueEventListener {
+        auth.currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.i(TAG, "User profile updated.")
+                updateUserProfile(auth.currentUser)
+                onCompletedCallback(true)
+            } else {
 
-                override fun onCancelled(p0: DatabaseError) {
-                    Log.w(this.javaClass.name, "onCancelled(error: ${p0.code}, message: ${p0.message})")
-                }
-
-                override fun onDataChange(p0: DataSnapshot) {
-                    Log.d(this.javaClass.name, "onDataChange(data: ${p0.value})")
-                    (p0.value as? String)?.let { onDataChanged(it) }
-                }
-            })
+                Log.w(TAG, "User profile update failed. Error: ${task.exception?.message}")
+                onCompletedCallback(false)
+            }
         }
     }
 
@@ -143,11 +259,11 @@ object FirebaseServer {
             database.child(DATABASE_ARENAS).child(geoHash.hashCode().toString()).addValueEventListener(object : ValueEventListener {
 
                 override fun onCancelled(p0: DatabaseError) {
-                    Log.w(this.javaClass.name, "onCancelled(error: ${p0.code}, message: ${p0.message})")
+                    Log.w(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message})")
                 }
 
                 override fun onDataChange(p0: DataSnapshot) {
-                    Log.d(this.javaClass.name, "onDataChange(data: ${p0.value})")
+                    Log.d(TAG, "onDataChange(data: ${p0.value})")
                     (p0.value as? String)?.let { onDataChanged(it) }
                 }
             })
@@ -159,20 +275,18 @@ object FirebaseServer {
         auth.currentUser?.let { user ->
 
             user.getIdToken(false).addOnSuccessListener { taskSnapshot ->
-                Log.d(this.javaClass.name, "getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
-                taskSnapshot.token?.let { token ->
-
-                    val data = HashMap<String, String>()
-                    data[token] = user.uid
-
-                    updateData(DATABASE_ARENAS, data, geohash)
-                    updateData(DATABASE_POKESTOPS, data, geohash)
-                    updateData(DATABASE_RAID_BOSSES, data, geohash)
-                }
-
+                Log.d(TAG, "getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
+//                taskSnapshot.token?.let { token ->
+//
+//                    val data = HashMap<String, String>()
+//                    data[token] = user.uid
+//
+//                    updateData(DATABASE_ARENAS, data, geohash)
+//                    updateData(DATABASE_POKESTOPS, data, geohash)
+//                    updateData(DATABASE_RAID_BOSSES, data, geohash)
+//                }
             }
         }
-
     }
 
     fun updateData(type: String, data: Map<String, String>, geoHash: GeoHash) {
@@ -183,7 +297,7 @@ object FirebaseServer {
 
         return FirebaseServer.user()?.let { user ->
 
-            if (user.isEmailVerified) {
+            if (user.isVerified) {
                 context.getString(R.string.authentication_state_signed_in, user.email)
             } else {
                 context.getString(R.string.authentication_state_signed_in_but_missing_verification, user.email)
@@ -194,27 +308,11 @@ object FirebaseServer {
         }
     }
 
-    fun updateUserName(name: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        auth.currentUser?.let { user ->
-
-            val data = HashMap<String, Any>()
-            data[DATABASE_USER_TRAINER_NAME] = name
-
-            database.database.getReference(DATABASE_USERS).child(user.uid).updateChildren(data).addOnCompleteListener { task ->
-
-                if (!task.isSuccessful) {
-                    Log.w(this.javaClass.name, "update user name failed with error: ${task.exception?.message}")
-                }
-
-                onCompletedCallback(task.isSuccessful)
-            }
-        }
-    }
-
     /**
      * database
      */
+
+    private val TAG = this.javaClass.name
 
     private const val DATABASE_USERS = "users"
     private const val DATABASE_USER_TRAINER_NAME = "trainerName"

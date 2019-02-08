@@ -9,12 +9,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import io.stanc.pogotool.R
 import io.stanc.pogotool.WaitingSpinner
+import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.layout_fragment_authentication.*
 
 class AuthenticationFragment: Fragment(), View.OnClickListener {
 
+    private var rootView: View? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.layout_fragment_authentication, container, false) as ViewGroup
+        rootView = inflater.inflate(R.layout.layout_fragment_authentication, container, false) as ViewGroup
+        return rootView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,12 +34,21 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         authentication_button_sign_out.setOnClickListener(this)
         authentication_button_verify_email.setOnClickListener(this)
         authentication_button_user_name.setOnClickListener(this)
+
+        updateUI()
     }
 
     override fun onResume() {
         super.onResume()
-        updateUI()
-        context?.let { FirebaseServer.updateUserData(it, onCompletedReloading) }
+        FirebaseServer.addAuthStateObserver(authStateObserver)
+        FirebaseServer.addUserProfileObserver(userProfileObserver)
+        context?.let { FirebaseServer.updateUserData(it, onCompletedReloadingRequest) }
+    }
+
+    override fun onStop() {
+        FirebaseServer.removeAuthStateObserver(authStateObserver)
+        FirebaseServer.removeUserProfileObserver(userProfileObserver)
+        super.onStop()
     }
 
     override fun onClick(v: View) {
@@ -42,20 +56,17 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
             R.id.authentication_button_sign_up -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signUp(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedUp)
+                    FirebaseServer.signUp(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedUpRequest)
                 }
             }
 
             R.id.authentication_button_sign_in -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signIn(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedIn)
+                    FirebaseServer.signIn(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedInRequest)
                 }
             }
 
-            R.id.authentication_button_sign_out -> {
-                FirebaseServer.signOut()
-                updateUI()
-            }
+            R.id.authentication_button_sign_out -> FirebaseServer.signOut()
 
             R.id.authentication_button_verify_email -> {
                 authentication_button_verify_email?.isEnabled = false
@@ -65,56 +76,69 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
             R.id.authentication_button_user_name -> {
 
                 if (authentication_edittext_user_name.visibility == View.VISIBLE) {
-                    FirebaseServer.updateUserName(authentication_edittext_user_name.text.toString())
+
+                    FirebaseServer.changeUserName(authentication_edittext_user_name.text.toString())
+
                     authentication_edittext_user_name.visibility = View.GONE
+                    authentication_button_user_name.text = getString(R.string.authentication_button_open_user_name)
+                    KotlinUtils.safeLet(context, rootView) { _context, view -> SystemUtils.hideKeyboardFrom(_context, view) }
+
                 } else {
                     authentication_edittext_user_name.visibility = View.VISIBLE
+                    authentication_button_user_name.text = getString(R.string.authentication_button_send_user_name)
+                    context?.let { SystemUtils.showKeyboard(it) }
                 }
             }
         }
     }
 
     /**
-     * authentication completed callbacks
+     * firebase observer
      */
 
-    private val onCompletedSignedUp = { taskSuccessful: Boolean ->
-        if (taskSuccessful) {
-            updateUI()
-        } else {
-            Toast.makeText(context, getString(R.string.authentication_state_authentication_failed), Toast.LENGTH_LONG).show()
+    private val authStateObserver = object: FirebaseServer.AuthStateObserver {
+        override fun authStateChanged(newAuthState: FirebaseServer.AuthState) {
+            when (newAuthState) {
+                FirebaseServer.AuthState.UserLoggedOut -> updateUI()
+                FirebaseServer.AuthState.UserLoggedInButUnverified -> authentication_button_verify_email?.isEnabled = true
+                FirebaseServer.AuthState.UserLoggedIn -> updateUI()
+            }
         }
     }
 
-    private val onCompletedSignedIn = { taskSuccessful: Boolean ->
-        if (taskSuccessful) {
+    private val userProfileObserver = object: FirebaseServer.UserProfileObserver {
+        override fun userProfileChanged(user: FirebaseUserLocal) {
             updateUI()
-        } else {
-            Toast.makeText(context, getString(R.string.authentication_state_authentication_failed), Toast.LENGTH_LONG).show()
         }
     }
 
-    private val onCompletedReloading = { taskSuccessful: Boolean ->
-        if (taskSuccessful) {
-            updateUI()
-        } else {
+//    TODO: move onCompleted<XY>Request to FirebaseServer as default callbacks
+    private val onCompletedSignedUpRequest = { taskSuccessful: Boolean ->
+        if (!taskSuccessful) {
+            Toast.makeText(context, getString(R.string.authentication_state_authentication_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+    private val onCompletedSignedInRequest = { taskSuccessful: Boolean ->
+        if (!taskSuccessful) {
+            Toast.makeText(context, getString(R.string.authentication_state_authentication_failed), Toast.LENGTH_LONG).show()
+        }
+    }
+    private val onCompletedReloadingRequest = { taskSuccessful: Boolean ->
+        if (!taskSuccessful) {
             Toast.makeText(context, getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
         }
     }
-
     private val onCompletedVerificationRequest = { taskSuccessful: Boolean ->
         if (taskSuccessful) {
             Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.user()?.email), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(context, getString(R.string.authentication_state_verification_failed), Toast.LENGTH_LONG).show()
         }
-
-        authentication_button_verify_email?.isEnabled = true
     }
 
 
     /**
-     * authentication methods
+     * ui methods
      */
 
     private fun checkEditTextsInputsIsValid(): Boolean {
@@ -145,7 +169,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         WaitingSpinner.hideProgress()
 
         FirebaseServer.user()?.let { user ->
-            updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = user.isEmailVerified)
+            updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = user.isVerified)
 
         } ?: kotlin.run {
             updateSignButtons(userHasToSignInOrUp = true)
@@ -169,6 +193,11 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         authentication_button_sign_out?.visibility = if (userHasToSignInOrUp) View.GONE else View.VISIBLE
         authentication_button_verify_email?.visibility = if (!userHasToSignInOrUp && !isEmailVerified) View.VISIBLE else View.GONE
 
-        authentication_button_user_name.visibility = if (!userHasToSignInOrUp && isEmailVerified) View.VISIBLE else View.GONE
+        authentication_button_user_name?.visibility = if (!userHasToSignInOrUp && isEmailVerified) View.VISIBLE else View.GONE
+    }
+
+    companion object {
+
+        private val TAG = this::class.java.name
     }
 }

@@ -5,16 +5,20 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import io.stanc.pogotool.firebase.AuthenticationFragment
 import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.firebase.FirebaseUserLocal
 import io.stanc.pogotool.geohash.MapFragment
+import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
 import kotlinx.android.synthetic.main.layout_activity_drawer.*
 import kotlinx.android.synthetic.main.layout_nav_header.*
 import kotlinx.android.synthetic.main.layout_progress.*
+import java.lang.ref.WeakReference
 
 
 class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -34,11 +38,13 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
 
         // navigation drawer
+        val weakActivity = WeakReference(this)
         val toggle = object : ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
 
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
-                updateNavText()
+                weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
+                removeAuthFragment()
             }
         }
 
@@ -55,7 +61,15 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     override fun onResume() {
         super.onResume()
-        updateNavText()
+        FirebaseServer.start()
+        FirebaseServer.addUserProfileObserver(userProfileObserver)
+        FirebaseServer.updateUserData(baseContext)
+    }
+
+    override fun onStop() {
+        FirebaseServer.removeUserProfileObserver(userProfileObserver)
+        FirebaseServer.stop()
+        super.onStop()
     }
 
     /**
@@ -68,17 +82,23 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             MapFragment(), MapFragment::class.java.name).commit()
     }
 
-    private fun toggleAuthenticationFragment() {
-        val fragmentTag = AuthenticationFragment::class.java.name
+    private fun showAuthFragment() {
 
+        val fragmentTag = AuthenticationFragment::class.java.name
+        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+
+        if (fragment == null) {
+            fragment = AuthenticationFragment()
+        }
+
+        supportFragmentManager.beginTransaction().add(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
+    }
+
+    private fun removeAuthFragment() {
+
+        val fragmentTag = AuthenticationFragment::class.java.name
         supportFragmentManager?.findFragmentByTag(fragmentTag)?.let { fragment ->
             supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
-
-        } ?: kotlin.run {
-
-            val fragment = AuthenticationFragment()
-            supportFragmentManager.beginTransaction().add(R.id.activity_content_framelayout,
-                fragment, fragmentTag).commit()
         }
     }
 
@@ -114,29 +134,37 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Navigation drawer
      */
 
+    private val userProfileObserver = object : FirebaseServer.UserProfileObserver {
+        override fun userProfileChanged(user: FirebaseUserLocal) {
+            Log.d(TAG, "Debug:: userProfileChanged(${user.name})")
+            updateNavText()
+        }
+    }
+
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
-
-        FirebaseServer.registerForUserName(onUserNameChanged = { userName ->
-            nav_info?.text = getString(R.string.user_name, userName)
-        })
+        nav_info?.text = getString(R.string.user_name, FirebaseServer.user()?.name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_authentication -> {
-                toggleAuthenticationFragment()
+                showAuthFragment()
             }
             R.id.nav_share -> {
-
+                // TODO
             }
             R.id.nav_send -> {
-
+                // TODO
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    companion object {
+        private val TAG = this::class.java.name
     }
 }
