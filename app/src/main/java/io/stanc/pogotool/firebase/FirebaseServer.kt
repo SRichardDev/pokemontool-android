@@ -7,10 +7,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
-import io.stanc.pogotool.NavDrawerActivity
+import io.stanc.pogotool.R
 import io.stanc.pogotool.WaitingSpinner
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.R
 import java.lang.ref.WeakReference
 
 
@@ -18,6 +17,7 @@ object FirebaseServer {
 
 //    TODO: refactor: use FirebaseFirestore instaed of FirebaseAuth
 //    private val firebase = FirebaseFirestore.getInstance()
+
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
     private var currentUserLocal: io.stanc.pogotool.firebase.FirebaseUserLocal? = null
@@ -35,7 +35,7 @@ object FirebaseServer {
      * authentication listener
      */
 
-    private val authStateObservers = mutableListOf<WeakReference<AuthStateObserver>>()
+    private val authStateObservers = HashMap<Int, WeakReference<AuthStateObserver>>()
 
     enum class AuthState {
         UserLoggedOut,
@@ -49,17 +49,16 @@ object FirebaseServer {
 //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
     fun addAuthStateObserver(observer: AuthStateObserver) {
         val weakObserver = WeakReference(observer)
-        authStateObservers.add(weakObserver)
+        authStateObservers[observer.hashCode()] = weakObserver
     }
 
     fun removeAuthStateObserver(observer: AuthStateObserver) {
-        val weakObserver = WeakReference(observer)
 
         val checkCount = authStateObservers.count()
-        authStateObservers.remove(weakObserver)
+        authStateObservers.remove(observer.hashCode())
         val newCheckCount = authStateObservers.count()
         if (newCheckCount >= checkCount) {
-            Log.e(TAG, "removing observer failed: checkCount: $checkCount, newCheckCount: $newCheckCount")
+            Log.e(TAG, "could not remove observer: $observer from list: checkCount: $checkCount, newCheckCount: $newCheckCount")
         }
     }
 
@@ -71,14 +70,23 @@ object FirebaseServer {
 
             Log.i(TAG, "onAuthStateChanged: $currentUserLocal")
             if (firebaseUser.isEmailVerified) {
-                authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedIn) }
+                authStateObservers.forEach { it.value.get()?.authStateChanged(AuthState.UserLoggedIn) }
             } else {
-                authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedInButUnverified) }
+                authStateObservers.forEach { it.value.get()?.authStateChanged(AuthState.UserLoggedInButUnverified) }
+            }
+
+            registerForNotificationToken(firebaseUser, onDataChanged = { notificationToken ->
+                Log.i(TAG, "Debug:: new notificationToken: $notificationToken")
+                currentUserLocal?.notificationToken = notificationToken
+            })
+
+            firebaseUser.getIdToken(true).addOnSuccessListener { taskSnapshot ->
+                Log.i(TAG, "Debug:: new getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
             }
 
         } ?: kotlin.run {
             Log.i(TAG, "onAuthStateChanged: $currentUserLocal")
-            authStateObservers.forEach { it.get()?.authStateChanged(AuthState.UserLoggedOut) }
+            authStateObservers.forEach { it.value.get()?.authStateChanged(AuthState.UserLoggedOut) }
         }
     }
 
@@ -86,7 +94,7 @@ object FirebaseServer {
      * user profile listener
      */
 
-    private val userProfileObservers = mutableListOf<WeakReference<UserProfileObserver>>()
+    private val userProfileObservers = HashMap<Int, WeakReference<UserProfileObserver>>()
 
     interface UserProfileObserver {
         fun userProfileChanged(user: FirebaseUserLocal)
@@ -95,17 +103,16 @@ object FirebaseServer {
     //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
     fun addUserProfileObserver(observer: UserProfileObserver) {
         val weakObserver = WeakReference(observer)
-        userProfileObservers.add(weakObserver)
+        userProfileObservers[observer.hashCode()] = weakObserver
     }
 
     fun removeUserProfileObserver(observer: UserProfileObserver) {
-        val weakObserver = WeakReference(observer)
 
         val checkCount = userProfileObservers.count()
-        userProfileObservers.remove(weakObserver)
+        userProfileObservers.remove(observer.hashCode())
         val newCheckCount = userProfileObservers.count()
         if (newCheckCount >= checkCount) {
-            Log.e(TAG, "removing observer failed: checkCount: $checkCount, newCheckCount: $newCheckCount")
+            Log.e(TAG, "could not remove observer: $observer from list: checkCount: $checkCount, newCheckCount: $newCheckCount")
         }
     }
 
@@ -185,7 +192,6 @@ object FirebaseServer {
      */
 
     fun updateUserData(context: Context, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        Log.d(TAG, "Debug:: updateUserData()")
 
         auth.currentUser?.reload()?.addOnCompleteListener { task ->
 
@@ -202,23 +208,26 @@ object FirebaseServer {
 
     private fun updateUserProfile(user: FirebaseUser?) {
 
-        Log.d(TAG, "Debug:: updateUserProfile(${user?.displayName})")
         if (user != null) {
 
             FirebaseUserLocal(
                 user.displayName,
                 user.email,
-                user.photoUrl,
-                user.isEmailVerified
+                user.isEmailVerified,
+                user.uid,
+                null,
+                user.photoUrl
             ).let { userLocal ->
 
                 currentUserLocal = userLocal
-                userProfileObservers.forEach { it.get()?.userProfileChanged(userLocal) }
+                userProfileObservers.forEach { it.value.get()?.userProfileChanged(userLocal) }
             }
 
         } else {
-            currentUserLocal = null
-            userProfileObservers.forEach { it.get()?.userProfileChanged(FirebaseUserLocal(null, null, null, false)) }
+
+            val emptyUserLocal = FirebaseUserLocal()
+            currentUserLocal = emptyUserLocal
+            userProfileObservers.forEach { it.value.get()?.userProfileChanged(emptyUserLocal) }
         }
     }
 
@@ -228,10 +237,6 @@ object FirebaseServer {
     fun user(): FirebaseUserLocal? {
         return currentUserLocal
     }
-
-    /**
-     * data registration
-     */
 
     fun changeUserName(newUserName: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
@@ -253,44 +258,62 @@ object FirebaseServer {
         }
     }
 
-    private fun registerForArea(geoHash: GeoHash, onDataChanged: (data: String) -> Unit) {
+    /**
+     * data registration
+     */
 
-        auth.currentUser?.let { user ->
-            database.child(DATABASE_ARENAS).child(geoHash.hashCode().toString()).addValueEventListener(object : ValueEventListener {
+    private fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
+
+        // just if firebaseUser is logged in
+        auth.currentUser?.let {
+
+            database.child(databaseChildPath).addValueEventListener(object : ValueEventListener {
 
                 override fun onCancelled(p0: DatabaseError) {
-                    Log.w(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message})")
+                    Log.w(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for data: $databaseChildPath")
                 }
 
                 override fun onDataChange(p0: DataSnapshot) {
-                    Log.d(TAG, "onDataChange(data: ${p0.value})")
+                    Log.d(TAG, "onDataChange(data: ${p0.value}) for data: $databaseChildPath")
                     (p0.value as? String)?.let { onDataChanged(it) }
                 }
             })
         }
     }
 
-    fun subscribeForPush(geohash: GeoHash) {
+    private fun registerForArea(geoHash: GeoHash, onDataChanged: (data: String) -> Unit) {
 
+        val databaseChildPath = "$DATABASE_ARENAS/$geoHash"
+        registerForData(databaseChildPath, onDataChanged)
+    }
+
+    private fun registerForNotificationToken(firebaseUser: FirebaseUser, onDataChanged: (data: String) -> Unit) {
+
+        val databaseChildPath = DATABASE_USERS+"/"+firebaseUser.uid+"/"+DATABASE_NOTIFICATION_TOKEN
+        registerForData(databaseChildPath, onDataChanged)
+    }
+
+    fun subscribeForPush(geoHash: GeoHash) {
+
+        Log.d(TAG, "Debug:: subscribeForPush(geoHash: $geoHash)")
         auth.currentUser?.let { user ->
 
-            user.getIdToken(false).addOnSuccessListener { taskSnapshot ->
-                Log.d(TAG, "getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
-//                taskSnapshot.token?.let { token ->
-//
-//                    val data = HashMap<String, String>()
-//                    data[token] = user.uid
-//
-//                    updateData(DATABASE_ARENAS, data, geohash)
-//                    updateData(DATABASE_POKESTOPS, data, geohash)
-//                    updateData(DATABASE_RAID_BOSSES, data, geohash)
-//                }
+            Log.d(TAG, "Debug:: subscribeForPush, user logged in")
+            currentUserLocal?.notificationToken?.let { notificationToken ->
+
+                Log.d(TAG, "Debug:: subscribeForPush, user has token: $notificationToken")
+                val data = HashMap<String, String>()
+                data[notificationToken] = user.uid
+
+                updateDataForRegisteredUser("$DATABASE_ARENAS/$geoHash", data)
+                updateDataForRegisteredUser("$DATABASE_POKESTOPS/$geoHash", data)
+                updateDataForRegisteredUser("$DATABASE_RAID_BOSSES/$geoHash", data)
             }
         }
     }
 
-    fun updateData(type: String, data: Map<String, String>, geoHash: GeoHash) {
-        database.child(type).child(geoHash.hashCode().toString()).child(DATABASE_REG_USER).updateChildren(data)
+    private fun updateDataForRegisteredUser(databaseChildPath: String, data: Map<String, String>) {
+        database.child(databaseChildPath).child(DATABASE_REG_USER).updateChildren(data)
     }
 
     fun usersAuthenticationStateText(context: Context): String {
@@ -320,5 +343,6 @@ object FirebaseServer {
     private const val DATABASE_POKESTOPS = "pokestops"
     private const val DATABASE_RAID_BOSSES = "raidBosses"
     private const val DATABASE_REG_USER = "registered_user"
+    private const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 
 }

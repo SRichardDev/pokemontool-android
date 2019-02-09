@@ -66,10 +66,10 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseServer.updateUserData(baseContext)
     }
 
-    override fun onStop() {
+    override fun onPause() {
         FirebaseServer.removeUserProfileObserver(userProfileObserver)
         FirebaseServer.stop()
-        super.onStop()
+        super.onPause()
     }
 
     /**

@@ -3,6 +3,7 @@ package io.stanc.pogotool.firebase
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,10 +46,10 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         context?.let { FirebaseServer.updateUserData(it, onCompletedReloadingRequest) }
     }
 
-    override fun onStop() {
+    override fun onPause() {
         FirebaseServer.removeAuthStateObserver(authStateObserver)
         FirebaseServer.removeUserProfileObserver(userProfileObserver)
-        super.onStop()
+        super.onPause()
     }
 
     override fun onClick(v: View) {
