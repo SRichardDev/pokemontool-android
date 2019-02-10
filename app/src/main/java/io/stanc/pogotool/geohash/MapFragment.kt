@@ -113,14 +113,10 @@ class MapFragment: Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d(MapFragment::class.java.name, "Debug:: onRequestPermissionsResult(requestCode: $requestCode)")
 
         when(requestCode) {
             REQUEST_CODE_LOCATION -> {
-                if (isLocationPermissionGranted()) {
-                    Log.d(MapFragment::class.java.name, "Debug:: onRequestPermissionsResult(), isLocationPermissionGranted: true")
-                    showCurrentLocation()
-                }
+                if (isLocationPermissionGranted()) { showCurrentLocation() }
             }
         }
     }
@@ -178,7 +174,6 @@ class MapFragment: Fragment() {
     }
 
     private fun showGeoHashGrid(geoHash: GeoHash) {
-        Log.d(this::class.java.name, "Debug:: showGeoHashGrid: geoHash: $geoHash, location: ${geoHash.toLocation()}")
 
         if (geoHashList.contains(geoHash)) {
             geoHashList[geoHash]?.remove()
@@ -208,7 +203,6 @@ class MapFragment: Fragment() {
 
     @SuppressLint("MissingPermission")
     private fun showCurrentLocation() {
-        Log.d(this::class.java.name, "Debug:: showCurrentLocation(), googleMap: $googleMap, locationManager: $locationManager")
 
         googleMap?.let { _map ->
 
@@ -216,8 +210,6 @@ class MapFragment: Fragment() {
             _map.isMyLocationEnabled = true
 
             locationManager?.let { _locationManager ->
-
-                Log.d(this::class.java.name, "Debug:: showCurrentLocation() -> requestLocationUpdates")
 
                 // Use the location manager through GPS
                 _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -231,7 +223,6 @@ class MapFragment: Fragment() {
                     updateCameraPosition(it)
                 }
 
-                Log.d(this::class.java.name, "Debug:: showCurrentLocation() -> removeUpdates")
                 //when the current location is found – stop listening for updates (preserves battery)
                 _locationManager.removeUpdates(locationListener)
             }

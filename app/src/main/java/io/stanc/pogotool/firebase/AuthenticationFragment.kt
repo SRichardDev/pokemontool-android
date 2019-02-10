@@ -3,7 +3,6 @@ package io.stanc.pogotool.firebase
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,14 +35,14 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         authentication_button_verify_email.setOnClickListener(this)
         authentication_button_user_name.setOnClickListener(this)
 
-        updateUI()
+        updateUI(FirebaseServer.authState())
     }
 
     override fun onResume() {
         super.onResume()
         FirebaseServer.addAuthStateObserver(authStateObserver)
         FirebaseServer.addUserProfileObserver(userProfileObserver)
-        context?.let { FirebaseServer.updateUserData(it, onCompletedReloadingRequest) }
+        context?.let { FirebaseServer.reloadUserData(it, onCompletedReloadingRequest) }
     }
 
     override fun onPause() {
@@ -99,17 +98,14 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
     private val authStateObserver = object: FirebaseServer.AuthStateObserver {
         override fun authStateChanged(newAuthState: FirebaseServer.AuthState) {
-            when (newAuthState) {
-                FirebaseServer.AuthState.UserLoggedOut -> updateUI()
-                FirebaseServer.AuthState.UserLoggedInButUnverified -> authentication_button_verify_email?.isEnabled = true
-                FirebaseServer.AuthState.UserLoggedIn -> updateUI()
-            }
+            authentication_button_verify_email?.isEnabled = true
+            updateUI(newAuthState)
         }
     }
 
     private val userProfileObserver = object: FirebaseServer.UserProfileObserver {
         override fun userProfileChanged(user: FirebaseUserLocal) {
-            updateUI()
+            updateAuthenticationStateText()
         }
     }
 
@@ -131,7 +127,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     }
     private val onCompletedVerificationRequest = { taskSuccessful: Boolean ->
         if (taskSuccessful) {
-            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.user()?.email), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.user().email), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(context, getString(R.string.authentication_state_verification_failed), Toast.LENGTH_LONG).show()
         }
@@ -165,15 +161,20 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
         return valid
     }
 
-    private fun updateUI() {
+    private fun updateUI(newAuthState: FirebaseServer.AuthState) {
 
         WaitingSpinner.hideProgress()
 
-        FirebaseServer.user()?.let { user ->
-            updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = user.isVerified)
-
-        } ?: kotlin.run {
-            updateSignButtons(userHasToSignInOrUp = true)
+        when (newAuthState) {
+            FirebaseServer.AuthState.UserLoggedOut -> {
+                updateSignButtons(userHasToSignInOrUp = true)
+            }
+            FirebaseServer.AuthState.UserLoggedInButUnverified -> {
+                updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = false)
+            }
+            FirebaseServer.AuthState.UserLoggedIn -> {
+                updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = true)
+            }
         }
 
         updateAuthenticationStateText()

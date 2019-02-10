@@ -63,7 +63,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         super.onResume()
         FirebaseServer.start()
         FirebaseServer.addUserProfileObserver(userProfileObserver)
-        FirebaseServer.updateUserData(baseContext)
+        FirebaseServer.reloadUserData(baseContext)
     }
 
     override fun onPause() {
@@ -143,7 +143,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseServer.user()?.name)
+        nav_info?.text = getString(R.string.user_name, FirebaseServer.user().name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
