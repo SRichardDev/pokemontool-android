@@ -422,4 +422,7 @@ object FirebaseServer {
     private const val DATABASE_REG_USER = "registered_user"
     private const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 
+    const val NOTIFICATION_DATA_LATITUDE = "latitude"
+    const val NOTIFICATION_DATA_LONGITUDE = "longitude"
+
 }

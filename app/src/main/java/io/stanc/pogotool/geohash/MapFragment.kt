@@ -22,6 +22,8 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
+import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
 
 
 class MapFragment: Fragment() {
@@ -31,20 +33,26 @@ class MapFragment: Fragment() {
 
     // location
     private var locationManager: LocationManager? = null
-    private var lastLocation: Location? = null
+    private var lastFocusedLocation: Location? = null
     private var currentLocationMarker: Marker? = null
     private val locationListener = MapLocationListener()
+
+    private var geoHashStartPosition: GeoHash? = null
 
     private val geoHashList: HashMap<GeoHash, Polygon> = HashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (!isLocationPermissionGranted()) {
-            requestPermissions(
-                LOCATION_PERMISSIONS,
-                REQUEST_CODE_LOCATION
-            )
+        activity?.intent?.extras?.let { bundle ->
+
+            Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"$NOTIFICATION_DATA_LONGITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)}, bundle.containsKey(\"$NOTIFICATION_DATA_LATITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LATITUDE)}]")
+
+            if (bundle.containsKey(NOTIFICATION_DATA_LATITUDE) && bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)) {
+                val latitude = (bundle.get(NOTIFICATION_DATA_LATITUDE) as String).toDouble()
+                val longitude = (bundle.get(NOTIFICATION_DATA_LONGITUDE) as String).toDouble()
+                geoHashStartPosition = GeoHash(latitude, longitude, GEO_HASH_PRECISION)
+            }
         }
     }
 
@@ -78,9 +86,7 @@ class MapFragment: Fragment() {
             }
         }
 
-        if (isLocationPermissionGranted()) {
-            showCurrentLocation()
-        }
+        focusStartLocation()
 
         showGeoHashGridList()
     }
@@ -88,7 +94,8 @@ class MapFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
-        checkGPS()
+        checkLocationPermission()
+        checkGPSEnable()
     }
 
     override fun onPause() {
@@ -111,12 +118,18 @@ class MapFragment: Fragment() {
      * Permissions
      */
 
+    private fun checkLocationPermission() {
+        if (!isLocationPermissionGranted()) {
+            requestPermissions(LOCATION_PERMISSIONS, REQUEST_CODE_LOCATION)
+        }
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         when(requestCode) {
             REQUEST_CODE_LOCATION -> {
-                if (isLocationPermissionGranted()) { showCurrentLocation() }
+                if (isLocationPermissionGranted()) { focusStartLocation() }
             }
         }
     }
@@ -142,7 +155,7 @@ class MapFragment: Fragment() {
     }
 
     /**
-     * Location
+     * GeoHash Grid
      */
 
     private fun toggleGeoHashGrid(latlng: LatLng) {
@@ -193,40 +206,58 @@ class MapFragment: Fragment() {
         googleMap?.addPolygon(polygonRect)?.let { geoHashList[geoHash] = it }
     }
 
-    fun updateCurrentLocation() {
+    /**
+     * Location
+     */
+
+    private fun focusStartLocation() {
+
         if (isLocationPermissionGranted()) {
-            showCurrentLocation()
+
+            geoHashStartPosition?.let { focusLocation(it, shouldSetLocationMarker = true) }
+                ?: kotlin.run { focusCurrentLocation() }
+
         } else {
             requestLocationPermission()
+        }
+
+        geoHashStartPosition = null
+    }
+
+    private fun focusLocation(geoHash: GeoHash, shouldSetLocationMarker: Boolean = false) {
+        focusLocation(geoHash.toLocation(), shouldSetLocationMarker)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun focusLocation(location: Location, shouldSetLocationMarker: Boolean = false) {
+
+        googleMap?.let { map ->
+
+            // For showing a move to my location button
+            map.isMyLocationEnabled = true
+
+            locationManager?.let { manager ->
+
+                // Use the location manager through GPS
+                manager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                    LOCATION_UPDATE_MIN_TIME_MILLISECONDS,
+                    LOCATION_UPDATE_MIN_DISTANCE_METER, locationListener)
+
+                updateCameraPosition(location)
+                if (shouldSetLocationMarker) {
+                    updateLocationMarker(location)
+                }
+                lastFocusedLocation = location
+
+                //when the current location is found – stop listening for updates (preserves battery)
+                manager.removeUpdates(locationListener)
+            }
         }
     }
 
     @SuppressLint("MissingPermission")
-    private fun showCurrentLocation() {
-
-        googleMap?.let { _map ->
-
-            // For showing a move to my location button
-            _map.isMyLocationEnabled = true
-
-            locationManager?.let { _locationManager ->
-
-                // Use the location manager through GPS
-                _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    LOCATION_UPDATE_MIN_TIME_MILLISECONDS,
-                    LOCATION_UPDATE_MIN_DISTANCE_METER, locationListener)
-
-                //get the current location (last known location) from the location manager
-                lastLocation = _locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                lastLocation?.let {
-                    updateLocationMarker(it)
-                    updateCameraPosition(it)
-                }
-
-                //when the current location is found – stop listening for updates (preserves battery)
-                _locationManager.removeUpdates(locationListener)
-            }
-        }
+    private fun focusCurrentLocation() {
+        locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { lastLocation -> focusLocation(lastLocation) }
     }
 
     private fun updateLocationMarker(location: Location) {
@@ -285,7 +316,7 @@ class MapFragment: Fragment() {
      * GPS
      */
 
-    private fun checkGPS() {
+    private fun checkGPSEnable() {
 
         locationManager?.let {
 

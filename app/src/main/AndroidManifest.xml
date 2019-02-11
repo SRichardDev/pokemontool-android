@@ -32,7 +32,7 @@
             android:value="@integer/google_play_services_version"/>
 
         <!-- Firebase -->
-        <service android:name="io.stanc.pogotool.firebase.PoGoFirebaseMessagingService">
+        <service android:name="io.stanc.pogotool.firebase.PoGoToolMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
