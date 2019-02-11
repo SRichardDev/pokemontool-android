@@ -14,6 +14,7 @@ import io.stanc.pogotool.WaitingSpinner
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.KotlinUtils
 import java.lang.ref.WeakReference
+import com.google.firebase.database.FirebaseDatabase
 
 
 object FirebaseServer {
@@ -225,8 +226,8 @@ object FirebaseServer {
 
     fun deleteUser() {
         // TODO...
-//        ...
-//        updateUserProfile()
+        // auth.currentUser?.delete()
+        // updateUserProfile()
     }
 
     /**
@@ -265,7 +266,7 @@ object FirebaseServer {
                 updateUserProfile(auth.currentUser)
             } else {
                 Log.w(TAG, "reloading currentUserLocal data failed with error: ${task.exception?.message}")
-                Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_LONG).show()
             }
 
             onCompletedCallback(task.isSuccessful)
@@ -313,6 +314,14 @@ object FirebaseServer {
      * data registration
      */
 
+    // TODO: request data (all GeoHashes for arenas, pokestops, quests, ...)
+    private fun requestData() {
+
+//        val reference = FirebaseDatabase.getInstance().reference
+//
+//        val query = database.child(DATABASE_ARENAS).orderByChild("id").equalTo(0.0)
+    }
+
     private fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
 
         // just if firebaseUser is logged in
@@ -348,48 +357,44 @@ object FirebaseServer {
      * data subscription
      */
 
-    fun subscribeForPush(geoHash: GeoHash) {
+    fun subscribeForPush(geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-        Log.d(TAG, "Debug:: subscribeForPush(geoHash: $geoHash), userID: ${currentUserLocal.id}, notificationToken: ${currentUserLocal.notificationToken}")
+        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${currentUserLocal.id}, notificationToken: ${currentUserLocal.notificationToken}")
         KotlinUtils.safeLet(currentUserLocal.id, currentUserLocal.notificationToken) { id, token ->
 
-            subscripeForArenas(id, token, geoHash)
-            subscripeForPokestops(id, token, geoHash)
-            subscripeForRaids(id, token, geoHash)
-            subscripeForQuests(id, token, geoHash)
+            subscribeForArenas(id, token, geoHash, onCompletedCallback)
+            subscribeForPokestops(id, token, geoHash, onCompletedCallback)
+            subscribeForRaids(id, token, geoHash, onCompletedCallback)
+            subscribeForQuests(id, token, geoHash, onCompletedCallback)
         }
     }
 
-    private fun subscripeForArenas(userId: String, userToken: String, geoHash: GeoHash) {
-        Log.d(TAG, "subscribe for arenas in $geoHash [userId: $userId, userToken: $userToken]")
+    private fun subscribeForArenas(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = HashMap<String, String>()
         data[userToken] = userId
 
-        updateData("$DATABASE_ARENAS/$geoHash/$DATABASE_REG_USER", data)
+        updateData("$DATABASE_ARENAS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
     }
 
-    private fun subscripeForPokestops(userId: String, userToken: String, geoHash: GeoHash) {
-        Log.d(TAG, "subscribe for pokestops in $geoHash [userId: $userId, userToken: $userToken]")
+    private fun subscribeForPokestops(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = HashMap<String, String>()
         data[userToken] = userId
 
-        updateData("$DATABASE_POKESTOPS/$geoHash/$DATABASE_REG_USER", data)
+        updateData("$DATABASE_POKESTOPS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
     }
 
-    private fun subscripeForRaids(userId: String, userToken: String, geoHash: GeoHash) {
-        Log.d(TAG, "subscribe for raids in $geoHash [userId: $userId, userToken: $userToken]")
+    private fun subscribeForRaids(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = HashMap<String, String>()
         data[userToken] = userId
 
-        updateData("$DATABASE_RAID_BOSSES/$geoHash/$DATABASE_REG_USER", data)
+        updateData("$DATABASE_RAID_BOSSES/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
     }
 
-    private fun subscripeForQuests(userId: String, userToken: String, geoHash: GeoHash) {
-        Log.d(TAG, "subscribe for quests in $geoHash [userId: $userId, userToken: $userToken]")
+    private fun subscribeForQuests(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = HashMap<String, String>()
         data[userToken] = userId
 
-        updateData("$DATABASE_QUESTS/$geoHash/$DATABASE_REG_USER", data)
+        updateData("$DATABASE_QUESTS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
     }
 
     /**
@@ -402,9 +407,9 @@ object FirebaseServer {
         } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUserLocal: $currentUserLocal") }
     }
 
-    private fun updateData(databaseChildPath: String, data: Map<String, String>) {
-        Log.d(TAG, "updateData(databaseChildPath: $databaseChildPath, data: $data)")
-        database.child(databaseChildPath).updateChildren(data)
+    private fun updateData(databaseChildPath: String, data: Map<String, String>, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        Log.v(TAG, "update data [databaseChildPath: $databaseChildPath, data: $data]")
+        database.child(databaseChildPath).updateChildren(data).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
     }
 
     /**

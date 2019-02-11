@@ -347,10 +347,18 @@ class MapFragment: Fragment() {
      */
 
     // TODO... -> FirebaseServer.kt
-    fun updateData() {
-        // firebase....
+    fun updateData(context: Context) {
 
-        geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) }
+        var allTasksSuccessful = true
+        geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) { taskSuccessful: Boolean ->
+            if (!taskSuccessful) { allTasksSuccessful = false }
+        } }
+
+        if (allTasksSuccessful) {
+            Toast.makeText(context, context.getString(R.string.locations_sent_sucessfully), Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(context, context.getString(R.string.locations_not_sent_sucessfully), Toast.LENGTH_LONG).show()
+        }
     }
 
     companion object {

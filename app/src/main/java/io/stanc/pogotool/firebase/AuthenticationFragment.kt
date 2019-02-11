@@ -3,6 +3,7 @@ package io.stanc.pogotool.firebase
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -122,7 +123,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     }
     private val onCompletedReloadingRequest = { taskSuccessful: Boolean ->
         if (!taskSuccessful) {
-            Toast.makeText(context, getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_LONG).show()
         }
     }
     private val onCompletedVerificationRequest = { taskSuccessful: Boolean ->

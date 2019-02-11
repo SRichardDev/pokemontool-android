@@ -52,6 +52,7 @@
 
     <!-- Firebase -->
     <string name="user_name">User: %s</string>
-
+    <string name="locations_sent_sucessfully">Locations sent successfully.</string>
+    <string name="locations_not_sent_sucessfully">Locations not send successfully!</string>
 
 </resources>
