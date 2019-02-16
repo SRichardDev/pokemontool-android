@@ -49,9 +49,11 @@ class MapFragment: Fragment() {
             Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"$NOTIFICATION_DATA_LONGITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)}, bundle.containsKey(\"$NOTIFICATION_DATA_LATITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LATITUDE)}]")
 
             if (bundle.containsKey(NOTIFICATION_DATA_LATITUDE) && bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)) {
+
                 val latitude = (bundle.get(NOTIFICATION_DATA_LATITUDE) as String).toDouble()
                 val longitude = (bundle.get(NOTIFICATION_DATA_LONGITUDE) as String).toDouble()
-                geoHashStartPosition = GeoHash(latitude, longitude, GEO_HASH_PRECISION)
+
+                geoHashStartPosition = GeoHash(latitude, longitude)
             }
         }
     }
@@ -159,7 +161,7 @@ class MapFragment: Fragment() {
      */
 
     private fun toggleGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_AREA_PRECISION)
         toggleGeoHashGrid(geoHash)
     }
 
@@ -177,12 +179,12 @@ class MapFragment: Fragment() {
     }
 
     private fun showGeoHashGrid(location: Location) {
-        val geoHash = GeoHash(location, GEO_HASH_PRECISION)
+        val geoHash = GeoHash(location, GEO_HASH_AREA_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
     private fun showGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_PRECISION)
+        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_AREA_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
@@ -378,6 +380,6 @@ class MapFragment: Fragment() {
         private const val ZOOM_LEVEL_STREET: Float = 15.0f
         private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
 
-        private const val GEO_HASH_PRECISION: Int = 6
+        private const val GEO_HASH_AREA_PRECISION: Int = 6
     }
 }
