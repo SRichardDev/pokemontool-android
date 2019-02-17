@@ -16,9 +16,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import com.getbase.floatingactionbutton.FloatingActionButton
+import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
@@ -42,8 +46,10 @@ class MapFragment: Fragment() {
     private val locationListener = MapLocationListener()
 
     private var geoHashStartPosition: GeoHash? = null
-
     private val geoHashList: HashMap<GeoHash, Polygon> = HashMap()
+
+    private var crosshairImage: ImageView? = null
+    private var crosshairAnimation: Animation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +85,10 @@ class MapFragment: Fragment() {
         // floating action buttons
         setupFAB(fragmentLayout)
 
+        // crosshair
+        crosshairAnimation = AnimationUtils.loadAnimation(context, R.anim.flashing)
+        crosshairImage = fragmentLayout.findViewById(R.id.fragment_map_imageview_crosshair)
+
         return fragmentLayout
     }
 
@@ -101,7 +111,7 @@ class MapFragment: Fragment() {
 
     override fun onLowMemory() {
         super.onLowMemory()
-        Log.w(this::class.java.name, "onLowMemory()")
+        Log.w(TAG, "onLowMemory()")
         mapView?.onLowMemory()
     }
 
@@ -129,23 +139,40 @@ class MapFragment: Fragment() {
 
     private fun setupFAB(fragmentLayout: View) {
 
+        fragmentLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
+            override fun onMenuCollapsed() {
+                Log.d(TAG, "Debug:: fab_menu onMenuCollapsed")
+                dismissCrosshair()
+            }
+
+            override fun onMenuExpanded() { /* is not needed */ }
+        })
+
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_geo_hash)?.let { fab ->
             fab.setOnClickListener {
                 Log.d(TAG, "Debug:: fab_geo_hash pressed")
-
+                context?.let { updateData(it) }
             }
         }
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_arena)?.let { fab ->
             fab.setOnClickListener {
                 Log.d(TAG, "Debug:: fab_arena pressed")
+                centeredPosition()?.let { updateLocationMarker(it) }
             }
         }
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_pokestop)?.let { fab ->
             fab.setOnClickListener {
                 Log.d(TAG, "Debug:: fab_pokestop pressed")
-                context?.let { updateData(it) }
+                centeredPosition()?.let { updateLocationMarker(it) }
+            }
+        }
+
+        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_crosshair)?.let { fab ->
+            fab.setOnClickListener {
+                Log.d(TAG, "Debug:: fab_crosshair pressed")
+                context?.let { showCrosshair() }
             }
         }
     }
@@ -195,11 +222,20 @@ class MapFragment: Fragment() {
      */
 
     private fun showCrosshair() {
+        crosshairImage?.visibility = View.VISIBLE
+        crosshairImage?.startAnimation(crosshairAnimation)
 
     }
 
     private fun dismissCrosshair() {
+        crosshairAnimation?.cancel()
+        crosshairAnimation?.reset()
+        crosshairImage?.clearAnimation()
+        crosshairImage?.visibility = View.GONE
+    }
 
+    private fun centeredPosition(): LatLng? {
+        return googleMap?.cameraPosition?.target
     }
 
     /**

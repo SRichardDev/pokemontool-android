@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
                                              xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -15,5 +16,14 @@
              android:layout_margin="@dimen/fab_margin"
              app:layout_constraintBottom_toBottomOf="parent"
              app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/fragment_map_imageview_crosshair"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/crosshair_svg"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:ignore="ContentDescription"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -25,6 +25,7 @@
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_quest"/>
+        android:id="@+id/fab_crosshair"
+        fab:fab_icon="@drawable/crosshair_svg"/>
 
 </com.getbase.floatingactionbutton.FloatingActionsMenu>
