@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.getbase.floatingactionbutton.FloatingActionsMenu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:fab="http://schemas.android.com/apk/res-auto"
+    style="@style/FABEx_menu_button"
+    android:id="@+id/fab_menu"
+    android:layout_weight="wrap_content"
+    android:layout_height="wrap_content"
+    fab:fab_expandDirection="up"
+    fab:fab_labelStyle="@style/FABEx_label">
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        style="@style/FABEx_menu_subbutton"
+        android:id="@+id/fab_geo_hash"/>
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        style="@style/FABEx_menu_subbutton"
+        android:id="@+id/fab_arena"/>
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        style="@style/FABEx_menu_subbutton"
+        android:id="@+id/fab_pokestop"/>
+
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        style="@style/FABEx_menu_subbutton"
+        android:id="@+id/fab_quest"/>
+
+</com.getbase.floatingactionbutton.FloatingActionsMenu>

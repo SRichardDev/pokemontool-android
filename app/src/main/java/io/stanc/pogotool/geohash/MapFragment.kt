@@ -18,12 +18,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
+import com.getbase.floatingactionbutton.FloatingActionButton
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
+import android.graphics.drawable.Drawable
 
 
 class MapFragment: Fragment() {
@@ -72,25 +74,10 @@ class MapFragment: Fragment() {
 
         mapView?.getMapAsync {onMapReadyCallback(it)}
 
+        // floating action buttons
+        setupFAB(fragmentLayout)
+
         return fragmentLayout
-    }
-
-    private val onMapReadyCallback = { it: GoogleMap ->
-
-        googleMap = it
-
-        googleMap?.setOnMapLongClickListener {
-
-            if (isLocationPermissionGranted()) {
-                toggleGeoHashGrid(it)
-            } else {
-                Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
-            }
-        }
-
-        focusStartLocation()
-
-        showGeoHashGridList()
     }
 
     override fun onResume() {
@@ -114,6 +101,54 @@ class MapFragment: Fragment() {
         super.onLowMemory()
         Log.w(this::class.java.name, "onLowMemory()")
         mapView?.onLowMemory()
+    }
+
+    /**
+     * Setup
+     */
+
+    private val onMapReadyCallback = { it: GoogleMap ->
+
+        googleMap = it
+
+        googleMap?.setOnMapLongClickListener {
+
+            if (isLocationPermissionGranted()) {
+                toggleGeoHashGrid(it)
+            } else {
+                Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
+            }
+        }
+
+        focusStartLocation()
+
+        showGeoHashGridList()
+    }
+
+    private fun setupFAB(fragmentLayout: View) {
+
+        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_geo_hash)?.let { fab ->
+            Drawable.createFromStream(context?.assets?.open("Map"), null)?.let { fab.setIconDrawable(it) }
+            fab.setOnClickListener {
+                Log.d(TAG, "Debug:: fab_geo_hash pressed")
+
+            }
+        }
+
+        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_arena)?.let { fab ->
+            Drawable.createFromStream(context?.assets?.open("raid_active"), null)?.let { fab.setIconDrawable(it) }
+            fab.setOnClickListener {
+                Log.d(TAG, "Debug:: fab_arena pressed")
+            }
+        }
+
+        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_pokestop)?.let { fab ->
+            Drawable.createFromStream(context?.assets?.open("Pstop"), null)?.let { fab.setIconDrawable(it) }
+            fab.setOnClickListener {
+                Log.d(TAG, "Debug:: fab_pokestop pressed")
+                context?.let { updateData(it) }
+            }
+        }
     }
 
     /**
@@ -154,6 +189,18 @@ class MapFragment: Fragment() {
             android.Manifest.permission.ACCESS_COARSE_LOCATION),
             REQUEST_CODE_LOCATION
         )
+    }
+
+    /**
+     * Crosshair
+     */
+
+    private fun showCrosshair() {
+
+    }
+
+    private fun dismissCrosshair() {
+
     }
 
     /**

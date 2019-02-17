@@ -23,15 +23,6 @@
 
     <include layout="@layout/layout_activity_content"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:layout_gravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_map"
-        app:rippleColor="@color/colorRedDarkPoke"/>
-
     <include
         layout="@layout/layout_progress"
         android:layout_width="match_parent"

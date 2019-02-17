@@ -32,11 +32,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // appbar
         setSupportActionBar(toolbar)
 
-        // floating action buttons
-        fab_update.setOnClickListener {
-            (supportFragmentManager.findFragmentByTag(MapFragment::class.java.name) as MapFragment).updateData()
-        }
-
         // navigation drawer
         val weakActivity = WeakReference(this)
         val toggle = object : ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
