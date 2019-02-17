@@ -2,22 +2,26 @@
 <com.getbase.floatingactionbutton.FloatingActionsMenu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:fab="http://schemas.android.com/apk/res-auto"
     style="@style/FABEx_menu_button"
     android:id="@+id/fab_menu"
-    android:layout_weight="wrap_content"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@color/colorTransparent"
     fab:fab_expandDirection="up"
     fab:fab_labelStyle="@style/FABEx_label">
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_geo_hash"/>
+        android:id="@+id/fab_geo_hash"
+        fab:fab_icon="@drawable/map_svg"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_arena"/>
+        android:id="@+id/fab_arena"
+        fab:fab_icon="@drawable/raid_active_svg"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_pokestop"/>
+        android:id="@+id/fab_pokestop"
+        fab:fab_icon="@drawable/pstop_svg"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
