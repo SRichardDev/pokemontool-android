@@ -3,13 +3,13 @@ package io.stanc.pogotool.firebase
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import io.stanc.pogotool.R
 import io.stanc.pogotool.WaitingSpinner
+import io.stanc.pogotool.firebase.data.FirebaseUserLocal
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.layout_fragment_authentication.*

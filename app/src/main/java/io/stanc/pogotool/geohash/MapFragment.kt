@@ -5,10 +5,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.support.annotation.DrawableRes
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -42,7 +45,6 @@ class MapFragment: Fragment() {
     // location
     private var locationManager: LocationManager? = null
     private var lastFocusedLocation: Location? = null
-    private var currentLocationMarker: Marker? = null
     private val locationListener = MapLocationListener()
 
     private var geoHashStartPosition: GeoHash? = null
@@ -141,7 +143,6 @@ class MapFragment: Fragment() {
 
         fragmentLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
             override fun onMenuCollapsed() {
-                Log.d(TAG, "Debug:: fab_menu onMenuCollapsed")
                 dismissCrosshair()
             }
 
@@ -150,28 +151,39 @@ class MapFragment: Fragment() {
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_geo_hash)?.let { fab ->
             fab.setOnClickListener {
-                Log.d(TAG, "Debug:: fab_geo_hash pressed")
                 context?.let { updateData(it) }
             }
         }
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_arena)?.let { fab ->
             fab.setOnClickListener {
-                Log.d(TAG, "Debug:: fab_arena pressed")
-                centeredPosition()?.let { updateLocationMarker(it) }
+                // TODO:
+                // 1. send arena -> Firebase
+                // 2. register for events
+                // 3. get new arena from firebase -> show marker
+                centeredPosition()?.let {
+                    setLocationMarker(it, MarkerType.arena)
+                    FirebaseServer.sendArena("new Debug Arena", GeoHash(it.latitude, it.longitude))
+                }
+
             }
         }
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_pokestop)?.let { fab ->
             fab.setOnClickListener {
-                Log.d(TAG, "Debug:: fab_pokestop pressed")
-                centeredPosition()?.let { updateLocationMarker(it) }
+                // TODO:
+                // 1. send pokestop -> Firebase
+                // 2. register for events
+                // 3. get new pokestop from firebase -> show marker
+                centeredPosition()?.let {
+                    setLocationMarker(it, MarkerType.pokestop)
+                    FirebaseServer.sendPokestop("new Debug Pokestop", GeoHash(it.latitude, it.longitude))
+                }
             }
         }
 
         fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_crosshair)?.let { fab ->
             fab.setOnClickListener {
-                Log.d(TAG, "Debug:: fab_crosshair pressed")
                 context?.let { showCrosshair() }
             }
         }
@@ -294,6 +306,12 @@ class MapFragment: Fragment() {
      * Location
      */
 
+    enum class MarkerType {
+        default,
+        arena,
+        pokestop
+    }
+
     private fun focusStartLocation() {
 
         if (isLocationPermissionGranted()) {
@@ -329,7 +347,7 @@ class MapFragment: Fragment() {
 
                 updateCameraPosition(location)
                 if (shouldSetLocationMarker) {
-                    updateLocationMarker(location)
+                    setLocationMarker(location)
                 }
                 lastFocusedLocation = location
 
@@ -344,19 +362,36 @@ class MapFragment: Fragment() {
         locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { lastLocation -> focusLocation(lastLocation) }
     }
 
-    private fun updateLocationMarker(location: Location) {
+    private fun setLocationMarker(location: Location) {
         val latlng = LatLng(location.latitude, location.longitude)
-        updateLocationMarker(latlng)
+        setLocationMarker(latlng)
     }
 
-    private fun updateLocationMarker(latLng: LatLng) {
+    private fun setLocationMarker(latLng: LatLng, markerType: MarkerType = MarkerType.default) {
 
-        googleMap?.let { _googleMap ->
+        val markerOptions = MarkerOptions().position(latLng)
+//            .title(getString(R.string.location_marker_current_position_title))
+//            .snippet(getString(R.string.location_marker_current_position_description))
 
-            currentLocationMarker = _googleMap.addMarker(MarkerOptions().position(latLng)
-                .title(getString(R.string.location_marker_current_position_title))
-                .snippet(getString(R.string.location_marker_current_position_description)))
+        when(markerType) {
+
+            MarkerType.default -> {}
+            MarkerType.arena -> markerOptions.icon(getBitmapDescriptor(R.drawable.arenaex_svg))
+            MarkerType.pokestop -> markerOptions.icon(getBitmapDescriptor(R.drawable.pstop_svg))
         }
+
+        googleMap?.addMarker(markerOptions)
+    }
+
+    private fun getBitmapDescriptor(@DrawableRes id: Int): BitmapDescriptor {
+        val vectorDrawable = context?.getDrawable(id)
+//        val h = ((int) Utils?.convertDpToPixel(42, context));
+//        val w = ((int) Utils?.convertDpToPixel(25, context));
+        vectorDrawable?.setBounds(0, 0, 50, 50)
+        val bm = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bm)
+        vectorDrawable?.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bm)
     }
 
     private fun updateCameraPosition(location: Location) {
@@ -462,6 +497,6 @@ class MapFragment: Fragment() {
         private const val ZOOM_LEVEL_STREET: Float = 15.0f
         private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
 
-        private const val GEO_HASH_AREA_PRECISION: Int = 6
+        const val GEO_HASH_AREA_PRECISION: Int = 6
     }
 }

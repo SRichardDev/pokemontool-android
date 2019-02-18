@@ -15,6 +15,8 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.KotlinUtils
 import java.lang.ref.WeakReference
 import com.google.firebase.database.FirebaseDatabase
+import io.stanc.pogotool.firebase.data.*
+import io.stanc.pogotool.firebase.data.FirebaseSubscription.Type
 
 
 object FirebaseServer {
@@ -24,7 +26,8 @@ object FirebaseServer {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance().reference
-    private var currentUserLocal: io.stanc.pogotool.firebase.FirebaseUserLocal = FirebaseUserLocal()
+    private var currentUserLocal: FirebaseUserLocal =
+        FirebaseUserLocal()
 
     fun start() {
         auth.addAuthStateListener { onAuthStateChanged() }
@@ -95,7 +98,7 @@ object FirebaseServer {
             Log.i(TAG, "Debug:: sendTokenRequest.onRequestResponds, token: $token")
             val data = HashMap<String, String>()
             data[DATABASE_NOTIFICATION_TOKEN] = token
-            updateUserData(data)
+            sendUserData(data)
         })
     }
 
@@ -114,10 +117,6 @@ object FirebaseServer {
         }
     }
 
-//    TODO: why not using firebaseUser.getIdToken(true)?
-//    firebaseUser.getIdToken(true).addOnSuccessListener { taskSnapshot ->
-//        Log.i(TAG, "Debug:: new getIdToken.addOnSuccessListener -> ${taskSnapshot.token}")
-//    }
     private fun sendTokenRequest(onRequestResponds: (token: String) -> Unit) {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
 
@@ -311,7 +310,7 @@ object FirebaseServer {
     }
 
     /**
-     * data registration
+     * data registration/getter
      */
 
     // TODO: request data (all GeoHashes for arenas, pokestops, quests, ...)
@@ -362,54 +361,41 @@ object FirebaseServer {
         Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${currentUserLocal.id}, notificationToken: ${currentUserLocal.notificationToken}")
         KotlinUtils.safeLet(currentUserLocal.id, currentUserLocal.notificationToken) { id, token ->
 
-            subscribeForArenas(id, token, geoHash, onCompletedCallback)
-            subscribeForPokestops(id, token, geoHash, onCompletedCallback)
-            subscribeForRaids(id, token, geoHash, onCompletedCallback)
-            subscribeForQuests(id, token, geoHash, onCompletedCallback)
+            subscribeFor(Type.Arena, id, token, geoHash, onCompletedCallback)
+            subscribeFor(Type.Pokestop, id, token, geoHash, onCompletedCallback)
+            subscribeFor(Type.Raid, id, token, geoHash, onCompletedCallback)
+            subscribeFor(Type.Quest, id, token, geoHash, onCompletedCallback)
         }
     }
 
-    private fun subscribeForArenas(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = HashMap<String, String>()
-        data[userToken] = userId
-
-        updateData("$DATABASE_ARENAS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
-    }
-
-    private fun subscribeForPokestops(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = HashMap<String, String>()
-        data[userToken] = userId
-
-        updateData("$DATABASE_POKESTOPS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
-    }
-
-    private fun subscribeForRaids(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = HashMap<String, String>()
-        data[userToken] = userId
-
-        updateData("$DATABASE_RAID_BOSSES/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
-    }
-
-    private fun subscribeForQuests(userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = HashMap<String, String>()
-        data[userToken] = userId
-
-        updateData("$DATABASE_QUESTS/$geoHash/$DATABASE_REG_USER", data, onCompletedCallback)
+    private fun subscribeFor(type: FirebaseSubscription.Type, userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        val data = FirebaseSubscription(userId, userToken, geoHash, type)
+        sendData(data, onCompletedCallback)
     }
 
     /**
      * data update
      */
 
-    private fun updateUserData(data: Map<String, String>) {
+    fun sendArena(name: String, geoHash: GeoHash, isEX: Boolean = false) {
+        val data = FirebaseArena(name, isEX, geoHash)
+        sendData(data)
+    }
+
+    fun sendPokestop(name: String, geoHash: GeoHash, questName: String = "debug Quest") {
+        val data = FirebasePokestop(name, questName, geoHash)
+        sendData(data)
+    }
+
+    private fun sendUserData(data: Map<String, String>) {
         currentUserLocal.id?.let {
-            updateData("$DATABASE_USERS/$it", data)
+            sendData(currentUserLocal)
         } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUserLocal: $currentUserLocal") }
     }
 
-    private fun updateData(databaseChildPath: String, data: Map<String, String>, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        Log.v(TAG, "update data [databaseChildPath: $databaseChildPath, data: $data]")
-        database.child(databaseChildPath).updateChildren(data).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
+    private fun sendData(firebaseData: FirebaseData, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        Log.v(TAG, "update data [databaseChildPath: ${firebaseData.databasePath()}, data: ${firebaseData.data()}]")
+        database.child(firebaseData.databasePath()).updateChildren(firebaseData.data()).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
     }
 
     /**
@@ -418,14 +404,14 @@ object FirebaseServer {
 
     private val TAG = this.javaClass.name
 
-    private const val DATABASE_USERS = "users"
-    private const val DATABASE_USER_TRAINER_NAME = "trainerName"
-    private const val DATABASE_ARENAS = "arenas"
-    private const val DATABASE_POKESTOPS = "pokestops"
-    private const val DATABASE_QUESTS = "quests"
-    private const val DATABASE_RAID_BOSSES = "raidBosses"
-    private const val DATABASE_REG_USER = "registered_user"
-    private const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
+    const val DATABASE_USERS = "users"
+    const val DATABASE_USER_TRAINER_NAME = "trainerName"
+    const val DATABASE_ARENAS = "arenas"
+    const val DATABASE_POKESTOPS = "pokestops"
+    const val DATABASE_QUESTS = "quests"
+    const val DATABASE_RAID_BOSSES = "raidBosses"
+    const val DATABASE_REG_USER = "registered_user"
+    const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 
     const val NOTIFICATION_DATA_LATITUDE = "latitude"
     const val NOTIFICATION_DATA_LONGITUDE = "longitude"

@@ -11,7 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import io.stanc.pogotool.firebase.AuthenticationFragment
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.FirebaseUserLocal
+import io.stanc.pogotool.firebase.data.FirebaseUserLocal
 import io.stanc.pogotool.geohash.MapFragment
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
