@@ -363,8 +363,6 @@ object FirebaseServer {
 
             subscribeFor(Type.Arena, id, token, geoHash, onCompletedCallback)
             subscribeFor(Type.Pokestop, id, token, geoHash, onCompletedCallback)
-            subscribeFor(Type.Raid, id, token, geoHash, onCompletedCallback)
-            subscribeFor(Type.Quest, id, token, geoHash, onCompletedCallback)
         }
     }
 
@@ -405,11 +403,8 @@ object FirebaseServer {
     private val TAG = this.javaClass.name
 
     const val DATABASE_USERS = "users"
-    const val DATABASE_USER_TRAINER_NAME = "trainerName"
     const val DATABASE_ARENAS = "arenas"
     const val DATABASE_POKESTOPS = "pokestops"
-    const val DATABASE_QUESTS = "quests"
-    const val DATABASE_RAID_BOSSES = "raidBosses"
     const val DATABASE_REG_USER = "registered_user"
     const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 

@@ -1,0 +1,102 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="10dp"
+    android:height="30dp"
+    android:viewportWidth="10"
+    android:viewportHeight="30">
+  <path
+      android:pathData="M5.0078,1.0586L0.9141,3.4922L5.0078,5.9258L9.0977,3.4922ZM5.0078,1.0586"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.2"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="M0.8086,3.6797L0.8086,8.5469L4.9023,10.9844L4.9023,6.1133ZM0.8086,3.6797"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.2"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="M9.2031,3.6797L5.1094,6.1133L5.1094,10.9844L9.2031,8.5469ZM9.2031,3.6797"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.2"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="M5,19L5,29"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.3"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="M5.0078,15L0.9141,17.4336L5.0078,19.8672L9.0977,17.4336ZM5.0078,15"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.2"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <path
+      android:pathData="M5,11L5,17.1992"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="miter"
+      android:strokeWidth="0.3"
+      android:fillColor="#00000000"
+      android:strokeColor="#000000"
+      android:strokeLineCap="butt"/>
+  <group>
+    <clip-path android:pathData="M5,3L10,3L10,11L5,11ZM5,3 M 0,0"/>
+    <group>
+      <clip-path android:pathData="M 9.203125 3.679688 L 5.109375 6.113281 L 5.109375 10.984375 L 9.203125 8.546875 Z M 9.203125 3.679688  M 0,0"/>
+      <path
+          android:pathData="M 0.109375 15.984375 L 14.203125 15.984375 L 14.203125 -1.320312 L 0.109375 -1.320312 Z M 0.109375 15.984375 "
+          android:fillColor="#00C3FF"
+          android:fillAlpha="1"
+          android:fillType="nonZero"
+          android:strokeColor="#00000000"/>
+    </group>
+  </group>
+  <group>
+    <clip-path android:pathData="M0,3L5,3L5,11L0,11ZM0,3 M 0,0"/>
+    <group>
+      <clip-path android:pathData="M 0.808594 3.679688 L 0.808594 8.546875 L 4.902344 10.984375 L 4.902344 6.113281 Z M 0.808594 3.679688  M 0,0"/>
+      <path
+          android:pathData="M -4.191406 15.984375 L 9.902344 15.984375 L 9.902344 -1.320312 L -4.191406 -1.320312 Z M -4.191406 15.984375 "
+          android:fillColor="#00C0FF"
+          android:fillAlpha="1"
+          android:fillType="nonZero"
+          android:strokeColor="#00000000"/>
+    </group>
+  </group>
+  <group>
+    <clip-path android:pathData="M0,1L10,1L10,6L0,6ZM0,1 M 0,0"/>
+    <group>
+      <clip-path android:pathData="M 5.007812 1.058594 L 0.914062 3.492188 L 5.007812 5.925781 L 9.097656 3.492188 Z M 5.007812 1.058594  M 0,0"/>
+      <path
+          android:pathData="M -4.085938 10.925781 L 14.097656 10.925781 L 14.097656 -3.941406 L -4.085938 -3.941406 Z M -4.085938 10.925781 "
+          android:fillColor="#00A8FF"
+          android:fillAlpha="1"
+          android:fillType="nonZero"
+          android:strokeColor="#00000000"/>
+    </group>
+  </group>
+  <group>
+    <clip-path android:pathData="M0,15L10,15L10,20L0,20ZM0,15 M 0,0"/>
+    <group>
+      <clip-path android:pathData="M 5.007812 15 L 0.914062 17.433594 L 5.007812 19.867188 L 9.097656 17.433594 Z M 5.007812 15  M 0,0"/>
+      <path
+          android:pathData="M -4.085938 24.867188 L 14.097656 24.867188 L 14.097656 10 L -4.085938 10 Z M -4.085938 24.867188 "
+          android:fillColor="#00BAFF"
+          android:fillAlpha="1"
+          android:fillType="nonZero"
+          android:strokeColor="#00000000"/>
+    </group>
+  </group>
+</vector>

@@ -114,7 +114,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="@dimen/item_padding_default"
-        android:src="@drawable/ic_close"
+        android:src="@drawable/icon_close"
         android:background="@color/colorTransparent"
         tools:ignore="ContentDescription"/>
 

@@ -376,8 +376,8 @@ class MapFragment: Fragment() {
         when(markerType) {
 
             MarkerType.default -> {}
-            MarkerType.arena -> markerOptions.icon(getBitmapDescriptor(R.drawable.arenaex_svg))
-            MarkerType.pokestop -> markerOptions.icon(getBitmapDescriptor(R.drawable.pstop_svg))
+            MarkerType.arena -> markerOptions.icon(getBitmapDescriptor(R.drawable.icon_arenaex_30dp))
+            MarkerType.pokestop -> markerOptions.icon(getBitmapDescriptor(R.drawable.icon_pstop_30dp))
         }
 
         googleMap?.addMarker(markerOptions)

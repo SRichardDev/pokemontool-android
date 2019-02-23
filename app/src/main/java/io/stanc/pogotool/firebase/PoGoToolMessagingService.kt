@@ -67,7 +67,7 @@ class PoGoToolMessagingService: FirebaseMessagingService() {
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
 
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.mipmap.icon_launcher)
             .setContentTitle(title)
             .setContentText(text).setAutoCancel(true)
             .setContentIntent(pendingIntent)
