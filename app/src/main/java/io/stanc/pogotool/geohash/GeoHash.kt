@@ -3,6 +3,7 @@ package io.stanc.pogotool.geohash
 import android.location.Location
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.android.gms.maps.model.LatLng
 
 fun String.toGeoHash(): GeoHash = GeoHash(this)
 
@@ -114,6 +115,10 @@ open class GeoHash : Parcelable {
     @JvmOverloads
     constructor(location: Location, charsCount: Int = MAX_CHARACTER_PRECISION) :
             this(location.latitude, location.longitude, charsCount)
+
+    @JvmOverloads
+    constructor(latLng: LatLng, charsCount: Int = MAX_CHARACTER_PRECISION) :
+            this(latLng.latitude, latLng.longitude, charsCount)
 
     @JvmOverloads
     constructor(boundingBox: BoundingBox, charsCount: Int = MAX_CHARACTER_PRECISION) :

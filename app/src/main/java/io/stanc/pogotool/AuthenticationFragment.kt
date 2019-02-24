@@ -1,4 +1,4 @@
-package io.stanc.pogotool.firebase
+package io.stanc.pogotool
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import io.stanc.pogotool.R
-import io.stanc.pogotool.WaitingSpinner
+import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.data.FirebaseUserLocal
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
+import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_fragment_authentication.*
 
 class AuthenticationFragment: Fragment(), View.OnClickListener {
@@ -57,13 +57,21 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
 
             R.id.authentication_button_sign_up -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signUp(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedUpRequest)
+                    FirebaseServer.signUp(
+                        authentication_edittext_email.text.toString(),
+                        authentication_edittext_password.text.toString(),
+                        onCompletedSignedUpRequest
+                    )
                 }
             }
 
             R.id.authentication_button_sign_in -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signIn(authentication_edittext_email.text.toString(), authentication_edittext_password.text.toString(), onCompletedSignedInRequest)
+                    FirebaseServer.signIn(
+                        authentication_edittext_email.text.toString(),
+                        authentication_edittext_password.text.toString(),
+                        onCompletedSignedInRequest
+                    )
                 }
             }
 
@@ -182,7 +190,9 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     }
 
     private fun updateAuthenticationStateText() {
-        context?.let { authentication_textview_status?.text = FirebaseServer.usersAuthenticationStateText(it) }
+        context?.let { authentication_textview_status?.text =
+            FirebaseServer.usersAuthenticationStateText(it)
+        }
     }
 
     private fun updateSignButtons(userHasToSignInOrUp: Boolean, isEmailVerified: Boolean = false) {

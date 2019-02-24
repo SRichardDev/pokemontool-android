@@ -1,4 +1,4 @@
-package io.stanc.pogotool.geohash
+package io.stanc.pogotool
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -31,10 +31,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
-import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
+import io.stanc.pogotool.firebase.data.FirebaseArena
+import io.stanc.pogotool.firebase.data.FirebasePokestop
+import io.stanc.pogotool.firebase.data.FirebaseSubscription
+import io.stanc.pogotool.geohash.GeoHash
 
 
 class MapFragment: Fragment() {
@@ -124,6 +127,7 @@ class MapFragment: Fragment() {
     private val onMapReadyCallback = { it: GoogleMap ->
 
         googleMap = it
+        googleMap?.isBuildingsEnabled = true // 3D buildings
 
         googleMap?.setOnMapLongClickListener {
 
@@ -131,6 +135,20 @@ class MapFragment: Fragment() {
                 toggleGeoHashGrid(it)
             } else {
                 Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
+            }
+        }
+
+        // on camera move finished
+        googleMap?.setOnCameraIdleListener {
+            Log.d(TAG, "Debug:: camera move finished.")
+//            update arenas and pokestops for this camera view
+            googleMap?.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+                removeAllMarkers()
+                FirebaseServer.requestForData(bounds.northeast, bounds.southwest,onNewArenaCallback = {
+                    setLocationMarker(it.geoHash.toLocation(), MarkerType.arena)
+                }, onNewPokestopCallback = {
+                    setLocationMarker(it.geoHash.toLocation(), MarkerType.pokestop)
+                })
             }
         }
 
@@ -163,7 +181,9 @@ class MapFragment: Fragment() {
                 // 3. get new arena from firebase -> show marker
                 centeredPosition()?.let {
                     setLocationMarker(it, MarkerType.arena)
-                    FirebaseServer.sendArena("new Debug Arena", GeoHash(it.latitude, it.longitude))
+                    FirebaseServer.sendArena("new Debug Arena",
+                        GeoHash(it.latitude, it.longitude)
+                    )
                 }
 
             }
@@ -177,7 +197,9 @@ class MapFragment: Fragment() {
                 // 3. get new pokestop from firebase -> show marker
                 centeredPosition()?.let {
                     setLocationMarker(it, MarkerType.pokestop)
-                    FirebaseServer.sendPokestop("new Debug Pokestop", GeoHash(it.latitude, it.longitude))
+                    FirebaseServer.sendPokestop("new Debug Pokestop",
+                        GeoHash(it.latitude, it.longitude)
+                    )
                 }
             }
         }
@@ -195,7 +217,10 @@ class MapFragment: Fragment() {
 
     private fun checkLocationPermission() {
         if (!isLocationPermissionGranted()) {
-            requestPermissions(LOCATION_PERMISSIONS, REQUEST_CODE_LOCATION)
+            requestPermissions(
+                LOCATION_PERMISSIONS,
+                REQUEST_CODE_LOCATION
+            )
         }
     }
 
@@ -255,7 +280,11 @@ class MapFragment: Fragment() {
      */
 
     private fun toggleGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_AREA_PRECISION)
+        val geoHash = GeoHash(
+            latlng.latitude,
+            latlng.longitude,
+            GEO_HASH_AREA_PRECISION
+        )
         toggleGeoHashGrid(geoHash)
     }
 
@@ -273,12 +302,17 @@ class MapFragment: Fragment() {
     }
 
     private fun showGeoHashGrid(location: Location) {
-        val geoHash = GeoHash(location, GEO_HASH_AREA_PRECISION)
+        val geoHash =
+            GeoHash(location, GEO_HASH_AREA_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
     private fun showGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(latlng.latitude, latlng.longitude, GEO_HASH_AREA_PRECISION)
+        val geoHash = GeoHash(
+            latlng.latitude,
+            latlng.longitude,
+            GEO_HASH_AREA_PRECISION
+        )
         showGeoHashGrid(geoHash)
     }
 
@@ -362,9 +396,9 @@ class MapFragment: Fragment() {
         locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { lastLocation -> focusLocation(lastLocation) }
     }
 
-    private fun setLocationMarker(location: Location) {
+    private fun setLocationMarker(location: Location, markerType: MarkerType = MarkerType.default) {
         val latlng = LatLng(location.latitude, location.longitude)
-        setLocationMarker(latlng)
+        setLocationMarker(latlng, markerType)
     }
 
     private fun setLocationMarker(latLng: LatLng, markerType: MarkerType = MarkerType.default) {
@@ -381,6 +415,10 @@ class MapFragment: Fragment() {
         }
 
         googleMap?.addMarker(markerOptions)
+    }
+
+    private fun removeAllMarkers() {
+        googleMap?.clear()
     }
 
     private fun getBitmapDescriptor(@DrawableRes id: Int): BitmapDescriptor {
@@ -466,7 +504,7 @@ class MapFragment: Fragment() {
      */
 
     // TODO... -> FirebaseServer.kt
-    fun updateData(context: Context) {
+    private fun updateData(context: Context) {
 
         var allTasksSuccessful = true
         geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) { taskSuccessful: Boolean ->

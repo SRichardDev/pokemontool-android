@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.utils
 
 import android.view.View
 import android.view.Window
@@ -13,8 +13,8 @@ object WaitingSpinner {
     private var window: WeakReference<Window>? = null
 
     fun initialize(progressBarView: View, window: Window) {
-        this.progressBarView = WeakReference(progressBarView)
-        this.window = WeakReference(window)
+        WaitingSpinner.progressBarView = WeakReference(progressBarView)
+        WaitingSpinner.window = WeakReference(window)
     }
 
     fun showProgress() {

@@ -3,6 +3,7 @@ package io.stanc.pogotool.firebase
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -10,7 +11,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
 import io.stanc.pogotool.R
-import io.stanc.pogotool.WaitingSpinner
+import io.stanc.pogotool.utils.WaitingSpinner
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.KotlinUtils
 import java.lang.ref.WeakReference
@@ -313,13 +314,24 @@ object FirebaseServer {
      * data registration/getter
      */
 
-    // TODO: request data (all GeoHashes for arenas, pokestops, quests, ...)
-    private fun requestData() {
+    fun requestForData(northeast: LatLng, southwest: LatLng, onNewArenaCallback: (arena: FirebaseArena) -> Unit, onNewPokestopCallback: (pokestop: FirebasePokestop) -> Unit) {
 
-//        val reference = FirebaseDatabase.getInstance().reference
-//
-//        val query = database.child(DATABASE_ARENAS).orderByChild("id").equalTo(0.0)
+        val geoHashStringNE = GeoHash(northeast).toString()
+        val geoHashStringSW = GeoHash(southwest).toString()
+        val geoHashParent = GeoHash(geoHashStringNE.commonPrefixWith(geoHashStringSW))
+        Log.i(TAG, "requestForData geoHashStringNE: $geoHashStringNE, geoHashStringSW: $geoHashStringSW => geoHashParent: $geoHashParent")
+
+        val databaseReferenceArena = database.child(DATABASE_ARENAS)
+        val arenaEventListener = FirebaseArena.DataEventListener(databaseReferenceArena, geoHashParent, onNewArenaCallback)
+        databaseReferenceArena.addChildEventListener(arenaEventListener)
+
+        val databaseReferencePokestop = database.child(DATABASE_POKESTOPS)
+        val pokestopEventListener = FirebasePokestop.DataEventListener(databaseReferencePokestop, geoHashParent, onNewPokestopCallback)
+        databaseReferencePokestop.addChildEventListener(pokestopEventListener)
     }
+
+
+    // TODO: request data (all GeoHashes for arenas, pokestops and subscriptions)
 
     private fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
 
@@ -381,7 +393,7 @@ object FirebaseServer {
     }
 
     fun sendPokestop(name: String, geoHash: GeoHash, questName: String = "debug Quest") {
-        val data = FirebasePokestop(name, questName, geoHash)
+        val data = FirebasePokestop(name, geoHash)
         sendData(data)
     }
 

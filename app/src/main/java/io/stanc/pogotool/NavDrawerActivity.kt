@@ -9,11 +9,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import io.stanc.pogotool.firebase.AuthenticationFragment
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.data.FirebaseUserLocal
-import io.stanc.pogotool.geohash.MapFragment
 import io.stanc.pogotool.utils.SystemUtils
+import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
 import kotlinx.android.synthetic.main.layout_activity_drawer.*
 import kotlinx.android.synthetic.main.layout_nav_header.*
