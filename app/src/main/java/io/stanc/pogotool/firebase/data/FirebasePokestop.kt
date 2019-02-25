@@ -7,8 +7,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import io.stanc.pogotool.MapFragment
 import io.stanc.pogotool.geohash.GeoHash
+import java.util.*
 
-class FirebasePokestop(val name: String,
+class FirebasePokestop(val id: String,
+                       val name: String,
                        val geoHash: GeoHash,
                        val questName: String? = null,
                        val questReward: String? = null
@@ -50,13 +52,13 @@ class FirebasePokestop(val name: String,
             p0.key?.let {
                 val geoHash = GeoHash(it)
                 if (geoHashArea.boundingBox.contains(geoHash.toLocation())) {
-//                        Log.v(TAG, "ARENAS: onChildAdded(key: ${p0.key}, value: ${p0.value}), childrenCount: ${p0.childrenCount}, children: ${p0.children}, p1: $p1")
-//                        Log.d(TAG, "geoHashView for $objectID: $geoHashView contains geoHash: $geoHash")
-                    FirebasePokestop.new(p0)?.let { pokestop ->
-                        Log.d(TAG, "Debug:: new Pokestop: ${pokestop.name} at ${pokestop.geoHash}")
-                        onNewPokestopCallback(pokestop)
+//                    Log.d(TAG, "Debug:: dataSnapshot: $p0")
+                    p0.children.forEach { childDataSnapshot ->
+//                        Log.d(TAG, "Debug:: child: $childDataSnapshot")
+                        FirebasePokestop.new(childDataSnapshot)?.let { pokestop ->
+                            onNewPokestopCallback(pokestop)
+                        }
                     }
-
                 }
             }
         }
@@ -70,19 +72,23 @@ class FirebasePokestop(val name: String,
 
         fun new(dataSnapshot: DataSnapshot): FirebasePokestop? {
 
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
+            val id = dataSnapshot.key
             val name = dataSnapshot.child("name").value as? String
-            val latitude = (dataSnapshot.child("latitude").value as? String)?.toDouble()
-            val longitude = (dataSnapshot.child("longitude").value as? String)?.toDouble()
+            val latitudeNum = dataSnapshot.child("latitude").value as? Number
+            val longitudeNum = dataSnapshot.child("longitude").value as? Number
+            val latitude = latitudeNum?.toDouble()
+            val longitude = longitudeNum?.toDouble()
+
             val questName = dataSnapshot.child("quest/name").value as? String
             val questReward = dataSnapshot.child("quest/reward").value as? String
 
-//            Log.v(TAG, "dataSnapshot: name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude")
+//            Log.v(TAG, "id: $id, name: $name, latitudeNum: $latitudeNum, latitude: $latitude, longitudeNum: $longitudeNum, longitude: $longitude")
 
-            if (name != null && latitude != null && longitude != null) {
+            if (id != null && name != null && latitude != null && longitude != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                return FirebasePokestop(name, geoHash, questName, questReward)
+                return FirebasePokestop(id, name, geoHash, questName, questReward)
             }
 
             return null

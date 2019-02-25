@@ -56,6 +56,8 @@ class MapFragment: Fragment() {
     private var crosshairImage: ImageView? = null
     private var crosshairAnimation: Animation? = null
 
+    private val pokestopIDs: HashMap<String, FirebasePokestop> = HashMap()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -147,6 +149,12 @@ class MapFragment: Fragment() {
                 FirebaseServer.requestForData(bounds.northeast, bounds.southwest,onNewArenaCallback = {
                     setLocationMarker(it.geoHash.toLocation(), MarkerType.arena)
                 }, onNewPokestopCallback = {
+
+                    pokestopIDs[it.id]?.let { firebasePokestop ->
+                        pokestopIDs[firebasePokestop.id] = firebasePokestop
+                    } ?: kotlin.run {
+                        pokestopIDs.put(it.id, it)
+                    }
                     setLocationMarker(it.geoHash.toLocation(), MarkerType.pokestop)
                 })
             }

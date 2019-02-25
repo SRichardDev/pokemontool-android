@@ -6,10 +6,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import io.stanc.pogotool.MapFragment.Companion.GEO_HASH_AREA_PRECISION
-import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.GeoHash
 
-data class FirebaseArena(val name: String,
+data class FirebaseArena(val id: String,
+                         val name: String,
                          val isEX: Boolean,
                          val geoHash: GeoHash): FirebaseData {
 
@@ -23,8 +23,6 @@ data class FirebaseArena(val name: String,
         data["isEX"] = isEX.toString()
         data["latitude"] = geoHash.toLocation().latitude.toString()
         data["longitude"] = geoHash.toLocation().longitude.toString()
-        // raid...
-        // submitter
 
         return data
     }
@@ -48,12 +46,14 @@ data class FirebaseArena(val name: String,
             p0.key?.let {
                 val geoHash = GeoHash(it)
                 if (geoHashArea.boundingBox.contains(geoHash.toLocation())) {
-//                        Log.v(TAG, "ARENAS: onChildAdded(key: ${p0.key}, value: ${p0.value}), childrenCount: ${p0.childrenCount}, children: ${p0.children}, p1: $p1")
-//                        Log.d(TAG, "geoHashView for $objectID: $geoHashView contains geoHash: $geoHash")
-                    FirebaseArena.new(p0)?.let { arena ->
-                        Log.d(TAG, "Debug:: new Arena: ${arena.name} at ${arena.geoHash}")
-                        onNewArenaCallback(arena)
+//                    Log.d(TAG, "Debug:: dataSnapshot: $p0")
+                    p0.children.forEach { childDataSnapshot ->
+//                        Log.d(TAG, "Debug:: child: $childDataSnapshot")
+                        FirebaseArena.new(childDataSnapshot)?.let { arena ->
+                            onNewArenaCallback(arena)
+                        }
                     }
+
                 }
             }
         }
@@ -67,18 +67,19 @@ data class FirebaseArena(val name: String,
 
         fun new(dataSnapshot: DataSnapshot): FirebaseArena? {
 
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
+            val id = dataSnapshot.key
             val name = dataSnapshot.child("name").value as? String
-            val isEX = (dataSnapshot.child("isEX").value as? String)?.toBoolean()
-            val latitude = (dataSnapshot.child("latitude").value as? String)?.toDouble()
-            val longitude = (dataSnapshot.child("longitude").value as? String)?.toDouble()
+            val isEX = (dataSnapshot.child("isEX").value as? Boolean)
+            val latitude = (dataSnapshot.child("latitude").value as? Number)?.toDouble()
+            val longitude = (dataSnapshot.child("longitude").value as? Number)?.toDouble()
 
-//            Log.v(TAG, "dataSnapshot: name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude")
+//            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude")
 
-            if (name != null && isEX != null && latitude != null && longitude != null) {
+            if (id != null && name != null && isEX != null && latitude != null && longitude != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                return FirebaseArena(name, isEX, geoHash)
+                return FirebaseArena(id, name, isEX, geoHash)
             }
 
             return null
