@@ -30,7 +30,7 @@ object FirebaseServer {
     private val database = FirebaseDatabase.getInstance().reference
 
     private val databaseArena = database.child("arenas")
-    private val databasePokestop = database.child("pokestops") //  test_pokestops
+    private val databasePokestop = database.child("test_pokestops") //  test_pokestops pokestops
 
     private var currentUserLocal: FirebaseUserLocal =
         FirebaseUserLocal()

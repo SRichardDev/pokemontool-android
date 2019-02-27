@@ -31,13 +31,19 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterManager
+import com.google.maps.android.clustering.view.ClusterRenderer
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
 import io.stanc.pogotool.firebase.data.FirebaseArena
 import io.stanc.pogotool.firebase.data.FirebasePokestop
-import io.stanc.pogotool.firebase.data.FirebaseSubscription
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.map.ClusterPokestop
+import io.stanc.pogotool.map.MyClusterRenderer
+import io.stanc.pogotool.utils.KotlinUtils
+import kotlin.coroutines.coroutineContext
 
 
 class MapFragment: Fragment() {
@@ -56,7 +62,10 @@ class MapFragment: Fragment() {
     private var crosshairImage: ImageView? = null
     private var crosshairAnimation: Animation? = null
 
-    private val pokestopIDs: HashMap<String, FirebasePokestop> = HashMap()
+
+    private val pokestops: HashMap<String, FirebasePokestop> = HashMap()
+    private val markers: HashMap<String, Marker> = HashMap()
+    private var pokestopClusterManager: ClusterManager<ClusterPokestop>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +96,7 @@ class MapFragment: Fragment() {
 
         activity?.let { MapsInitializer.initialize(it.applicationContext) }
 
-        mapView?.getMapAsync {onMapReadyCallback(it)}
+        mapView?.getMapAsync { onMapReadyCallback(it) }
 
         // floating action buttons
         setupFAB(fragmentLayout)
@@ -126,10 +135,57 @@ class MapFragment: Fragment() {
      * Setup
      */
 
-    private val onMapReadyCallback = { it: GoogleMap ->
+    private val onMapReadyCallback = { map: GoogleMap ->
 
-        googleMap = it
+        googleMap = map
+
         googleMap?.isBuildingsEnabled = true // 3D buildings
+
+        setupOnMapClickListener()
+        setupOnCameraIdleListener()
+
+        Log.d(TAG, "Debug:: onMapReadyCallback: map: $map, googleMap: $googleMap")
+
+        // init view
+        focusStartLocation()
+        showGeoHashGridList()
+    }
+
+    private fun setupOnCameraIdleListener() {
+
+        googleMap?.let {
+
+            pokestopClusterManager = ClusterManager(context, it)
+
+            KotlinUtils.safeLet(context, pokestopClusterManager) { con, manager ->
+                pokestopClusterManager?.renderer = MyClusterRenderer(con, it, manager)
+            }
+
+
+//            it.setOnCameraIdleListener(pokestopClusterManager)
+            it.setOnMarkerClickListener(pokestopClusterManager)
+            // TODO: needed?
+            it.setOnInfoWindowClickListener(pokestopClusterManager)
+
+            it.setOnCameraIdleListener {
+                Log.d(TAG, "Debug:: camera move finished.")
+
+                pokestopClusterManager?.onCameraIdle()
+//            update arenas and pokestops for this camera view
+                googleMap?.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+
+                    Log.d(TAG, "Debug:: on camera changed...")
+                    FirebaseServer.requestForData(bounds.northeast, bounds.southwest,
+                        onNewArenaCallback = { updateArenas(it) },
+                        onNewPokestopCallback = { updatePokestops(it) })
+                }
+            }
+
+            pokestopClusterManager?.cluster()
+        }
+    }
+
+    private fun setupOnMapClickListener() {
 
         googleMap?.setOnMapLongClickListener {
 
@@ -139,30 +195,6 @@ class MapFragment: Fragment() {
                 Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
             }
         }
-
-        // on camera move finished
-        googleMap?.setOnCameraIdleListener {
-            Log.d(TAG, "Debug:: camera move finished.")
-//            update arenas and pokestops for this camera view
-            googleMap?.projection?.visibleRegion?.latLngBounds?.let { bounds ->
-                removeAllMarkers()
-                FirebaseServer.requestForData(bounds.northeast, bounds.southwest,onNewArenaCallback = {
-                    setLocationMarker(it.geoHash.toLocation(), MarkerType.arena)
-                }, onNewPokestopCallback = {
-
-                    pokestopIDs[it.id]?.let { firebasePokestop ->
-                        pokestopIDs[firebasePokestop.id] = firebasePokestop
-                    } ?: kotlin.run {
-                        pokestopIDs.put(it.id, it)
-                    }
-                    setLocationMarker(it.geoHash.toLocation(), MarkerType.pokestop)
-                })
-            }
-        }
-
-        focusStartLocation()
-
-        showGeoHashGridList()
     }
 
     private fun setupFAB(fragmentLayout: View) {
@@ -281,6 +313,35 @@ class MapFragment: Fragment() {
 
     private fun centeredPosition(): LatLng? {
         return googleMap?.cameraPosition?.target
+    }
+
+    /**
+     * Map items
+     */
+
+    private fun updateArenas(arena: FirebaseArena) {
+
+        // TODO:like pokestops
+        setLocationMarker(arena.geoHash.toLocation(), MarkerType.arena)
+    }
+
+    private fun updatePokestops(pokestop: FirebasePokestop) {
+
+        Log.d(TAG,"Debug:: updatePokestops(pokestop: ${pokestop.name}, geohash: ${pokestop.geoHash})")
+        pokestops[pokestop.id]?.let {
+            Log.d(TAG,"Debug:: updatePokestops() -> already there")
+            pokestops[it.id] = it
+
+        } ?: kotlin.run {
+
+            pokestops[pokestop.id] = pokestop
+            val item = ClusterPokestop.new(pokestop.id, pokestop.geoHash)
+            Log.d(TAG,"Debug:: updatePokestops() -> add new item: $item in manager: $pokestopClusterManager")
+            pokestopClusterManager?.addItem(item)
+//            setLocationMarker(pokestop.geoHash.toLocation(), MarkerType.pokestop)?.let { marker ->
+//                markers.put(pokestop.id, marker)
+//            }
+        }
     }
 
     /**
@@ -404,12 +465,12 @@ class MapFragment: Fragment() {
         locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { lastLocation -> focusLocation(lastLocation) }
     }
 
-    private fun setLocationMarker(location: Location, markerType: MarkerType = MarkerType.default) {
+    private fun setLocationMarker(location: Location, markerType: MarkerType = MarkerType.default): Marker? {
         val latlng = LatLng(location.latitude, location.longitude)
-        setLocationMarker(latlng, markerType)
+        return setLocationMarker(latlng, markerType)
     }
 
-    private fun setLocationMarker(latLng: LatLng, markerType: MarkerType = MarkerType.default) {
+    private fun setLocationMarker(latLng: LatLng, markerType: MarkerType = MarkerType.default): Marker? {
 
         val markerOptions = MarkerOptions().position(latLng)
 //            .title(getString(R.string.location_marker_current_position_title))
@@ -422,7 +483,7 @@ class MapFragment: Fragment() {
             MarkerType.pokestop -> markerOptions.icon(getBitmapDescriptor(R.drawable.icon_pstop_30dp))
         }
 
-        googleMap?.addMarker(markerOptions)
+        return googleMap?.addMarker(markerOptions)
     }
 
     private fun removeAllMarkers() {
