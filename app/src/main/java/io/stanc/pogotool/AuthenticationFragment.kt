@@ -136,7 +136,7 @@ class AuthenticationFragment: Fragment(), View.OnClickListener {
     }
     private val onCompletedVerificationRequest = { taskSuccessful: Boolean ->
         if (taskSuccessful) {
-            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.user().email), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.currentUser.email), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(context, getString(R.string.authentication_state_verification_failed), Toast.LENGTH_LONG).show()
         }

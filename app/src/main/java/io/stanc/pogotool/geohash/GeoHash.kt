@@ -3,6 +3,7 @@ package io.stanc.pogotool.geohash
 import android.location.Location
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 
 fun String.toGeoHash(): GeoHash = GeoHash(this)
@@ -377,6 +378,83 @@ open class GeoHash : Parcelable {
     override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<GeoHash> {
+
+        fun geoHashMatrix(northWest: GeoHash, southEast: GeoHash, charsCount: Int = DEFAULT_CHARACTER_PRECISION): List<GeoHash>? {
+
+            val list = mutableListOf<GeoHash>()
+
+            var finished = false
+            var geohash = northWest
+
+            while (!finished) {
+
+                geoHashVector(geohash, GeoHash(geohash.toLocation().latitude, southEast.toLocation().longitude, charsCount))?.let { newHorizontalVector ->
+
+                    list.addAll(newHorizontalVector)
+
+                    // for performance reasons
+                    if (list.size > DEFAULT_MAX_GEO_HASH_MATRIX_SIZE) {
+                        return null
+                    }
+
+                    if (newHorizontalVector.last() == southEast) {
+                        finished = true
+                    }
+
+                } ?: kotlin.run {
+                    // for performance reasons
+                    return null
+                }
+
+
+                geohash = geohash.southernNeighbour
+            }
+
+            return list
+        }
+
+        fun geoHashMatrix(northEast: LatLng, southWest: LatLng, charsCount: Int = DEFAULT_CHARACTER_PRECISION): List<GeoHash>? {
+
+            val northWestGeoHash = GeoHash(northEast.latitude, southWest.longitude, charsCount)
+            val southEastGeoHash = GeoHash(southWest.latitude, northEast.longitude, charsCount)
+
+            return geoHashMatrix(northWestGeoHash, southEastGeoHash, charsCount)
+        }
+
+        private fun geoHashVector(west: GeoHash, east: GeoHash): List<GeoHash>? {
+
+            val list = mutableListOf<GeoHash>()
+            list.add(west)
+
+            if (west == east) {
+                return list
+            }
+
+            var finished = false
+            var geohash = west
+            while (!finished) {
+
+                val neighbour = geohash.easternNeighbour
+                list.add(neighbour)
+
+                // for performance reasons
+                if (list.size > DEFAULT_MAX_GEO_HASH_MATRIX_SIZE) {
+                    return null
+                }
+
+                if (neighbour == east) {
+                    finished = true
+                } else {
+                    geohash = neighbour
+                }
+            }
+
+            return list
+        }
+
+        private val TAG = this::class.java.name
+        private const val DEFAULT_MAX_GEO_HASH_MATRIX_SIZE = 64
+        private const val DEFAULT_CHARACTER_PRECISION = 6
 
         const val base32 = "0123456789bcdefghjkmnpqrstuvwxyz"
         const val BASE32_BITS = 5

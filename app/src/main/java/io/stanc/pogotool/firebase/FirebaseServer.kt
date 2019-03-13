@@ -3,37 +3,28 @@ package io.stanc.pogotool.firebase
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.iid.FirebaseInstanceId
 import io.stanc.pogotool.R
 import io.stanc.pogotool.utils.WaitingSpinner
-import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.utils.KotlinUtils
 import java.lang.ref.WeakReference
-import com.google.firebase.database.FirebaseDatabase
 import io.stanc.pogotool.firebase.data.*
-import io.stanc.pogotool.firebase.data.FirebaseSubscription.Type
 
 
 object FirebaseServer {
 
-//    TODO: refactor: use FirebaseFirestore instaed of FirebaseAuth
-//    private val firebase = FirebaseFirestore.getInstance()
-
+    internal val database = FirebaseDatabase.getInstance().reference
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val database = FirebaseDatabase.getInstance().reference
 
-    private val databaseArena = database.child("arenas")
-    private val databasePokestop = database.child("test_pokestops") //  test_pokestops pokestops
-
-    private var currentUserLocal: FirebaseUserLocal =
-        FirebaseUserLocal()
+    var currentUser: FirebaseUserLocal = FirebaseUserLocal()
+        private set
 
     fun start() {
         auth.addAuthStateListener { onAuthStateChanged() }
@@ -79,7 +70,7 @@ object FirebaseServer {
         updateUserProfile(auth.currentUser)
 
         val authState = authState()
-        Log.i(TAG, "onAuthStateChanged(${authState.name}) for user: $currentUserLocal")
+        Log.i(TAG, "onAuthStateChanged(${authState.name}) for user: $currentUser")
         authStateObservers.forEach { it.value.get()?.authStateChanged(authState) }
 
         when(authState) {
@@ -95,9 +86,9 @@ object FirebaseServer {
     private fun updateNotificationToken(firebaseUser: FirebaseUser) {
 
         registerForNotificationToken(firebaseUser, onDataChanged = { notificationToken ->
-            Log.i(TAG, "Debug:: currentUserLocal: $currentUserLocal, registerForNotificationToken.onDataChanged, token: $notificationToken")
-            currentUserLocal.notificationToken = notificationToken
-            Log.i(TAG, "Debug:: currentUserLocal: $currentUserLocal")
+            Log.i(TAG, "Debug:: currentUser: $currentUser, registerForNotificationToken.onDataChanged, token: $notificationToken")
+            currentUser.notificationToken = notificationToken
+            Log.i(TAG, "Debug:: currentUser: $currentUser")
         })
 
         sendTokenRequest(onRequestResponds = { token ->
@@ -226,7 +217,7 @@ object FirebaseServer {
                 WaitingSpinner.hideProgress()
                 onCompletedCallback(task.isSuccessful)
             }
-        } ?: kotlin.run { Log.w(TAG, "can not send email verification because current currentUserLocal is null!") }
+        } ?: kotlin.run { Log.w(TAG, "can not send email verification because current currentUser is null!") }
     }
 
     fun deleteUser() {
@@ -240,14 +231,14 @@ object FirebaseServer {
      */
 
     fun user(): FirebaseUserLocal {
-        return currentUserLocal
+        return currentUser
     }
 
     fun changeUserName(newUserName: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(newUserName)
-            .setPhotoUri(currentUserLocal.photoURL)
+            .setPhotoUri(currentUser.photoURL)
             .build()
 
         auth.currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
@@ -270,7 +261,7 @@ object FirebaseServer {
             if (task.isSuccessful) {
                 updateUserProfile(auth.currentUser)
             } else {
-                Log.w(TAG, "reloading currentUserLocal data failed with error: ${task.exception?.message}")
+                Log.w(TAG, "reloading currentUser data failed with error: ${task.exception?.message}")
                 Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_LONG).show()
             }
 
@@ -280,14 +271,14 @@ object FirebaseServer {
 
     fun usersAuthenticationStateText(context: Context): String {
 
-        val isUserLoggedIn = currentUserLocal.email != null && currentUserLocal.id != null
+        val isUserLoggedIn = currentUser.email != null && currentUser.id != null
 
         return if (isUserLoggedIn) {
 
-            if (currentUserLocal.isVerified) {
-                context.getString(R.string.authentication_state_signed_in, currentUserLocal.email)
+            if (currentUser.isVerified) {
+                context.getString(R.string.authentication_state_signed_in, currentUser.email)
             } else {
-                context.getString(R.string.authentication_state_signed_in_but_missing_verification, currentUserLocal.email)
+                context.getString(R.string.authentication_state_signed_in_but_missing_verification, currentUser.email)
             }
 
         } else {
@@ -299,54 +290,44 @@ object FirebaseServer {
 
         if (user != null) {
 
-            currentUserLocal.name = user.displayName
-            currentUserLocal.email = user.email
-            currentUserLocal.isVerified = user.isEmailVerified
-            currentUserLocal.id = user.uid
-            currentUserLocal.photoURL = user.photoUrl
+            currentUser.name = user.displayName
+            currentUser.email = user.email
+            currentUser.isVerified = user.isEmailVerified
+            currentUser.id = user.uid
+            currentUser.photoURL = user.photoUrl
 
-            userProfileObservers.forEach { it.value.get()?.userProfileChanged(currentUserLocal) }
+            userProfileObservers.forEach { it.value.get()?.userProfileChanged(currentUser) }
 
         } else {
 
             val emptyUserLocal = FirebaseUserLocal()
-            currentUserLocal = emptyUserLocal
+            currentUser = emptyUserLocal
             userProfileObservers.forEach { it.value.get()?.userProfileChanged(emptyUserLocal) }
         }
     }
 
     /**
-     * data registration/getter
+     * data
      */
 
-    fun requestForData(northeast: LatLng, southwest: LatLng, onNewArenaCallback: (arena: FirebaseArena) -> Unit, onNewPokestopCallback: (pokestop: FirebasePokestop) -> Unit) {
+    private fun registerForNotificationToken(firebaseUser: FirebaseUser, onDataChanged: (data: String) -> Unit) {
 
-        val geoHashStringNE = GeoHash(northeast).toString()
-        val geoHashStringSW = GeoHash(southwest).toString()
-        val geoHashParent = GeoHash(geoHashStringNE.commonPrefixWith(geoHashStringSW))
-        Log.i(TAG, "requestForData geoHashStringNE: $geoHashStringNE, geoHashStringSW: $geoHashStringSW => geoHashParent: $geoHashParent")
-
-        val arenaEventListener = FirebaseArena.DataEventListener(databaseArena, geoHashParent, onNewArenaCallback)
-        databaseArena.addChildEventListener(arenaEventListener)
-
-//        val databaseReferencePokestop = database.child(DATABASE_POKESTOPS)
-//        val pokestopEventListener = FirebasePokestop.DataEventListener(databaseReferencePokestop, geoHashParent, onNewPokestopCallback)
-//        databaseReferencePokestop.addChildEventListener(pokestopEventListener)
-
-        // TODO: for debugging many points only
-        val pokestopEventListener = FirebasePokestop.DataEventListener(databasePokestop, geoHashParent, onNewPokestopCallback)
-        databasePokestop.addChildEventListener(pokestopEventListener)
+        val databaseChildPath = FirebaseServer.DATABASE_USERS +"/"+firebaseUser.uid+"/"+ FirebaseServer.DATABASE_NOTIFICATION_TOKEN
+        registerForData(databaseChildPath, onDataChanged)
     }
 
+    private fun sendUserData(data: Map<String, String>) {
+        currentUser.id?.let {
+            FirebaseServer.sendData(currentUser)
+        } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUser: $currentUser") }
+    }
 
-    // TODO: request data (all GeoHashes for arenas, pokestops and subscriptions)
-
-    private fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
+    fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
 
         // just if firebaseUser is logged in
-        auth.currentUser?.let {
+        currentUser.let {
 
-            database.child(databaseChildPath).addValueEventListener(object : ValueEventListener {
+            FirebaseServer.database.child(databaseChildPath).addValueEventListener(object : ValueEventListener {
 
                 override fun onCancelled(p0: DatabaseError) {
                     Log.w(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for data: $databaseChildPath")
@@ -360,78 +341,7 @@ object FirebaseServer {
         }
     }
 
-    private fun registerForArea(geoHash: GeoHash, onDataChanged: (data: String) -> Unit) {
-
-        val databaseChildPath = "$DATABASE_ARENAS/$geoHash"
-        registerForData(databaseChildPath, onDataChanged)
-    }
-
-    private fun registerForNotificationToken(firebaseUser: FirebaseUser, onDataChanged: (data: String) -> Unit) {
-
-        val databaseChildPath = DATABASE_USERS+"/"+firebaseUser.uid+"/"+DATABASE_NOTIFICATION_TOKEN
-        registerForData(databaseChildPath, onDataChanged)
-    }
-
-    /**
-     * data subscription
-     */
-
-    fun subscribeForPush(geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${currentUserLocal.id}, notificationToken: ${currentUserLocal.notificationToken}")
-        KotlinUtils.safeLet(currentUserLocal.id, currentUserLocal.notificationToken) { id, token ->
-
-            subscribeFor(Type.Arena, id, token, geoHash, onCompletedCallback)
-            subscribeFor(Type.Pokestop, id, token, geoHash, onCompletedCallback)
-        }
-    }
-
-    private fun subscribeFor(type: FirebaseSubscription.Type, userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = FirebaseSubscription(userId, userToken, geoHash, type)
-        sendData(data, onCompletedCallback)
-    }
-
-    /**
-     * data update
-     */
-
-    // TODO: Debug mode:
-
-//    func savePokestop(_ pokestop: Pokestop) {
-//        let data = try! FirebaseEncoder().encode(pokestop)
-//            pokestopsRef.child(pokestop.geohash).childByAutoId().setValue(data)
-//        }
-
-//    func saveArena(_ arena: Arena) {
-//        let data = try! FirebaseEncoder().encode(arena)
-//            arenasRef.child(arena.geohash).childByAutoId().setValue(data)
-//        }
-
-    // TODO: save raid only !
-    fun sendArena(name: String, geoHash: GeoHash, isEX: Boolean = false) {
-//        val data = FirebaseArena(name, isEX, geoHash)
-//        sendData(data)
-    }
-//    func saveRaid(arena: Arena) {
-//        guard let arenaID = arena.id else { return }
-//        let data = try! FirebaseEncoder().encode(arena.raid)
-//            var data1 = data as! [String: Any]
-//            data1["timestamp"] = ServerValue.timestamp()
-//            arenasRef.child(arena.geohash).child(arenaID).child("raid").setValue(data1)
-//        }
-
-    fun sendPokestop(name: String, geoHash: GeoHash, questName: String = "debug Quest") {
-//        val data = FirebasePokestop(name, geoHash)
-//        sendData(data)
-    }
-
-    private fun sendUserData(data: Map<String, String>) {
-        currentUserLocal.id?.let {
-            sendData(currentUserLocal)
-        } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUserLocal: $currentUserLocal") }
-    }
-
-    private fun sendData(firebaseData: FirebaseData, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun sendData(firebaseData: FirebaseData, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         Log.v(TAG, "update data [databaseChildPath: ${firebaseData.databasePath()}, data: ${firebaseData.data()}]")
         database.child(firebaseData.databasePath()).updateChildren(firebaseData.data()).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
     }

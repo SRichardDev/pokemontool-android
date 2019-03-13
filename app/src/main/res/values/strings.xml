@@ -55,4 +55,7 @@
     <string name="locations_sent_sucessfully">Locations sent successfully.</string>
     <string name="locations_not_sent_sucessfully">Locations not send successfully!</string>
 
+    <!-- Map -->
+    <string name="map_max_zooming_level">Max zooming level reached. Please zoom in.</string>
+
 </resources>

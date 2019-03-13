@@ -3,6 +3,7 @@ package io.stanc.pogotool.geohash
 import android.location.Location
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.android.gms.maps.model.LatLng
 
 open class BoundingBox(y1: Double, y2: Double, x1: Double, x2: Double) : Parcelable {
 
@@ -55,8 +56,12 @@ open class BoundingBox(y1: Double, y2: Double, x1: Double, x2: Double) : Parcela
         maxLat = Math.max(y1, y2)
     }
 
-    operator fun contains(point: Location) = point.latitude >= minLat && point.longitude >= minLon
-            && point.latitude <= maxLat && point.longitude <= maxLon
+    operator fun contains(latLng: LatLng) = contains(latLng.latitude, latLng.longitude)
+
+    operator fun contains(point: Location) = contains(point.latitude, point.longitude)
+
+    private fun contains(latitude: Double, longitude: Double) = latitude >= minLat && longitude >= minLon
+            && latitude <= maxLat && longitude <= maxLon
 
     fun intersects(other: BoundingBox) = !(other.minLon > maxLon || other.maxLon < minLon
             || other.minLat > maxLat || other.maxLat < minLat)
