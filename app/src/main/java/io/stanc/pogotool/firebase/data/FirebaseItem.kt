@@ -5,5 +5,5 @@ interface FirebaseItem {
 
     val id: String
     fun databasePath(): String
-    fun data(): Map<String, String>
+    fun data(): Map<String, Any>
 }

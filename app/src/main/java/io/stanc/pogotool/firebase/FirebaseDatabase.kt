@@ -37,7 +37,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
             Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for ItemEventListener")
         }
 
-        override fun onChildMoved(p0: DataSnapshot, p1: String?) { /* not needed */ }
+        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+            Log.v(TAG, "onChildMoved(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
+        }
 
         override fun onChildChanged(p0: DataSnapshot, p1: String?) {
             Log.d(TAG, "onChildChanged(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
@@ -58,7 +60,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
 
         private fun addItem(item: Item) {
+            Log.v(TAG, "addItem($item) 1, items: $items")
             if (!items.containsKey(item.id)) {
+                Log.v(TAG, "addItem($item) 2")
                 items[item.id] = item
                 delegate.get()?.onItemAdded(item)
             }
@@ -84,16 +88,31 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         databaseArena.child(geoHash.toString()).addChildEventListener(arenaEventListener)
     }
 
+    fun pushArena(arena: FirebaseArena) {
+
+        firebaseGeoHash(arena.geoHash)?.let { childGeoHash ->
+            databaseArena.child(childGeoHash.toString()).push().setValue(arena.data())
+        }
+    }
+
     /**
-     * items
+     * pokestops
      */
 
-    private val databasePokestop = FirebaseServer.database.child("test_pokestops") //  test_pokestops items
+    private val databasePokestop = FirebaseServer.database.child("test_pokestops")
+//    private val databasePokestop = FirebaseServer.database.child("pokestops")
     private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
 
     fun loadPokestops(geoHash: GeoHash) {
         databasePokestop.child(geoHash.toString()).removeEventListener(pokestopEventListener)
         databasePokestop.child(geoHash.toString()).addChildEventListener(pokestopEventListener)
+    }
+
+    fun pushPokestop(pokestop: FirebasePokestop) {
+
+        firebaseGeoHash(pokestop.geoHash)?.let { childGeoHash ->
+            databasePokestop.child(childGeoHash.toString()).push().setValue(pokestop.data())
+        }
     }
 
     /**
@@ -115,37 +134,13 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         FirebaseServer.sendData(data, onCompletedCallback)
     }
 
-    /**
-     * data update
-     */
+    private fun firebaseGeoHash(geoHash: GeoHash): GeoHash? {
 
-    // TODO: Debug mode:
-
-//    func savePokestop(_ pokestop: Pokestop) {
-//        let data = try! FirebaseEncoder().encode(pokestop)
-//            pokestopsRef.child(pokestop.geohash).childByAutoId().setValue(data)
-//        }
-
-//    func saveArena(_ arena: Arena) {
-//        let data = try! FirebaseEncoder().encode(arena)
-//            arenasRef.child(arena.geohash).childByAutoId().setValue(data)
-//        }
-
-    // TODO: save raids only !
-    fun sendArena(name: String, geoHash: GeoHash, isEX: Boolean = false) {
-//        val data = FirebaseArena(name, isEX, geoHash)
-//        sendItem(data)
-    }
-//    func saveRaid(arena: Arena) {
-//        guard let arenaID = arena.id else { return }
-//        let data = try! FirebaseEncoder().encode(arena.raid)
-//            var data1 = data as! [String: Any]
-//            data1["timestamp"] = ServerValue.timestamp()
-//            arenasRef.child(arena.geohash).child(arenaID).child("raid").setValue(data1)
-//        }
-
-    fun sendPokestop(name: String, geoHash: GeoHash, questName: String = "debug Quest") {
-//        val data = FirebasePokestop(name, geoHash)
-//        sendItem(data)
+        val precision = geoHash.toString().length
+        return if (precision >= 6) {
+            GeoHash(geoHash.toString().substring(0, 6))
+        } else {
+            null
+        }
     }
 }

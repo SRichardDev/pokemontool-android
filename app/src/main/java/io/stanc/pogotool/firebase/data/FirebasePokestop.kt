@@ -9,23 +9,19 @@ class FirebasePokestop(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
-    val questName: String? = null,
-    val questReward: String? = null
-                       ): FirebaseItem {
-
-
+    val submitter: String): FirebaseItem {
 
     override fun databasePath(): String {
         return "items/${geoHash.toString().substring(0, MapFragment.GEO_HASH_AREA_PRECISION)}"
     }
 
-    override fun data(): Map<String, String> {
-        val data = HashMap<String, String>()
+    override fun data(): Map<String, Any> {
+        val data = HashMap<String, Any>()
+
         data["name"] = name
-        data["latitude"] = geoHash.toLocation().latitude.toString()
-        data["longitude"] = geoHash.toLocation().longitude.toString()
-        // quest...
-        // submitter
+        data["latitude"] = geoHash.toLocation().latitude
+        data["longitude"] = geoHash.toLocation().longitude
+        data["submitter"] = submitter
 
         return data
     }
@@ -44,19 +40,19 @@ class FirebasePokestop(
 
             val id = id(dataSnapshot)
             val name = dataSnapshot.child("name").value as? String
-            val latitudeNum = dataSnapshot.child("latitude").value as? Number
-            val longitudeNum = dataSnapshot.child("longitude").value as? Number
-            val latitude = latitudeNum?.toDouble()
-            val longitude = longitudeNum?.toDouble()
-
-            val questName = dataSnapshot.child("quest/name").value as? String
-            val questReward = dataSnapshot.child("quest/reward").value as? String
+            val latitude = (dataSnapshot.child("latitude").value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child("latitude").value as? String)?.toDouble()
+            }
+            val longitude = (dataSnapshot.child("longitude").value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child("longitude").value as? String)?.toDouble()
+            }
+            val submitter = dataSnapshot.child("submitter").value as? String
 
 //            Log.v(TAG, "id: $id, name: $name, latitudeNum: $latitudeNum, latitude: $latitude, longitudeNum: $longitudeNum, longitude: $longitude")
 
-            if (id != null && name != null && latitude != null && longitude != null) {
+            if (id != null && name != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                return FirebasePokestop(id, name, geoHash, questName, questReward)
+                return FirebasePokestop(id, name, geoHash, submitter)
             }
 
             return null

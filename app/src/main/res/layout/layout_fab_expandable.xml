@@ -10,23 +10,18 @@
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_geo_hash"
-        fab:fab_icon="@drawable/icon_map_30dp"/>
-
-    <com.getbase.floatingactionbutton.FloatingActionButton
-        style="@style/FABEx_menu_subbutton"
         android:id="@+id/fab_arena"
         fab:fab_icon="@drawable/icon_arenaex_30dp"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
         android:id="@+id/fab_pokestop"
-        android:scaleType="centerInside"
+        android:scaleType="matrix"
         fab:fab_icon="@drawable/icon_pstop_30dp"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_crosshair"
-        fab:fab_icon="@drawable/icon_crosshair_100dp"/>
+        android:id="@+id/fab_geo_hash"
+        fab:fab_icon="@drawable/icon_map_30dp"/>
 
 </com.getbase.floatingactionbutton.FloatingActionsMenu>
