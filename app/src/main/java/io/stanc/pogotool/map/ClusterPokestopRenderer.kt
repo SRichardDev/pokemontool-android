@@ -19,23 +19,26 @@ class ClusterPokestopRenderer(
     clusterManager: ClusterManager<ClusterPokestop>
 ) : DefaultClusterRenderer<ClusterPokestop>(context, map, clusterManager) {
 
+    private val iconHeight: Int = 50
+    private val iconWidth: Int = 25
+
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterPokestop>): Boolean {
         return cluster.size > 5 // when count of markers is more than 5, render as cluster
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
         super.onBeforeClusterItemRendered(item, markerOptions)
-        markerOptions?.title(item?.title)?.icon(getBitmapDescriptor(R.drawable.icon_pstop_30dp))// for marker
+        markerOptions?.title(item?.title)?.icon(getBitmapDescriptor(R.drawable.icon_pstop_30dp))?.anchor(0.5f, 1.0f)
     }
 
     private fun getBitmapDescriptor(@DrawableRes id: Int): BitmapDescriptor {
         val vectorDrawable = context.getDrawable(id)
-//        val h = ((int) Utils?.convertDpToPixel(42, context));
-//        val w = ((int) Utils?.convertDpToPixel(25, context));
-        vectorDrawable?.setBounds(0, 0, 50, 50)
-        val bm = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888)
+
+        vectorDrawable?.setBounds(0, 0, iconWidth, iconHeight)
+        val bm = Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bm)
         vectorDrawable?.draw(canvas)
+
         return BitmapDescriptorFactory.fromBitmap(bm)
     }
 }
