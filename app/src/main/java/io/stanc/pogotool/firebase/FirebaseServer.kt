@@ -20,10 +20,13 @@ import io.stanc.pogotool.firebase.data.*
 
 object FirebaseServer {
 
+    //    TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
+//    private val firebase = FirebaseFirestore.getInstance()
+
     internal val database = FirebaseDatabase.getInstance().reference
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    var currentUser: FirebaseUserLocal = FirebaseUserLocal()
+    var currentUser: FirebaseUserLocal? = null
         private set
 
     fun start() {
@@ -87,7 +90,7 @@ object FirebaseServer {
 
         registerForNotificationToken(firebaseUser, onDataChanged = { notificationToken ->
             Log.i(TAG, "Debug:: currentUser: $currentUser, registerForNotificationToken.onDataChanged, token: $notificationToken")
-            currentUser.notificationToken = notificationToken
+            currentUser?.notificationToken = notificationToken
             Log.i(TAG, "Debug:: currentUser: $currentUser")
         })
 
@@ -136,7 +139,7 @@ object FirebaseServer {
     private val userProfileObservers = HashMap<Int, WeakReference<UserProfileObserver>>()
 
     interface UserProfileObserver {
-        fun userProfileChanged(user: FirebaseUserLocal)
+        fun userProfileChanged(user: FirebaseUserLocal?)
     }
 
     //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
@@ -230,7 +233,7 @@ object FirebaseServer {
      * user
      */
 
-    fun user(): FirebaseUserLocal {
+    fun user(): FirebaseUserLocal? {
         return currentUser
     }
 
@@ -238,7 +241,7 @@ object FirebaseServer {
 
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(newUserName)
-            .setPhotoUri(currentUser.photoURL)
+            .setPhotoUri(currentUser?.photoURL)
             .build()
 
         auth.currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
@@ -271,38 +274,34 @@ object FirebaseServer {
 
     fun usersAuthenticationStateText(context: Context): String {
 
-        val isUserLoggedIn = currentUser.email != null && currentUser.id != null
+        return currentUser?.let { user ->
 
-        return if (isUserLoggedIn) {
-
-            if (currentUser.isVerified) {
-                context.getString(R.string.authentication_state_signed_in, currentUser.email)
+            if (user.isVerified) {
+                context.getString(R.string.authentication_state_signed_in, user.email)
             } else {
-                context.getString(R.string.authentication_state_signed_in_but_missing_verification, currentUser.email)
+                context.getString(R.string.authentication_state_signed_in_but_missing_verification, user.email)
             }
 
-        } else {
-            context.getString(R.string.authentication_state_signed_out)
-        }
+        } ?: kotlin.run { context.getString(R.string.authentication_state_signed_out) }
     }
 
     private fun updateUserProfile(user: FirebaseUser?) {
 
-        if (user != null) {
+        user?.let {
 
-            currentUser.name = user.displayName
-            currentUser.email = user.email
-            currentUser.isVerified = user.isEmailVerified
-            currentUser.id = user.uid
-            currentUser.photoURL = user.photoUrl
+            currentUser = FirebaseUserLocal(
+                it.uid,
+                it.displayName,
+                it.email,
+                it.isEmailVerified,
+                null,
+                it.photoUrl
+            )
 
-            userProfileObservers.forEach { it.value.get()?.userProfileChanged(currentUser) }
+            userProfileObservers.forEach { observer -> observer.value.get()?.userProfileChanged(currentUser) }
 
-        } else {
-
-            val emptyUserLocal = FirebaseUserLocal()
-            currentUser = emptyUserLocal
-            userProfileObservers.forEach { it.value.get()?.userProfileChanged(emptyUserLocal) }
+        } ?: kotlin.run {
+            userProfileObservers.forEach { it.value.get()?.userProfileChanged(null) }
         }
     }
 
@@ -317,9 +316,8 @@ object FirebaseServer {
     }
 
     private fun sendUserData(data: Map<String, String>) {
-        currentUser.id?.let {
-            FirebaseServer.sendData(currentUser)
-        } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUser: $currentUser") }
+        currentUser?.let { FirebaseServer.sendData(it) }
+            ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUser: $currentUser") }
     }
 
     fun registerForData(databaseChildPath: String, onDataChanged: (data: String) -> Unit) {
@@ -341,9 +339,9 @@ object FirebaseServer {
         }
     }
 
-    fun sendData(firebaseData: FirebaseData, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        Log.v(TAG, "update data [databaseChildPath: ${firebaseData.databasePath()}, data: ${firebaseData.data()}]")
-        database.child(firebaseData.databasePath()).updateChildren(firebaseData.data()).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
+    fun sendData(firebaseItem: FirebaseItem, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        Log.v(TAG, "update data [databaseChildPath: ${firebaseItem.databasePath()}, data: ${firebaseItem.data()}]")
+        database.child(firebaseItem.databasePath()).updateChildren(firebaseItem.data()).addOnCompleteListener { onCompletedCallback(it.isSuccessful) }
     }
 
     /**
@@ -354,7 +352,7 @@ object FirebaseServer {
 
     const val DATABASE_USERS = "users"
     const val DATABASE_ARENAS = "arenas"
-    const val DATABASE_POKESTOPS = "pokestops"
+    const val DATABASE_POKESTOPS = "items"
     const val DATABASE_REG_USER = "registered_user"
     const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 

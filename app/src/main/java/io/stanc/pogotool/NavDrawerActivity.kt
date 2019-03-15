@@ -129,15 +129,15 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      */
 
     private val userProfileObserver = object : FirebaseServer.UserProfileObserver {
-        override fun userProfileChanged(user: FirebaseUserLocal) {
-            Log.d(TAG, "Debug:: userProfileChanged(${user.name})")
+        override fun userProfileChanged(user: FirebaseUserLocal?) {
+            Log.d(TAG, "Debug:: userProfileChanged(${user?.name})")
             updateNavText()
         }
     }
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseServer.currentUser.name)
+        nav_info?.text = getString(R.string.user_name, FirebaseServer.currentUser?.name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

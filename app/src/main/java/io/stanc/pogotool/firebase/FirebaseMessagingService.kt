@@ -17,7 +17,7 @@ import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
 
 
-class PoGoToolMessagingService: FirebaseMessagingService() {
+class FirebaseMessagingService: FirebaseMessagingService() {
 
     // Notification in Background/Foreground:
     // https://medium.com/@Miqubel/mastering-firebase-notifications-36a3ffe57c41
@@ -81,6 +81,6 @@ class PoGoToolMessagingService: FirebaseMessagingService() {
 
         const val NOTIFICATION_ID = 0
         const val NOTIFICATION_CHANNEL_ID = "3131830000"
-        const val NOTIFICATION_CHANNEL_NAME = "PoGoToolMessagingService"
+        const val NOTIFICATION_CHANNEL_NAME = "FirebaseMessagingService"
     }
 }

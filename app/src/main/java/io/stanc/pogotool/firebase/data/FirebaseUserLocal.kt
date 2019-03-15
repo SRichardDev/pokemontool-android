@@ -4,17 +4,15 @@ import android.net.Uri
 import io.stanc.pogotool.firebase.FirebaseServer.DATABASE_NOTIFICATION_TOKEN
 import io.stanc.pogotool.firebase.FirebaseServer.DATABASE_USERS
 
-data class FirebaseUserLocal(var name: String? = null,
-                             var email: String? = null,
+data class FirebaseUserLocal(override var id: String,
+                             var name: String?,
+                             var email: String?,
                              var isVerified: Boolean = false,
-                             var id: String? = null,
                              var notificationToken: String? = null,
-                             var photoURL: Uri? = null): FirebaseData {
+                             var photoURL: Uri? = null): FirebaseItem {
 
     override fun databasePath(): String {
-        return id?.let {
-            "$DATABASE_USERS/$it"
-        } ?: kotlin.run { "" }
+        return "$DATABASE_USERS/$id"
     }
 
     override fun data(): Map<String, String> {

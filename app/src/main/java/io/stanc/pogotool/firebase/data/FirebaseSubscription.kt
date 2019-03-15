@@ -5,10 +5,11 @@ import io.stanc.pogotool.firebase.FirebaseServer.DATABASE_POKESTOPS
 import io.stanc.pogotool.firebase.FirebaseServer.DATABASE_REG_USER
 import io.stanc.pogotool.geohash.GeoHash
 
-class FirebaseSubscription(val userId: String,
-                           val userToken: String,
-                           val geoHash: GeoHash,
-                           val type: Type): FirebaseData {
+class FirebaseSubscription(
+    override val id: String,
+    val userToken: String,
+    val geoHash: GeoHash,
+    val type: Type): FirebaseItem {
 
     enum class Type {
         Arena,
@@ -24,7 +25,7 @@ class FirebaseSubscription(val userId: String,
 
     override fun data(): Map<String, String> {
         val data = HashMap<String, String>()
-        data[userToken] = userId
+        data[userToken] = id
         return data
     }
 }

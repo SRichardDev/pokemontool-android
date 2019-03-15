@@ -31,19 +31,20 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
-import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
-import com.google.maps.android.clustering.view.ClusterRenderer
-import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
 import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
 import io.stanc.pogotool.firebase.data.FirebaseArena
 import io.stanc.pogotool.firebase.data.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.map.ClusterArena
+import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestop
-import io.stanc.pogotool.map.MyClusterRenderer
+import io.stanc.pogotool.map.ClusterPokestopRenderer
+import io.stanc.pogotool.utils.DelayedTrigger
 import io.stanc.pogotool.utils.KotlinUtils
-import kotlin.coroutines.coroutineContext
+import java.lang.ref.WeakReference
 
 
 class MapFragment: Fragment() {
@@ -61,11 +62,6 @@ class MapFragment: Fragment() {
 
     private var crosshairImage: ImageView? = null
     private var crosshairAnimation: Animation? = null
-
-
-    private val pokestops: HashMap<String, FirebasePokestop> = HashMap()
-    private val markers: HashMap<String, Marker> = HashMap()
-    private var pokestopClusterManager: ClusterManager<ClusterPokestop>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,6 +128,83 @@ class MapFragment: Fragment() {
     }
 
     /**
+     * Clustering Firebase items (Pokestops, Arenas, ...)
+     */
+
+    private val pokestopDelegate = object : FirebaseDatabase.Delegate<FirebasePokestop> {
+        override fun onItemAdded(item: FirebasePokestop) {
+
+            if (!items.containsKey(item.id)) {
+                val clusterItem = ClusterPokestop.new(item)
+                Log.v(TAG,"Debug:: onItemAdded(pokestop.id: ${clusterItem.id}) -> add new item: $clusterItem in manager: $pokestopClusterManager")
+                pokestopClusterManager?.addItem(clusterItem)
+                pokestopClustering.trigger()
+                items[clusterItem.id] = WeakReference(clusterItem)
+            }
+        }
+
+        override fun onItemChanged(item: FirebasePokestop) {
+
+            Log.d(TAG,"Debug:: onItemChanged(pokestop.id: ${item.id})")
+            onItemRemoved(item)
+            onItemAdded(item)
+        }
+
+        override fun onItemRemoved(item: FirebasePokestop) {
+
+            items[item.id]?.get()?.let {
+                Log.d(TAG,"Debug:: onItemRemoved(pokestop.id: ${item.id}) -> items: $items in manager: $pokestopClusterManager")
+                pokestopClusterManager?.removeItem(it)
+                pokestopClustering.trigger()
+            }
+            items.remove(item.id)
+        }
+
+        private val items: HashMap<String, WeakReference<ClusterPokestop>> = HashMap()
+    }
+
+    private val arenaDelegate = object : FirebaseDatabase.Delegate<FirebaseArena> {
+        override fun onItemAdded(item: FirebaseArena) {
+
+            if (!items.containsKey(item.id)) {
+                val clusterItem = ClusterArena.new(item)
+                Log.v(TAG,"Debug:: onItemAdded(arena.id: ${clusterItem.id}) -> add new item: $clusterItem in manager: $arenaClusterManager")
+                arenaClusterManager?.addItem(clusterItem)
+                arenaClustering.trigger()
+                items[clusterItem.id] = WeakReference(clusterItem)
+            }
+        }
+
+        override fun onItemChanged(item: FirebaseArena) {
+
+            Log.d(TAG,"Debug:: onItemChanged(arena.id: ${item.id})")
+            onItemRemoved(item)
+            onItemAdded(item)
+        }
+
+        override fun onItemRemoved(item: FirebaseArena) {
+
+            items[item.id]?.get()?.let {
+                Log.d(TAG,"Debug:: onItemRemoved(arena.id: ${item.id}) -> items: $items in manager: $arenaClusterManager")
+                arenaClusterManager?.removeItem(it)
+                arenaClustering.trigger()
+            }
+            items.remove(item.id)
+        }
+
+        private val items: HashMap<String, WeakReference<ClusterArena>> = HashMap()
+    }
+
+    private val firebase = FirebaseDatabase(pokestopDelegate, arenaDelegate)
+
+    private var pokestopClusterManager: ClusterManager<ClusterPokestop>? = null
+    private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager?.cluster() }
+
+    private var arenaClusterManager: ClusterManager<ClusterArena>? = null
+    private val arenaClustering = DelayedTrigger(200) { arenaClusterManager?.cluster() }
+
+
+    /**
      * Setup
      */
 
@@ -156,32 +229,53 @@ class MapFragment: Fragment() {
         googleMap?.let {
 
             pokestopClusterManager = ClusterManager(context, it)
-
             KotlinUtils.safeLet(context, pokestopClusterManager) { con, manager ->
-                pokestopClusterManager?.renderer = MyClusterRenderer(con, it, manager)
+                pokestopClusterManager?.renderer = ClusterPokestopRenderer(con, it, manager)
             }
 
+            arenaClusterManager = ClusterManager(context, it)
+            KotlinUtils.safeLet(context, arenaClusterManager) { con, manager ->
+                arenaClusterManager?.renderer = ClusterArenaRenderer(con, it, manager)
+            }
 
-//            it.setOnCameraIdleListener(pokestopClusterManager)
-            it.setOnMarkerClickListener(pokestopClusterManager)
+            it.setOnMarkerClickListener { marker ->
+
+                var handled = false
+
+                pokestopClusterManager?.let {
+                    handled = it.onMarkerClick(marker)
+                }
+
+                if (!handled) {
+                    arenaClusterManager?.let {
+                        handled = it.onMarkerClick(marker)
+                    }
+                }
+
+                handled
+            }
             // TODO: needed?
-            it.setOnInfoWindowClickListener(pokestopClusterManager)
+//            it.setOnInfoWindowClickListener(pokestopClusterManager)
 
             it.setOnCameraIdleListener {
-                Log.d(TAG, "Debug:: camera move finished.")
+                Log.i(TAG, "Debug:: camera move finished.")
+
+                googleMap?.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+                    Log.i(TAG, "Debug:: on camera changed...")
+
+                    GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.forEach { geoHash ->
+
+                        firebase.loadPokestops(geoHash)
+                        firebase.loadArenas(geoHash)
+
+                    } ?: kotlin.run {
+                        Log.w(TAG, "Max zooming level reached!")
+                    }
+                }
 
                 pokestopClusterManager?.onCameraIdle()
-//            update arenas and pokestops for this camera view
-                googleMap?.projection?.visibleRegion?.latLngBounds?.let { bounds ->
-
-                    Log.d(TAG, "Debug:: on camera changed...")
-                    FirebaseServer.requestForData(bounds.northeast, bounds.southwest,
-                        onNewArenaCallback = { updateArenas(it) },
-                        onNewPokestopCallback = { updatePokestops(it) })
-                }
+                arenaClusterManager?.onCameraIdle()
             }
-
-            pokestopClusterManager?.cluster()
         }
     }
 
@@ -197,6 +291,7 @@ class MapFragment: Fragment() {
         }
     }
 
+    // TODO: add button to show users registered geohash areas
     private fun setupFAB(fragmentLayout: View) {
 
         fragmentLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
@@ -221,7 +316,7 @@ class MapFragment: Fragment() {
                 // 3. get new arena from firebase -> show marker
                 centeredPosition()?.let {
                     setLocationMarker(it, MarkerType.arena)
-                    FirebaseServer.sendArena("new Debug Arena",
+                    firebase.sendArena("new Debug Arena",
                         GeoHash(it.latitude, it.longitude)
                     )
                 }
@@ -237,7 +332,7 @@ class MapFragment: Fragment() {
                 // 3. get new pokestop from firebase -> show marker
                 centeredPosition()?.let {
                     setLocationMarker(it, MarkerType.pokestop)
-                    FirebaseServer.sendPokestop("new Debug Pokestop",
+                    firebase.sendPokestop("new Debug Pokestop",
                         GeoHash(it.latitude, it.longitude)
                     )
                 }
@@ -321,27 +416,8 @@ class MapFragment: Fragment() {
 
     private fun updateArenas(arena: FirebaseArena) {
 
-        // TODO:like pokestops
+        // TODO:like items
         setLocationMarker(arena.geoHash.toLocation(), MarkerType.arena)
-    }
-
-    private fun updatePokestops(pokestop: FirebasePokestop) {
-
-        Log.d(TAG,"Debug:: updatePokestops(pokestop: ${pokestop.name}, geohash: ${pokestop.geoHash})")
-        pokestops[pokestop.id]?.let {
-            Log.d(TAG,"Debug:: updatePokestops() -> already there")
-            pokestops[it.id] = it
-
-        } ?: kotlin.run {
-
-            pokestops[pokestop.id] = pokestop
-            val item = ClusterPokestop.new(pokestop.id, pokestop.geoHash)
-            Log.d(TAG,"Debug:: updatePokestops() -> add new item: $item in manager: $pokestopClusterManager")
-            pokestopClusterManager?.addItem(item)
-//            setLocationMarker(pokestop.geoHash.toLocation(), MarkerType.pokestop)?.let { marker ->
-//                markers.put(pokestop.id, marker)
-//            }
-        }
     }
 
     /**
@@ -576,7 +652,7 @@ class MapFragment: Fragment() {
     private fun updateData(context: Context) {
 
         var allTasksSuccessful = true
-        geoHashList.keys.forEach { FirebaseServer.subscribeForPush(it) { taskSuccessful: Boolean ->
+        geoHashList.keys.forEach { firebase.subscribeForPush(it) { taskSuccessful: Boolean ->
             if (!taskSuccessful) { allTasksSuccessful = false }
         } }
 

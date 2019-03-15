@@ -1,17 +1,14 @@
 package io.stanc.pogotool.firebase.data
 
-import android.util.Log
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import io.stanc.pogotool.MapFragment.Companion.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.geohash.GeoHash
 
-data class FirebaseArena(val id: String,
-                         val name: String,
-                         val isEX: Boolean,
-                         val geoHash: GeoHash): FirebaseData {
+data class FirebaseArena(
+    override val id: String,
+    val name: String,
+    val isEX: Boolean,
+    val geoHash: GeoHash): FirebaseItem {
 
     override fun databasePath(): String {
         return "arenas/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
@@ -25,40 +22,6 @@ data class FirebaseArena(val id: String,
         data["longitude"] = geoHash.toLocation().longitude.toString()
 
         return data
-    }
-
-    class DataEventListener(private val databaseReference: DatabaseReference,
-                            private val geoHashArea: GeoHash,
-                            private val onNewArenaCallback: (arena: FirebaseArena) -> Unit): ChildEventListener {
-
-        override fun onCancelled(p0: DatabaseError) {
-            Log.w(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for arenaEventListener")
-            databaseReference.removeEventListener(this)
-        }
-
-        override fun onChildMoved(p0: DataSnapshot, p1: String?) { /* not needed */ }
-
-        override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-            databaseReference.removeEventListener(this)
-        }
-
-        override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-            p0.key?.let {
-                val geoHash = GeoHash(it)
-                if (geoHashArea.boundingBox.contains(geoHash.toLocation())) {
-//                    Log.d(TAG, "Debug:: dataSnapshot: $p0")
-                    p0.children.forEach { childDataSnapshot ->
-//                        Log.d(TAG, "Debug:: child: $childDataSnapshot")
-                        FirebaseArena.new(childDataSnapshot)?.let { arena ->
-                            onNewArenaCallback(arena)
-                        }
-                    }
-
-                }
-            }
-        }
-
-        override fun onChildRemoved(p0: DataSnapshot) { /* not needed */ }
     }
 
     companion object {
