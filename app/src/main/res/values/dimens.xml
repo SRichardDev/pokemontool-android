@@ -6,11 +6,9 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="layout_margin_top">64dp</dimen>
-    <dimen name="layout_margin_bottom">64dp</dimen>
-    <dimen name="layout_margin_end">32dp</dimen>
-    <dimen name="layout_margin_start">32dp</dimen>
+    <dimen name="layout_padding_screen">32dp</dimen>
+    <dimen name="layout_margin_default">16dp</dimen>
 
-    <dimen name="item_padding_default">8dp</dimen>
+    <dimen name="text_margin">4dp</dimen>
 
 </resources>

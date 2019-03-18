@@ -59,13 +59,7 @@ object FirebaseServer {
     }
 
     fun removeAuthStateObserver(observer: AuthStateObserver) {
-
-        val checkCount = authStateObservers.count()
         authStateObservers.remove(observer.hashCode())
-        val newCheckCount = authStateObservers.count()
-        if (newCheckCount >= checkCount) {
-            Log.e(TAG, "could not remove observer: $observer from list: checkCount: $checkCount, newCheckCount: $newCheckCount")
-        }
     }
 
     private val onAuthStateChanged: () -> Unit = {
@@ -117,6 +111,16 @@ object FirebaseServer {
         }
     }
 
+    fun authStateText(context: Context): String {
+
+        return when (authState()) {
+
+            AuthState.UserLoggedIn -> context.getString(R.string.authentication_state_signed_in)
+            AuthState.UserLoggedInButUnverified -> context.getString(R.string.authentication_state_signed_in_but_missing_verification)
+            AuthState.UserLoggedOut -> context.getString(R.string.authentication_state_signed_out)
+        }
+    }
+
     private fun sendTokenRequest(onRequestResponds: (token: String) -> Unit) {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
 
@@ -162,7 +166,7 @@ object FirebaseServer {
      * authentication methods
      */
 
-    fun signUp(email: String, password: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun signUp(email: String, password: String, onCompletedCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
 
         if (email.isEmpty() || password.isEmpty()) {
             return
@@ -176,12 +180,12 @@ object FirebaseServer {
                 Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
             }
 
-            onCompletedCallback(task.isSuccessful)
+            onCompletedCallback(task.isSuccessful, task.exception?.message)
             WaitingSpinner.hideProgress()
         }
     }
 
-    fun signIn(email: String, password: String, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun signIn(email: String, password: String, onCompletedCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
 
         if (email.isEmpty() || password.isEmpty()) {
             return
@@ -195,7 +199,7 @@ object FirebaseServer {
                 Log.w(TAG, "signing in failed with error: ${task.exception?.message}")
             }
 
-            onCompletedCallback(task.isSuccessful)
+            onCompletedCallback(task.isSuccessful, task.exception?.message)
             WaitingSpinner.hideProgress()
         }
     }
@@ -204,7 +208,7 @@ object FirebaseServer {
         auth.signOut()
     }
 
-    fun sendEmailVerification(onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun sendEmailVerification(onCompletedCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
 
         // Send verification email
         auth.currentUser?.let { user ->
@@ -218,7 +222,7 @@ object FirebaseServer {
                 }
 
                 WaitingSpinner.hideProgress()
-                onCompletedCallback(task.isSuccessful)
+                onCompletedCallback(task.isSuccessful, task.exception?.message)
             }
         } ?: kotlin.run { Log.w(TAG, "can not send email verification because current currentUser is null!") }
     }
@@ -270,19 +274,6 @@ object FirebaseServer {
 
             onCompletedCallback(task.isSuccessful)
         }
-    }
-
-    fun usersAuthenticationStateText(context: Context): String {
-
-        return currentUser?.let { user ->
-
-            if (user.isVerified) {
-                context.getString(R.string.authentication_state_signed_in, user.email)
-            } else {
-                context.getString(R.string.authentication_state_signed_in_but_missing_verification, user.email)
-            }
-
-        } ?: kotlin.run { context.getString(R.string.authentication_state_signed_out) }
     }
 
     private fun updateUserProfile(user: FirebaseUser?) {

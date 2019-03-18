@@ -5,7 +5,6 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -38,7 +37,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
                 weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
-                removeAuthFragment()
             }
         }
 
@@ -49,7 +47,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         // progress view
         WaitingSpinner.initialize(layout_progress, window)
 
-        // first fragment
+        // first screen
         showMapFragment()
     }
 
@@ -67,22 +65,28 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     /**
-     * Fragments
+     * Screens
      */
 
     private fun showMapFragment() {
 
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout,
-            MapFragment(), MapFragment::class.java.name).commit()
+        val fragmentTag = MapFragment::class.java.name
+        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+
+        if (fragment == null) {
+            fragment = MapFragment()
+        }
+
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
     }
 
     private fun showAuthFragment() {
 
-        val fragmentTag = AuthenticationFragment::class.java.name
+        val fragmentTag = AccountFragment::class.java.name
         var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = AuthenticationFragment()
+            fragment = AccountFragment()
         }
 
         supportFragmentManager.beginTransaction().add(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
@@ -90,7 +94,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun removeAuthFragment() {
 
-        val fragmentTag = AuthenticationFragment::class.java.name
+        val fragmentTag = AccountFragment::class.java.name
         supportFragmentManager?.findFragmentByTag(fragmentTag)?.let { fragment ->
             supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
         }
@@ -130,27 +134,23 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private val userProfileObserver = object : FirebaseServer.UserProfileObserver {
         override fun userProfileChanged(user: FirebaseUserLocal?) {
-            Log.d(TAG, "Debug:: userProfileChanged(${user?.name})")
             updateNavText()
         }
     }
 
     private fun updateNavText() {
-        nav_header_subtitle?.text = FirebaseServer.usersAuthenticationStateText(baseContext)
+        nav_header_subtitle?.text = FirebaseServer.authStateText(baseContext)
         nav_info?.text = getString(R.string.user_name, FirebaseServer.currentUser?.name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_authentication -> {
+            R.id.nav_account -> {
                 showAuthFragment()
             }
-            R.id.nav_share -> {
-                // TODO
-            }
-            R.id.nav_send -> {
-                // TODO
+            R.id.nav_map -> {
+                showMapFragment()
             }
         }
 

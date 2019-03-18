@@ -19,8 +19,8 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/colorBlack</item>
         <item name="android:background">@color/colorWhite</item>
-        <item name="android:padding">@dimen/item_padding_default</item>
-        <item name="android:layout_margin">@dimen/item_padding_default</item>
+        <item name="android:padding">@dimen/text_margin</item>
+        <item name="android:layout_margin">@dimen/text_margin</item>
     </style>
 
     <style name="FABEx_menu_button" parent="Widget.Design.FloatingActionButton">
