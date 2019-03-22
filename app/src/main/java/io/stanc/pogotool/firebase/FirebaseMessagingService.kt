@@ -13,8 +13,8 @@ import android.content.Intent
 import android.support.v4.app.NotificationCompat
 import io.stanc.pogotool.NavDrawerActivity
 import io.stanc.pogotool.R
-import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
-import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LATITUDE
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LONGITUDE
 
 
 class FirebaseMessagingService: FirebaseMessagingService() {

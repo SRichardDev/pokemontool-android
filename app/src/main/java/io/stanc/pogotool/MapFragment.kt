@@ -29,16 +29,16 @@ import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polygon
-import com.google.android.gms.maps.model.PolygonOptions
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LATITUDE
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LONGITUDE
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LATITUDE
-import io.stanc.pogotool.firebase.FirebaseServer.NOTIFICATION_DATA_LONGITUDE
 import io.stanc.pogotool.firebase.data.FirebaseArena
 import io.stanc.pogotool.firebase.data.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
+import io.stanc.pogotool.map.MapGeoHashGridProvider
+import io.stanc.pogotool.utils.WaitingSpinner
 
 
 class MapFragment: Fragment() {
@@ -51,8 +51,8 @@ class MapFragment: Fragment() {
     private var lastFocusedLocation: Location? = null
     private val locationListener = MapLocationListener()
 
+    private var geoHashMapGridProvider: MapGeoHashGridProvider? = null
     private var geoHashStartPosition: GeoHash? = null
-    private val geoHashList: HashMap<GeoHash, Polygon> = HashMap()
 
     private var crosshairImage: ImageView? = null
     private var crosshairAnimation: Animation? = null
@@ -126,13 +126,6 @@ class MapFragment: Fragment() {
     }
 
     /**
-     * Clustering Firebase items (Pokestops, Arenas, ...)
-     */
-
-
-
-
-    /**
      * Setup
      */
 
@@ -145,11 +138,10 @@ class MapFragment: Fragment() {
         setupOnMapClickListener()
         setupOnCameraIdleListener()
 
-        Log.d(TAG, "Debug:: onMapReadyCallback: map: $map, googleMap: $googleMap")
-
         // init view
         focusStartLocation()
-        showGeoHashGridList()
+        geoHashMapGridProvider = MapGeoHashGridProvider(map)
+        geoHashMapGridProvider?.showGeoHashGridList()
     }
 
     private fun setupOnCameraIdleListener() {
@@ -181,6 +173,7 @@ class MapFragment: Fragment() {
 
     enum class Mode {
         DEFAULT,
+        EDIT_GEO_HASHES,
         NEW_ARENA,
         NEW_POKESTOP
     }
@@ -193,7 +186,7 @@ class MapFragment: Fragment() {
             when(currentMode) {
 
                 Mode.NEW_ARENA -> {
-                    FirebaseServer.user()?.name?.let { submitter ->
+                    FirebaseServer.currentUser?.name?.let { submitter ->
                         centeredPosition()?.let { latlng ->
 
                             // TODO: user should type name
@@ -205,7 +198,7 @@ class MapFragment: Fragment() {
                 }
 
                 Mode.NEW_POKESTOP -> {
-                    FirebaseServer.user()?.name?.let { submitter ->
+                    FirebaseServer.currentUser?.name?.let { submitter ->
                         centeredPosition()?.let { latlng ->
 
                             // TODO: user should type name
@@ -223,7 +216,35 @@ class MapFragment: Fragment() {
         googleMap?.setOnMapLongClickListener {
 
             if (isLocationPermissionGranted()) {
-                toggleGeoHashGrid(it)
+
+                if (currentMode == Mode.EDIT_GEO_HASHES) {
+
+                    Log.d(TAG, "OnMapLongClickListener(Mode.EDIT_GEO_HASHES)")
+                    firebase.formattedFirebaseGeoHash(GeoHash(it))?.let { geoHash ->
+                        Log.d(TAG, "OnMapLongClickListener(Mode.EDIT_GEO_HASHES), clicked at $geoHash")
+
+                        geoHashMapGridProvider?.let { mapProvider ->
+                            if (mapProvider.geoHashExists(geoHash)) {
+
+                                // TODO: add onCompletionCallBack for removing ...
+                                Log.i(TAG, "Debug:: remove subscription and geoHashGrid for $geoHash...")
+                                firebase.removeSubscription(geoHash)
+                                mapProvider.removeGeoHashGrid(geoHash)
+
+                            } else {
+
+                                Log.i(TAG, "Debug:: add subscription and geoHashGrid for $geoHash...")
+                                firebase.subscribeForPush(geoHash) { successful ->
+                                    Log.i(TAG, "Debug:: subscribeForPush($geoHash), successful: $successful")
+                                    mapProvider.showGeoHashGrid(geoHash)
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+//                geoHashMapGridProvider?.toggleGeoHashGrid(it)
             } else {
                 Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
             }
@@ -235,22 +256,36 @@ class MapFragment: Fragment() {
 
         fragmentLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
             override fun onMenuCollapsed() {
-                dismissCrosshair()
-                currentMode = Mode.DEFAULT
+                resetMap()
             }
 
             override fun onMenuExpanded() {
+                resetMap()
+            }
+
+            private fun resetMap() {
                 dismissCrosshair()
+                geoHashMapGridProvider?.clearGeoHashGridList()
                 currentMode = Mode.DEFAULT
             }
         })
 
-        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_geo_hash)?.let { fab ->
+        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_edit_geo_hashs)?.let { fab ->
             fab.setOnClickListener {
 
+                Log.i(TAG, "Debug:: tab fab_geo_hashs...")
                 dismissCrosshair()
-                currentMode = Mode.DEFAULT
-                context?.let { updateData(it) }
+                geoHashMapGridProvider?.clearGeoHashGridList()
+                currentMode = Mode.EDIT_GEO_HASHES
+
+                WaitingSpinner.showProgress()
+                firebase.loadSubscriptions { geoHashes ->
+                    Log.i(TAG, "Debug:: geoHashes: $geoHashes")
+                    for (geoHash in geoHashes) {
+                        geoHashMapGridProvider?.showGeoHashGrid(geoHash)
+                    }
+                    WaitingSpinner.hideProgress()
+                }
             }
         }
 
@@ -335,67 +370,6 @@ class MapFragment: Fragment() {
         return googleMap?.cameraPosition?.target
     }
 
-
-    /**
-     * GeoHash Grid
-     */
-
-    private fun toggleGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(
-            latlng.latitude,
-            latlng.longitude,
-            GEO_HASH_AREA_PRECISION
-        )
-        toggleGeoHashGrid(geoHash)
-    }
-
-    private fun toggleGeoHashGrid(geoHash: GeoHash) {
-
-        if (geoHashList.contains(geoHash)) {
-            geoHashList.remove(geoHash)?.remove()
-        } else {
-            showGeoHashGrid(geoHash)
-        }
-    }
-
-    private fun showGeoHashGridList() {
-        geoHashList.keys.forEach { showGeoHashGrid(it) }
-    }
-
-    private fun showGeoHashGrid(location: Location) {
-        val geoHash =
-            GeoHash(location, GEO_HASH_AREA_PRECISION)
-        showGeoHashGrid(geoHash)
-    }
-
-    private fun showGeoHashGrid(latlng: LatLng) {
-        val geoHash = GeoHash(
-            latlng.latitude,
-            latlng.longitude,
-            GEO_HASH_AREA_PRECISION
-        )
-        showGeoHashGrid(geoHash)
-    }
-
-    private fun showGeoHashGrid(geoHash: GeoHash) {
-
-        if (geoHashList.contains(geoHash)) {
-            geoHashList[geoHash]?.remove()
-        }
-
-        val polygonRect = PolygonOptions()
-            .strokeWidth(5.0f)
-            .fillColor(R.color.colorGeoHashArea)
-            .add(
-                LatLng(geoHash.boundingBox.bottomLeft.latitude, geoHash.boundingBox.bottomLeft.longitude),
-                LatLng(geoHash.boundingBox.topLeft.latitude, geoHash.boundingBox.topLeft.longitude),
-                LatLng(geoHash.boundingBox.topRight.latitude, geoHash.boundingBox.topRight.longitude),
-                LatLng(geoHash.boundingBox.bottomRight.latitude, geoHash.boundingBox.bottomRight.longitude),
-                LatLng(geoHash.boundingBox.bottomLeft.latitude, geoHash.boundingBox.bottomLeft.longitude)
-            )
-
-        googleMap?.addPolygon(polygonRect)?.let { geoHashList[geoHash] = it }
-    }
 
     /**
      * Location
@@ -520,12 +494,13 @@ class MapFragment: Fragment() {
      */
 
     // TODO... -> FirebaseServer.kt
-    private fun updateData(context: Context) {
+    private fun subscribeForGeoHashes(context: Context) {
 
         var allTasksSuccessful = true
-        geoHashList.keys.forEach { firebase.subscribeForPush(it) { taskSuccessful: Boolean ->
-            if (!taskSuccessful) { allTasksSuccessful = false }
-        } }
+        geoHashMapGridProvider?.geoHashes()?.forEach { firebase.subscribeForPush(it) { taskSuccessful: Boolean ->
+                if (!taskSuccessful) { allTasksSuccessful = false }
+            }
+        }
 
         if (allTasksSuccessful) {
             Toast.makeText(context, context.getString(R.string.locations_sent_sucessfully), Toast.LENGTH_LONG).show()

@@ -1,7 +1,7 @@
 package io.stanc.pogotool.firebase.data
 
 
-interface FirebaseItem {
+interface FirebaseNode {
 
     val id: String
     fun databasePath(): String

@@ -1,15 +1,17 @@
 package io.stanc.pogotool.firebase
 
 import android.util.Log
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.*
 import io.stanc.pogotool.firebase.data.FirebaseArena
-import io.stanc.pogotool.firebase.data.FirebaseItem
+import io.stanc.pogotool.firebase.data.FirebaseNode
 import io.stanc.pogotool.firebase.data.FirebasePokestop
 import io.stanc.pogotool.firebase.data.FirebaseSubscription
+import io.stanc.pogotool.firebase.data.FirebaseSubscription.Type
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.utils.Async
+import io.stanc.pogotool.utils.Async.awaitResponse
 import io.stanc.pogotool.utils.KotlinUtils
+import kotlinx.coroutines.*
 import java.lang.ref.WeakReference
 
 class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
@@ -27,7 +29,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         fun onItemRemoved(item: Item)
     }
 
-    class ItemEventListener<Item: FirebaseItem>(delegate: Delegate<Item>, private val newItem: (p0: DataSnapshot) -> Item?): ChildEventListener {
+    class ItemEventListener<Item: FirebaseNode>(delegate: Delegate<Item>, private val newItem: (p0: DataSnapshot) -> Item?): ChildEventListener {
         private val TAG = this.javaClass.name
 
         val items: HashMap<String, Item> = HashMap()
@@ -50,7 +52,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
 
         override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-            Log.v(TAG, "onChildAdded(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
+//            Log.v(TAG, "onChildAdded(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
             newItem(p0)?.let { addItem(it) }
         }
 
@@ -60,9 +62,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
 
         private fun addItem(item: Item) {
-            Log.v(TAG, "addItem($item) 1, items: $items")
             if (!items.containsKey(item.id)) {
-                Log.v(TAG, "addItem($item) 2")
                 items[item.id] = item
                 delegate.get()?.onItemAdded(item)
             }
@@ -80,7 +80,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * arenas
      */
 
-    private val databaseArena = FirebaseServer.database.child("arenas")
+    private val databaseArena = FirebaseServer.database.child(DATABASE_ARENAS)
     private val arenaEventListener: ChildEventListener = ItemEventListener(arenaDelegate) { dataSnapshot-> FirebaseArena.new(dataSnapshot) }
 
     fun loadArenas(geoHash: GeoHash) {
@@ -90,8 +90,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun pushArena(arena: FirebaseArena) {
 
-        firebaseGeoHash(arena.geoHash)?.let { childGeoHash ->
-            databaseArena.child(childGeoHash.toString()).push().setValue(arena.data())
+        formattedFirebaseGeoHash(arena.geoHash)?.let { childGeoHash ->
+            val path = databaseArena.child(childGeoHash.toString()).toString()
+            FirebaseServer.addNewNode(path, arena.data())
         }
     }
 
@@ -99,8 +100,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * pokestops
      */
 
-    private val databasePokestop = FirebaseServer.database.child("test_pokestops")
-//    private val databasePokestop = FirebaseServer.database.child("pokestops")
+    private val databasePokestop = FirebaseServer.database.child(DATABASE_POKESTOPS)
     private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
 
     fun loadPokestops(geoHash: GeoHash) {
@@ -110,31 +110,125 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun pushPokestop(pokestop: FirebasePokestop) {
 
-        firebaseGeoHash(pokestop.geoHash)?.let { childGeoHash ->
-            databasePokestop.child(childGeoHash.toString()).push().setValue(pokestop.data())
+        formattedFirebaseGeoHash(pokestop.geoHash)?.let { childGeoHash ->
+            val path = databasePokestop.child(childGeoHash.toString()).toString()
+            FirebaseServer.addNewNode(path, pokestop.data())
         }
     }
 
     /**
-     * data subscription
+     * location subscriptions
      */
 
-    fun subscribeForPush(geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    // TODO: call onCompletionCallback only once! independent of database number
+    fun loadSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>) -> Unit) {
 
-        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseServer.currentUser?.id}, notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
-        KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { id, token ->
+        Log.i(TAG, "Debug:: loadSubscriptions for userToken: ${FirebaseServer.currentUser?.notificationToken} ...")
 
-            subscribeFor(FirebaseSubscription.Type.Arena, id, token, geoHash, onCompletedCallback)
-            subscribeFor(FirebaseSubscription.Type.Pokestop, id, token, geoHash, onCompletedCallback)
+        GlobalScope.launch(Dispatchers.Default) {
+
+            val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databasePokestop, it) }
+            Log.i(TAG, "Debug:: pokestopsGeoHashes: $pokestopsGeoHashes")
+            val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databaseArena, it) }
+            Log.i(TAG, "Debug:: arenaGeoHashes: $arenaGeoHashes")
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val geoHashes = pokestopsGeoHashes.union(arenaGeoHashes).distinct()
+                Log.i(TAG, "Debug:: union, distinct geoHashes: $geoHashes")
+                onCompletionCallback(geoHashes)
+            }
         }
     }
 
-    private fun subscribeFor(type: FirebaseSubscription.Type, userId: String, userToken: String, geoHash: GeoHash, onCompletedCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        val data = FirebaseSubscription(userId, userToken, geoHash, type)
-        FirebaseServer.sendData(data, onCompletedCallback)
+    fun removeAllSubscriptions() {
+        removeSubscriptionsFromDatabase(databasePokestop, Type.Pokestop)
+        removeSubscriptionsFromDatabase(databaseArena, Type.Arena)
     }
 
-    private fun firebaseGeoHash(geoHash: GeoHash): GeoHash? {
+//    fun removeAllSubscriptions(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        GlobalScope.launch(Dispatchers.Default) {
+//
+//            val firstTaskSuccessful: Boolean = awaitResponse { removeSubscriptionsFromDatabase(databasePokestop, Type.Pokestop, it) }
+//            val secondTaskSuccessful: Boolean = awaitResponse { removeSubscriptionsFromDatabase(databaseArena, Type.Arena, it) }
+//
+//            CoroutineScope(Dispatchers.Main).launch {
+//                onCompletionCallback(firstTaskSuccessful && secondTaskSuccessful)
+//            }
+//        }
+//    }
+
+    fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        Log.d(TAG, "Debug:: subscribeForPush(geoHash: $geoHash), currentUser: ${FirebaseServer.currentUser}")
+        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseServer.currentUser?.id}, notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
+        KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { uid, notificationToken ->
+
+            subscribeFor(FirebaseSubscription.Type.Arena, uid, notificationToken, geoHash, onCompletionCallback)
+            subscribeFor(FirebaseSubscription.Type.Pokestop, uid, notificationToken, geoHash, onCompletionCallback)
+        }
+    }
+
+    private fun subscribeFor(type: FirebaseSubscription.Type, uid: String, notificationToken: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        val data = FirebaseSubscription(id = notificationToken, uid = uid, geoHash = geoHash, type = type)
+        FirebaseServer.addDataToNode(data, onCompletionCallback)
+    }
+
+    // TODO: add onCompletionCallBack for removing ...
+    fun removeSubscription(geoHash: GeoHash) {
+        FirebaseServer.currentUser?.notificationToken?.let { userToken ->
+            databaseArena.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
+            databasePokestop.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
+
+//            FirebaseServer.removeData()
+        }
+    }
+
+    /**
+     * private implementations
+     */
+
+    private fun loadSubscriptionsFromDatabase(database: DatabaseReference, onResponse: Async.Response<List<GeoHash>>) {
+
+        FirebaseServer.currentUser?.notificationToken?.let { userToken ->
+
+            database.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.e(TAG, "onCancelled(${p0.message}) for loadSubscriptionsFromDatabase(database: $database)")
+                    onResponse.onException(p0.toException())
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    Log.d(TAG, "Debug::load onDataChange(${p0.value})")
+                    val geoHashes = registeredGeoHashes(p0, userToken)
+                    onResponse.onCompletion(geoHashes)
+                }
+            })
+        }
+    }
+
+    private fun removeSubscriptionsFromDatabase(database: DatabaseReference, type: FirebaseSubscription.Type) {
+
+        KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { uid, userToken ->
+
+            database.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.e(TAG, "onCancelled(${p0.message}) for loadSubscriptionsFromDatabase(database: $database)")
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    Log.d(TAG, "Debug::remove onDataChange(${p0.value})")
+                    val geoHashes = registeredGeoHashes(p0, userToken)
+                    for (geoHash in geoHashes) {
+                        val data = FirebaseSubscription(id = userToken, uid = uid, geoHash = geoHash, type = type)
+                        FirebaseServer.removeData(data)
+                    }
+                }
+            })
+        }
+    }
+
+    fun formattedFirebaseGeoHash(geoHash: GeoHash): GeoHash? {
 
         val precision = geoHash.toString().length
         return if (precision >= 6) {
@@ -142,5 +236,40 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         } else {
             null
         }
+    }
+
+    private fun registeredGeoHashes(snapshot: DataSnapshot, usersNotificationToken: String): List<GeoHash> {
+
+        val geoHashes = mutableListOf<GeoHash>()
+
+        for (child in snapshot.children) {
+            for (registered_user in child.child(DATABASE_REG_USER).children) {
+//                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
+                if (registered_user.key == usersNotificationToken) {
+//                    Log.d(TAG, "Debug:: new geoHash: key: ${child.key}, value: ${child.value}")
+                    val geoHash = GeoHash(child.key as String)
+                    geoHashes.add(geoHash)
+                }
+            }
+        }
+
+        return geoHashes
+    }
+
+    /**
+     * database constants
+     */
+
+    companion object {
+
+        const val DATABASE_USERS = "users"
+        const val DATABASE_ARENAS = "arenas"
+        //    const val DATABASE_POKESTOPS = "pokestops"
+        const val DATABASE_POKESTOPS = "test_pokestops"
+        const val DATABASE_REG_USER = "registered_user"
+        const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
+
+        const val NOTIFICATION_DATA_LATITUDE = "latitude"
+        const val NOTIFICATION_DATA_LONGITUDE = "longitude"
     }
 }

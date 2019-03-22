@@ -3,13 +3,12 @@ package io.stanc.pogotool
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseUserLocal
+import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -116,7 +115,7 @@ class AccountFragment: Fragment(), View.OnClickListener {
     }
 
     private val userProfileObserver = object: FirebaseServer.UserProfileObserver {
-        override fun userProfileChanged(user: FirebaseUserLocal?) {
+        override fun userProfileChanged(user: FirebaseUser?) {
             updateUI()
         }
     }
@@ -194,13 +193,13 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
     private fun updateUserStateTexts() {
 
-        FirebaseServer.user()?.photoURL?.let { authentication_imageview_user?.setImageURI(it) }
+        FirebaseServer.currentUser?.photoURL?.let { authentication_imageview_user?.setImageURI(it) }
 
         context?.let {
             authentication_layout_user_status?.text = getString(R.string.authentication_user_state, FirebaseServer.authStateText(it))
         }
-        FirebaseServer.user()?.name?.let { authentication_layout_user_name?.text = getString(R.string.authentication_user_name, it) }
-        FirebaseServer.user()?.email?.let { authentication_layout_user_email?.text = getString(R.string.authentication_user_email, it) }
+        FirebaseServer.currentUser?.name?.let { authentication_layout_user_name?.text = getString(R.string.authentication_user_name, it) }
+        FirebaseServer.currentUser?.email?.let { authentication_layout_user_email?.text = getString(R.string.authentication_user_email, it) }
     }
 
     private fun updateSignButtons(userHasToSignInOrUp: Boolean, isEmailVerified: Boolean = false) {

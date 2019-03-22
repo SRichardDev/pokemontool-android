@@ -2,17 +2,18 @@ package io.stanc.pogotool.firebase.data
 
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.MapFragment
+import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
 import java.util.*
 
-class FirebasePokestop(
+data class FirebasePokestop(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
-    val submitter: String): FirebaseItem {
+    val submitter: String): FirebaseNode {
 
     override fun databasePath(): String {
-        return "items/${geoHash.toString().substring(0, MapFragment.GEO_HASH_AREA_PRECISION)}"
+        return "${FirebaseDatabase.DATABASE_POKESTOPS}/${geoHash.toString().substring(0, MapFragment.GEO_HASH_AREA_PRECISION)}"
     }
 
     override fun data(): Map<String, Any> {

@@ -1,8 +1,8 @@
 package io.stanc.pogotool.firebase.data
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.MapFragment.Companion.GEO_HASH_AREA_PRECISION
+import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
 
 data class FirebaseArena(
@@ -10,10 +10,10 @@ data class FirebaseArena(
     val name: String,
     val geoHash: GeoHash,
     val submitter: String,
-    val isEX: Boolean = false): FirebaseItem {
+    val isEX: Boolean = false): FirebaseNode {
 
     override fun databasePath(): String {
-        return "arenas/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+        return "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
     }
 
     override fun data(): Map<String, Any> {

@@ -9,7 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseUserLocal
+import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
@@ -133,7 +133,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      */
 
     private val userProfileObserver = object : FirebaseServer.UserProfileObserver {
-        override fun userProfileChanged(user: FirebaseUserLocal?) {
+        override fun userProfileChanged(user: FirebaseUser?) {
             updateNavText()
         }
     }
