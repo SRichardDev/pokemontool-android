@@ -62,5 +62,6 @@
 
     <!-- Map -->
     <string name="map_max_zooming_level">Max zooming level reached. Please zoom in.</string>
+    <string name="map_max_subscriptions">Max subscriptions reached. Please delete areas before adding new ones.</string>
 
 </resources>

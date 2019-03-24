@@ -10,7 +10,7 @@ import io.stanc.pogotool.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.geohash.GeoHash
 
-class MapGeoHashGridProvider(private val googleMap: GoogleMap) {
+class MapGridProvider(private val googleMap: GoogleMap) {
 
     private val TAG = javaClass.name
     private val geoHashList: HashMap<GeoHash, Polygon> = HashMap()

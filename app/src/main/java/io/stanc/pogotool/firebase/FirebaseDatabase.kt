@@ -262,6 +262,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     companion object {
 
+        const val MAX_SUBSCRIPTIONS = 10
         const val DATABASE_USERS = "users"
         const val DATABASE_ARENAS = "arenas"
         //    const val DATABASE_POKESTOPS = "pokestops"
