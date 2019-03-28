@@ -28,7 +28,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
         val geoHash = GeoHash(
             latlng.latitude,
             latlng.longitude,
-            MapFragment.GEO_HASH_AREA_PRECISION
+            MapGridProvider.GEO_HASH_AREA_PRECISION
         )
         toggleGeoHashGrid(geoHash)
     }
@@ -49,7 +49,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
     }
 
     fun showGeoHashGrid(location: Location) {
-        val geoHash = GeoHash(location, MapFragment.GEO_HASH_AREA_PRECISION)
+        val geoHash = GeoHash(location, MapGridProvider.GEO_HASH_AREA_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
@@ -57,7 +57,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
         val geoHash = GeoHash(
             latlng.latitude,
             latlng.longitude,
-            MapFragment.GEO_HASH_AREA_PRECISION
+            MapGridProvider.GEO_HASH_AREA_PRECISION
         )
         showGeoHashGrid(geoHash)
     }
@@ -92,5 +92,9 @@ class MapGridProvider(private val googleMap: GoogleMap) {
             polygon.remove()
         }
         geoHashList.clear()
+    }
+
+    companion object {
+        const val GEO_HASH_AREA_PRECISION: Int = 6
     }
 }

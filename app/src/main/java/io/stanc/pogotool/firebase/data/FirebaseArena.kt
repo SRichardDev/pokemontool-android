@@ -1,9 +1,9 @@
 package io.stanc.pogotool.firebase.data
 
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.MapFragment.Companion.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
 
 data class FirebaseArena(
     override val id: String,

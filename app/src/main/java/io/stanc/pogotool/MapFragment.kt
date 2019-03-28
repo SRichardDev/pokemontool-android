@@ -3,6 +3,8 @@ package io.stanc.pogotool
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -10,66 +12,39 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
-import android.widget.Toast
-import android.widget.Toast.LENGTH_LONG
-import com.getbase.floatingactionbutton.FloatingActionButton
-import com.getbase.floatingactionbutton.FloatingActionsMenu
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
-import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.MAX_SUBSCRIPTIONS
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LATITUDE
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LONGITUDE
-import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseArena
-import io.stanc.pogotool.firebase.data.FirebasePokestop
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.map.ClusterManager
-import io.stanc.pogotool.map.MapGridProvider
 import io.stanc.pogotool.utils.PermissionManager
-import io.stanc.pogotool.utils.WaitingSpinner
 
 
-class MapFragment: Fragment() {
+open class MapFragment : Fragment() {
 
-    // map manager
-    private var locationManager: io.stanc.pogotool.map.LocationManager? = null
-    private var mapGridProvider: MapGridProvider? = null
-    private var clusterManager: ClusterManager? = null
-    private var firebase: FirebaseDatabase? = null
+    private val TAG = javaClass.name
 
-    // map view
+    var map: GoogleMap? = null
+
     private var mapView: MapView? = null
-    private var crosshairImage: ImageView? = null
-    private var crosshairAnimation: Animation? = null
+    private var delegate: MapDelegate? = null
+    private var locationManager: LocationManager? = null
 
+    private var geoHashStartPosition: GeoHash? = null
+    private var isMyLocationEnabled: Boolean = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        activity?.intent?.extras?.let { bundle ->
-
-            Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"$NOTIFICATION_DATA_LONGITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)}, bundle.containsKey(\"$NOTIFICATION_DATA_LATITUDE\"): ${bundle.containsKey(NOTIFICATION_DATA_LATITUDE)}]")
-
-            if (bundle.containsKey(NOTIFICATION_DATA_LATITUDE) && bundle.containsKey(NOTIFICATION_DATA_LONGITUDE)) {
-
-                val latitude = (bundle.get(NOTIFICATION_DATA_LATITUDE) as String).toDouble()
-                val longitude = (bundle.get(NOTIFICATION_DATA_LONGITUDE) as String).toDouble()
-
-                locationManager?.setNextStartLocation(latitude, longitude)
-            }
-        }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
-    @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val fragmentLayout = inflater.inflate(R.layout.layout_fragment_map, container, false)
+        val rootLayout = inflater.inflate(R.layout.fragment_map, container, false)
 
-        mapView = fragmentLayout.findViewById(R.id.fragment_map_mapview) as MapView
+        mapView = rootLayout.findViewById(R.id.map_mapview) as MapView
         mapView?.onCreate(savedInstanceState)
         mapView?.onResume() // needed to get the map to display immediately
 
@@ -77,46 +52,36 @@ class MapFragment: Fragment() {
 
         mapView?.getMapAsync { setupMap(it) }
 
-        // floating action buttons
-        setupFAB(fragmentLayout)
-
-        // crosshair
-        crosshairAnimation = AnimationUtils.loadAnimation(context, R.anim.flashing)
-        crosshairImage = fragmentLayout.findViewById(R.id.fragment_map_imageview_crosshair)
-
-        return fragmentLayout
+        return rootLayout
     }
 
     private fun setupMap(googleMap: GoogleMap) {
+        map = googleMap
 
-        context?.let { context ->
-            locationManager = io.stanc.pogotool.map.LocationManager(googleMap, context)
+        // 3D buildings
+        map?.isBuildingsEnabled = true
 
-            locationManager?.setOnMapClickListener(onMapClickListener)
-            locationManager?.setOnMapLongClickListener(onMapLongClickListener)
-            locationManager?.setOnCameraIdleListener(onCameraIdleListener)
-            locationManager?.setOnMarkerClickListener(onMarkerClickListener)
+        updateMyLocationEnabledPOI()
 
-            clusterManager = ClusterManager(context, googleMap)
-            clusterManager?.let {
-                firebase = FirebaseDatabase(it.pokestopDelegate, it.arenaDelegate)
-            }
-        }
+        updateCameraStartPosition()
+        map?.let { delegate?.onMapReady(it) }
+    }
 
-        // init view
-        locationManager?.focusStartLocation(activity)
+    /**
+     * mapView lifecycle
+     */
 
-        mapGridProvider = MapGridProvider(googleMap)
-        mapGridProvider?.showGeoHashGridList()
+    override fun onStart() {
+        super.onStart()
+        mapView?.onStart()
     }
 
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
         activity?.let { PermissionManager.checkLocationPermission(it) }
-
-        locationManager?.let {
-            if (!it.isGPSEnabled()) {
+        isGPSEnabled()?.let { enabled ->
+            if (!enabled) {
                 showAlertMessageNoGPS()
             }
         }
@@ -125,6 +90,16 @@ class MapFragment: Fragment() {
     override fun onPause() {
         super.onPause()
         mapView?.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView?.onStop()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -139,164 +114,173 @@ class MapFragment: Fragment() {
     }
 
     /**
-     * map
+     * Location
      */
 
-    enum class Mode {
-        DEFAULT,
-        EDIT_GEO_HASHES,
-        NEW_ARENA,
-        NEW_POKESTOP
+    fun centeredPosition(): LatLng? {
+        return map?.cameraPosition?.target
     }
-    private var currentMode = Mode.DEFAULT
 
-    private val onMapClickListener = GoogleMap.OnMapClickListener {
+    fun visibleRegionBounds(): LatLngBounds? {
+        return map?.projection?.visibleRegion?.latLngBounds
+    }
 
-        when(currentMode) {
-
-            Mode.NEW_ARENA -> {
-                FirebaseServer.currentUser?.name?.let { submitter ->
-                    locationManager?.centeredPosition()?.let { latlng ->
-
-                        // TODO: user should type name
-                        val geoHash = GeoHash(latlng.latitude, latlng.longitude)
-                        val arena = FirebaseArena("", "new Debug Arena", geoHash, submitter)
-                        firebase?.pushArena(arena)
-                    }
-                }
-            }
-
-            Mode.NEW_POKESTOP -> {
-                FirebaseServer.currentUser?.name?.let { submitter ->
-                    locationManager?.centeredPosition()?.let { latlng ->
-
-                        // TODO: user should type name
-                        val geoHash = GeoHash(latlng.latitude, latlng.longitude)
-                        val pokestop = FirebasePokestop("", "new Debug Pokestop", geoHash, submitter)
-                        firebase?.pushPokestop(pokestop)
-                    }
-                }
-            }
-
-            else -> {}
+    @SuppressLint("MissingPermission") // permission check exists
+    fun latestLocation(): Location? {
+        return if (PermissionManager.isLocationPermissionGranted(context)) {
+            locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        } else {
+            null
         }
     }
 
-    private val onMapLongClickListener = GoogleMap.OnMapLongClickListener {
+    fun setNextStartPosition(latitude: Double, longitude: Double) {
+        geoHashStartPosition = GeoHash(latitude, longitude)
+    }
+
+    fun enableMyLocationPOI(enabled: Boolean) {
+        isMyLocationEnabled = enabled
+        updateMyLocationEnabledPOI()
+    }
+
+    // TODO: does not work
+//    fun enableUIInteraction(enabled: Boolean) {
+//        map?.uiSettings?.let { uiSettings ->
+//
+//            uiSettings.isScrollGesturesEnabled = enabled
+//            uiSettings.isTiltGesturesEnabled = enabled
+//            uiSettings.isRotateGesturesEnabled = enabled
+//            uiSettings.isZoomGesturesEnabled = enabled
+//            uiSettings.isZoomControlsEnabled = enabled
+//        }
+//    }
+
+    @SuppressLint("MissingPermission") // permission check exists
+    // for showing myPOI and button to my location
+    private fun updateMyLocationEnabledPOI() {
 
         if (PermissionManager.isLocationPermissionGranted(context)) {
-            if (currentMode == Mode.EDIT_GEO_HASHES) {
-
-                firebase?.formattedFirebaseGeoHash(GeoHash(it))?.let { geoHash ->
-                    toggleSubscriptions(geoHash)
-                }
-            }
-        } else {
-            Toast.makeText(context, R.string.dialog_location_disabled_message, LENGTH_LONG).show()
+            map?.isMyLocationEnabled = isMyLocationEnabled
+            map?.uiSettings?.isMyLocationButtonEnabled = isMyLocationEnabled
         }
     }
 
-    private fun toggleSubscriptions(geoHash: GeoHash) {
+    private fun updateCameraStartPosition() {
 
-        mapGridProvider?.let {
-            if (it.geoHashExists(geoHash)) {
+        if (PermissionManager.isLocationPermissionGranted(activity)) {
 
-                // TODO: add onCompletionCallBack for removing ...
-                Log.i(TAG, "Debug:: remove subscription and geoHashGrid for $geoHash...")
-                firebase?.removeSubscription(geoHash)
-                it.removeGeoHashGrid(geoHash)
-
-            } else {
-
-                Log.i(TAG, "Debug:: add subscription and geoHashGrid for $geoHash...")
-                if (it.geoHashes().size < MAX_SUBSCRIPTIONS) {
-                    firebase?.subscribeForPush(geoHash) { successful ->
-                        Log.i(TAG, "Debug:: subscribeForPush($geoHash), successful: $successful")
-                        it.showGeoHashGrid(geoHash)
-                    }
-                } else {
-                    Toast.makeText(context, R.string.map_max_subscriptions, LENGTH_LONG).show()
-                }
-            }
-        }
-    }
-
-    private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
-
-        locationManager?.visibleRegionBounds()?.let { bounds ->
-            GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.forEach { geoHash ->
-
-                firebase?.loadPokestops(geoHash)
-                firebase?.loadArenas(geoHash)
-
+            geoHashStartPosition?.let {
+                updateCameraPosition(it, onFinished = {
+                    delegate?.onCameraStartAnimationFinished()
+                })
             } ?: kotlin.run {
-                Log.w(TAG, "Max zooming level reached!")
+                latestLocation()?.let {
+                    updateCameraPosition(it, onFinished = {
+                        delegate?.onCameraStartAnimationFinished()
+                    })
+                }
             }
+
+            geoHashStartPosition = null
+
+        } else {
+            PermissionManager.requestLocationPermission(activity)
         }
-
-        clusterManager?.onCameraIdle()
-    }
-
-    private val onMarkerClickListener = GoogleMap.OnMarkerClickListener { marker ->
-        clusterManager?.onMarkerClick(marker) ?: kotlin.run { false }
     }
 
     /**
-     * FABs
+     * camera position
      */
 
-    // TODO: add button to show users registered geohash areas
-    private fun setupFAB(fragmentLayout: View) {
+    fun updateCameraPosition(geoHash: GeoHash, onFinished: () -> Unit = {}) {
+        val latlng = LatLng(geoHash.toLocation().latitude, geoHash.toLocation().longitude)
+        updateCameraPosition(latlng, onFinished)
+    }
 
-        fragmentLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
-            override fun onMenuCollapsed() {
-                resetMap()
+    fun updateCameraPosition(location: Location, onFinished: () -> Unit = {}) {
+        val latlng = LatLng(location.latitude, location.longitude)
+        updateCameraPosition(latlng, onFinished)
+    }
+
+    fun updateCameraPosition(latLng: LatLng, onFinished: () -> Unit = {}) {
+
+        map?.let { googleMap ->
+            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(ZOOM_LEVEL_STREET).build()
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
+        }
+    }
+
+    private fun animationCallback(onFinished: () -> Unit): GoogleMap.CancelableCallback {
+
+        return object: GoogleMap.CancelableCallback {
+            override fun onFinish() {
+                onFinished()
             }
 
-            override fun onMenuExpanded() {
-                resetMap()
+            override fun onCancel() {
+                Log.w(TAG, "animation canceled.")
             }
+        }
+    }
 
-            private fun resetMap() {
-                dismissCrosshair()
-                mapGridProvider?.clearGeoHashGridList()
-                currentMode = Mode.DEFAULT
+    /**
+     * camera animation
+     */
+
+    private var animationRunning = false
+    private val defaultDurationInMilliSec = 6000
+
+    fun startAnimation(latLng: LatLng) {
+        animationRunning = true
+        animate(latLng)
+    }
+
+    fun stopAnimation() {
+        animationRunning = false
+    }
+
+    private fun animate(latLng: LatLng) {
+        rotateCamera(latLng, onFinished = {
+            if (animationRunning) {
+                animate(latLng)
             }
         })
+    }
 
-        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_edit_geo_hashs)?.let { fab ->
-            fab.setOnClickListener {
+    fun rotateCamera(latLng: LatLng, onFinished:() -> Unit = {}, durationInMilliSec: Int = defaultDurationInMilliSec) {
 
-                dismissCrosshair()
-                mapGridProvider?.clearGeoHashGridList()
-                currentMode = Mode.EDIT_GEO_HASHES
+        map?.let { googleMap ->
 
-                WaitingSpinner.showProgress()
-                firebase?.loadSubscriptions { geoHashes ->
-                    Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
-                    for (geoHash in geoHashes) {
-                        mapGridProvider?.showGeoHashGrid(geoHash)
-                    }
-                    WaitingSpinner.hideProgress()
-                }
-            }
+            val lastBearing = googleMap.cameraPosition.bearing
+            val bearing1 = lastBearing + 179
+            val bearing2 = lastBearing - 2
+
+            val camPosition1 = CameraPosition.builder()
+                .target(latLng)
+                .bearing(bearing1)
+                .zoom(ZOOM_LEVEL_BUILDING)
+                .tilt(googleMap.cameraPosition.tilt) // 30f
+                .build()
+
+            val camPosition2 = CameraPosition.builder()
+                .target(latLng)
+                .bearing(bearing2)
+                .zoom(ZOOM_LEVEL_STREET)
+                .tilt(75f)
+                .build()
+
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPosition1),
+                                    durationInMilliSec,
+                                    animationCallback(onFinished = {
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPosition2),
+                                        durationInMilliSec,
+                                        animationCallback(onFinished))
+            }))
         }
+    }
 
-        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_arena)?.let { fab ->
-            fab.setOnClickListener {
-
-                showCrosshair()
-                currentMode = Mode.NEW_ARENA
-            }
-        }
-
-        fragmentLayout.findViewById<FloatingActionButton>(R.id.fab_pokestop)?.let { fab ->
-            fab.setOnClickListener {
-
-                showCrosshair()
-                currentMode = Mode.NEW_POKESTOP
-            }
-        }
+    fun rotateCameraAroundCenter() {
+        centeredPosition()?.let { rotateCamera(it) }
     }
 
     /**
@@ -307,52 +291,60 @@ class MapFragment: Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         context?.let {
             PermissionManager.onRequestPermissionsResult(requestCode, it, onLocationPermissionGranted = {
-                locationManager?.focusStartLocation(activity)
+                Log.i(TAG, "location permission granted! start init camera animation...")
+                updateCameraStartPosition()
             })
         }
-    }
-
-    /**
-     * Crosshair
-     */
-
-    private fun showCrosshair() {
-        crosshairImage?.visibility = View.VISIBLE
-        crosshairImage?.startAnimation(crosshairAnimation)
-
-    }
-
-    private fun dismissCrosshair() {
-        crosshairAnimation?.cancel()
-        crosshairAnimation?.reset()
-        crosshairImage?.clearAnimation()
-        crosshairImage?.visibility = View.GONE
     }
 
     /**
      * GPS
      */
 
+    private fun isGPSEnabled(): Boolean? = locationManager?.isProviderEnabled( LocationManager.GPS_PROVIDER )
+
     private fun showAlertMessageNoGPS() {
 
         context?.let { _context ->
 
             val builder = AlertDialog.Builder(_context)
-            builder.setMessage(getString(R.string.dialog_gps_disabled_message))
+                .setMessage(getString(R.string.dialog_gps_disabled_message))
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.dialog_gps_disabled_button_positive)
-                ) { _, _ -> startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
-                .setNegativeButton(getString(R.string.dialog_gps_disabled_button_negative)
-                ) { dialog, _ -> dialog.cancel() }
+                .setPositiveButton(getString(R.string.dialog_gps_disabled_button_positive)) { _, _ ->
+                    startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                }
+                .setNegativeButton(getString(R.string.dialog_gps_disabled_button_negative)) { dialog, _ ->
+                    dialog.cancel()
+                }
 
             builder.create().show()
         }
     }
 
-    companion object {
+    /**
+     * observer
+     */
 
-        private val TAG = this::class.java.name
+    interface MapDelegate {
+        fun onMapReady(googleMap: GoogleMap)
+        fun onCameraStartAnimationFinished()
+    }
 
-        const val GEO_HASH_AREA_PRECISION: Int = 6
+    fun setDelegate(delegate: MapDelegate) {
+        map?.let { delegate.onMapReady(it) }
+        this.delegate = delegate
+    }
+
+        companion object {
+
+        // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
+        private const val ZOOM_LEVEL_WORLD: Float = 1.0f
+        private const val ZOOM_LEVEL_LANDMASS: Float = 5.0f
+        private const val ZOOM_LEVEL_CITY: Float = 10.0f
+        private const val ZOOM_LEVEL_STREET: Float = 15.0f
+        private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
+
+        private const val LOCATION_UPDATE_MIN_TIME_MILLISECONDS: Long = 1000
+        private const val LOCATION_UPDATE_MIN_DISTANCE_METER: Float = 2.0f
     }
 }

@@ -6,7 +6,7 @@
                                              android:padding="@dimen/layout_padding_screen"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
-                                             android:background="@color/colorWhiteBlue">
+                                             android:background="@color/colorWhite">
 
     <ImageView
         android:id="@+id/authentication_imageview_user"
@@ -74,7 +74,7 @@
 
         <Button
             android:id="@+id/authentication_button_user_name"
-            style="@style/AppButtons"
+            style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -82,7 +82,7 @@
 
         <EditText
             android:id="@+id/authentication_edittext_user_name"
-            style="@style/AppButtons"
+            style="@style/TextStyle_edittext"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -93,7 +93,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_in"
-            style="@style/AppButtons"
+            style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -101,7 +101,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_up"
-            style="@style/AppButtons"
+            style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -109,7 +109,7 @@
 
         <Button
             android:id="@+id/authentication_button_verify_email"
-            style="@style/AppButtons"
+            style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -117,7 +117,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_out"
-            style="@style/AppButtons"
+            style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -125,7 +125,7 @@
 
         <EditText
             android:id="@+id/authentication_edittext_email"
-            style="@style/AppButtons"
+            style="@style/TextStyle_edittext"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -135,7 +135,7 @@
 
         <EditText
             android:id="@+id/authentication_edittext_password"
-            style="@style/AppButtons"
+            style="@style/TextStyle_edittext"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -143,16 +143,5 @@
             android:inputType="textPassword"/>
 
     </LinearLayout>
-
-    <!--<ImageView-->
-        <!--android:id="@+id/authentication_imageButton_close"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--app:layout_constraintTop_toTopOf="parent"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--android:padding="@dimen/item_padding_default"-->
-        <!--android:src="@drawable/icon_close"-->
-        <!--android:background="@color/colorTransparent"-->
-        <!--tools:ignore="ContentDescription"/>-->
 
 </android.support.constraint.ConstraintLayout>

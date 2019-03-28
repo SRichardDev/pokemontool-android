@@ -305,11 +305,7 @@ object FirebaseServer {
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
     fun addDataToNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        Log.v(TAG, "Debug:: addDataToNode [databaseChildPath: ${firebaseNode.databasePath()}, id: ${firebaseNode.id}, data: ${firebaseNode.data()}]")
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
-            Log.i(TAG, "Debug:: addDataToNode OnCompleteListener isSuccessful: ${task.isSuccessful}")
-            Log.e(TAG, "Debug:: addDataToNode OnCompleteListener exception: ${task.exception?.message}")
-
             onCompletionCallback(task.isSuccessful)
         }
     }
@@ -318,7 +314,6 @@ object FirebaseServer {
         database.child(databasePath).push().setValue(data).addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
     }
 
-//    TODO: ???
     fun removeData(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
     }

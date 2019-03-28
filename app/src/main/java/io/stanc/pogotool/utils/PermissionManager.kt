@@ -34,8 +34,15 @@ object PermissionManager {
     fun isLocationPermissionGranted(context: Context?): Boolean {
 
         context?.let {
-            return  ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+            var allLocationPermissionsGranted = true
+
+            LOCATION_PERMISSIONS.forEach {
+                if (ActivityCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED) {
+                    allLocationPermissionsGranted = false
+                }
+            }
+            return allLocationPermissionsGranted
         }
 
         return false
@@ -46,7 +53,7 @@ object PermissionManager {
         activity?.let {
 
             requestPermissions(it,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION),
+                LOCATION_PERMISSIONS,
                 REQUEST_CODE_LOCATION
             )
         } ?: kotlin.run {

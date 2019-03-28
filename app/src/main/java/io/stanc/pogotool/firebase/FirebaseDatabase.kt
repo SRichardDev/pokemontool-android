@@ -89,11 +89,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     }
 
     fun pushArena(arena: FirebaseArena) {
-
-        formattedFirebaseGeoHash(arena.geoHash)?.let { childGeoHash ->
-            val path = databaseArena.child(childGeoHash.toString()).toString()
-            FirebaseServer.addNewNode(path, arena.data())
-        }
+        FirebaseServer.addNewNode(arena.databasePath(), arena.data())
     }
 
     /**
@@ -109,11 +105,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
-
-        formattedFirebaseGeoHash(pokestop.geoHash)?.let { childGeoHash ->
-            val path = databasePokestop.child(childGeoHash.toString()).toString()
-            FirebaseServer.addNewNode(path, pokestop.data())
-        }
+        FirebaseServer.addNewNode(pokestop.databasePath(), pokestop.data())
     }
 
     /**

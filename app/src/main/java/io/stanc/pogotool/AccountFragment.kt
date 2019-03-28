@@ -12,14 +12,14 @@ import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
-import kotlinx.android.synthetic.main.layout_fragment_authentication.*
+import kotlinx.android.synthetic.main.fragment_authentication.*
 
 class AccountFragment: Fragment(), View.OnClickListener {
 
     private var rootView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        rootView = inflater.inflate(R.layout.layout_fragment_authentication, container, false) as ViewGroup
+        rootView = inflater.inflate(R.layout.fragment_authentication, container, false) as ViewGroup
 
         rootView?.setOnClickListener { activity?.let { SystemUtils.hideKeyboard(it) } }
 
@@ -28,10 +28,6 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-//        authentication_imageButton_close.setOnClickListener {
-//            activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
-//        }
 
         authentication_button_sign_in.setOnClickListener(this)
         authentication_button_sign_up.setOnClickListener(this)

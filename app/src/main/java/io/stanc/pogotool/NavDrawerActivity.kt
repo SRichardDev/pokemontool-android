@@ -13,8 +13,8 @@ import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_activity_appbar.*
-import kotlinx.android.synthetic.main.layout_activity_drawer.*
-import kotlinx.android.synthetic.main.layout_nav_header.*
+import kotlinx.android.synthetic.main.activity_drawer.*
+import kotlinx.android.synthetic.main.layout_navigation_header.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import java.lang.ref.WeakReference
 
@@ -25,7 +25,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         super.onCreate(savedInstanceState)
 
         // content
-        setContentView(R.layout.layout_activity_drawer)
+        setContentView(R.layout.activity_drawer)
 
         // appbar
         setSupportActionBar(toolbar)
@@ -70,11 +70,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun showMapFragment() {
 
-        val fragmentTag = MapFragment::class.java.name
+        val fragmentTag = MapGridFragment::class.java.name
         var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = MapFragment()
+            fragment = MapGridFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
@@ -89,7 +89,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             fragment = AccountFragment()
         }
 
-        supportFragmentManager.beginTransaction().add(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_framelayout, fragment, fragmentTag).commit()
     }
 
     private fun removeAuthFragment() {

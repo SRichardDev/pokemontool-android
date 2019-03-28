@@ -15,12 +15,37 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="AppButtons" parent="android:style/Widget.Button">
-        <item name="android:textSize">12sp</item>
+    <!-- Texts -->
+
+    <style name="TextStyle_header">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/colorBlack</item>
+    </style>
+
+    <style name="TextStyle_edittext">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+    </style>
+
+    <style name="TextStyle_default">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+    </style>
+
+    <!-- Buttons -->
+
+    <style name="ButtonStyle" parent="android:style/Widget.Button">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorBlack</item>
+
         <item name="android:background">@color/colorWhite</item>
+        <item name="android:layout_margin">@dimen/layout_margin_small</item>
         <item name="android:padding">@dimen/text_margin</item>
-        <item name="android:layout_margin">@dimen/text_margin</item>
+        <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
     </style>
 
     <style name="FABEx_menu_button" parent="Widget.Design.FloatingActionButton">
@@ -36,6 +61,8 @@
         <item name="fab_colorNormal">@color/colorPrimary</item>
         <item name="fab_colorPressed">@color/colorPrimaryDark</item>
     </style>
+
+    <!-- Label -->
 
     <style name="FABEx_label">
         <item name="android:background">@color/colorPrimary</item>

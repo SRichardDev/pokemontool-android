@@ -63,5 +63,10 @@
     <!-- Map -->
     <string name="map_max_zooming_level">Max zooming level reached. Please zoom in.</string>
     <string name="map_max_subscriptions">Max subscriptions reached. Please delete areas before adding new ones.</string>
+    <string name="map_map_item_header">New %s</string>
+    <string name="map_map_item_edittext">Please type the correct name of the %s from the game.</string>
+    <string name="map_map_item_button_cancel">Cancel</string>
+    <string name="map_map_item_button_send">Send data</string>
+    <string name="map_map_item_checkbox_isex_arena">Is EX-Arena?</string>
 
 </resources>
