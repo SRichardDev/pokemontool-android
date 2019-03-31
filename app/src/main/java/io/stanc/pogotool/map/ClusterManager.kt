@@ -2,6 +2,7 @@ package io.stanc.pogotool.map
 
 import android.content.Context
 import android.util.Log
+import android.view.View
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
@@ -11,41 +12,98 @@ import io.stanc.pogotool.firebase.data.FirebasePokestop
 import io.stanc.pogotool.utils.DelayedTrigger
 import java.lang.ref.WeakReference
 
-class ClusterManager(context: Context, map: GoogleMap) {
+
+class ClusterManager(context: Context, googleMap: GoogleMap, private val delegate: MarkerDelegate) {
 
     private val TAG = javaClass.name
 
-    private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, map)
-    private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, map)
+    private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
+    private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
     
     private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
-    
+
+    private val arenaInfoWindowAdapter = ClusterArenaRenderer.Companion.InfoWindowAdapter(context)
+    private val pokestopInfoWindowAdapter = ClusterPokestopRenderer.Companion.InfoWindowAdapter(context)
+
+    private val googleMapInfoWindowAdapter = object: GoogleMap.InfoWindowAdapter {
+        override fun getInfoContents(p0: Marker?): View? {
+            (p0?.tag as? ClusterArena.Tag)?.let {
+                return arenaInfoWindowAdapter.getInfoContents(p0)
+            }
+            (p0?.tag as? ClusterPokestop.Tag)?.let {
+                return pokestopInfoWindowAdapter.getInfoContents(p0)
+            }
+
+            return null
+        }
+
+        override fun getInfoWindow(p0: Marker?): View? {
+            (p0?.tag as? ClusterArena.Tag)?.let {
+                return arenaInfoWindowAdapter.getInfoWindow(p0)
+            }
+            (p0?.tag as? ClusterPokestop.Tag)?.let {
+                return pokestopInfoWindowAdapter.getInfoWindow(p0)
+            }
+
+            return null
+        }
+    }
+
     init {
-        pokestopClusterManager.renderer = ClusterPokestopRenderer(context, map, pokestopClusterManager)
-        arenaClusterManager.renderer = ClusterArenaRenderer(context, map, arenaClusterManager)
+        pokestopClusterManager.renderer = ClusterPokestopRenderer(context, googleMap, pokestopClusterManager)
+        arenaClusterManager.renderer = ClusterArenaRenderer(context, googleMap, arenaClusterManager)
+
+        googleMap.setOnMarkerClickListener { this.onMarkerClicked(it) }
+        googleMap.setOnInfoWindowClickListener {this.onInfoWindowClicked(it)}
+
+        googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
     }
 
     /**
-     *
+     * marker & info window
      */
 
-    fun onMarkerClick(marker: Marker): Boolean {
+    interface MarkerDelegate {
+        fun onArenaInfoWindowClicked(id: String)
+        fun onPokestopInfoWindowClicked(id: String)
+    }
 
+    private fun onInfoWindowClicked(marker: Marker) {
+        val tag = marker.tag
+
+        (tag as? ClusterArena.Tag)?.let {
+            delegate.onArenaInfoWindowClicked(it.id)
+        }
+
+        (tag as? ClusterPokestop.Tag)?.let {
+            delegate.onPokestopInfoWindowClicked(it.id)
+        }
+    }
+
+    private fun onMarkerClicked(marker: Marker): Boolean {
         var handled = false
 
         pokestopClusterManager.let {
-            handled = it.onMarkerClick(marker)
+            if (it.onMarkerClick(marker)) {
+                handled = true
+            }
         }
 
         if (!handled) {
             arenaClusterManager.let {
-                handled = it.onMarkerClick(marker)
+                if (it.onMarkerClick(marker)) {
+                    handled = true
+                }
             }
         }
 
         return handled
     }
+
+    /**
+     *
+     */
 
     fun onCameraIdle() {
         pokestopClusterManager.onCameraIdle()
@@ -53,7 +111,7 @@ class ClusterManager(context: Context, map: GoogleMap) {
     }
 
     /**
-     * delegates
+     * firebase items
      */
 
     val pokestopDelegate = object : FirebaseDatabase.Delegate<FirebasePokestop> {
@@ -63,7 +121,7 @@ class ClusterManager(context: Context, map: GoogleMap) {
                 val clusterItem = ClusterPokestop.new(item)
                 pokestopClusterManager.addItem(clusterItem)
                 pokestopClustering.trigger()
-                items[clusterItem.id] = WeakReference(clusterItem)
+                items[clusterItem.tag.id] = WeakReference(clusterItem)
             }
         }
 
@@ -92,7 +150,7 @@ class ClusterManager(context: Context, map: GoogleMap) {
                 val clusterItem = ClusterArena.new(item)
                 arenaClusterManager.addItem(clusterItem)
                 arenaClustering.trigger()
-                items[clusterItem.id] = WeakReference(clusterItem)
+                items[clusterItem.tag.id] = WeakReference(clusterItem)
             }
         }
 

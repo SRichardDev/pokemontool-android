@@ -288,17 +288,24 @@ object FirebaseServer {
      * interface for request, add, change & remove data
      */
 
-    fun requestData(databaseChildPath: String, onRequestResponds: (data: Any) -> Unit) {
+    fun requestDataValue(databaseChildPath: String, onRequestResponds: (data: Any?) -> Unit) {
+        requestData(databaseChildPath, onRequestResponds, dataOnResponse = { it.value })
+    }
 
-        FirebaseServer.database.child(databaseChildPath).addListenerForSingleValueEvent(object : ValueEventListener {
+    fun requestDataChilds(databaseChildPath: String, onRequestResponds: (childs: List<DataSnapshot>) -> Unit) {
+        requestData(databaseChildPath, onRequestResponds, dataOnResponse = { it.children.toList() })
+    }
+
+    private fun <T : Any?> requestData(databasePath: String, onRequestResponds: (any: T) -> Unit, dataOnResponse: (p0: DataSnapshot) -> T) {
+        FirebaseServer.database.child(databasePath).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onCancelled(p0: DatabaseError) {
-                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for data: $databaseChildPath")
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databasePath")
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                Log.d(TAG, "onDataChange(data: ${p0.value}) for data: $databaseChildPath")
-                p0.value?.let { onRequestResponds(it) }
+                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databasePath")
+                onRequestResponds(dataOnResponse(p0))
             }
         })
     }

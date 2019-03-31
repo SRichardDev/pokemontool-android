@@ -4,14 +4,19 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.support.annotation.DrawableRes
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
+import io.stanc.pogotool.utils.KotlinUtils
 
 
 class ClusterPokestopRenderer(
@@ -26,6 +31,13 @@ class ClusterPokestopRenderer(
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
         super.onBeforeClusterItemRendered(item, markerOptions)
         markerOptions?.title(item?.title)?.icon(icon(context))?.anchor(ANCHOR_X, ANCHOR_Y)
+    }
+
+    override fun onClusterItemRendered(clusterItem: ClusterPokestop?, marker: Marker?) {
+        KotlinUtils.safeLet(clusterItem, marker) { _clusterItem, _marker ->
+            _marker.tag = _clusterItem.tag
+        }
+        super.onClusterItemRendered(clusterItem, marker)
     }
 
     companion object {
@@ -50,6 +62,22 @@ class ClusterPokestopRenderer(
 
         fun pokestopMarkerOptions(context: Context): MarkerOptions {
             return MarkerOptions().icon(icon(context)).anchor(ANCHOR_X, ANCHOR_Y)
+        }
+
+        class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {
+
+            private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_pokestop, null)
+
+            private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_pokestop_textview_header) as TextView
+
+            override fun getInfoContents(p0: Marker?): View? {
+                return null
+            }
+
+            override fun getInfoWindow(p0: Marker?): View {
+                p0?.let { header.text = it.title }
+                return infoWindowView
+            }
         }
     }
 }

@@ -81,10 +81,21 @@ class MapGridFragment: Fragment() {
                 googleMap.setOnMapClickListener(onMapClickListener)
                 googleMap.setOnMapLongClickListener(onMapLongClickListener)
                 googleMap.setOnCameraIdleListener(onCameraIdleListener)
-                googleMap.setOnMarkerClickListener(onMarkerClickListener)
 
                 context?.let {
-                    ClusterManager(it, googleMap).let { manager ->
+                    ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
+                        override fun onArenaInfoWindowClicked(id: String) {
+                            Log.i(TAG, "onArenaInfoWindowClicked($id)")
+                            firebase?.loadRaidBosses { firebaseRaidBosses ->
+                                Log.i(TAG, "raid bosses (${firebaseRaidBosses?.count()}) loaded: $firebaseRaidBosses")
+                            }
+                        }
+
+                        override fun onPokestopInfoWindowClicked(id: String) {
+                            Log.i(TAG, "onPokestopInfoWindowClicked($id)")
+                        }
+
+                    }).let { manager ->
                         firebase = FirebaseDatabase(manager.pokestopDelegate, manager.arenaDelegate)
                         clusterManager = manager
                     }
@@ -146,10 +157,6 @@ class MapGridFragment: Fragment() {
         }
 
         clusterManager?.onCameraIdle()
-    }
-
-    private val onMarkerClickListener = GoogleMap.OnMarkerClickListener { marker ->
-        clusterManager?.onMarkerClick(marker) ?: kotlin.run { false }
     }
 
     /**

@@ -7,6 +7,7 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="layout_padding_screen">16dp</dimen>
+    <dimen name="layout_padding_popup">4dp</dimen>
     <dimen name="layout_margin_default">16dp</dimen>
     <dimen name="layout_margin_small">8dp</dimen>
 

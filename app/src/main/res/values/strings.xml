@@ -69,4 +69,10 @@
     <string name="map_map_item_button_send">Send data</string>
     <string name="map_map_item_checkbox_isex_arena">Is EX-Arena?</string>
 
+    <string name="map_info_window_arena_subheader_default">Arena</string>
+    <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
+    <string name="map_info_window_arena_button_info">Show Details/\nNew Raid</string>
+
+    <string name="map_info_window_pokestop_subheader">Pokestop</string>
+    <string name="map_info_window_pokestop_button_info">Show Details &amp; Quest</string>
 </resources>

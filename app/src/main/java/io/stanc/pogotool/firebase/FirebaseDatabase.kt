@@ -2,10 +2,7 @@ package io.stanc.pogotool.firebase
 
 import android.util.Log
 import com.google.firebase.database.*
-import io.stanc.pogotool.firebase.data.FirebaseArena
-import io.stanc.pogotool.firebase.data.FirebaseNode
-import io.stanc.pogotool.firebase.data.FirebasePokestop
-import io.stanc.pogotool.firebase.data.FirebaseSubscription
+import io.stanc.pogotool.firebase.data.*
 import io.stanc.pogotool.firebase.data.FirebaseSubscription.Type
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
@@ -106,6 +103,22 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun pushPokestop(pokestop: FirebasePokestop) {
         FirebaseServer.addNewNode(pokestop.databasePath(), pokestop.data())
+    }
+
+    /**
+     * raid bosses
+     */
+
+    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>?) -> Unit) {
+
+        FirebaseServer.requestDataChilds(DATABASE_RAID_BOSSES, onRequestResponds = { childs ->
+            Log.d(TAG, "Debug:: requestDataChilds, childs: $childs, count: ${childs.count()}")
+            val raidBosses = mutableListOf<FirebaseRaidboss>()
+            childs.forEach { child ->
+                FirebaseRaidboss.new(child)?.let { raidBosses.add(it) }
+            }
+            onCompletionCallback(raidBosses)
+        })
     }
 
     /**
@@ -257,6 +270,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         const val MAX_SUBSCRIPTIONS = 10
         const val DATABASE_USERS = "users"
         const val DATABASE_ARENAS = "arenas"
+        const val DATABASE_RAID_BOSSES = "raidBosses"
         //    const val DATABASE_POKESTOPS = "pokestops"
         const val DATABASE_POKESTOPS = "test_pokestops"
         const val DATABASE_REG_USER = "registered_user"

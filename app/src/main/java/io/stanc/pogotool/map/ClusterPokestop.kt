@@ -5,10 +5,12 @@ import com.google.maps.android.clustering.ClusterItem
 import io.stanc.pogotool.firebase.data.FirebasePokestop
 
 
-class ClusterPokestop(val id: String,
+class ClusterPokestop(id: String,
                       private val position: LatLng,
                       private val title: String = "",
                       private val snippet: String = "") : ClusterItem {
+
+    val tag = ClusterPokestop.Tag(id)
 
     override fun getPosition(): LatLng {
         return position
@@ -22,16 +24,17 @@ class ClusterPokestop(val id: String,
         return snippet
     }
 
+    data class Tag(val id: String)
+
     companion object {
 
         fun new(pokestop: FirebasePokestop): ClusterPokestop {
 
-            val id = pokestop.id
             val position = LatLng(pokestop.geoHash.toLocation().latitude, pokestop.geoHash.toLocation().longitude)
             val title = pokestop.name
             val snippet = ""
 
-            return ClusterPokestop(id, position, title, snippet)
+            return ClusterPokestop(pokestop.id, position, title, snippet)
         }
     }
 }

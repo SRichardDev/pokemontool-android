@@ -12,9 +12,7 @@ data class FirebaseArena(
     val submitter: String,
     val isEX: Boolean = false): FirebaseNode {
 
-    override fun databasePath(): String {
-        return "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
-    }
+    override fun databasePath() = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()

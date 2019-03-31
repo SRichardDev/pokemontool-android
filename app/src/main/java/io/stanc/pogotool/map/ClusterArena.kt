@@ -5,10 +5,13 @@ import com.google.maps.android.clustering.ClusterItem
 import io.stanc.pogotool.firebase.data.FirebaseArena
 
 
-class ClusterArena(val id: String,
+class ClusterArena(id: String,
+                   isEx: Boolean,
                     private val position: LatLng,
                     private val title: String = "",
                     private val snippet: String = "") : ClusterItem {
+
+        val tag = ClusterArena.Tag(id, isEx)
 
         override fun getPosition(): LatLng {
             return position
@@ -22,16 +25,17 @@ class ClusterArena(val id: String,
             return snippet
         }
 
+        data class Tag(val id: String, val isEx: Boolean)
+
         companion object {
 
             fun new(arena: FirebaseArena): ClusterArena {
 
-                val id = arena.id
                 val position = LatLng(arena.geoHash.toLocation().latitude, arena.geoHash.toLocation().longitude)
                 val title = arena.name
                 val snippet = ""
 
-                return ClusterArena(id, position, title, snippet)
+                return ClusterArena(arena.id, arena.isEX, position, title, snippet)
             }
         }
     }
