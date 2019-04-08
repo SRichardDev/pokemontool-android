@@ -4,7 +4,7 @@
     android:id="@+id/fab_menu"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorTransparent"
+    android:background="@color/transparent"
     fab:fab_expandDirection="up"
     fab:fab_labelStyle="@style/FABEx_label">
 

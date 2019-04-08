@@ -6,7 +6,7 @@
                                              android:padding="@dimen/layout_padding_screen"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
-                                             android:background="@color/colorWhite">
+                                             android:background="@color/white">
 
     <ImageView
         android:id="@+id/authentication_imageview_user"
@@ -33,7 +33,7 @@
 
         <TextView
             android:id="@+id/authentication_layout_user_status"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -44,7 +44,7 @@
 
         <TextView
             android:id="@+id/authentication_layout_user_name"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -55,7 +55,7 @@
 
         <TextView
             android:id="@+id/authentication_layout_user_email"
-            android:textColor="@color/colorBlack"
+            android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

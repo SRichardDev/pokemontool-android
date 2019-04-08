@@ -5,7 +5,7 @@
                                              android:layout_width="200dp"
                                              android:layout_height="200dp"
                                              android:padding="@dimen/layout_padding_popup"
-                                             android:background="@color/colorWhite">
+                                             android:background="@color/white">
 
     <ImageView
         android:id="@+id/info_window_arena_imageview"

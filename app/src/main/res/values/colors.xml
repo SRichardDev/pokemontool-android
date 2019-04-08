@@ -10,11 +10,12 @@
     <color name="colorLayoutBackground">#ffffff</color>
     <color name="colorText">#800000</color>
 
-    <color name="colorWhite">#ffffff</color>
-    <color name="colorBlack">#000000</color>
-    <color name="colorTransparent">#00000000</color>
-    <color name="colorBlackTransparent">#CC000000</color>
-    <color name="colorWhiteBlue">#ccccff</color>
+    <color name="white">#ffffff</color>
+    <color name="aliceBlue">#F0F8FF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="blackTransparent">#CC000000</color>
+    <color name="whiteBlue">#ccccff</color>
 
     <!-- Poke colors -->
     <color name="colorBluePoke">#3B4CCA</color>
