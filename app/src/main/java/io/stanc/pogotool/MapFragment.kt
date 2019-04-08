@@ -19,6 +19,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.vw.remote.appbar.AppbarManager
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.PermissionManager
 
@@ -43,6 +44,8 @@ open class MapFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_map, container, false)
+
+        AppbarManager.setTitle(getString(R.string.app_name))
 
         mapView = rootLayout.findViewById(R.id.map_mapview) as MapView
         mapView?.onCreate(savedInstanceState)

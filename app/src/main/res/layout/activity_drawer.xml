@@ -9,28 +9,34 @@
         android:fitsSystemWindows="true"
         tools:openDrawer="start">
 
-    <include
-            layout="@layout/layout_activity_appbar"
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".NavDrawerActivity">
+
+        <io.stanc.pogotool.appbar.PoGoToolbar
+            android:id="@+id/activity_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="@dimen/appbar_height"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.design.widget.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
+        <FrameLayout
+            android:id="@+id/activity_content_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/activity_toolbar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+        <include
+            layout="@layout/layout_progress"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-            app:headerLayout="@layout/layout_navigation_header"
-            app:menu="@menu/menu_nav_drawer">
+            android:visibility="gone"/>
 
-        <TextView
-            android:id="@+id/nav_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_margin="@dimen/text_margin"
-            tools:text="test"/>
+    </android.support.constraint.ConstraintLayout>
 
-    </android.support.design.widget.NavigationView>
+    <include layout="@layout/layout_drawer_navigationview"/>
 
 </android.support.v4.widget.DrawerLayout>

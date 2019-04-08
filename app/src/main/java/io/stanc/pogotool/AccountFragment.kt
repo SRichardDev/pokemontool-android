@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.vw.remote.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.KotlinUtils
@@ -21,6 +22,7 @@ class AccountFragment: Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView = inflater.inflate(R.layout.fragment_authentication, container, false) as ViewGroup
 
+        AppbarManager.setTitle(getString(R.string.app_name))
         rootView?.setOnClickListener { activity?.let { SystemUtils.hideKeyboard(it) } }
 
         return rootView
