@@ -153,7 +153,7 @@ object FirebaseServer {
             return
         }
 
-        WaitingSpinner.showProgress()
+        WaitingSpinner.showProgress(R.string.spinner_title_sign_up)
 
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {task ->
 
@@ -172,7 +172,7 @@ object FirebaseServer {
             return
         }
 
-        WaitingSpinner.showProgress()
+        WaitingSpinner.showProgress(R.string.spinner_title_sign_in)
 
         auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
 
@@ -194,7 +194,7 @@ object FirebaseServer {
         // Send verification email
         auth.currentUser?.let { user ->
 
-            WaitingSpinner.showProgress()
+            WaitingSpinner.showProgress(R.string.spinner_title_email_verification)
 
             user.sendEmailVerification().addOnCompleteListener { task ->
 

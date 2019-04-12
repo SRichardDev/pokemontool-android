@@ -1,6 +1,5 @@
 package io.stanc.pogotool.firebase.data
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_RAID_BOSSES
 

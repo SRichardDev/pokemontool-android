@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="@dimen/layout_padding_popup">
+
+    <ImageView
+        android:id="@+id/raid_egg_1"
+        style="@style/ImageButton"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/layout_padding_popup"
+        android:src="@drawable/icon_level_1_30dp"
+        tools:ignore="ContentDescription"/>
+
+    <ImageView
+        android:id="@+id/raid_egg_2"
+        style="@style/ImageButton"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/layout_padding_popup"
+        android:src="@drawable/icon_level_2_30dp"
+        tools:ignore="ContentDescription"/>
+
+    <ImageView
+        android:id="@+id/raid_egg_3"
+        style="@style/ImageButton"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/layout_padding_popup"
+        android:src="@drawable/icon_level_3_30dp"
+        tools:ignore="ContentDescription"/>
+
+    <ImageView
+        android:id="@+id/raid_egg_4"
+        style="@style/ImageButton"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/layout_padding_popup"
+        android:src="@drawable/icon_level_4_30dp"
+        tools:ignore="ContentDescription"/>
+
+    <ImageView
+        android:id="@+id/raid_egg_5"
+        style="@style/ImageButton"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:src="@drawable/icon_level_5_30dp"
+        tools:ignore="ContentDescription"/>
+
+</LinearLayout>

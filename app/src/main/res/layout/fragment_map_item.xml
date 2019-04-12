@@ -41,7 +41,7 @@
 
     <Button
         android:id="@+id/map_item_button_cancel"
-        style="@style/ButtonStyle"
+        style="@style/ButtonStyle_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,7 @@
 
     <Button
         android:id="@+id/map_item_button_send"
-        style="@style/ButtonStyle"
+        style="@style/ButtonStyle_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"

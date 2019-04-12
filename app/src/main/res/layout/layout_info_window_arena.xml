@@ -45,7 +45,7 @@
 
     <TextView
         android:id="@+id/info_window_arena_button_info"
-        style="@style/ButtonStyle"
+        style="@style/ButtonStyle_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/info_window_arena_textview_subheader"

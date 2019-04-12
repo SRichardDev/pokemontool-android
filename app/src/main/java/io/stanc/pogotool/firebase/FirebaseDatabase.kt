@@ -109,7 +109,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * raid bosses
      */
 
-    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>?) -> Unit) {
+    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>) -> Unit) {
 
         FirebaseServer.requestDataChilds(DATABASE_RAID_BOSSES, onRequestResponds = { childs ->
             Log.d(TAG, "Debug:: requestDataChilds, childs: $childs, count: ${childs.count()}")
@@ -119,6 +119,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
             }
             onCompletionCallback(raidBosses)
         })
+    }
+
+    fun pushRaidMeetup(raid: FirebaseRaid) {
+//        FirebaseServer.addNewNode(raid.databasePath(), raid.data())
     }
 
     /**

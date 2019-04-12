@@ -1,78 +1,90 @@
 <resources>
 
-    <!-- keys -->
+    <!-- keys & ids -->
     <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
-
-    <!-- app -->
-    <string name="app_name">PoGoTool</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
     <string name="default_notification_channel_id">firebasenotificationchannelid</string>
 
+    <!-- internal -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- app -->
+    <string name="app_name">Pokemon Go Tool</string>
+    <string name="action_settings">Einstellungen</string>
+
+    <!-- progress spinner -->
+    <string name="spinner_title_sign_up">Registriere Account…</string>
+    <string name="spinner_title_sign_in">Einloggen…</string>
+    <string name="spinner_title_email_verification">Daten werden gesendet…</string>
+    <string name="spinner_title_map_data">Kartenelemente werden geladen…</string>
+    <string name="spinner_title_raid_data">Raid Daten werden geladen…</string>
+
     <!-- Navigation Drawer -->
-    <string name="nav_header_account_state">Account status:</string>
+    <string name="nav_header_account_state">Account Status:</string>
     <string name="nav_menu_item_account">Account</string>
-    <string name="nav_menu_item_map">Map</string>
+    <string name="nav_menu_item_map">Karte</string>
 
     <!-- Authentication -->
-    <string name="authentication_state_user"> Email User: %1$s (verified: %2$b)</string>
-
+    <string name="authentication_app_title">Account Daten</string>
     <string name="authentication_user_state">Account: %s</string>
-    <string name="authentication_user_name">User: %s</string>
+    <string name="authentication_user_name">Benutzer: %s</string>
     <string name="authentication_user_email">Email: %s</string>
 
-    <string name="authentication_state_signed_in">Logged in.</string>
-    <string name="authentication_state_signed_in_but_missing_verification">Waiting for email verification…</string>
-    <string name="authentication_state_signed_out">Logged out.</string>
+    <string name="authentication_state_signed_in">Eingeloggt</string>
+    <string name="authentication_state_signed_in_but_missing_verification">Ausstehende Email Bestätigung…</string>
+    <string name="authentication_state_signed_out">Ausgeloggt</string>
 
-    <string name="authentication_state_synchronization_failed">Synchronization failed!\n%s</string>
-    <string name="authentication_state_authentication_failed">Authentication failed!\n%s</string>
-    <string name="authentication_state_verification_failed">Failed to send verification email!\n%s</string>
-    <string name="authentication_state_verification_successful">Verification email sent to %s</string>
+    <string name="authentication_state_synchronization_failed">Synchronisation fehlgeschlagen!\n%s</string>
+    <string name="authentication_state_authentication_failed">Anmeldung fehlgeschlagen!\n%s</string>
+    <string name="authentication_state_verification_failed">Email Verifikation fehlgeschlagen!\n%s</string>
+    <string name="authentication_state_verification_successful">Email Verifikation wurde an %s gesendet.</string>
 
-    <string name="authentication_button_sign_in">Sign In</string>
-    <string name="authentication_button_sign_up">Sign Up</string>
-    <string name="authentication_button_sign_out">Sign Out</string>
-    <string name="authentication_button_verify_email">Verify Email</string>
-    <string name="authentication_button_open_user_name">Change Username</string>
-    <string name="authentication_button_send_user_name">Send new Username</string>
+    <string name="authentication_button_sign_in">Anmelden</string>
+    <string name="authentication_button_sign_up">Registrieren</string>
+    <string name="authentication_button_sign_out">Abmelden</string>
+    <string name="authentication_button_verify_email">Email verifizieren</string>
+    <string name="authentication_button_open_user_name">Benutzername ändern</string>
+    <string name="authentication_button_send_user_name">Neuen Benutzernamen senden</string>
 
-    <string name="authentication_hint_email">type your email here…</string>
-    <string name="authentication_hint_password">type your password here…</string>
+    <string name="authentication_hint_email">Gebe deine Emailadresse hier ein.</string>
+    <string name="authentication_hint_password">Gebe dein Passwort hier ein.</string>
 
-    <string name="authentication_edittext_email_error">Required!</string>
-    <string name="authentication_edittext_password_error">Required!</string>
+    <string name="authentication_edittext_email_error">Benötigt!</string>
+    <string name="authentication_edittext_password_error">Benötigt!</string>
 
     <!-- Dialog -->
-    <string name="dialog_gps_disabled_message">Your GPS seems to be disabled, do you want to enable it?</string>
-    <string name="dialog_gps_disabled_button_positive">Yes</string>
-    <string name="dialog_gps_disabled_button_negative">No</string>
-    <string name="dialog_location_disabled_message">Please enable location permission to use this feature.</string>
-
-    <!-- Location -->
-    <string name="location_marker_current_position_title">Your Position</string>
-    <string name="location_marker_current_position_description">Marker description…</string>
+    <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?</string>
+    <string name="dialog_gps_disabled_button_positive">Ja</string>
+    <string name="dialog_gps_disabled_button_negative">Nein</string>
+    <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.</string>
 
     <!-- Firebase -->
-    <string name="user_name">User: %s</string>
-    <string name="locations_sent_sucessfully">Locations sent successfully.</string>
-    <string name="locations_not_sent_sucessfully">Locations not send successfully!</string>
+    <string name="user_name">Benutzer: %s</string>
 
     <!-- Map -->
-    <string name="map_max_zooming_level">Max zooming level reached. Please zoom in.</string>
-    <string name="map_max_subscriptions">Max subscriptions reached. Please delete areas before adding new ones.</string>
-    <string name="map_map_item_header">New %s</string>
-    <string name="map_map_item_edittext">Please type the correct name of the %s from the game.</string>
-    <string name="map_map_item_button_cancel">Cancel</string>
-    <string name="map_map_item_button_send">Send data</string>
-    <string name="map_map_item_checkbox_isex_arena">Is EX-Arena?</string>
+    <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
+    <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
+    <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
+    <string name="map_map_item_button_cancel">Abbrechen</string>
+    <string name="map_map_item_button_send">Daten senden</string>
+    <string name="map_map_item_checkbox_isex_arena">Ist eine EX-Arena?</string>
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
-    <string name="map_info_window_arena_button_info">Show Details/\nNew Raid</string>
+    <string name="map_info_window_arena_button_info">Details/\nNeuer Raid</string>
 
     <string name="map_info_window_pokestop_subheader">Pokestop</string>
-    <string name="map_info_window_pokestop_button_info">Show Details &amp; Quest</string>
+    <string name="map_info_window_pokestop_button_info">Details &amp; Quest</string>
+
+    <!-- Raid -->
+    <string name="raid_app_title">Raid Meldung</string>
+    <string name="raid_eggs_title">Wähle den Raid Level:</string>
+    <string name="raid_check_egg">Ei bereits geschlüpft?</string>
+    <string name="raid_check_participation">Am Raid teilnehmen?</string>
+    <string name="raid_text_time_egg">Zeit bis Ei schlüpft [min]:</string>
+    <string name="raid_text_time_raid">Zeit bis Raid beginnt [min]:</string>
+    <string name="raid_text_time_meetup">Treffzeitpunkt [h/min]:</string>
+
+    <string name="raid_button_send">Raid melden</string>
+
 </resources>

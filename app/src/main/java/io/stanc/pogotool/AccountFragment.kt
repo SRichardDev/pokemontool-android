@@ -22,7 +22,8 @@ class AccountFragment: Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         rootView = inflater.inflate(R.layout.fragment_authentication, container, false) as ViewGroup
 
-        AppbarManager.setTitle(getString(R.string.app_name))
+        AppbarManager.setTitle(getString(R.string.authentication_app_title))
+
         rootView?.setOnClickListener { activity?.let { SystemUtils.hideKeyboard(it) } }
 
         return rootView

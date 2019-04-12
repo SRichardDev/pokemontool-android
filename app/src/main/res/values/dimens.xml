@@ -13,11 +13,15 @@
 
     <dimen name="layout_padding_screen">16dp</dimen>
     <dimen name="layout_padding_popup">4dp</dimen>
+
+    <dimen name="layout_margin_large">32dp</dimen>
     <dimen name="layout_margin_default">16dp</dimen>
     <dimen name="layout_margin_small">8dp</dimen>
 
     <dimen name="text_margin">4dp</dimen>
 
     <dimen name="raid_eggs_height">64dp</dimen>
+    <dimen name="raid_raidboss_list_height">96dp</dimen>
+    <dimen name="raid_picker_height">128dp</dimen>
 
 </resources>

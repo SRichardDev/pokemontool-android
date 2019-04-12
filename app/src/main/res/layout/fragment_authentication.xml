@@ -74,7 +74,7 @@
 
         <Button
             android:id="@+id/authentication_button_user_name"
-            style="@style/ButtonStyle"
+            style="@style/ButtonStyle_margin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -93,7 +93,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_in"
-            style="@style/ButtonStyle"
+            style="@style/ButtonStyle_margin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -101,7 +101,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_up"
-            style="@style/ButtonStyle"
+            style="@style/ButtonStyle_margin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -109,7 +109,7 @@
 
         <Button
             android:id="@+id/authentication_button_verify_email"
-            style="@style/ButtonStyle"
+            style="@style/ButtonStyle_margin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -117,7 +117,7 @@
 
         <Button
             android:id="@+id/authentication_button_sign_out"
-            style="@style/ButtonStyle"
+            style="@style/ButtonStyle_margin"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"

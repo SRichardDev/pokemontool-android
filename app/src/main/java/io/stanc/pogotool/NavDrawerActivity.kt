@@ -3,13 +3,10 @@ package io.stanc.pogotool
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ProgressBar
 import com.vw.remote.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseServer
@@ -38,7 +35,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         setupDrawer()
 
         // progress view
-        WaitingSpinner.initialize(layout_progress, window)
+        WaitingSpinner.initialize(layout_progress, progressbar_text, window)
 
         // first screen
         showMapFragment()
@@ -90,11 +87,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun showMapFragment() {
 
-        val fragmentTag = MapGridFragment::class.java.name
+        val fragmentTag = MapInteractionFragment::class.java.name
         var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = MapGridFragment()
+            fragment = MapInteractionFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()

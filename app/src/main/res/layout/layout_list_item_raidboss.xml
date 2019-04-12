@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_height="@dimen/raid_raidboss_list_height"
+              android:layout_width="@dimen/raid_raidboss_list_height"
+              android:padding="@dimen/layout_margin_small"
+              style="@style/ImageButton"
+              android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/list_item_raidboss_image"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:layout_width="match_parent"
+        android:scaleType="fitCenter"
+        tools:src="@mipmap/icon_launcher"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:id="@+id/list_item_raidboss_name"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/layout_margin_small"
+        tools:text="name"/>
+
+</LinearLayout>

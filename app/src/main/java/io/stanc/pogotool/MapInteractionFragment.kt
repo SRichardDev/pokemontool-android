@@ -15,6 +15,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.vw.remote.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
@@ -23,7 +24,7 @@ import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
 
-class MapGridFragment: Fragment() {
+class MapInteractionFragment: Fragment() {
 
     private var mapGridProvider: MapGridProvider? = null
     private var clusterManager: ClusterManager? = null
@@ -59,6 +60,8 @@ class MapGridFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_map_grid, container, false)
 
+        AppbarManager.setTitle(getString(R.string.app_name))
+
         setupMapFragment()
 
         // floating action buttons
@@ -85,14 +88,12 @@ class MapGridFragment: Fragment() {
                 context?.let {
                     ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
                         override fun onArenaInfoWindowClicked(id: String) {
-                            Log.i(TAG, "onArenaInfoWindowClicked($id)")
-                            firebase?.loadRaidBosses { firebaseRaidBosses ->
-                                Log.i(TAG, "raid bosses (${firebaseRaidBosses?.count()}) loaded: $firebaseRaidBosses")
-                            }
+                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($id)")
+                            showRaidFragment()
                         }
 
                         override fun onPokestopInfoWindowClicked(id: String) {
-                            Log.i(TAG, "onPokestopInfoWindowClicked($id)")
+                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($id)")
                         }
 
                     }).let { manager ->
@@ -212,6 +213,24 @@ class MapGridFragment: Fragment() {
     }
 
     /**
+     * info window fragments
+     */
+
+    private fun showRaidFragment() {
+
+        val fragmentTag = RaidFragment::class.java.name
+
+        fragmentManager?.findFragmentByTag(fragmentTag)?.let { oldFragment ->
+            fragmentManager?.beginTransaction()?.remove(oldFragment)?.commit()
+        }
+
+        firebase?.let {
+            val fragment = RaidFragment.newInstance(it)
+            fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
+        }
+    }
+
+    /**
      * FABs
      */
 
@@ -240,7 +259,7 @@ class MapGridFragment: Fragment() {
                 mapGridProvider?.clearGeoHashGridList()
                 currentMode = MapMode.EDIT_GEO_HASHES
 
-                WaitingSpinner.showProgress()
+                WaitingSpinner.showProgress(R.string.spinner_title_map_data)
                 firebase?.loadSubscriptions { geoHashes ->
                     Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
                     for (geoHash in geoHashes) {

@@ -15,7 +15,7 @@ import io.stanc.pogotool.firebase.data.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
-import io.stanc.pogotool.MapGridFragment.MapMode
+import io.stanc.pogotool.MapInteractionFragment.MapMode
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.utils.KotlinUtils

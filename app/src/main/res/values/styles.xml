@@ -76,11 +76,13 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/black</item>
-
         <item name="android:background">@color/white</item>
-        <item name="android:layout_margin">@dimen/layout_margin_small</item>
         <item name="android:padding">@dimen/text_margin</item>
         <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
+    </style>
+
+    <style name="ButtonStyle_margin" parent="ButtonStyle">
+        <item name="android:layout_margin">@dimen/layout_margin_small</item>
     </style>
 
     <style name="FABEx_menu_button" parent="Widget.Design.FloatingActionButton">
@@ -95,6 +97,12 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="fab_colorNormal">@color/colorPrimary</item>
         <item name="fab_colorPressed">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="ImageButton">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:background">@drawable/image_state_selector</item>
     </style>
 
     <!-- Label -->
