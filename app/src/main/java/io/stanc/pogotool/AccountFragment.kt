@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.vw.remote.appbar.AppbarManager
+import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.data.FirebaseUser
 import io.stanc.pogotool.utils.KotlinUtils

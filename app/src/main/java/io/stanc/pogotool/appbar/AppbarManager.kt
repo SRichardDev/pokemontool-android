@@ -1,7 +1,6 @@
-package com.vw.remote.appbar
+package io.stanc.pogotool.appbar
 
 import android.support.annotation.DrawableRes
-import io.stanc.pogotool.appbar.Toolbar
 import java.lang.ref.WeakReference
 
 

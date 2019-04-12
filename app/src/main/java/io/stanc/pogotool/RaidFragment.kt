@@ -12,8 +12,7 @@ import io.stanc.pogotool.firebase.data.FirebaseRaidboss
 import java.util.*
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import com.vw.remote.appbar.AppbarManager
-import io.stanc.pogotool.firebase.data.FirebaseRaid
+import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
 

@@ -19,7 +19,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.vw.remote.appbar.AppbarManager
+import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.PermissionManager
 
