@@ -7,18 +7,22 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.iid.FirebaseInstanceId
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.data.FirebaseData
+import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.utils.WaitingSpinner
 import java.lang.ref.WeakReference
-import io.stanc.pogotool.firebase.data.*
 
 
 object FirebaseServer {
+
+    interface OnCompleteCallback<T> {
+        fun onSuccess(data: T)
+        fun onFailed(message: String?)
+    }
 
     private val TAG = javaClass.name
 
@@ -28,7 +32,7 @@ object FirebaseServer {
     internal val database = FirebaseDatabase.getInstance().reference
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    var currentUser: io.stanc.pogotool.firebase.data.FirebaseUser? = null
+    var currentUser: io.stanc.pogotool.firebase.node.FirebaseUser? = null
         private set
 
     fun start() {
@@ -124,7 +128,7 @@ object FirebaseServer {
     private val userProfileObservers = HashMap<Int, WeakReference<UserProfileObserver>>()
 
     interface UserProfileObserver {
-        fun userProfileChanged(user: io.stanc.pogotool.firebase.data.FirebaseUser?)
+        fun userProfileChanged(user: io.stanc.pogotool.firebase.node.FirebaseUser?)
     }
 
     //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
@@ -213,6 +217,34 @@ object FirebaseServer {
         // auth.currentUser?.delete()
         // updateUserProfile()
     }
+
+    /**
+     * others
+     */
+
+    fun timestamp(): Any {
+        return ServerValue.TIMESTAMP
+    }
+
+//    fun time(callback: OnCompleteCallback<Any>) {
+//
+//        // use this to set before push
+//        val timestamp = ServerValue.TIMESTAMP
+//        Log.i(TAG, "Debug:: time, timestamp: $timestamp")
+//
+//        FirebaseFunctions.getInstance().getHttpsCallable("getTime").call().addOnCompleteListener { task ->
+//
+//            Log.i(TAG, "Debug:: time addOnComplete: isSuccessful: ${task.isSuccessful}, result?.data: ${task.result?.data}, exception?.message: ${task.exception?.message}")
+//
+//            if (task.isSuccessful) {
+//
+////                val timestamp = task.result?.data as? Long
+////                callback.onSuccess()
+//            } else {
+//                callback.onFailed(task.exception?.message)
+//            }
+//        }
+//    }
 
     /**
      * user
@@ -311,17 +343,25 @@ object FirebaseServer {
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
-    fun addDataToNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun addNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
             onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun addNewNode(databasePath: String, data: Map<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        database.child(databasePath).push().setValue(data).addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
+    fun setData(firebaseData: FirebaseData, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        database.child(firebaseData.databasePath()).child(firebaseData.key).setValue(firebaseData.data()).addOnCompleteListener { task ->
+            onCompletionCallback(task.isSuccessful)
+        }
     }
 
-    fun removeData(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
+        val newNode = database.child(databasePath).push()
+        newNode.setValue(data).addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
+        return newNode.key
+    }
+
+    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
     }
 
@@ -346,7 +386,7 @@ object FirebaseServer {
 
     private fun sendUserData(data: Map<String, String>) {
         currentUser?.let {
-            FirebaseServer.addDataToNode(it)
+            FirebaseServer.addNode(it)
         } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUser: $currentUser") }
     }
 }

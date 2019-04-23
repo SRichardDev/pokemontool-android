@@ -87,13 +87,13 @@ class MapInteractionFragment: Fragment() {
 
                 context?.let {
                     ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
-                        override fun onArenaInfoWindowClicked(id: String) {
-                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($id)")
-                            showRaidFragment()
+                        override fun onArenaInfoWindowClicked(id: String, geoHash: GeoHash) {
+                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($id, $geoHash)")
+                            showRaidFragment(id, geoHash)
                         }
 
-                        override fun onPokestopInfoWindowClicked(id: String) {
-                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($id)")
+                        override fun onPokestopInfoWindowClicked(id: String, geoHash: GeoHash) {
+                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($id, $geoHash)")
                         }
 
                     }).let { manager ->
@@ -216,7 +216,7 @@ class MapInteractionFragment: Fragment() {
      * info window fragments
      */
 
-    private fun showRaidFragment() {
+    private fun showRaidFragment(arenaId: String, arenaGeoHash: GeoHash) {
 
         val fragmentTag = RaidFragment::class.java.name
 
@@ -225,7 +225,7 @@ class MapInteractionFragment: Fragment() {
         }
 
         firebase?.let {
-            val fragment = RaidFragment.newInstance(it)
+            val fragment = RaidFragment.newInstance(it, arenaId, arenaGeoHash)
             fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
         }
     }
@@ -262,9 +262,13 @@ class MapInteractionFragment: Fragment() {
                 WaitingSpinner.showProgress(R.string.spinner_title_map_data)
                 firebase?.loadSubscriptions { geoHashes ->
                     Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
-                    for (geoHash in geoHashes) {
-                        mapGridProvider?.showGeoHashGrid(geoHash)
+
+                    geoHashes?.let {
+                        for (geoHash in geoHashes) {
+                            mapGridProvider?.showGeoHashGrid(geoHash)
+                        }
                     }
+
                     WaitingSpinner.hideProgress()
                 }
             }

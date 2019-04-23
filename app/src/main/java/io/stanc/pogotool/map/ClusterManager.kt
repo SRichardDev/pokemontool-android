@@ -1,14 +1,14 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.data.FirebaseArena
-import io.stanc.pogotool.firebase.data.FirebasePokestop
+import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.firebase.node.FirebasePokestop
+import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.DelayedTrigger
 import java.lang.ref.WeakReference
 
@@ -65,19 +65,19 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     interface MarkerDelegate {
-        fun onArenaInfoWindowClicked(id: String)
-        fun onPokestopInfoWindowClicked(id: String)
+        fun onArenaInfoWindowClicked(id: String, geoHash: GeoHash)
+        fun onPokestopInfoWindowClicked(id: String, geoHash: GeoHash)
     }
 
     private fun onInfoWindowClicked(marker: Marker) {
         val tag = marker.tag
 
         (tag as? ClusterArena.Tag)?.let {
-            delegate.onArenaInfoWindowClicked(it.id)
+            delegate.onArenaInfoWindowClicked(it.id, it.geoHash)
         }
 
         (tag as? ClusterPokestop.Tag)?.let {
-            delegate.onPokestopInfoWindowClicked(it.id)
+            delegate.onPokestopInfoWindowClicked(it.id, it.geoHash)
         }
     }
 

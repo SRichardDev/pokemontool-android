@@ -7,8 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import io.stanc.pogotool.firebase.data.FirebaseRaidboss
-import android.databinding.adapters.ImageViewBindingAdapter.setImageDrawable
+import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import android.graphics.drawable.Drawable
 import android.view.View
 import java.io.IOException
@@ -58,7 +57,7 @@ class RaidBossAdapter(private val context: Context,
         holder.id = raidBosses[position].id
 
         try {
-            val inputStream = context.assets.open("${raidBosses[position].imageName}.png")
+            val inputStream = context.assets.open("raidbosses/${raidBosses[position].imageName}.png")
             val drawable = Drawable.createFromStream(inputStream, null)
             holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
 

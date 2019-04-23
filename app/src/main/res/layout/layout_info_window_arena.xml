@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/icon_arenaex_30dp"
+        android:src="@drawable/icon_arena_30dp"
         tools:ignore="ContentDescription"/>
 
     <TextView

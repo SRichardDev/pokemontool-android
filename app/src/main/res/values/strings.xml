@@ -87,4 +87,7 @@
 
     <string name="raid_button_send">Raid melden</string>
 
+    <!-- Exceptions -->
+    <string name="exceptions_no_user">User wurde nicht gefunden.</string>
+
 </resources>

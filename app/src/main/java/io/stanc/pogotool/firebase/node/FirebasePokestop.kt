@@ -1,24 +1,25 @@
-package io.stanc.pogotool.firebase.data
+package io.stanc.pogotool.firebase.node
 
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
+import java.util.*
 
-data class FirebaseArena(
+data class FirebasePokestop(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
-    val submitter: String,
-    val isEX: Boolean = false): FirebaseNode {
+    val submitter: String): FirebaseNode {
 
-    override fun databasePath() = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+    override fun databasePath(): String {
+        return "${FirebaseDatabase.DATABASE_POKESTOPS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+    }
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
         data["name"] = name
-        data["isEX"] = isEX
         data["latitude"] = geoHash.toLocation().latitude
         data["longitude"] = geoHash.toLocation().longitude
         data["submitter"] = submitter
@@ -26,19 +27,20 @@ data class FirebaseArena(
         return data
     }
 
+
     companion object {
 
         private val TAG = javaClass.name
 
-        fun new(dataSnapshot: DataSnapshot): FirebaseArena? {
+        fun id(dataSnapshot: DataSnapshot): String? {
+            return dataSnapshot.key
+        }
 
+        fun new(dataSnapshot: DataSnapshot): FirebasePokestop? {
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
-            val id = dataSnapshot.key
+            val id = id(dataSnapshot)
             val name = dataSnapshot.child("name").value as? String
-            val isEX = (dataSnapshot.child("isEX").value as? Boolean) ?: kotlin.run {
-                (dataSnapshot.child("isEX").value as? String)?.toBoolean()
-            }
             val latitude = (dataSnapshot.child("latitude").value as? Number)?.toDouble() ?: kotlin.run {
                 (dataSnapshot.child("latitude").value as? String)?.toDouble()
             }
@@ -47,11 +49,11 @@ data class FirebaseArena(
             }
             val submitter = dataSnapshot.child("submitter").value as? String
 
-//            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
+//            Log.v(TAG, "id: $id, name: $name, latitudeNum: $latitudeNum, latitude: $latitude, longitudeNum: $longitudeNum, longitude: $longitude")
 
-            if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
+            if (id != null && name != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                return FirebaseArena(id, name, geoHash, submitter, isEX)
+                return FirebasePokestop(id, name, geoHash, submitter)
             }
 
             return null

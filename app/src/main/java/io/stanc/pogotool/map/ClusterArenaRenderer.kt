@@ -28,7 +28,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
-        markerOptions?.title(item?.title)?.icon(icon(context))?.anchor(ANCHOR_X, ANCHOR_Y)
+        markerOptions?.title(item?.title)?.icon(icon(context, item?.tag?.isEx))?.anchor(ANCHOR_X, ANCHOR_Y)
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
@@ -45,24 +45,59 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private const val ICON_HEIGHT: Int = 75
         private const val ICON_WIDTH: Int = 75
+        private const val INNER_ICON_HEIGHT: Int = 50
+        private const val INNER_ICON_WIDTH: Int = 50
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun icon(context: Context) = getBitmapDescriptor(context, R.drawable.icon_arenaex_30dp)
+        private fun icon(context: Context, isEx: Boolean?): BitmapDescriptor {
 
-        private fun getBitmapDescriptor(context: Context, @DrawableRes id: Int): BitmapDescriptor {
-            val vectorDrawable = context.getDrawable(id)
+            return isEx?.let { isEx ->
 
-            vectorDrawable?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
-            val bm = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bm)
-            vectorDrawable?.draw(canvas)
+                if (isEx) {
+                    getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp)
+                } else {
+                    getBitmapDescriptor(context, R.drawable.icon_arena_30dp)
+                }
 
-            return BitmapDescriptorFactory.fromBitmap(bm)
+            } ?: kotlin.run {
+                getBitmapDescriptor(context, R.drawable.icon_arena_30dp)
+            }
         }
 
-        fun arenaMarkerOptions(context: Context): MarkerOptions {
-            return MarkerOptions().icon(icon(context)).anchor(ANCHOR_X, ANCHOR_Y)
+        private fun getBitmapDescriptor(context: Context, @DrawableRes backgroundDrawableRes: Int, @DrawableRes foregroundDrawableRes: Int? = null): BitmapDescriptor {
+
+            val bitmap = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            val drawableBackground = context.getDrawable(backgroundDrawableRes)
+            drawableBackground?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
+            drawableBackground?.draw(canvas)
+
+            foregroundDrawableRes?.let {
+
+                val drawableForeground = context.getDrawable(it)
+                val marginLeft = (ICON_WIDTH-INNER_ICON_WIDTH)/2
+                val marginTop = (ICON_HEIGHT-INNER_ICON_HEIGHT)/2
+                drawableForeground?.setBounds(marginLeft, marginTop, ICON_WIDTH-marginLeft, ICON_HEIGHT-marginTop)
+                drawableForeground?.draw(canvas)
+            }
+
+
+//            val bitmapBackground = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
+//
+//            val drawableForeground = context.getDrawable(backgroundDrawableRes)
+//            drawableForeground?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
+//            val bitmapForeground = Bitmap.createBitmap(INNER_ICON_WIDTH, INNER_ICON_HEIGHT, Bitmap.Config.ARGB_8888)
+//
+//            val canvas = Canvas(bitmapBackground)
+//            drawableBackground?.draw(canvas)
+
+            return BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
+
+        fun arenaMarkerOptions(context: Context, isEx: Boolean = false): MarkerOptions {
+            return MarkerOptions().icon(icon(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {

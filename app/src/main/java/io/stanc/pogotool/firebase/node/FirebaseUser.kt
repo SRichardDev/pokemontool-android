@@ -1,4 +1,4 @@
-package io.stanc.pogotool.firebase.data
+package io.stanc.pogotool.firebase.node
 
 import android.net.Uri
 import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_NOTIFICATION_TOKEN

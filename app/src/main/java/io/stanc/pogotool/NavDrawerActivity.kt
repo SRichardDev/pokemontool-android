@@ -10,7 +10,7 @@ import android.view.View
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseUser
+import io.stanc.pogotool.firebase.node.FirebaseUser
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.activity_drawer.*

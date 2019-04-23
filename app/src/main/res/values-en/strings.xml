@@ -95,4 +95,7 @@
 
     <string name="raid_button_send">Send raid</string>
 
+    <!-- Exceptions -->
+    <string name="exceptions_no_user">User not found.</string>
+
 </resources>

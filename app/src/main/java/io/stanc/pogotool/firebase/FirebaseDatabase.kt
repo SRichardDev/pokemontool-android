@@ -2,13 +2,15 @@ package io.stanc.pogotool.firebase
 
 import android.util.Log
 import com.google.firebase.database.*
-import io.stanc.pogotool.firebase.data.*
-import io.stanc.pogotool.firebase.data.FirebaseSubscription.Type
+import io.stanc.pogotool.firebase.data.RaidMeetup
+import io.stanc.pogotool.firebase.node.*
+import io.stanc.pogotool.firebase.node.FirebaseSubscription.Type
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
 import io.stanc.pogotool.utils.Async.awaitResponse
 import io.stanc.pogotool.utils.KotlinUtils
 import kotlinx.coroutines.*
+import java.lang.Exception
 import java.lang.ref.WeakReference
 
 class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
@@ -86,7 +88,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     }
 
     fun pushArena(arena: FirebaseArena) {
-        FirebaseServer.addNewNode(arena.databasePath(), arena.data())
+        FirebaseServer.createNodeByAutoId(arena.databasePath(), arena.data())
     }
 
     /**
@@ -102,7 +104,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
-        FirebaseServer.addNewNode(pokestop.databasePath(), pokestop.data())
+        FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())
     }
 
     /**
@@ -121,31 +123,59 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         })
     }
 
-    fun pushRaidMeetup(raid: FirebaseRaid) {
-//        FirebaseServer.addNewNode(raid.databasePath(), raid.data())
+    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null) {
+        FirebaseServer.addNode(raid)
+        raidMeetup?.let {
+            val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
+            Log.i(TAG, "Debug:: pushRaid, raidMeetupId: $raidMeetupId")
+            raidMeetupId?.let { id ->
+                val data = RaidMeetup(raid.databasePath(), id)
+                FirebaseServer.setData(data) {
+                    Log.i(TAG, "Debug:: pushRaid, set meetup data successfully: $it")
+                }
+            }
+        }
     }
 
     /**
      * location subscriptions
      */
 
-    // TODO: call onCompletionCallback only once! independent of database number
-    fun loadSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>) -> Unit) {
-
-        Log.i(TAG, "Debug:: loadSubscriptions for userToken: ${FirebaseServer.currentUser?.notificationToken} ...")
+    fun loadSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
 
         GlobalScope.launch(Dispatchers.Default) {
 
-            val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databasePokestop, it) }
-            Log.i(TAG, "Debug:: pokestopsGeoHashes: $pokestopsGeoHashes")
-            val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databaseArena, it) }
-            Log.i(TAG, "Debug:: arenaGeoHashes: $arenaGeoHashes")
+            try {
 
-            CoroutineScope(Dispatchers.Main).launch {
-                val geoHashes = pokestopsGeoHashes.union(arenaGeoHashes).distinct()
-                Log.i(TAG, "Debug:: union, distinct geoHashes: $geoHashes")
-                onCompletionCallback(geoHashes)
+                val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databasePokestop, it) }
+                val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databaseArena, it) }
+
+                notifyCompletionCallback(pokestopsGeoHashes, arenaGeoHashes, onCompletionCallback)
+
+            } catch (e: Exception) {
+                Log.e(TAG, "geohash loading failed. Exception: ${e.message}")
+                notifyCompletionCallback(null, null, onCompletionCallback)
             }
+        }
+    }
+
+    private fun notifyCompletionCallback(geoHashList1: List<GeoHash>?, geoHashList2: List<GeoHash>?, onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            var geoHashes: List<GeoHash>? = null
+
+            if (geoHashList1 != null && geoHashList2 != null) {
+                geoHashes = geoHashList1.union(geoHashList2).distinct()
+
+            } else if (geoHashList1 != null) {
+                geoHashes = geoHashList1
+
+            } else if (geoHashList2 != null) {
+                geoHashes = geoHashList2
+            }
+
+            onCompletionCallback(geoHashes)
         }
     }
 
@@ -169,7 +199,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-        Log.d(TAG, "Debug:: subscribeForPush(geoHash: $geoHash), currentUser: ${FirebaseServer.currentUser}")
         Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseServer.currentUser?.id}, notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
         KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { uid, notificationToken ->
 
@@ -180,7 +209,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     private fun subscribeFor(type: FirebaseSubscription.Type, uid: String, notificationToken: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = FirebaseSubscription(id = notificationToken, uid = uid, geoHash = geoHash, type = type)
-        FirebaseServer.addDataToNode(data, onCompletionCallback)
+        FirebaseServer.addNode(data, onCompletionCallback)
     }
 
     // TODO: add onCompletionCallBack for removing ...
@@ -189,7 +218,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
             databaseArena.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
             databasePokestop.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
 
-//            FirebaseServer.removeData()
+//            FirebaseServer.removeNode()
         }
     }
 
@@ -213,6 +242,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
                     onResponse.onCompletion(geoHashes)
                 }
             })
+        } ?: kotlin.run {
+            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseServer.currentUser}, and notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
+            onResponse.onException(exception)
         }
     }
 
@@ -230,7 +262,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
                     val geoHashes = registeredGeoHashes(p0, userToken)
                     for (geoHash in geoHashes) {
                         val data = FirebaseSubscription(id = userToken, uid = uid, geoHash = geoHash, type = type)
-                        FirebaseServer.removeData(data)
+                        FirebaseServer.removeNode(data)
                     }
                 }
             })
@@ -275,9 +307,11 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         const val DATABASE_USERS = "users"
         const val DATABASE_ARENAS = "arenas"
         const val DATABASE_RAID_BOSSES = "raidBosses"
+        const val DATABASE_RAID_MEETUPS = "raidMeetups"
         //    const val DATABASE_POKESTOPS = "pokestops"
         const val DATABASE_POKESTOPS = "test_pokestops"
         const val DATABASE_REG_USER = "registered_user"
+        const val DATABASE_RAID = "raid"
         const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
 
         const val NOTIFICATION_DATA_LATITUDE = "latitude"

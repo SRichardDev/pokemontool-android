@@ -32,6 +32,6 @@ object WaitingSpinner {
 
     fun hideProgress() {
         progressBarView?.get()?.let { it.visibility = View.GONE }
-        window?.get()?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        window?.get()?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 }

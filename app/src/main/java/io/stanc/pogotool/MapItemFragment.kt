@@ -6,12 +6,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseArena
-import io.stanc.pogotool.firebase.data.FirebasePokestop
+import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
@@ -31,6 +33,10 @@ class MapItemFragment: Fragment() {
     private var firebase: FirebaseDatabase? = null
 
     private var mapFragment: MapFragment? = null
+
+    private var map: GoogleMap? = null
+    private var arenaMarker: Marker? = null
+    private var checkboxIsExArena: CheckBox? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.fragment_map_item, container, false) as ViewGroup
@@ -55,7 +61,17 @@ class MapItemFragment: Fragment() {
         }
 
         if (mapMode == MapMode.NEW_ARENA) {
-            map_item_checkbox_isex_arena?.visibility = View.VISIBLE
+
+            view.findViewById<CheckBox>(R.id.map_item_checkbox_isex_arena)?.let { checkbox ->
+
+                checkbox.visibility = View.VISIBLE
+                checkbox.setOnClickListener {
+                    arenaMarker?.remove()
+                    addMarker(checkbox.isChecked)
+                }
+
+                checkboxIsExArena = checkbox
+            }
         }
     }
 
@@ -71,19 +87,24 @@ class MapItemFragment: Fragment() {
             }
 
             override fun onMapReady(googleMap: GoogleMap) {
-                addMarker(googleMap)
+                map = googleMap
+                val isArenaEx = checkboxIsExArena?.isChecked ?: kotlin.run { false }
+                arenaMarker = addMarker(isArenaEx)
             }
         })
     }
 
-    private fun addMarker(googleMap: GoogleMap) {
-        KotlinUtils.safeLet(context, position) { _context, _position->
+    private fun addMarker(isArenaEx: Boolean): Marker? {
+
+        return KotlinUtils.safeLet(context, position) { _context, _position->
+
             when(mapMode) {
-                MapMode.NEW_ARENA -> ClusterArenaRenderer.arenaMarkerOptions(_context).position(_position)
-                MapMode.NEW_POKESTOP -> ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position)
+                MapMode.NEW_ARENA ->  map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(_context, isArenaEx).position(_position))
+                MapMode.NEW_POKESTOP ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
                 else -> null
-            }?.let { googleMap.addMarker(it) }
-        }
+            }
+
+        } ?: kotlin.run { null }
     }
 
     /**

@@ -8,17 +8,24 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.data.FirebaseRaidboss
+import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import java.util.*
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import io.stanc.pogotool.appbar.AppbarManager
+import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.firebase.node.FirebaseRaid
+import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
+import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 
 
 class RaidFragment: Fragment() {
 
     private var firebase: FirebaseDatabase? = null
+    private var geoHash: GeoHash? = null
+    private var arenaId: String? = null
     private var listAdapter: RaidBossAdapter? = null
     private var rootLayout: View? = null
 
@@ -29,11 +36,11 @@ class RaidFragment: Fragment() {
     private var eggImageButton5: ImageView? = null
 
     private var textEggHatched: TextView? = null
+    private var layoutRaidBosses: View? = null
 
     private var raidLevel: Int? = null
-    private var isEggHatched: Boolean = false
-    private var participate: Boolean = false
-    private var raidBossId: Int? = null
+    private var isEggAlreadyHatched: Boolean = false
+    private var isUserParticipating: Boolean = false
     private var timeUntilEvent: Int = 0
     private var meetupTimeHour: Int = Calendar.getInstance().time.hours
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
@@ -77,24 +84,28 @@ class RaidFragment: Fragment() {
     }
 
     private fun setupCheckBoxes(rootLayout: View) {
-        
+
         rootLayout.findViewById<CheckBox>(R.id.raid_checkbox_egg)?.let { checkbox ->
             checkbox.setOnClickListener {
                 Log.d(TAG, "Debug:: checkbox raid_checkbox_egg clicked(isChecked: ${checkbox.isChecked}), textEggHatched: ${textEggHatched?.text}")
-                isEggHatched = checkbox.isChecked
-                textEggHatched?.text = if (isEggHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
+                isEggAlreadyHatched = checkbox.isChecked
+                textEggHatched?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
+                layoutRaidBosses?.visibility = if (isEggAlreadyHatched) View.VISIBLE else View.GONE
                 Log.d(TAG, "Debug:: checkbox raid_checkbox_egg clicked, new textEggHatched: ${textEggHatched?.text}")
             }
         }
 
         rootLayout.findViewById<CheckBox>(R.id.raid_checkbox_participation)?.let { checkbox ->
-            checkbox.setOnClickListener { participate = checkbox.isChecked }
+            checkbox.setOnClickListener { isUserParticipating = checkbox.isChecked }
         }
     }
 
     private fun setupList(rootLayout: View, firebaseRaidBosses: List<FirebaseRaidboss>) {
 
         rootLayout.findViewById<RecyclerView>(R.id.raid_list_raidbosses)?.let { recyclerView ->
+
+            layoutRaidBosses = recyclerView
+            layoutRaidBosses?.visibility = View.GONE
 
             context?.let {
                 val adapter = RaidBossAdapter(it, firebaseRaidBosses, onItemClickListener = object: RaidBossAdapter.OnItemClickListener {
@@ -115,7 +126,7 @@ class RaidFragment: Fragment() {
 
     private fun setupPicker(rootLayout: View) {
 
-        // egg time
+        // egg formattedTime
 
         val eggPicker = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg)
         eggPicker.minValue = 0
@@ -127,7 +138,7 @@ class RaidFragment: Fragment() {
 
         textEggHatched = rootLayout.findViewById(R.id.raid_text_egg_time)
 
-        // meetup time
+        // meetup formattedTime
 
         val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_meetup_1)
         meetupPickerHour.minValue = 0
@@ -194,21 +205,63 @@ class RaidFragment: Fragment() {
 
     private fun sendData() {
 
-        listAdapter?.getSelectedItem()?.let { selectedRaidBoss ->
+        KotlinUtils.safeLet(arenaId, geoHash, raidLevel) { arenaId, geoHash, raidLevel ->
 
-        }
-        // TODO: check if all arguments are valid (not null...)
-//        val raid = FirebaseRaid()
-//        firebase?.pushRaidMeetup()
+            if (isEggAlreadyHatched) {
+
+                val raidbossId = listAdapter?.getSelectedItem()?.id
+                val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId, raidbossId)
+                pushRaidAndMeetupIfUserParticipates(raid)
+
+            } else {
+
+                val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId)
+                pushRaidAndMeetupIfUserParticipates(raid)
+            }
+
+        } ?: kotlin.run { Log.e(TAG, "sendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!") }
     }
+
+    private fun pushRaidAndMeetupIfUserParticipates(raid: FirebaseRaid) {
+
+        val raidMeetup = getMeetupIfUserParticipates()
+        firebase?.pushRaid(raid, raidMeetup)
+    }
+
+    private fun getMeetupIfUserParticipates(): FirebaseRaidMeetup? {
+
+        return if (isUserParticipating) {
+
+            FirebaseServer.currentUser?.id?.let {
+
+                val participants: List<String> = listOf(it)
+                FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
+
+            } ?: kotlin.run {
+                Log.e(TAG, "could not send raid meetup, because user is logged out. (currentUser: ${FirebaseServer.currentUser}, currentUser?.id: ${FirebaseServer.currentUser?.id})")
+                null
+            }
+
+        } else {
+            null
+        }
+    }
+
+    /**
+     * private
+     */
+
+    private fun formattedTime(hours: Int, minutes: Int): String = "$hours:$minutes"
 
     companion object {
 
         private val TAG = javaClass.name
 
-        fun newInstance(firebase: FirebaseDatabase): RaidFragment {
+        fun newInstance(firebase: FirebaseDatabase, arenaId: String, geoHash: GeoHash): RaidFragment {
             val fragment = RaidFragment()
             fragment.firebase = firebase
+            fragment.arenaId = arenaId
+            fragment.geoHash = geoHash
             return fragment
         }
     }

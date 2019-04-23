@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.data.FirebaseUser
+import io.stanc.pogotool.firebase.node.FirebaseUser
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner

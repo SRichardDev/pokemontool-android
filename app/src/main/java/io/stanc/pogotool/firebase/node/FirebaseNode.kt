@@ -1,4 +1,4 @@
-package io.stanc.pogotool.firebase.data
+package io.stanc.pogotool.firebase.node
 
 
 interface FirebaseNode {
