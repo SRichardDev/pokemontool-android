@@ -1,7 +1,7 @@
 #!/bin/bash
 
 input_dir=$(pwd)/../models/official-artwork
-output_dir=$(pwd)/app/src/main/assets
+output_dir=$(pwd)/app/src/main/assets/raidbosses
 
 mkdir -p ${output_dir}
 
