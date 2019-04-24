@@ -2,15 +2,13 @@ package io.stanc.pogotool
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
-import android.graphics.drawable.Drawable
 import android.view.View
-import java.io.IOException
+import io.stanc.pogotool.map.RaidBossImageMapper
 
 
 class RaidBossAdapter(private val context: Context,
@@ -56,14 +54,8 @@ class RaidBossAdapter(private val context: Context,
 
         holder.id = raidBosses[position].id
 
-        try {
-            val inputStream = context.assets.open("raidbosses/${raidBosses[position].imageName}.png")
-            val drawable = Drawable.createFromStream(inputStream, null)
-            holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
-
-        } catch (ex: IOException) {
-            Log.e(TAG, ex.toString())
-        }
+        val drawable = RaidBossImageMapper.raidBossDrawable(context, raidBosses[position].imageName)
+        holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
 
         holder.itemView.findViewById<TextView>(R.id.list_item_raidboss_name).text = raidBosses[position].name
     }

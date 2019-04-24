@@ -28,10 +28,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private val googleMapInfoWindowAdapter = object: GoogleMap.InfoWindowAdapter {
         override fun getInfoContents(p0: Marker?): View? {
-            (p0?.tag as? ClusterArena.Tag)?.let {
+            (p0?.tag as? FirebaseArena)?.let {
                 return arenaInfoWindowAdapter.getInfoContents(p0)
             }
-            (p0?.tag as? ClusterPokestop.Tag)?.let {
+            (p0?.tag as? FirebasePokestop)?.let {
                 return pokestopInfoWindowAdapter.getInfoContents(p0)
             }
 
@@ -39,10 +39,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
 
         override fun getInfoWindow(p0: Marker?): View? {
-            (p0?.tag as? ClusterArena.Tag)?.let {
+            (p0?.tag as? FirebaseArena)?.let {
                 return arenaInfoWindowAdapter.getInfoWindow(p0)
             }
-            (p0?.tag as? ClusterPokestop.Tag)?.let {
+            (p0?.tag as? FirebasePokestop)?.let {
                 return pokestopInfoWindowAdapter.getInfoWindow(p0)
             }
 
@@ -72,11 +72,11 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private fun onInfoWindowClicked(marker: Marker) {
         val tag = marker.tag
 
-        (tag as? ClusterArena.Tag)?.let {
+        (tag as? FirebaseArena)?.let {
             delegate.onArenaInfoWindowClicked(it.id, it.geoHash)
         }
 
-        (tag as? ClusterPokestop.Tag)?.let {
+        (tag as? FirebasePokestop)?.let {
             delegate.onPokestopInfoWindowClicked(it.id, it.geoHash)
         }
     }
@@ -121,7 +121,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
                 val clusterItem = ClusterPokestop.new(item)
                 pokestopClusterManager.addItem(clusterItem)
                 pokestopClustering.trigger()
-                items[clusterItem.tag.id] = WeakReference(clusterItem)
+                items[clusterItem.pokestop.id] = WeakReference(clusterItem)
             }
         }
 
@@ -150,7 +150,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
                 val clusterItem = ClusterArena.new(item)
                 arenaClusterManager.addItem(clusterItem)
                 arenaClustering.trigger()
-                items[clusterItem.tag.id] = WeakReference(clusterItem)
+                items[clusterItem.arena.id] = WeakReference(clusterItem)
             }
         }
 

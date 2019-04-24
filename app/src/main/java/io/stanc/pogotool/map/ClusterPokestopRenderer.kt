@@ -35,7 +35,7 @@ class ClusterPokestopRenderer(
 
     override fun onClusterItemRendered(clusterItem: ClusterPokestop?, marker: Marker?) {
         KotlinUtils.safeLet(clusterItem, marker) { _clusterItem, _marker ->
-            _marker.tag = _clusterItem.tag
+            _marker.tag = _clusterItem.pokestop
         }
         super.onClusterItemRendered(clusterItem, marker)
     }

@@ -3,7 +3,9 @@ package io.stanc.pogotool.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.support.annotation.DrawableRes
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -16,6 +18,7 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.utils.KotlinUtils
 
 
@@ -28,13 +31,13 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
-        markerOptions?.title(item?.title)?.icon(icon(context, item?.tag?.isEx))?.anchor(ANCHOR_X, ANCHOR_Y)
+        markerOptions?.title(item?.title)?.icon(arenaIcon(context, item?.arena))?.anchor(ANCHOR_X, ANCHOR_Y)
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
     override fun onClusterItemRendered(clusterItem: ClusterArena?, marker: Marker?) {
         KotlinUtils.safeLet(clusterItem, marker) { _clusterItem, _marker ->
-            _marker.tag = _clusterItem.tag
+            _marker.tag = _clusterItem.arena
         }
         super.onClusterItemRendered(clusterItem, marker)
     }
@@ -50,38 +53,51 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun icon(context: Context, isEx: Boolean?): BitmapDescriptor {
+        private fun arenaIcon(context: Context, arena: FirebaseArena?): BitmapDescriptor {
 
-            return isEx?.let { isEx ->
+            val foregroundDrawable = RaidBossImageMapper.raidDrawable(context, arena)
+            Log.i(TAG, "Debug:: arenaIcon(arena: $arena), foregroundDrawable: $foregroundDrawable")
 
-                if (isEx) {
-                    getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp)
+            return arena?.isEX?.let { isExArena ->
+
+                if (isExArena) {
+                    getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp, foregroundDrawable)
                 } else {
-                    getBitmapDescriptor(context, R.drawable.icon_arena_30dp)
+                    getBitmapDescriptor(context, R.drawable.icon_arena_30dp, foregroundDrawable)
                 }
 
             } ?: kotlin.run {
+                getBitmapDescriptor(context, R.drawable.icon_arena_30dp, foregroundDrawable)
+            }
+
+        }
+
+        private fun arenaBaseIcon(context: Context, isExArena: Boolean): BitmapDescriptor {
+
+            return if (isExArena) {
+                getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp)
+            } else {
                 getBitmapDescriptor(context, R.drawable.icon_arena_30dp)
             }
         }
 
-        private fun getBitmapDescriptor(context: Context, @DrawableRes backgroundDrawableRes: Int, @DrawableRes foregroundDrawableRes: Int? = null): BitmapDescriptor {
+        private fun getBitmapDescriptor(context: Context, @DrawableRes backgroundDrawableRes: Int, foregroundDrawable: Drawable? = null): BitmapDescriptor {
 
             val bitmap = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
 
-            val drawableBackground = context.getDrawable(backgroundDrawableRes)
-            drawableBackground?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
-            drawableBackground?.draw(canvas)
+            val backgroundDrawable = context.getDrawable(backgroundDrawableRes)
+            backgroundDrawable?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
+            backgroundDrawable?.draw(canvas)
 
-            foregroundDrawableRes?.let {
+            foregroundDrawable?.let {
 
-                val drawableForeground = context.getDrawable(it)
                 val marginLeft = (ICON_WIDTH-INNER_ICON_WIDTH)/2
                 val marginTop = (ICON_HEIGHT-INNER_ICON_HEIGHT)/2
-                drawableForeground?.setBounds(marginLeft, marginTop, ICON_WIDTH-marginLeft, ICON_HEIGHT-marginTop)
-                drawableForeground?.draw(canvas)
+                it.setBounds(marginLeft, marginTop, ICON_WIDTH-marginLeft, ICON_HEIGHT-marginTop)
+                it.draw(canvas)
             }
+            Log.i(TAG, "Debug:: getBitmapDescriptor(), backgroundDrawable: $backgroundDrawable, foregroundDrawable: $foregroundDrawable")
 
 
 //            val bitmapBackground = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
@@ -97,7 +113,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
         }
 
         fun arenaMarkerOptions(context: Context, isEx: Boolean = false): MarkerOptions {
-            return MarkerOptions().icon(icon(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
+            return MarkerOptions().icon(arenaBaseIcon(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {
@@ -119,8 +135,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
                 p0?.let { marker ->
                     header.text = marker.title
 
-                    (marker.tag as? ClusterArena.Tag)?.let { arenaTag ->
-                        subheader.text = if (arenaTag.isEx) subheaderTextEx else subheaderTextDefault
+                    (marker.tag as? FirebaseArena)?.let { arena ->
+                        subheader.text = if (arena.isEX) subheaderTextEx else subheaderTextDefault
                     }
                 }
 

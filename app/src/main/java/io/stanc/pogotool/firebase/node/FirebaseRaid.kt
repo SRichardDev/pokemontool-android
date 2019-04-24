@@ -22,9 +22,6 @@ data class FirebaseRaid(override val id: String,
                         var raidBossId: String? = null,
                         var raidMeetupId: String? = null): FirebaseNode {
 
-//    val clock = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
-
-
     init {
         eggIsAlreadyHatched()
     }
@@ -48,26 +45,31 @@ data class FirebaseRaid(override val id: String,
         return data
     }
 
-    fun eggIsAlreadyHatched() {
-
-        TimeCalculator.currentTime()
-
+    fun eggIsAlreadyHatched(): Boolean? {
         (timestamp as? Long)?.let {
-            Log.i(TAG, "Debug:: timestamp: $timestamp")
-            Log.d(TAG, TimeCalculator.format(it))
+            return TimeCalculator.timeExpired(it, timeLeftEggHatches)
         }
+
+        return null
     }
 
-//    fun timeEggHatches(): String? {
-//        (timestamp as? Long)?.let {
-//            Log.d(TAG, clock.format(Date(it)))
-//            System.currentTimeMillis().
-//        }
-//    }
-//
-//    fun timeRaidStarts(): String {
-//
-//    }
+    fun timeEggHatches(): String? {
+        (timestamp as? Long)?.let {
+            val date = TimeCalculator.addTime(it, timeLeftEggHatches)
+            return TimeCalculator.format(date)
+        }
+
+        return null
+    }
+
+    fun timeRaidStarts(): String? {
+        (timestamp as? Long)?.let {
+            val date = TimeCalculator.addTime(it, timeLeft)
+            return TimeCalculator.format(date)
+        }
+
+        return null
+    }
 
     companion object {
 

@@ -20,6 +20,7 @@ import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
+import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
@@ -74,6 +75,11 @@ class MapInteractionFragment: Fragment() {
         return rootLayout
     }
 
+    override fun onResume() {
+        super.onResume()
+        firebase?.let { RaidBossImageMapper.loadRaidBosses(it) }
+    }
+
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as MapFragment
@@ -98,6 +104,7 @@ class MapInteractionFragment: Fragment() {
 
                     }).let { manager ->
                         firebase = FirebaseDatabase(manager.pokestopDelegate, manager.arenaDelegate)
+                        firebase?.let { RaidBossImageMapper.loadRaidBosses(it) }
                         clusterManager = manager
                     }
                 }
@@ -225,6 +232,7 @@ class MapInteractionFragment: Fragment() {
         }
 
         firebase?.let {
+//            TODO: if raid already announced show another screen !!!
             val fragment = RaidFragment.newInstance(it, arenaId, arenaGeoHash)
             fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
         }

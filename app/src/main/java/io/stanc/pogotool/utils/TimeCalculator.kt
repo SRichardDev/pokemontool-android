@@ -4,55 +4,37 @@ import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 object TimeCalculator {
 
     private val TAG = javaClass.name
 
     @SuppressLint("SimpleDateFormat")
     val clock = SimpleDateFormat("HH:mm")
-    @SuppressLint("SimpleDateFormat")
-    val hours = SimpleDateFormat("HH")
-    @SuppressLint("SimpleDateFormat")
-    val minutes = SimpleDateFormat("mm")
 
-    fun format(timestamp: Long): String {
-        return clock.format(timestamp)
+    fun format(date: Date): String {
+        return clock.format(date)
     }
 
-//    TODO: need original time from FirebaseServer (implement time function, see https://stackoverflow.com/questions/51455767/how-to-get-a-timestamp-from-firebase-android)
-//    TODO: + time from server has to be modified w.r.t timezone and winter/sommer time
-    fun currentTime(): String {
-        return clock.format(Date())
+    fun currentTime(): Date {
+        return Calendar.getInstance().time
     }
 
-    fun addTime(timestamp: Long, minutes: String): String {
+    fun addTime(timestamp: Long, minutes: String): Date {
 
-        var timestampHours =  minutes.format(timestamp).toInt()
-        var timestampMinutes =  minutes.format(timestamp).toInt()
-        val addMinutes = minutes.toInt()
+        val timestampDate = Date(timestamp)
 
-        val additionalHours = (timestampMinutes + addMinutes) / 60
-
-        if (additionalHours > 0) {
-            timestampHours = (timestampHours + additionalHours) % 24
-        }
-
-        timestampMinutes = (timestampMinutes + addMinutes) % 60
-
-        return hours.format(timestampHours)+":"+minutes.format(timestampMinutes)
+        val calendar = Calendar.getInstance()
+        calendar.time = timestampDate
+        calendar.add(Calendar.MINUTE, minutes.toInt())
+        return calendar.time
     }
 
-//    TODO: date check, we need date as well
-//    fun timeExpired(timestamp: Long, minutes: String): Boolean {
-//
-//        val currentTime = currentTime()
-//        val currentTimeHours = hours.format(currentTime)
-//        val currentTimeMinutes = minutes.format(currentTime)
-//
-//        val time = addTime(timestamp, minutes)
-//        val timeHours = hours.format(time)
-//        val timeMinutes = minutes.format(time)
-//
-//        if (currentTimeHours > timeHours)
-//    }
+    fun timeExpired(timestamp: Long, minutes: String): Boolean {
+
+        val currentTime = currentTime()
+        val timeToCheck = addTime(timestamp, minutes)
+
+        return timeToCheck.after(currentTime)
+    }
 }

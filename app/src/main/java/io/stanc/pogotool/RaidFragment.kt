@@ -17,8 +17,8 @@ import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
-import io.stanc.pogotool.utils.WaitingSpinner
 
 
 class RaidFragment: Fragment() {
@@ -52,10 +52,9 @@ class RaidFragment: Fragment() {
 
         setupEggImageButtons(rootLayout)
         setupCheckBoxes(rootLayout)
+        setupRaidbossList(rootLayout)
         setupPicker(rootLayout)
         setupButton(rootLayout)
-
-        loadRaidbosses()
 
         this.rootLayout = rootLayout
         return rootLayout
@@ -100,8 +99,21 @@ class RaidFragment: Fragment() {
         }
     }
 
-    private fun setupList(rootLayout: View, firebaseRaidBosses: List<FirebaseRaidboss>) {
+    private fun setupRaidbossList(rootLayout: View) {
+        Log.i(TAG, "Debug:: setupRaidbossList, raidLevel: $raidLevel, list: ${RaidBossImageMapper.raidBosses.size}, rootLayout: $rootLayout")
 
+        val raidBossesToShow = raidLevel?.let { chosenRaidLevel ->
+            RaidBossImageMapper.raidBosses.filter { it.level.toInt() == chosenRaidLevel }
+
+        } ?: kotlin.run {
+            RaidBossImageMapper.raidBosses
+        }
+
+        setupList(rootLayout, raidBossesToShow)
+    }
+
+    private fun setupList(rootLayout: View, firebaseRaidBosses: List<FirebaseRaidboss>) {
+        Log.i(TAG, "Debug:: setupList(firebaseRaidBosses: ${firebaseRaidBosses.size})")
         rootLayout.findViewById<RecyclerView>(R.id.raid_list_raidbosses)?.let { recyclerView ->
 
             layoutRaidBosses = recyclerView
@@ -173,7 +185,7 @@ class RaidFragment: Fragment() {
             resetEggImageButtonsSelectionState()
             p0.isSelected = !p0.isSelected
             raidLevel = level
-            loadRaidbosses()
+            rootLayout?.let { setupRaidbossList(it) }
         }
     }
 
@@ -188,20 +200,6 @@ class RaidFragment: Fragment() {
     /**
      * send data
      */
-
-    // TODO: load optional sprites from: https://github.com/PokeAPI/sprites
-    private fun loadRaidbosses() {
-        WaitingSpinner.showProgress(R.string.spinner_title_raid_data)
-        firebase?.loadRaidBosses { firebaseRaidBosses ->
-
-            val raidBossesToShow = raidLevel?.let { chosenRaidLevel ->
-                firebaseRaidBosses.filter { it.level.toInt() == chosenRaidLevel }
-            } ?: kotlin.run { firebaseRaidBosses }
-
-            rootLayout?.let { setupList(it, raidBossesToShow) }
-            WaitingSpinner.hideProgress()
-        }
-    }
 
     private fun sendData() {
 
