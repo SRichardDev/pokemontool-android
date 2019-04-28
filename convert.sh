@@ -18,6 +18,6 @@ mkdir -p ${output_dir}
 
 for image in ${input_dir}/*.png; do
 	image_name=$(basename "$image" .png)
-	convert ${image} -alpha extract -edge 2 -negate ${output_dir}/"$image_name".png
+	convert ${image} -alpha extract -edge 5 -negate ${output_dir}/"$image_name".png
 done
 
