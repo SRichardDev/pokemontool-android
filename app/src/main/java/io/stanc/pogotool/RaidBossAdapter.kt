@@ -35,10 +35,10 @@ class RaidBossAdapter(private val context: Context,
             val imageView = itemLayout.findViewById<ImageView>(R.id.list_item_raidboss_image)
             imageView.setOnClickListener {
                 id?.let {
-                    onItemClickListener.onClick(it)
                     deselectAllItems()
                     itemLayout.isSelected = true
                     selectedItem = getItem(it)
+                    onItemClickListener.onClick(it)
                 }
             }
         }

@@ -18,6 +18,7 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
 import io.stanc.pogotool.MapInteractionFragment.MapMode
+import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.utils.KotlinUtils
@@ -113,7 +114,7 @@ class MapItemFragment: Fragment() {
 
     private fun sendMapItem() {
 
-        FirebaseServer.currentUser?.id?.let { uid ->
+        FirebaseUser.currentUser?.id?.let { uid ->
             position?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
@@ -139,7 +140,7 @@ class MapItemFragment: Fragment() {
                     else -> Log.e(TAG, "Could not sending map item to server! Reason: unknown mapMode: $mapMode")
                 }
             } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: position is $position") }
-        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter name is missing, currentUser: ${FirebaseServer.currentUser}") }
+        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter trainerName is missing, currentUser: ${FirebaseUser.currentUser}") }
     }
 
     private fun close() {

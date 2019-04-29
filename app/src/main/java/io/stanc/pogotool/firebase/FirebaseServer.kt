@@ -1,392 +1,114 @@
 package io.stanc.pogotool.firebase
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
-import io.stanc.pogotool.R
+import com.google.firebase.iid.InstanceIdResult
 import io.stanc.pogotool.firebase.data.FirebaseData
-import io.stanc.pogotool.firebase.node.*
-import io.stanc.pogotool.utils.WaitingSpinner
-import java.lang.ref.WeakReference
+import io.stanc.pogotool.firebase.node.FirebaseNode
 
 
 object FirebaseServer {
-
-    interface OnCompleteCallback<T> {
-        fun onSuccess(data: T)
-        fun onFailed(message: String?)
-    }
-
     private val TAG = javaClass.name
 
     //    TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
-//    private val firebase = FirebaseFirestore.getInstance()
-
     internal val database = FirebaseDatabase.getInstance().reference
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
-    var currentUser: io.stanc.pogotool.firebase.node.FirebaseUser? = null
-        private set
-
-    fun start() {
-        auth.addAuthStateListener { onAuthStateChanged() }
-    }
-
-    fun stop() {
-        auth.removeAuthStateListener { onAuthStateChanged }
-    }
-
-    /**
-     * authentication listener
-     */
-
-    private val authStateObservers = HashMap<Int, WeakReference<AuthStateObserver>>()
-
-    enum class AuthState {
-        UserLoggedOut,
-        UserLoggedInButUnverified,
-        UserLoggedIn
-    }
-    interface AuthStateObserver {
-        fun authStateChanged(newAuthState: AuthState)
-    }
-
-//  TODO: see https://firebase.google.com/docs/auth/web/manage-users
-    fun addAuthStateObserver(observer: AuthStateObserver) {
-        val weakObserver = WeakReference(observer)
-        authStateObservers[observer.hashCode()] = weakObserver
-    }
-
-    fun removeAuthStateObserver(observer: AuthStateObserver) {
-        authStateObservers.remove(observer.hashCode())
-    }
-
-    private val onAuthStateChanged: () -> Unit = {
-
-        updateUserProfile(auth.currentUser)
-
-        val authState = authState()
-        Log.i(TAG, "onAuthStateChanged(${authState.name}) for user: $currentUser")
-        authStateObservers.forEach { it.value.get()?.authStateChanged(authState) }
-
-        when(authState) {
-            AuthState.UserLoggedIn, AuthState.UserLoggedInButUnverified -> {
-                updateUsersNotificationToken()
-            }
-            else -> { /* nothing */ }
-        }
-    }
-
-    private fun updateUsersNotificationToken() {
-
-        requestNotificationToken(onRequestResponds = { token ->
-
-            val data = HashMap<String, String>()
-            data[io.stanc.pogotool.firebase.FirebaseDatabase.DATABASE_NOTIFICATION_TOKEN] = token
-            sendUserData(data)
-
-            currentUser?.notificationToken = token
-        })
-    }
-
-    fun authState(): AuthState {
-
-        auth.currentUser?.let { firebaseUser ->
-
-            return if (firebaseUser.isEmailVerified) {
-                AuthState.UserLoggedIn
-            } else {
-                AuthState.UserLoggedInButUnverified
-            }
-
-        } ?: kotlin.run {
-            return AuthState.UserLoggedOut
-        }
-    }
-
-    fun authStateText(context: Context): String {
-
-        return when (authState()) {
-
-            AuthState.UserLoggedIn -> context.getString(R.string.authentication_state_signed_in)
-            AuthState.UserLoggedInButUnverified -> context.getString(R.string.authentication_state_signed_in_but_missing_verification)
-            AuthState.UserLoggedOut -> context.getString(R.string.authentication_state_signed_out)
-        }
-    }
-
-    /**
-     * user profile listener
-     */
-
-    private val userProfileObservers = HashMap<Int, WeakReference<UserProfileObserver>>()
-
-    interface UserProfileObserver {
-        fun userProfileChanged(user: io.stanc.pogotool.firebase.node.FirebaseUser?)
-    }
-
-    //  TODO: see https://firebase.google.com/docs/auth/web/manage-users
-    fun addUserProfileObserver(observer: UserProfileObserver) {
-        val weakObserver = WeakReference(observer)
-        userProfileObservers[observer.hashCode()] = weakObserver
-    }
-
-    fun removeUserProfileObserver(observer: UserProfileObserver) {
-
-        val checkCount = userProfileObservers.count()
-        userProfileObservers.remove(observer.hashCode())
-        val newCheckCount = userProfileObservers.count()
-        if (newCheckCount >= checkCount) {
-            Log.e(TAG, "could not remove observer: $observer from list: checkCount: $checkCount, newCheckCount: $newCheckCount")
-        }
-    }
-
-    /**
-     * authentication methods
-     */
-
-    fun signUp(email: String, password: String, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
-
-        if (email.isEmpty() || password.isEmpty()) {
-            return
-        }
-
-        WaitingSpinner.showProgress(R.string.spinner_title_sign_up)
-
-        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {task ->
-
-            if (!task.isSuccessful) {
-                Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
-            }
-
-            onCompletionCallback(task.isSuccessful, task.exception?.message)
-            WaitingSpinner.hideProgress()
-        }
-    }
-
-    fun signIn(email: String, password: String, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
-
-        if (email.isEmpty() || password.isEmpty()) {
-            return
-        }
-
-        WaitingSpinner.showProgress(R.string.spinner_title_sign_in)
-
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-
-            if (!task.isSuccessful) {
-                Log.w(TAG, "signing in failed with error: ${task.exception?.message}")
-            }
-
-            onCompletionCallback(task.isSuccessful, task.exception?.message)
-            WaitingSpinner.hideProgress()
-        }
-    }
-
-    fun signOut() {
-        auth.signOut()
-    }
-
-    fun sendEmailVerification(onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = {_, _ ->}) {
-
-        // Send verification email
-        auth.currentUser?.let { user ->
-
-            WaitingSpinner.showProgress(R.string.spinner_title_email_verification)
-
-            user.sendEmailVerification().addOnCompleteListener { task ->
-
-                if (!task.isSuccessful) {
-                    Log.w(TAG, "email verification failed with error: ${task.exception?.message}")
-                }
-
-                WaitingSpinner.hideProgress()
-                onCompletionCallback(task.isSuccessful, task.exception?.message)
-            }
-        } ?: kotlin.run { Log.w(TAG, "can not send email verification because current currentUser is null!") }
-    }
-
-    fun deleteUser() {
-        // TODO...
-        // auth.currentUser?.delete()
-        // updateUserProfile()
-    }
 
     /**
      * others
      */
 
+    interface OnCompleteCallback<T> {
+        fun onSuccess(data: T?)
+        fun onFailed(message: String?)
+    }
+
+    private fun <TResult, TData>callback(task: Task<TResult>, callback: OnCompleteCallback<TData>) {
+
+        if (task.isSuccessful) {
+
+            (task.result as? InstanceIdResult)?.let { callback.onSuccess(it.token as TData) }
+            (task.result as? Void)?.let { callback.onSuccess(null) }
+
+        } else {
+            callback.onFailed(task.exception?.message)
+        }
+    }
+
     fun timestamp(): Any {
         return ServerValue.TIMESTAMP
-    }
-
-//    fun time(callback: OnCompleteCallback<Any>) {
-//
-//        // use this to set before push
-//        val timestamp = ServerValue.TIMESTAMP
-//        Log.i(TAG, "Debug:: time, timestamp: $timestamp")
-//
-//        FirebaseFunctions.getInstance().getHttpsCallable("getTime").call().addOnCompleteListener { task ->
-//
-//            Log.i(TAG, "Debug:: time addOnComplete: isSuccessful: ${task.isSuccessful}, result?.data: ${task.result?.data}, exception?.message: ${task.exception?.message}")
-//
-//            if (task.isSuccessful) {
-//
-////                val timestamp = task.result?.data as? Long
-////                callback.onSuccess()
-//            } else {
-//                callback.onFailed(task.exception?.message)
-//            }
-//        }
-//    }
-
-    /**
-     * user
-     */
-
-    fun changeUserName(newUserName: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        val profileUpdates = UserProfileChangeRequest.Builder()
-            .setDisplayName(newUserName)
-            .setPhotoUri(currentUser?.photoURL)
-            .build()
-
-        auth.currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.i(TAG, "User profile updated.")
-                updateUserProfile(auth.currentUser)
-                onCompletionCallback(true)
-            } else {
-
-                Log.w(TAG, "User profile update failed. Error: ${task.exception?.message}")
-                onCompletionCallback(false)
-            }
-        }
-    }
-
-    fun reloadUserData(context: Context, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        auth.currentUser?.reload()?.addOnCompleteListener { task ->
-
-            if (task.isSuccessful) {
-                updateUserProfile(auth.currentUser)
-            } else {
-                Log.w(TAG, "reloading currentUser data failed with error: ${task.exception?.message}")
-                Toast.makeText(context, context.getString(R.string.authentication_state_synchronization_failed), Toast.LENGTH_LONG).show()
-            }
-
-            onCompletionCallback(task.isSuccessful)
-        }
-    }
-
-    private fun updateUserProfile(firebaseAuthUser: FirebaseUser?) {
-
-        firebaseAuthUser?.let { authUser ->
-
-            currentUser?.let { currentUser ->
-
-                currentUser.id = authUser.uid
-                currentUser.name = authUser.displayName
-                currentUser.email = authUser.email
-                currentUser.isVerified = authUser.isEmailVerified
-                currentUser.photoURL = authUser.photoUrl
-
-            } ?: kotlin.run {
-
-                currentUser = FirebaseUser(
-                    authUser.uid,
-                    authUser.displayName,
-                    authUser.email,
-                    authUser.isEmailVerified,
-                    null,
-                    authUser.photoUrl
-                )
-            }
-
-            userProfileObservers.forEach { observer -> observer.value.get()?.userProfileChanged(currentUser) }
-
-        } ?: kotlin.run {
-            userProfileObservers.forEach { it.value.get()?.userProfileChanged(null) }
-        }
     }
 
     /**
      * interface for request, add, change & remove data
      */
 
-    fun requestDataValue(databaseChildPath: String, onRequestResponds: (data: Any?) -> Unit) {
-        requestData(databaseChildPath, onRequestResponds, dataOnResponse = { it.value })
-    }
-
-    fun requestDataChilds(databaseChildPath: String, onRequestResponds: (childs: List<DataSnapshot>) -> Unit) {
-        requestData(databaseChildPath, onRequestResponds, dataOnResponse = { it.children.toList() })
-    }
-
-    private fun <T : Any?> requestData(databasePath: String, onRequestResponds: (any: T) -> Unit, dataOnResponse: (p0: DataSnapshot) -> T) {
-        FirebaseServer.database.child(databasePath).addListenerForSingleValueEvent(object : ValueEventListener {
+    fun requestDataValue(databaseDataPath: String, onCompletionCallback: OnCompleteCallback<Any?>? = null) {
+        FirebaseServer.database.child(databaseDataPath).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onCancelled(p0: DatabaseError) {
-                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databasePath")
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databaseDataPath")
+                onCompletionCallback?.onFailed(p0.message)
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databasePath")
-                onRequestResponds(dataOnResponse(p0))
+                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseDataPath")
+                onCompletionCallback?.onSuccess(p0.value)
+            }
+        })
+    }
+
+    fun requestDataChilds(databaseChildPath: String, onCompletionCallback: OnCompleteCallback<List<DataSnapshot>>? = null) {
+        FirebaseServer.database.child(databaseChildPath).addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onCancelled(p0: DatabaseError) {
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databaseChildPath")
+                onCompletionCallback?.onFailed(p0.message)
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseChildPath")
+                onCompletionCallback?.onSuccess(p0.children.toList())
             }
         })
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
-    fun addNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun createNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
-            onCompletionCallback(task.isSuccessful)
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
-    fun setData(firebaseData: FirebaseData, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun setData(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         database.child(firebaseData.databasePath()).child(firebaseData.key).setValue(firebaseData.data()).addOnCompleteListener { task ->
-            onCompletionCallback(task.isSuccessful)
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
-    fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
+    fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
         val newNode = database.child(databasePath).push()
-        newNode.setValue(data).addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
+        newNode.setValue(data).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
         return newNode.key
     }
 
-    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { onCompletionCallback(it.isSuccessful) }
+    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
     }
 
     /**
      * private implementation
      */
 
-    private fun requestNotificationToken(onRequestResponds: (token: String) -> Unit) {
-        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener(OnCompleteListener { task ->
-
-            if (task.isSuccessful) {
-                task.result?.token?.let { token ->
-                    onRequestResponds(token)
-                }
-
-            } else {
-                Log.e(TAG, "requestNotificationToken failed: ", task.exception)
-                return@OnCompleteListener
-            }
-        })
-    }
-
-    private fun sendUserData(data: Map<String, String>) {
-        currentUser?.let {
-            FirebaseServer.addNode(it)
-        } ?: kotlin.run { Log.w(TAG, "update user data failed for data: $data, currentUser: $currentUser") }
+    fun requestNotificationToken(onCompletionCallback: OnCompleteCallback<String>) {
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
+            callback<InstanceIdResult, String>(task, onCompletionCallback)
+        }
     }
 }

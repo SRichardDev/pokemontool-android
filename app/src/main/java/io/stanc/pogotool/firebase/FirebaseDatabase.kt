@@ -51,7 +51,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
 
         override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-//            Log.v(TAG, "onChildAdded(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
+            Log.v(TAG, "onChildAdded(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
             newItem(p0)?.let { addItem(it) }
         }
 
@@ -99,6 +99,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
 
     fun loadPokestops(geoHash: GeoHash) {
+        Log.d(TAG, "Debug:: loadPokestops for $geoHash")
         databasePokestop.child(geoHash.toString()).removeEventListener(pokestopEventListener)
         databasePokestop.child(geoHash.toString()).addChildEventListener(pokestopEventListener)
     }
@@ -111,28 +112,32 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * raid bosses
      */
 
-    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>) -> Unit) {
+    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>?) -> Unit) {
 
-        FirebaseServer.requestDataChilds(DATABASE_RAID_BOSSES, onRequestResponds = { childs ->
-            Log.d(TAG, "Debug:: requestDataChilds, childs: $childs, count: ${childs.count()}")
-            val raidBosses = mutableListOf<FirebaseRaidboss>()
-            childs.forEach { child ->
-                FirebaseRaidboss.new(child)?.let { raidBosses.add(it) }
+        FirebaseServer.requestDataChilds(DATABASE_ARENA_RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+
+            override fun onSuccess(data: List<DataSnapshot>?) {
+                val raidBosses = mutableListOf<FirebaseRaidboss>()
+                data?.forEach { FirebaseRaidboss.new(it)?.let { raidBosses.add(it) } }
+                onCompletionCallback(raidBosses)
             }
-            onCompletionCallback(raidBosses)
+
+            override fun onFailed(message: String?) {
+                Log.d(TAG, "loadRaidBosses failed. Error: $message")
+                onCompletionCallback(null)
+            }
+
         })
     }
 
     fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null) {
-        FirebaseServer.addNode(raid)
+        FirebaseServer.createNode(raid)
         raidMeetup?.let {
             val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
             Log.i(TAG, "Debug:: pushRaid, raidMeetupId: $raidMeetupId")
             raidMeetupId?.let { id ->
                 val data = RaidMeetup(raid.databasePath(), id)
-                FirebaseServer.setData(data) {
-                    Log.i(TAG, "Debug:: pushRaid, set meetup data successfully: $it")
-                }
+                FirebaseServer.setData(data, callbackForVoid())
             }
         }
     }
@@ -199,8 +204,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseServer.currentUser?.id}, notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
-        KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { uid, notificationToken ->
+        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseUser.currentUser?.id}, notificationToken: ${FirebaseUser.currentUser?.notificationToken}")
+        KotlinUtils.safeLet(FirebaseUser.currentUser?.id, FirebaseUser.currentUser?.notificationToken) { uid, notificationToken ->
 
             subscribeFor(FirebaseSubscription.Type.Arena, uid, notificationToken, geoHash, onCompletionCallback)
             subscribeFor(FirebaseSubscription.Type.Pokestop, uid, notificationToken, geoHash, onCompletionCallback)
@@ -209,16 +214,15 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     private fun subscribeFor(type: FirebaseSubscription.Type, uid: String, notificationToken: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = FirebaseSubscription(id = notificationToken, uid = uid, geoHash = geoHash, type = type)
-        FirebaseServer.addNode(data, onCompletionCallback)
+        FirebaseServer.createNode(data, callbackForVoid(onCompletionCallback))
     }
 
     // TODO: add onCompletionCallBack for removing ...
     fun removeSubscription(geoHash: GeoHash) {
-        FirebaseServer.currentUser?.notificationToken?.let { userToken ->
+        FirebaseUser.currentUser?.notificationToken?.let { userToken ->
             databaseArena.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
             databasePokestop.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
 
-//            FirebaseServer.removeNode()
         }
     }
 
@@ -226,9 +230,20 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * private implementations
      */
 
+    private fun callbackForVoid(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) = object : FirebaseServer.OnCompleteCallback<Void> {
+        override fun onSuccess(data: Void?) {
+            onCompletionCallback(true)
+        }
+
+        override fun onFailed(message: String?) {
+            Log.d(TAG, "Data request failed. Error: $message")
+            onCompletionCallback(false)
+        }
+    }
+
     private fun loadSubscriptionsFromDatabase(database: DatabaseReference, onResponse: Async.Response<List<GeoHash>>) {
 
-        FirebaseServer.currentUser?.notificationToken?.let { userToken ->
+        FirebaseUser.currentUser?.notificationToken?.let { userToken ->
 
             database.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -243,14 +258,14 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
                 }
             })
         } ?: kotlin.run {
-            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseServer.currentUser}, and notificationToken: ${FirebaseServer.currentUser?.notificationToken}")
+            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.currentUser}, and notificationToken: ${FirebaseUser.currentUser?.notificationToken}")
             onResponse.onException(exception)
         }
     }
 
     private fun removeSubscriptionsFromDatabase(database: DatabaseReference, type: FirebaseSubscription.Type) {
 
-        KotlinUtils.safeLet(FirebaseServer.currentUser?.id, FirebaseServer.currentUser?.notificationToken) { uid, userToken ->
+        KotlinUtils.safeLet(FirebaseUser.currentUser?.id, FirebaseUser.currentUser?.notificationToken) { uid, userToken ->
 
             database.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -304,15 +319,20 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
     companion object {
 
         const val MAX_SUBSCRIPTIONS = 10
-        const val DATABASE_USERS = "users"
+
+        const val DATABASE_REG_USER = "registered_user"
+
         const val DATABASE_ARENAS = "arenas"
-        const val DATABASE_RAID_BOSSES = "raidBosses"
-        const val DATABASE_RAID_MEETUPS = "raidMeetups"
+        const val DATABASE_ARENA_RAID = "raid"
+        const val DATABASE_ARENA_RAID_BOSSES = "raidBosses"
+        const val DATABASE_ARENA_RAID_MEETUPS = "raidMeetups"
+
         //    const val DATABASE_POKESTOPS = "pokestops"
         const val DATABASE_POKESTOPS = "test_pokestops"
-        const val DATABASE_REG_USER = "registered_user"
-        const val DATABASE_RAID = "raid"
-        const val DATABASE_NOTIFICATION_TOKEN = "notificationToken"
+
+        const val DATABASE_USERS = "users"
+        const val DATABASE_USER_NOTIFICATION_TOKEN = "notificationToken"
+        const val DATABASE_USER_TRAINER_NAME = "trainerName"
 
         const val NOTIFICATION_DATA_LATITUDE = "latitude"
         const val NOTIFICATION_DATA_LONGITUDE = "longitude"

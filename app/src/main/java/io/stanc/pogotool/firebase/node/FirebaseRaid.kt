@@ -3,13 +3,11 @@ package io.stanc.pogotool.firebase.node
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_RAID
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider
 import io.stanc.pogotool.utils.TimeCalculator
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 data class FirebaseRaid(override val id: String,
@@ -26,7 +24,7 @@ data class FirebaseRaid(override val id: String,
         eggIsAlreadyHatched()
     }
 
-    override fun databasePath(): String = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$DATABASE_RAID"
+    override fun databasePath(): String = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$DATABASE_ARENA_RAID"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()

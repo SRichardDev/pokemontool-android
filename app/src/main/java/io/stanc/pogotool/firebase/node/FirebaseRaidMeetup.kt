@@ -2,14 +2,14 @@ package io.stanc.pogotool.firebase.node
 
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_RAID_MEETUPS
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID_MEETUPS
 
 data class FirebaseRaidMeetup(
     override val id: String,
     val meetupTime: String,
     val participants: List<String>): FirebaseNode {
 
-    override fun databasePath(): String = DATABASE_RAID_MEETUPS
+    override fun databasePath(): String = DATABASE_ARENA_RAID_MEETUPS
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()

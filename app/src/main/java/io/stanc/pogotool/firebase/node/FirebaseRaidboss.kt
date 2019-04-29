@@ -1,7 +1,7 @@
 package io.stanc.pogotool.firebase.node
 
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_RAID_BOSSES
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID_BOSSES
 
 data class FirebaseRaidboss(
     override val id: String,
@@ -9,7 +9,7 @@ data class FirebaseRaidboss(
     val level: String,
     val imageName: String): FirebaseNode {
 
-    override fun databasePath(): String = DATABASE_RAID_BOSSES
+    override fun databasePath(): String = DATABASE_ARENA_RAID_BOSSES
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -33,7 +33,7 @@ data class FirebaseRaidboss(
             val level = dataSnapshot.child("level").value as? String
             val imageName = dataSnapshot.child("imageName").value as? String
 
-//            Log.v(TAG, "id: $id, name: $name, level: $level, imageName: $imageName")
+//            Log.v(TAG, "id: $id, trainerName: $trainerName, level: $level, imageName: $imageName")
 
             if (id != null && name != null && level != null && imageName != null) {
                 return FirebaseRaidboss(id, name, level, imageName)

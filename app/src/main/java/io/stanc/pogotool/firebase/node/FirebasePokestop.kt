@@ -1,5 +1,6 @@
 package io.stanc.pogotool.firebase.node
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.geohash.GeoHash
@@ -49,7 +50,7 @@ data class FirebasePokestop(
             }
             val submitter = dataSnapshot.child("submitter").value as? String
 
-//            Log.v(TAG, "id: $id, name: $name, latitudeNum: $latitudeNum, latitude: $latitude, longitudeNum: $longitudeNum, longitude: $longitude")
+//            Log.v(TAG, "id: $id, name: $name, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 
             if (id != null && name != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)

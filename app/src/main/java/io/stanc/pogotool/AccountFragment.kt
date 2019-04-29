@@ -9,7 +9,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.firebase.node.FirebaseUser
+import io.stanc.pogotool.firebase.FirebaseUser
+import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -43,14 +44,15 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        FirebaseServer.addAuthStateObserver(authStateObserver)
-        FirebaseServer.addUserProfileObserver(userProfileObserver)
-        context?.let { FirebaseServer.reloadUserData(it, onCompletedReloadingRequest) }
+        FirebaseUser.addAuthStateObserver(authStateObserver)
+        FirebaseUser.addUserProfileObserver(userProfileObserver)
+//        TODO: ???
+//        context?.let { FirebaseUser.reloadUserData(it, onCompletedReloadingRequest) }
     }
 
     override fun onPause() {
-        FirebaseServer.removeAuthStateObserver(authStateObserver)
-        FirebaseServer.removeUserProfileObserver(userProfileObserver)
+        FirebaseUser.removeAuthStateObserver(authStateObserver)
+        FirebaseUser.removeUserProfileObserver(userProfileObserver)
         super.onPause()
     }
 
@@ -59,9 +61,9 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
             R.id.authentication_button_sign_up -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signUp(
-                        authentication_edittext_email.text.toString(),
-                        authentication_edittext_password.text.toString(),
+
+                    FirebaseUser.signUp(
+                        userConfigForAuthentication(),
                         onCompletedSignedUpRequest
                     )
                 }
@@ -69,26 +71,25 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
             R.id.authentication_button_sign_in -> {
                 if (checkEditTextsInputsIsValid()) {
-                    FirebaseServer.signIn(
-                        authentication_edittext_email.text.toString(),
-                        authentication_edittext_password.text.toString(),
+                    FirebaseUser.signIn(
+                        userConfigForAuthentication(),
                         onCompletedSignedInRequest
                     )
                 }
             }
 
-            R.id.authentication_button_sign_out -> FirebaseServer.signOut()
+            R.id.authentication_button_sign_out -> FirebaseUser.signOut()
 
             R.id.authentication_button_verify_email -> {
                 authentication_button_verify_email?.isEnabled = false
-                FirebaseServer.sendEmailVerification(onCompletedVerificationRequest)
+                FirebaseUser.sendEmailVerification(onCompletedVerificationRequest)
             }
 
             R.id.authentication_button_user_name -> {
 
                 if (authentication_edittext_user_name.visibility == View.VISIBLE) {
 
-                    FirebaseServer.changeUserName(authentication_edittext_user_name.text.toString())
+                    FirebaseUser.changeUserName(authentication_edittext_user_name.text.toString())
 
                     authentication_edittext_user_name.visibility = View.GONE
                     authentication_button_user_name.text = getString(R.string.authentication_button_open_user_name)
@@ -103,18 +104,28 @@ class AccountFragment: Fragment(), View.OnClickListener {
         }
     }
 
+    private fun userConfigForAuthentication(): FirebaseUser.UserConfig {
+
+        val email = authentication_edittext_email.text.toString()
+        val password = authentication_edittext_password.text.toString()
+//        val name = ?
+//        val team = ?
+
+        return FirebaseUser.UserConfig(email, password)
+    }
+
     /**
      * firebase observer
      */
 
-    private val authStateObserver = object: FirebaseServer.AuthStateObserver {
-        override fun authStateChanged(newAuthState: FirebaseServer.AuthState) {
+    private val authStateObserver = object: FirebaseUser.AuthStateObserver {
+        override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
             updateUI()
         }
     }
 
-    private val userProfileObserver = object: FirebaseServer.UserProfileObserver {
-        override fun userProfileChanged(user: FirebaseUser?) {
+    private val userProfileObserver = object: FirebaseUser.UserProfileObserver {
+        override fun userProfileChanged(user: FirebaseUserNode?) {
             updateUI()
         }
     }
@@ -137,7 +148,7 @@ class AccountFragment: Fragment(), View.OnClickListener {
     }
     private val onCompletedVerificationRequest = { taskSuccessful: Boolean, exception: String? ->
         if (taskSuccessful) {
-            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseServer.currentUser?.email), Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.authentication_state_verification_successful, FirebaseUser.currentUser?.email), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(context, getString(R.string.authentication_state_verification_failed, exception), Toast.LENGTH_LONG).show()
         }
@@ -175,14 +186,14 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
         WaitingSpinner.hideProgress()
 
-        when (FirebaseServer.authState()) {
-            FirebaseServer.AuthState.UserLoggedOut -> {
+        when (FirebaseUser.authState()) {
+            FirebaseUser.AuthState.UserLoggedOut -> {
                 updateSignButtons(userHasToSignInOrUp = true)
             }
-            FirebaseServer.AuthState.UserLoggedInButUnverified -> {
+            FirebaseUser.AuthState.UserLoggedInButUnverified -> {
                 updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = false)
             }
-            FirebaseServer.AuthState.UserLoggedIn -> {
+            FirebaseUser.AuthState.UserLoggedIn -> {
                 updateSignButtons(userHasToSignInOrUp = false, isEmailVerified = true)
             }
         }
@@ -192,13 +203,13 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
     private fun updateUserStateTexts() {
 
-        FirebaseServer.currentUser?.photoURL?.let { authentication_imageview_user?.setImageURI(it) }
+        FirebaseUser.currentUser?.photoURL?.let { authentication_imageview_user?.setImageURI(it) }
 
         context?.let {
-            authentication_layout_user_status?.text = getString(R.string.authentication_user_state, FirebaseServer.authStateText(it))
+            authentication_layout_user_status?.text = getString(R.string.authentication_user_state, FirebaseUser.authStateText(it))
         }
-        FirebaseServer.currentUser?.name?.let { authentication_layout_user_name?.text = getString(R.string.authentication_user_name, it) }
-        FirebaseServer.currentUser?.email?.let { authentication_layout_user_email?.text = getString(R.string.authentication_user_email, it) }
+        FirebaseUser.currentUser?.trainerName?.let { authentication_layout_user_name?.text = getString(R.string.authentication_user_name, it) }
+        FirebaseUser.currentUser?.email?.let { authentication_layout_user_email?.text = getString(R.string.authentication_user_email, it) }
     }
 
     private fun updateSignButtons(userHasToSignInOrUp: Boolean, isEmailVerified: Boolean = false) {

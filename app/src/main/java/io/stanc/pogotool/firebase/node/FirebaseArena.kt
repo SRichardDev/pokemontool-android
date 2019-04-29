@@ -3,7 +3,7 @@ package io.stanc.pogotool.firebase.node
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_RAID
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
 
@@ -51,7 +51,7 @@ data class FirebaseArena(
             val submitter = dataSnapshot.child("submitter").value as? String
 
             Log.d(TAG, "Debug:: childs: ${dataSnapshot.children}")
-            val raid = FirebaseRaid.new(dataSnapshot.child(DATABASE_RAID))
+            val raid = FirebaseRaid.new(dataSnapshot.child(DATABASE_ARENA_RAID))
 
             Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 

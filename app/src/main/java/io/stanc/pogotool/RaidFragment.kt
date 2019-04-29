@@ -13,7 +13,7 @@ import java.util.*
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import io.stanc.pogotool.appbar.AppbarManager
-import io.stanc.pogotool.firebase.FirebaseServer
+import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.geohash.GeoHash
@@ -86,11 +86,9 @@ class RaidFragment: Fragment() {
 
         rootLayout.findViewById<CheckBox>(R.id.raid_checkbox_egg)?.let { checkbox ->
             checkbox.setOnClickListener {
-                Log.d(TAG, "Debug:: checkbox raid_checkbox_egg clicked(isChecked: ${checkbox.isChecked}), textEggHatched: ${textEggHatched?.text}")
                 isEggAlreadyHatched = checkbox.isChecked
                 textEggHatched?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
                 layoutRaidBosses?.visibility = if (isEggAlreadyHatched) View.VISIBLE else View.GONE
-                Log.d(TAG, "Debug:: checkbox raid_checkbox_egg clicked, new textEggHatched: ${textEggHatched?.text}")
             }
         }
 
@@ -113,16 +111,16 @@ class RaidFragment: Fragment() {
     }
 
     private fun setupList(rootLayout: View, firebaseRaidBosses: List<FirebaseRaidboss>) {
-        Log.i(TAG, "Debug:: setupList(firebaseRaidBosses: ${firebaseRaidBosses.size})")
         rootLayout.findViewById<RecyclerView>(R.id.raid_list_raidbosses)?.let { recyclerView ->
 
             layoutRaidBosses = recyclerView
-            layoutRaidBosses?.visibility = View.GONE
 
             context?.let {
                 val adapter = RaidBossAdapter(it, firebaseRaidBosses, onItemClickListener = object: RaidBossAdapter.OnItemClickListener {
                     override fun onClick(id: String) {
-                        Log.i(TAG, "Debug:: setOnItemClickListener(id: $id)")
+                        listAdapter?.getSelectedItem()?.level?.toInt()?.let { raidLevel ->
+                            selectEggImageButton(raidLevel)
+                        }
                     }
                 })
 
@@ -176,25 +174,85 @@ class RaidFragment: Fragment() {
     }
 
     /**
-     * setup helper
+     * egg button selection
      */
 
     private inner class EggOnClickListener(private val level: Int): View.OnClickListener {
 
         override fun onClick(p0: View) {
-            resetEggImageButtonsSelectionState()
-            p0.isSelected = !p0.isSelected
-            raidLevel = level
+            switchEggImageButtonSelection(level)
             rootLayout?.let { setupRaidbossList(it) }
         }
     }
 
-    private fun resetEggImageButtonsSelectionState() {
-        eggImageButton1?.isSelected = false
-        eggImageButton2?.isSelected = false
-        eggImageButton3?.isSelected = false
-        eggImageButton4?.isSelected = false
-        eggImageButton5?.isSelected = false
+    private fun switchEggImageButtonSelection(level: Int) {
+        when(level) {
+            1 -> eggImageButton1?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
+            2 -> eggImageButton2?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
+            3 -> eggImageButton3?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
+            4 -> eggImageButton4?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
+            5 -> eggImageButton5?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
+        }
+    }
+
+    private fun selectEggImageButton(level: Int) {
+        deselectAllEggImageButtons(butLevel = level)
+
+        when(level) {
+            1 -> eggImageButton1?.let {
+                it.isSelected = true
+                raidLevel = level
+            }
+            2 -> eggImageButton2?.let {
+                it.isSelected = true
+                raidLevel = level
+            }
+            3 -> eggImageButton3?.let  {
+                it.isSelected = true
+                raidLevel = level
+            }
+            4 -> eggImageButton4?.let {
+                it.isSelected = true
+                raidLevel = level
+            }
+            5 -> eggImageButton5?.let {
+                it.isSelected = true
+                raidLevel = level
+            }
+        }
+    }
+
+    private fun deselectAllEggImageButtons(butLevel: Int) {
+        if (butLevel != 1) deselectEggImageButton(1)
+        if (butLevel != 2) deselectEggImageButton(2)
+        if (butLevel != 3) deselectEggImageButton(3)
+        if (butLevel != 4) deselectEggImageButton(4)
+        if (butLevel != 5) deselectEggImageButton(5)
+    }
+
+    private fun deselectEggImageButton(level: Int) {
+        when(level) {
+            1 -> eggImageButton1?.let {
+                it.isSelected = false
+                raidLevel = null
+            }
+            2 -> eggImageButton2?.let {
+                it.isSelected = false
+                raidLevel = null
+            }
+            3 -> eggImageButton3?.let  {
+                it.isSelected = false
+                raidLevel = null
+            }
+            4 -> eggImageButton4?.let {
+                it.isSelected = false
+                raidLevel = null
+            }
+            5 -> eggImageButton5?.let {
+                it.isSelected = false
+                raidLevel = null
+            }
+        }
     }
 
     /**
@@ -230,13 +288,13 @@ class RaidFragment: Fragment() {
 
         return if (isUserParticipating) {
 
-            FirebaseServer.currentUser?.id?.let {
+            FirebaseUser.currentUser?.id?.let {
 
                 val participants: List<String> = listOf(it)
                 FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
 
             } ?: kotlin.run {
-                Log.e(TAG, "could not send raid meetup, because user is logged out. (currentUser: ${FirebaseServer.currentUser}, currentUser?.id: ${FirebaseServer.currentUser?.id})")
+                Log.e(TAG, "could not send raid meetup, because user is logged out. (currentUser: ${FirebaseUser.currentUser}, currentUser?.id: ${FirebaseUser.currentUser?.id})")
                 null
             }
 

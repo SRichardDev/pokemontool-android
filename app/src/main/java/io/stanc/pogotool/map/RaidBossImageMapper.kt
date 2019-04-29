@@ -25,9 +25,9 @@ object RaidBossImageMapper {
         WaitingSpinner.showProgress(R.string.spinner_title_raid_data)
         firebase.loadRaidBosses { firebaseRaidBosses ->
 
-            Log.i(TAG, "Debug:: raidbosses loaded: ${firebaseRaidBosses.size}")
+            Log.i(TAG, "Debug:: raidbosses loaded: ${firebaseRaidBosses?.size}")
             Log.i(TAG, "Debug:: raidbosses bevor: ${raidBosses.size}")
-            raidBosses = firebaseRaidBosses
+            firebaseRaidBosses?.let { raidBosses = it }
             Log.i(TAG, "Debug:: raidbosses after: ${raidBosses.size}")
             WaitingSpinner.hideProgress()
         }
