@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
-import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.utils.SystemUtils
@@ -44,14 +43,15 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     override fun onResume() {
         super.onResume()
+        FirebaseUser.addAuthStateObserver(authStateObserver)
+        FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
-        FirebaseUser.addUserProfileObserver(userProfileObserver)
-//        FirebaseUser.reloadUserData(baseContext)
     }
 
     override fun onPause() {
-        FirebaseUser.removeUserProfileObserver(userProfileObserver)
         FirebaseUser.stopAuthentication()
+        FirebaseUser.removeAuthStateObserver(authStateObserver)
+        FirebaseUser.removeUserDataObserver(userDataObserver)
         super.onPause()
     }
 
@@ -73,6 +73,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             override fun onDrawerOpened(drawerView: View) {
                 super.onDrawerOpened(drawerView)
                 weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
+                updateNavText()
             }
         }
 
@@ -134,15 +135,21 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Navigation drawer
      */
 
-    private val userProfileObserver = object : FirebaseUser.UserProfileObserver {
-        override fun userProfileChanged(user: FirebaseUserNode?) {
+    private val authStateObserver = object : FirebaseUser.AuthStateObserver {
+        override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
+            updateNavText()
+        }
+    }
+
+    private val userDataObserver = object : FirebaseUser.UserDataObserver {
+        override fun userDataChanged(user: FirebaseUserNode?) {
             updateNavText()
         }
     }
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseUser.authStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseUser.currentUser?.trainerName)
+        nav_info?.text = getString(R.string.user_name, FirebaseUser.userData?.trainerName)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

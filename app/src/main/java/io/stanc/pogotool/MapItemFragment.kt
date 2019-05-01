@@ -11,7 +11,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
@@ -114,7 +113,7 @@ class MapItemFragment: Fragment() {
 
     private fun sendMapItem() {
 
-        FirebaseUser.currentUser?.id?.let { uid ->
+        FirebaseUser.userData?.id?.let { uid ->
             position?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
@@ -140,7 +139,7 @@ class MapItemFragment: Fragment() {
                     else -> Log.e(TAG, "Could not sending map item to server! Reason: unknown mapMode: $mapMode")
                 }
             } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: position is $position") }
-        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter trainerName is missing, currentUser: ${FirebaseUser.currentUser}") }
+        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter trainerName is missing, userData: ${FirebaseUser.userData}") }
     }
 
     private fun close() {

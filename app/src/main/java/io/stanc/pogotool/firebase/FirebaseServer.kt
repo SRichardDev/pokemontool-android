@@ -8,6 +8,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import io.stanc.pogotool.firebase.data.FirebaseData
 import io.stanc.pogotool.firebase.node.FirebaseNode
+import java.lang.ref.WeakReference
 
 
 object FirebaseServer {
@@ -17,7 +18,7 @@ object FirebaseServer {
     internal val database = FirebaseDatabase.getInstance().reference
 
     /**
-     * others
+     * callbacks
      */
 
     interface OnCompleteCallback<T> {
@@ -37,8 +38,40 @@ object FirebaseServer {
         }
     }
 
-    fun timestamp(): Any {
-        return ServerValue.TIMESTAMP
+    private val nodeDidChangeListener = HashMap<Int, NodeEventListener>()
+
+    fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
+        if (!nodeDidChangeListener.contains(callback.hashCode())) {
+
+            val newChildEventListener = NodeEventListener(callback)
+            nodeDidChangeListener[callback.hashCode()] = newChildEventListener
+            database.child(databasePath).addValueEventListener(newChildEventListener)
+        }
+    }
+
+    fun removeNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
+        nodeDidChangeListener.remove(callback.hashCode())?.let {
+            database.child(databasePath).removeEventListener(it)
+        }
+    }
+
+    interface OnNodeDidChangeCallback {
+        fun nodeChanged(dataSnapshot: DataSnapshot)
+    }
+
+    class NodeEventListener(callback: OnNodeDidChangeCallback): ValueEventListener {
+        private val TAG = this.javaClass.name
+
+        private val callback = WeakReference(callback)
+
+        override fun onCancelled(p0: DatabaseError) {
+            Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message})")
+        }
+
+        override fun onDataChange(p0: DataSnapshot) {
+            Log.d(TAG, "onDataChange(${p0.value}), p0.key: ${p0.key}")
+            callback.get()?.nodeChanged(p0)
+        }
     }
 
     /**
@@ -77,7 +110,9 @@ object FirebaseServer {
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
     fun createNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        Log.i(TAG, "Debug:: createNode($firebaseNode)....")
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
+            Log.i(TAG, "Debug:: onCompleteListener for createNode($firebaseNode): task: ${task.isSuccessful}")
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
@@ -102,9 +137,23 @@ object FirebaseServer {
         }
     }
 
+//    private val databasePokestop = FirebaseServer.database.child(DATABASE_POKESTOPS)
+//    private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
+//
+//    fun loadPokestops(geoHash: GeoHash) {
+//        Log.d(TAG, "Debug:: loadPokestops for $geoHash")
+//        databasePokestop.child(geoHash.toString()).removeEventListener(pokestopEventListener)
+//        databasePokestop.child(geoHash.toString()).addChildEventListener(pokestopEventListener)
+//    }
+
+
     /**
-     * private implementation
+     * helper
      */
+
+    fun timestamp(): Any {
+        return ServerValue.TIMESTAMP
+    }
 
     fun requestNotificationToken(onCompletionCallback: OnCompleteCallback<String>) {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->

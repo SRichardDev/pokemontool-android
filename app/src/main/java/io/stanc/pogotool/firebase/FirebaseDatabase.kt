@@ -204,8 +204,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseUser.currentUser?.id}, notificationToken: ${FirebaseUser.currentUser?.notificationToken}")
-        KotlinUtils.safeLet(FirebaseUser.currentUser?.id, FirebaseUser.currentUser?.notificationToken) { uid, notificationToken ->
+        Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseUser.userData?.id}, notificationToken: ${FirebaseUser.userData?.notificationToken}")
+        KotlinUtils.safeLet(FirebaseUser.userData?.id, FirebaseUser.userData?.notificationToken) { uid, notificationToken ->
 
             subscribeFor(FirebaseSubscription.Type.Arena, uid, notificationToken, geoHash, onCompletionCallback)
             subscribeFor(FirebaseSubscription.Type.Pokestop, uid, notificationToken, geoHash, onCompletionCallback)
@@ -219,7 +219,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     // TODO: add onCompletionCallBack for removing ...
     fun removeSubscription(geoHash: GeoHash) {
-        FirebaseUser.currentUser?.notificationToken?.let { userToken ->
+        FirebaseUser.userData?.notificationToken?.let { userToken ->
             databaseArena.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
             databasePokestop.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
 
@@ -243,7 +243,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     private fun loadSubscriptionsFromDatabase(database: DatabaseReference, onResponse: Async.Response<List<GeoHash>>) {
 
-        FirebaseUser.currentUser?.notificationToken?.let { userToken ->
+        FirebaseUser.userData?.notificationToken?.let { userToken ->
 
             database.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -258,14 +258,14 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
                 }
             })
         } ?: kotlin.run {
-            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.currentUser}, and notificationToken: ${FirebaseUser.currentUser?.notificationToken}")
+            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.userData}, and notificationToken: ${FirebaseUser.userData?.notificationToken}")
             onResponse.onException(exception)
         }
     }
 
     private fun removeSubscriptionsFromDatabase(database: DatabaseReference, type: FirebaseSubscription.Type) {
 
-        KotlinUtils.safeLet(FirebaseUser.currentUser?.id, FirebaseUser.currentUser?.notificationToken) { uid, userToken ->
+        KotlinUtils.safeLet(FirebaseUser.userData?.id, FirebaseUser.userData?.notificationToken) { uid, userToken ->
 
             database.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {

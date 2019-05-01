@@ -288,13 +288,13 @@ class RaidFragment: Fragment() {
 
         return if (isUserParticipating) {
 
-            FirebaseUser.currentUser?.id?.let {
+            FirebaseUser.userData?.id?.let {
 
                 val participants: List<String> = listOf(it)
                 FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
 
             } ?: kotlin.run {
-                Log.e(TAG, "could not send raid meetup, because user is logged out. (currentUser: ${FirebaseUser.currentUser}, currentUser?.id: ${FirebaseUser.currentUser?.id})")
+                Log.e(TAG, "could not send raid meetup, because user is logged out. (userData: ${FirebaseUser.userData}, userData?.id: ${FirebaseUser.userData?.id})")
                 null
             }
 
