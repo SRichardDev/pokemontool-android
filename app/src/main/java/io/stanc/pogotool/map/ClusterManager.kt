@@ -1,6 +1,7 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
@@ -120,22 +121,21 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             if (!items.containsKey(item.id)) {
                 val clusterItem = ClusterPokestop.new(item)
                 pokestopClusterManager.addItem(clusterItem)
-                pokestopClustering.trigger()
                 items[clusterItem.pokestop.id] = WeakReference(clusterItem)
             }
         }
 
         override fun onItemChanged(item: FirebasePokestop) {
-
+            Log.v(TAG, "Debug:: onItemChanged($item)")
             onItemRemoved(item)
             onItemAdded(item)
+            pokestopClustering.trigger()
         }
 
         override fun onItemRemoved(item: FirebasePokestop) {
 
             items[item.id]?.get()?.let {
                 pokestopClusterManager.removeItem(it)
-                pokestopClustering.trigger()
             }
             items.remove(item.id)
         }
@@ -149,22 +149,21 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             if (!items.containsKey(item.id)) {
                 val clusterItem = ClusterArena.new(item)
                 arenaClusterManager.addItem(clusterItem)
-                arenaClustering.trigger()
                 items[clusterItem.arena.id] = WeakReference(clusterItem)
             }
         }
 
         override fun onItemChanged(item: FirebaseArena) {
-
+            Log.v(TAG, "Debug:: onItemChanged($item)")
             onItemRemoved(item)
             onItemAdded(item)
+            arenaClustering.trigger()
         }
 
         override fun onItemRemoved(item: FirebaseArena) {
 
             items[item.id]?.get()?.let {
                 arenaClusterManager.removeItem(it)
-                arenaClustering.trigger()
             }
             items.remove(item.id)
         }

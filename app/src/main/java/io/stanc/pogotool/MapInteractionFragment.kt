@@ -52,6 +52,7 @@ class MapInteractionFragment: Fragment() {
                 val latitude = (bundle.get(FirebaseDatabase.NOTIFICATION_DATA_LATITUDE) as String).toDouble()
                 val longitude = (bundle.get(FirebaseDatabase.NOTIFICATION_DATA_LONGITUDE) as String).toDouble()
 
+                Log.i(TAG, "Debug:: onCreate() NOTIFICATION: latitude: $latitude, longitude: $longitude")
                 mapFragment?.setNextStartPosition(latitude, longitude)
             }
         }
@@ -151,13 +152,22 @@ class MapInteractionFragment: Fragment() {
         }
     }
 
+    private var lastGeoHashMatrix: List<GeoHash> = emptyList()
+
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
         mapFragment?.visibleRegionBounds()?.let { bounds ->
-            GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.forEach { geoHash ->
+            GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
-                firebase?.loadPokestops(geoHash)
-                firebase?.loadArenas(geoHash)
+                if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
+
+                    newGeoHashMatrix.forEach { geoHash ->
+                        firebase?.loadPokestops(geoHash)
+                        firebase?.loadArenas(geoHash)
+                    }
+
+                    lastGeoHashMatrix = newGeoHashMatrix
+                }
 
             } ?: kotlin.run {
                 Log.w(TAG, "Max zooming level reached!")
@@ -165,6 +175,10 @@ class MapInteractionFragment: Fragment() {
         }
 
         clusterManager?.onCameraIdle()
+    }
+
+    private fun isSameGeoHashList(list1: List<GeoHash>, list2: List<GeoHash>): Boolean {
+        return list1.containsAll(list2) && list2.containsAll(list1)
     }
 
     /**

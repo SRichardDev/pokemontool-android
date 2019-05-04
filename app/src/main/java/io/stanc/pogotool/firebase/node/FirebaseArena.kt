@@ -50,7 +50,6 @@ data class FirebaseArena(
             }
             val submitter = dataSnapshot.child("submitter").value as? String
 
-            Log.d(TAG, "Debug:: childs: ${dataSnapshot.children}")
             val raid = FirebaseRaid.new(dataSnapshot.child(DATABASE_ARENA_RAID))
 
             Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")

@@ -90,7 +90,7 @@
     <string name="raid_check_egg">Egg already hatched?</string>
     <string name="raid_check_participation">Participate?</string>
     <string name="raid_text_time_egg">Time until egg to hatch [min]:</string>
-    <string name="raid_text_time_raid">Time until raid starts [min]:</string>
+    <string name="raid_text_time_raid">Time until raid ends [min]:</string>
     <string name="raid_text_time_meetup">Meetup time [h/min]:</string>
 
     <string name="raid_button_send">Send raid</string>

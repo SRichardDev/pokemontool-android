@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.database.*
 import io.stanc.pogotool.firebase.data.RaidMeetup
 import io.stanc.pogotool.firebase.node.*
-import io.stanc.pogotool.firebase.node.FirebaseSubscription.Type
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
 import io.stanc.pogotool.utils.Async.awaitResponse
@@ -18,6 +17,28 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     private val TAG = this.javaClass.name
 
+    private val arenasDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
+        private val arenaDelegate = WeakReference(arenaDelegate)
+
+        override fun nodeChanged(dataSnapshot: DataSnapshot) {
+//            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
+            dataSnapshot.children.forEach { child ->
+                FirebaseArena.new(child)?.let { this.arenaDelegate.get()?.onItemChanged(it) }
+            }
+        }
+    }
+
+    private val pokestopsDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
+        private val pokestopDelegate = WeakReference(pokestopDelegate)
+
+        override fun nodeChanged(dataSnapshot: DataSnapshot) {
+            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
+            dataSnapshot.children.forEach { child ->
+                FirebasePokestop.new(child)?.let { this.pokestopDelegate.get()?.onItemChanged(it) }
+            }
+        }
+    }
+
     /**
      * data
      */
@@ -28,63 +49,12 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         fun onItemRemoved(item: Item)
     }
 
-    class ItemEventListener<Item: FirebaseNode>(delegate: Delegate<Item>, private val newItem: (p0: DataSnapshot) -> Item?): ChildEventListener {
-        private val TAG = this.javaClass.name
-
-        val items: HashMap<String, Item> = HashMap()
-        private val delegate = WeakReference(delegate)
-
-        override fun onCancelled(p0: DatabaseError) {
-            Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for ItemEventListener")
-        }
-
-        override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-            Log.v(TAG, "onChildMoved(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
-        }
-
-        override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-            Log.d(TAG, "onChildChanged(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
-            newItem(p0)?.let {
-                removeItem(it)
-                addItem(it)
-            }
-        }
-
-        override fun onChildAdded(p0: DataSnapshot, p1: String?) {
-            Log.v(TAG, "onChildAdded(${p0.value}, p1: $p1), p0.key: ${p0.key} for ItemEventListener")
-            newItem(p0)?.let { addItem(it) }
-        }
-
-        override fun onChildRemoved(p0: DataSnapshot) {
-            Log.w(TAG, "onChildRemoved(${p0.value}), p0.key: ${p0.key} for ItemEventListener")
-            newItem(p0)?.let { removeItem(it) }
-        }
-
-        private fun addItem(item: Item) {
-            if (!items.containsKey(item.id)) {
-                items[item.id] = item
-                delegate.get()?.onItemAdded(item)
-            }
-        }
-
-        private fun removeItem(item: Item) {
-            if (items.containsKey(item.id)) {
-                items.remove(item.id)
-                delegate.get()?.onItemRemoved(item)
-            }
-        }
-    }
-
     /**
      * arenas
      */
 
-    private val databaseArena = FirebaseServer.database.child(DATABASE_ARENAS)
-    private val arenaEventListener: ChildEventListener = ItemEventListener(arenaDelegate) { dataSnapshot-> FirebaseArena.new(dataSnapshot) }
-
     fun loadArenas(geoHash: GeoHash) {
-        databaseArena.child(geoHash.toString()).removeEventListener(arenaEventListener)
-        databaseArena.child(geoHash.toString()).addChildEventListener(arenaEventListener)
+        FirebaseServer.addNodeEventListener("$DATABASE_ARENAS/$geoHash", arenasDidChangeCallback)
     }
 
     fun pushArena(arena: FirebaseArena) {
@@ -95,13 +65,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
      * pokestops
      */
 
-    private val databasePokestop = FirebaseServer.database.child(DATABASE_POKESTOPS)
-    private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
-
     fun loadPokestops(geoHash: GeoHash) {
-        Log.d(TAG, "Debug:: loadPokestops for $geoHash")
-        databasePokestop.child(geoHash.toString()).removeEventListener(pokestopEventListener)
-        databasePokestop.child(geoHash.toString()).addChildEventListener(pokestopEventListener)
+        FirebaseServer.addNodeEventListener("$DATABASE_POKESTOPS/$geoHash", pokestopsDidChangeCallback)
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
@@ -152,8 +117,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
             try {
 
-                val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databasePokestop, it) }
-                val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(databaseArena, it) }
+                val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(DATABASE_POKESTOPS, it) }
+                val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(DATABASE_ARENAS, it) }
 
                 notifyCompletionCallback(pokestopsGeoHashes, arenaGeoHashes, onCompletionCallback)
 
@@ -184,24 +149,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
     }
 
-    fun removeAllSubscriptions() {
-        removeSubscriptionsFromDatabase(databasePokestop, Type.Pokestop)
-        removeSubscriptionsFromDatabase(databaseArena, Type.Arena)
-    }
-
-//    fun removeAllSubscriptions(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-//
-//        GlobalScope.launch(Dispatchers.Default) {
-//
-//            val firstTaskSuccessful: Boolean = awaitResponse { removeSubscriptionsFromDatabase(databasePokestop, Type.Pokestop, it) }
-//            val secondTaskSuccessful: Boolean = awaitResponse { removeSubscriptionsFromDatabase(databaseArena, Type.Arena, it) }
-//
-//            CoroutineScope(Dispatchers.Main).launch {
-//                onCompletionCallback(firstTaskSuccessful && secondTaskSuccessful)
-//            }
-//        }
-//    }
-
     fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseUser.userData?.id}, notificationToken: ${FirebaseUser.userData?.notificationToken}")
@@ -217,12 +164,13 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         FirebaseServer.createNode(data, callbackForVoid(onCompletionCallback))
     }
 
-    // TODO: add onCompletionCallBack for removing ...
+    // TODO: remove subscriptions in user data on firebase server
+    // TODO: for arena
+    // TODO: for pokestops
     fun removeSubscription(geoHash: GeoHash) {
         FirebaseUser.userData?.notificationToken?.let { userToken ->
-            databaseArena.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
-            databasePokestop.child(geoHash.toString()).child(DATABASE_REG_USER).child(userToken).removeValue()
-
+            Log.e(TAG, "NOT implemented yet: removeSubscription($geoHash) !")
+//            FirebaseServer.removeValue()
         }
     }
 
@@ -241,47 +189,32 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         }
     }
 
-    private fun loadSubscriptionsFromDatabase(database: DatabaseReference, onResponse: Async.Response<List<GeoHash>>) {
+    private fun loadSubscriptionsFromDatabase(databasePath: String, onResponse: Async.Response<List<GeoHash>>) {
 
         FirebaseUser.userData?.notificationToken?.let { userToken ->
 
-            database.addListenerForSingleValueEvent(object: ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    Log.e(TAG, "onCancelled(${p0.message}) for loadSubscriptionsFromDatabase(database: $database)")
-                    onResponse.onException(p0.toException())
+            FirebaseServer.requestDataChilds(databasePath, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+
+                override fun onSuccess(data: List<DataSnapshot>?) {
+                    Log.d(TAG, "Debug:: loadSubscriptions onSuccess($data)")
+                    data?.let {
+                        val geoHashes = registeredGeoHashes(it, userToken)
+                        onResponse.onCompletion(geoHashes)
+                    }
                 }
 
-                override fun onDataChange(p0: DataSnapshot) {
-                    Log.d(TAG, "Debug::load onDataChange(${p0.value})")
-                    val geoHashes = registeredGeoHashes(p0, userToken)
-                    onResponse.onCompletion(geoHashes)
+                override fun onFailed(message: String?) {
+                    Log.d(TAG, "loadSubscriptions failed. Error: $message")
+                    onResponse.onException(Exception(message))
                 }
+
             })
+
         } ?: kotlin.run {
             val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.userData}, and notificationToken: ${FirebaseUser.userData?.notificationToken}")
             onResponse.onException(exception)
         }
-    }
 
-    private fun removeSubscriptionsFromDatabase(database: DatabaseReference, type: FirebaseSubscription.Type) {
-
-        KotlinUtils.safeLet(FirebaseUser.userData?.id, FirebaseUser.userData?.notificationToken) { uid, userToken ->
-
-            database.addListenerForSingleValueEvent(object: ValueEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    Log.e(TAG, "onCancelled(${p0.message}) for loadSubscriptionsFromDatabase(database: $database)")
-                }
-
-                override fun onDataChange(p0: DataSnapshot) {
-                    Log.d(TAG, "Debug::remove onDataChange(${p0.value})")
-                    val geoHashes = registeredGeoHashes(p0, userToken)
-                    for (geoHash in geoHashes) {
-                        val data = FirebaseSubscription(id = userToken, uid = uid, geoHash = geoHash, type = type)
-                        FirebaseServer.removeNode(data)
-                    }
-                }
-            })
-        }
     }
 
     fun formattedFirebaseGeoHash(geoHash: GeoHash): GeoHash? {
@@ -292,6 +225,24 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         } else {
             null
         }
+    }
+
+    private fun registeredGeoHashes(dataSnapshots: List<DataSnapshot>, usersNotificationToken: String): List<GeoHash> {
+
+        val geoHashes = mutableListOf<GeoHash>()
+
+        for (child in dataSnapshots) {
+            for (registered_user in child.child(DATABASE_REG_USER).children) {
+//                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
+                if (registered_user.key == usersNotificationToken) {
+//                    Log.d(TAG, "Debug:: new geoHash: key: ${child.key}, value: ${child.value}")
+                    val geoHash = GeoHash(child.key as String)
+                    geoHashes.add(geoHash)
+                }
+            }
+        }
+
+        return geoHashes
     }
 
     private fun registeredGeoHashes(snapshot: DataSnapshot, usersNotificationToken: String): List<GeoHash> {

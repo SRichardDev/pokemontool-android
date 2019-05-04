@@ -38,21 +38,25 @@ object FirebaseServer {
         }
     }
 
-    private val nodeDidChangeListener = HashMap<Int, NodeEventListener>()
+    private val nodeDidChangeListener = HashMap<Pair<Int, String>, NodeEventListener>()
 
     fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
-        if (!nodeDidChangeListener.contains(callback.hashCode())) {
+        if (!alreadyAddedToList(databasePath, callback)) {
 
             val newChildEventListener = NodeEventListener(callback)
-            nodeDidChangeListener[callback.hashCode()] = newChildEventListener
+            nodeDidChangeListener[Pair(callback.hashCode(), databasePath)] = newChildEventListener
             database.child(databasePath).addValueEventListener(newChildEventListener)
         }
     }
 
     fun removeNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
-        nodeDidChangeListener.remove(callback.hashCode())?.let {
+        nodeDidChangeListener.remove(Pair(callback.hashCode(), databasePath))?.let {
             database.child(databasePath).removeEventListener(it)
         }
+    }
+
+    private fun alreadyAddedToList(databasePath: String, callback: OnNodeDidChangeCallback): Boolean {
+        return nodeDidChangeListener.containsKey(Pair(callback.hashCode(), databasePath))
     }
 
     interface OnNodeDidChangeCallback {
@@ -69,7 +73,7 @@ object FirebaseServer {
         }
 
         override fun onDataChange(p0: DataSnapshot) {
-            Log.d(TAG, "onDataChange(${p0.value}), p0.key: ${p0.key}")
+            Log.v(TAG, "onDataChange(${p0.value}), p0.key: ${p0.key}")
             callback.get()?.nodeChanged(p0)
         }
     }
@@ -137,14 +141,11 @@ object FirebaseServer {
         }
     }
 
-//    private val databasePokestop = FirebaseServer.database.child(DATABASE_POKESTOPS)
-//    private val pokestopEventListener: ChildEventListener = ItemEventListener(pokestopDelegate) { dataSnapshot-> FirebasePokestop.new(dataSnapshot) }
-//
-//    fun loadPokestops(geoHash: GeoHash) {
-//        Log.d(TAG, "Debug:: loadPokestops for $geoHash")
-//        databasePokestop.child(geoHash.toString()).removeEventListener(pokestopEventListener)
-//        databasePokestop.child(geoHash.toString()).addChildEventListener(pokestopEventListener)
-//    }
+    fun removeValue(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        database.child(firebaseData.databasePath()).removeValue().addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
 
 
     /**

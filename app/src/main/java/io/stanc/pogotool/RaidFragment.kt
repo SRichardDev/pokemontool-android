@@ -275,6 +275,8 @@ class RaidFragment: Fragment() {
                 pushRaidAndMeetupIfUserParticipates(raid)
             }
 
+            closeScreen()
+
         } ?: kotlin.run { Log.e(TAG, "sendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!") }
     }
 
@@ -303,9 +305,11 @@ class RaidFragment: Fragment() {
         }
     }
 
-    /**
-     * private
-     */
+    private fun closeScreen() {
+        fragmentManager?.findFragmentByTag(this::class.java.name)?.let {
+            fragmentManager?.beginTransaction()?.remove(it)?.commit()
+        }
+    }
 
     private fun formattedTime(hours: Int, minutes: Int): String = "$hours:$minutes"
 
