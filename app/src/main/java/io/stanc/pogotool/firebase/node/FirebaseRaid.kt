@@ -44,30 +44,30 @@ data class FirebaseRaid(override val id: String,
     }
 
     fun eggIsAlreadyHatched(): Boolean? {
-        (timestamp as? Long)?.let {
-            return TimeCalculator.timeExpired(it, timeLeftEggHatches)
+        return dateEggHatches()?.let {
+            return TimeCalculator.timeExpired(it) || timeLeftEggHatches.toInt() == 0
+        } ?: kotlin.run {
+            null
         }
-
-        return null
     }
 
-    fun timeEggHatches(): String? {
-        (timestamp as? Long)?.let {
-            val date = TimeCalculator.addTime(it, timeLeftEggHatches)
-            return TimeCalculator.format(date)
+    fun dateEggHatches(): Date? {
+        return (timestamp as? Long)?.let {
+           TimeCalculator.addTime(it, timeLeftEggHatches)
+        } ?: kotlin.run {
+            null
         }
-
-        return null
     }
+    fun timeEggHatches(): String? = dateEggHatches()?.let { TimeCalculator.format(it) } ?: kotlin.run { null }
 
-    fun timeRaidStarts(): String? {
-        (timestamp as? Long)?.let {
-            val date = TimeCalculator.addTime(it, timeLeft)
-            return TimeCalculator.format(date)
+    fun dateRaidEnds(): Date? {
+        return (timestamp as? Long)?.let {
+            TimeCalculator.addTime(it, timeLeft)
+        } ?: kotlin.run {
+            null
         }
-
-        return null
     }
+    fun timeRaidEnds(): String? = dateRaidEnds()?.let { TimeCalculator.format(it) } ?: kotlin.run { null }
 
     companion object {
 

@@ -12,29 +12,27 @@ object TimeCalculator {
     @SuppressLint("SimpleDateFormat")
     val clock = SimpleDateFormat("HH:mm")
 
-    fun format(date: Date): String {
-        return clock.format(date)
-    }
+    fun format(date: Date): String = clock.format(date)
 
-    fun currentTime(): Date {
-        return Calendar.getInstance().time
-    }
+    fun currentTime(): Date = Calendar.getInstance().time
 
     fun addTime(timestamp: Long, minutes: String): Date {
-
+        val calendar = Calendar.getInstance()
         val timestampDate = Date(timestamp)
 
-        val calendar = Calendar.getInstance()
         calendar.time = timestampDate
         calendar.add(Calendar.MINUTE, minutes.toInt())
+
         return calendar.time
     }
 
     fun timeExpired(timestamp: Long, minutes: String): Boolean {
-
-        val currentTime = currentTime()
         val timeToCheck = addTime(timestamp, minutes)
+        return timeExpired(timeToCheck)
+    }
 
-        return timeToCheck.after(currentTime)
+    fun timeExpired(date: Date): Boolean {
+        val currentTime = currentTime()
+        return currentTime.after(date)
     }
 }

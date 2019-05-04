@@ -46,10 +46,10 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private val TAG = javaClass.name
 
-        private const val ICON_HEIGHT: Int = 75
-        private const val ICON_WIDTH: Int = 75
-        private const val INNER_ICON_HEIGHT: Int = 50
-        private const val INNER_ICON_WIDTH: Int = 50
+        private const val ICON_HEIGHT: Int = 100
+        private const val ICON_WIDTH: Int = 100
+        private const val INNER_ICON_HEIGHT: Int = 60
+        private const val INNER_ICON_WIDTH: Int = 60
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
@@ -97,18 +97,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
                 it.setBounds(marginLeft, marginTop, ICON_WIDTH-marginLeft, ICON_HEIGHT-marginTop)
                 it.draw(canvas)
             }
-            Log.i(TAG, "Debug:: getBitmapDescriptor(), backgroundDrawable: $backgroundDrawable, foregroundDrawable: $foregroundDrawable")
 
-
-//            val bitmapBackground = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
-//
-//            val drawableForeground = context.getDrawable(backgroundDrawableRes)
-//            drawableForeground?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
-//            val bitmapForeground = Bitmap.createBitmap(INNER_ICON_WIDTH, INNER_ICON_HEIGHT, Bitmap.Config.ARGB_8888)
-//
-//            val canvas = Canvas(bitmapBackground)
-//            drawableBackground?.draw(canvas)
-
+//            Log.i(TAG, "Debug:: getBitmapDescriptor(), backgroundDrawable: $backgroundDrawable, foregroundDrawable: $foregroundDrawable")
             return BitmapDescriptorFactory.fromBitmap(bitmap)
         }
 
