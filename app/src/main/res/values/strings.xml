@@ -67,7 +67,7 @@
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
     <string name="map_map_item_button_cancel">Abbrechen</string>
     <string name="map_map_item_button_send">Daten senden</string>
-    <string name="map_map_item_checkbox_isex_arena">Ist eine EX-Arena?</string>
+    <string name="map_map_item_switch_isex_arena">Ist eine EX-Arena?</string>
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
@@ -77,12 +77,13 @@
     <string name="map_info_window_pokestop_button_info">Details &amp; Quest</string>
 
     <!-- Raid -->
-    <string name="raid_app_title">Raid Meldung</string>
-    <string name="raid_eggs_title">Wähle den Raid Level:</string>
-    <string name="raid_check_egg">Ei bereits geschlüpft?</string>
-    <string name="raid_check_participation">Am Raid teilnehmen?</string>
-    <string name="raid_text_time_egg">Zeit bis Ei schlüpft [min]:</string>
-    <string name="raid_text_time_raid">Zeit bis Raid beginnt [min]:</string>
+    <string name="raid_app_title">Neuer Level %d Raid</string>
+    <string name="raid_eggs_title">Raid Level:</string>
+    <string name="raid_check_egg">Raid läuft bereits?</string>
+    <string name="raid_raidboss_selection">Mögliche Raidbosse:</string>
+    <string name="raid_text_time_egg">Ei schlüpft nach wie vielen Minuten?</string>
+    <string name="raid_text_time_raid">Wieviele Minuten läuft der Raid noch?</string>
+    <string name="raid_check_participation">Nimmst du am Raid teil?</string>
     <string name="raid_text_time_meetup">Treffzeitpunkt [h/min]:</string>
 
     <string name="raid_button_send">Raid melden</string>

@@ -29,16 +29,18 @@ class RaidFragment: Fragment() {
     private var listAdapter: RaidBossAdapter? = null
     private var rootLayout: View? = null
 
+    private var eggImage: ImageView? = null
     private var eggImageButton1: ImageView? = null
     private var eggImageButton2: ImageView? = null
     private var eggImageButton3: ImageView? = null
     private var eggImageButton4: ImageView? = null
     private var eggImageButton5: ImageView? = null
 
-    private var textEggHatched: TextView? = null
+    private var eggOrRaidTimerText: TextView? = null
     private var layoutRaidBosses: View? = null
+    private var layoutRaidParticipation: View? = null
 
-    private var raidLevel: Int? = null
+    private var raidLevel: Int = 3
     private var isEggAlreadyHatched: Boolean = false
     private var isUserParticipating: Boolean = false
     private var timeUntilEvent: Int = 0
@@ -48,23 +50,42 @@ class RaidFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_raid, container, false)
 
-        AppbarManager.setTitle(getString(R.string.raid_app_title))
-
-        setupEggImageButtons(rootLayout)
-        setupCheckBoxes(rootLayout)
+        setupEggImages(rootLayout)
         setupRaidbossList(rootLayout)
-        setupPicker(rootLayout)
+        setupSwitches(rootLayout)
+        setupTimePicker(rootLayout)
         setupButton(rootLayout)
 
         this.rootLayout = rootLayout
         return rootLayout
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateLayoutsForRaidLevel()
+        selectEggImageButton(raidLevel)
+    }
+
     /**
      * setup
      */
 
-    private fun setupEggImageButtons(rootLayout: View) {
+    private fun updateLayoutsForRaidLevel() {
+
+        AppbarManager.setTitle(getString(R.string.raid_app_title, raidLevel))
+
+        when(raidLevel) {
+            1 -> eggImage?.setImageResource(R.drawable.icon_level_1_30dp)
+            2 -> eggImage?.setImageResource(R.drawable.icon_level_2_30dp)
+            3 -> eggImage?.setImageResource(R.drawable.icon_level_3_30dp)
+            4 -> eggImage?.setImageResource(R.drawable.icon_level_4_30dp)
+            5 -> eggImage?.setImageResource(R.drawable.icon_level_5_30dp)
+        }
+    }
+
+    private fun setupEggImages(rootLayout: View) {
+
+        eggImage = rootLayout.findViewById(R.id.raid_egg)
 
         eggImageButton1 = rootLayout.findViewById(R.id.raid_egg_1)
         eggImageButton1?.setOnClickListener(EggOnClickListener(1))
@@ -82,31 +103,31 @@ class RaidFragment: Fragment() {
         eggImageButton5?.setOnClickListener(EggOnClickListener(5))
     }
 
-    private fun setupCheckBoxes(rootLayout: View) {
+    private fun setupSwitches(rootLayout: View) {
 
-        rootLayout.findViewById<CheckBox>(R.id.raid_checkbox_egg)?.let { checkbox ->
-            checkbox.setOnClickListener {
-                isEggAlreadyHatched = checkbox.isChecked
-                textEggHatched?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
-                layoutRaidBosses?.visibility = if (isEggAlreadyHatched) View.VISIBLE else View.GONE
+        eggOrRaidTimerText = rootLayout.findViewById(R.id.raid_text_egg_time)
+
+        layoutRaidParticipation = rootLayout.findViewById(R.id.layout_raid_participation)
+        layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
+
+        rootLayout.findViewById<Switch>(R.id.raid_switch_egg)?.let { switch ->
+            switch.setOnCheckedChangeListener { _, isChecked ->
+                isEggAlreadyHatched = isChecked
+                eggOrRaidTimerText?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
             }
         }
 
-        rootLayout.findViewById<CheckBox>(R.id.raid_checkbox_participation)?.let { checkbox ->
-            checkbox.setOnClickListener { isUserParticipating = checkbox.isChecked }
+        rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.let { switch ->
+            switch.setOnCheckedChangeListener { _, isChecked ->
+                isUserParticipating = isChecked
+                layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
+            }
         }
     }
 
     private fun setupRaidbossList(rootLayout: View) {
         Log.i(TAG, "Debug:: setupRaidbossList, raidLevel: $raidLevel, list: ${RaidBossImageMapper.raidBosses.size}, rootLayout: $rootLayout")
-
-        val raidBossesToShow = raidLevel?.let { chosenRaidLevel ->
-            RaidBossImageMapper.raidBosses.filter { it.level.toInt() == chosenRaidLevel }
-
-        } ?: kotlin.run {
-            RaidBossImageMapper.raidBosses
-        }
-
+        val raidBossesToShow = RaidBossImageMapper.raidBosses.filter { it.level.toInt() == raidLevel }
         setupList(rootLayout, raidBossesToShow)
     }
 
@@ -118,9 +139,7 @@ class RaidFragment: Fragment() {
             context?.let {
                 val adapter = RaidBossAdapter(it, firebaseRaidBosses, onItemClickListener = object: RaidBossAdapter.OnItemClickListener {
                     override fun onClick(id: String) {
-                        listAdapter?.getSelectedItem()?.level?.toInt()?.let { raidLevel ->
-                            selectEggImageButton(raidLevel)
-                        }
+                        // nothing todo
                     }
                 })
 
@@ -134,7 +153,7 @@ class RaidFragment: Fragment() {
         }
     }
 
-    private fun setupPicker(rootLayout: View) {
+    private fun setupTimePicker(rootLayout: View) {
 
         // egg formattedTime
 
@@ -145,8 +164,6 @@ class RaidFragment: Fragment() {
         eggPicker.setOnValueChangedListener { _, _, newValue ->
             timeUntilEvent = newValue
         }
-
-        textEggHatched = rootLayout.findViewById(R.id.raid_text_egg_time)
 
         // meetup formattedTime
 
@@ -180,18 +197,9 @@ class RaidFragment: Fragment() {
     private inner class EggOnClickListener(private val level: Int): View.OnClickListener {
 
         override fun onClick(p0: View) {
-            switchEggImageButtonSelection(level)
+            deselectAllEggImageButtons(butLevel=level)
+            selectEggImageButton(level)
             rootLayout?.let { setupRaidbossList(it) }
-        }
-    }
-
-    private fun switchEggImageButtonSelection(level: Int) {
-        when(level) {
-            1 -> eggImageButton1?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
-            2 -> eggImageButton2?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
-            3 -> eggImageButton3?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
-            4 -> eggImageButton4?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
-            5 -> eggImageButton5?.let { if (it.isSelected) deselectEggImageButton(level) else selectEggImageButton(level) }
         }
     }
 
@@ -220,6 +228,8 @@ class RaidFragment: Fragment() {
                 raidLevel = level
             }
         }
+
+        updateLayoutsForRaidLevel()
     }
 
     private fun deselectAllEggImageButtons(butLevel: Int) {
@@ -234,23 +244,18 @@ class RaidFragment: Fragment() {
         when(level) {
             1 -> eggImageButton1?.let {
                 it.isSelected = false
-                raidLevel = null
             }
             2 -> eggImageButton2?.let {
                 it.isSelected = false
-                raidLevel = null
             }
             3 -> eggImageButton3?.let  {
                 it.isSelected = false
-                raidLevel = null
             }
             4 -> eggImageButton4?.let {
                 it.isSelected = false
-                raidLevel = null
             }
             5 -> eggImageButton5?.let {
                 it.isSelected = false
-                raidLevel = null
             }
         }
     }

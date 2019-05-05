@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -12,12 +11,29 @@
         android:orientation="vertical"
         android:padding="@dimen/layout_padding_screen">
 
+        <ImageView
+            android:id="@+id/raid_egg"
+            style="@style/Image"
+            android:layout_width="@dimen/image_size_big"
+            android:layout_height="@dimen/image_size_big"
+            android:layout_gravity="center"
+            android:src="@drawable/icon_level_2_30dp"
+            tools:ignore="ContentDescription"/>
+
         <TextView
-            android:id="@+id/raid_egg_title"
+            android:id="@+id/arena_title"
             style="@style/TextStyle_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_padding_popup"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            tools:text="Super Gold Arena"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
             android:text="@string/raid_eggs_title"/>
 
         <include layout="@layout/layout_raid_eggs"
@@ -28,108 +44,102 @@
 
         <include layout="@layout/layout_divider"/>
 
-        <LinearLayout
-            android:id="@+id/raid_checkboxes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/layout_margin_small">
-
-            <CheckBox android:id="@+id/raid_checkbox_egg"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/raid_check_egg"/>
-
-            <CheckBox android:id="@+id/raid_checkbox_participation"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:text="@string/raid_check_participation"/>
-
-        </LinearLayout>
+        <Switch android:id="@+id/raid_switch_egg"
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/raid_check_egg"
+                android:switchPadding="@dimen/layout_margin_large"/>
 
         <include layout="@layout/layout_divider"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/raid_raidboss_selection"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/raid_list_raidbosses"
             android:layout_width="match_parent"
             android:layout_height="@dimen/raid_raidboss_list_height"
             android:layout_marginTop="@dimen/layout_margin_small"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:orientation="horizontal">
 
         </android.support.v7.widget.RecyclerView>
 
         <include layout="@layout/layout_divider"/>
 
-        <LinearLayout
-            android:id="@+id/raid_layout_egg_time"
-            android:layout_width="match_parent"
+        <TextView
+            style="@style/TextStyle_bold"
+            android:id="@+id/raid_text_egg_time"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/layout_margin_small">
+            android:layout_width="wrap_content"
+            android:layout_gravity="start"
+            android:text="@string/raid_text_time_egg"/>
 
-            <TextView
-                style="@style/TextStyle_default"
-                android:id="@+id/raid_text_egg_time"
+        <NumberPicker
+            android:id="@+id/raid_picker_time_egg"
+            android:layout_height="@dimen/raid_picker_height"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        <include layout="@layout/layout_divider"/>
+
+        <Switch android:id="@+id/raid_switch_participation"
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_gravity="center"
-                android:text="@string/raid_text_time_egg"
-                android:layout_marginStart="@dimen/layout_margin_small"/>
-
-            <NumberPicker
-                android:id="@+id/raid_picker_time_egg"
-                android:layout_height="@dimen/raid_picker_height"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/layout_margin_small"/>
-
-        </LinearLayout>
+                android:text="@string/raid_check_participation"
+                android:switchPadding="@dimen/layout_margin_large"/>
 
         <include layout="@layout/layout_divider"/>
 
         <LinearLayout
-            android:id="@+id/raid_layout_meetup"
-            android:layout_width="match_parent"
+            android:id="@+id/layout_raid_participation"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/layout_margin_small">
+            android:layout_width="match_parent"
+            android:orientation="vertical">
 
             <TextView
-                style="@style/TextStyle_default"
+                style="@style/TextStyle_bold"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_gravity="start"
+                android:text="@string/raid_text_time_meetup"/>
+
+            <LinearLayout
+                android:id="@+id/raid_layout_meetup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_gravity="center"
-                android:text="@string/raid_text_time_meetup"
-                android:layout_marginStart="@dimen/layout_margin_small"/>
+                android:layout_marginTop="@dimen/layout_margin_small">
 
-            <NumberPicker
-                android:id="@+id/raid_picker_time_meetup_1"
-                android:layout_height="@dimen/raid_picker_height"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/layout_margin_small"/>
+                <NumberPicker
+                    android:id="@+id/raid_picker_time_meetup_1"
+                    android:layout_height="@dimen/raid_picker_height"
+                    android:layout_width="wrap_content"/>
 
-            <NumberPicker
-                android:id="@+id/raid_picker_time_meetup_2"
-                android:layout_height="@dimen/raid_picker_height"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/layout_margin_small"/>
+                <NumberPicker
+                    android:id="@+id/raid_picker_time_meetup_2"
+                    android:layout_height="@dimen/raid_picker_height"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="@dimen/layout_margin_small"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/layout_divider"/>
 
         </LinearLayout>
-
-        <include layout="@layout/layout_divider"/>
 
         <Button
             android:id="@+id/raid_button_send"
             style="@style/ButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_marginBottom="@dimen/layout_margin_small"
             android:text="@string/raid_button_send"/>
 
     </LinearLayout>

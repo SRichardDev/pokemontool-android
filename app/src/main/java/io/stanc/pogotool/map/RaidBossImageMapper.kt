@@ -21,14 +21,10 @@ object RaidBossImageMapper {
     // TODO: load optional sprites from: https://github.com/PokeAPI/sprites
     fun loadRaidBosses(firebase: FirebaseDatabase) {
 
-        Log.i(TAG, "Debug:: loadRaidBosses...")
         WaitingSpinner.showProgress(R.string.spinner_title_raid_data)
         firebase.loadRaidBosses { firebaseRaidBosses ->
 
-            Log.i(TAG, "Debug:: raidbosses loaded: ${firebaseRaidBosses?.size}")
-            Log.i(TAG, "Debug:: raidbosses bevor: ${raidBosses.size}")
             firebaseRaidBosses?.let { raidBosses = it }
-            Log.i(TAG, "Debug:: raidbosses after: ${raidBosses.size}")
             WaitingSpinner.hideProgress()
         }
     }

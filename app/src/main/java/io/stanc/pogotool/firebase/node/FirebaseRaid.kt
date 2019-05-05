@@ -74,9 +74,7 @@ data class FirebaseRaid(override val id: String,
         private val TAG = javaClass.name
 
         fun new(dataSnapshot: DataSnapshot): FirebaseRaid? {
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
-
-// TODO:            arenaId und geohash auslesen? oder als paramter in .new(...) mit geben
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val level = dataSnapshot.child("level").value as? String
@@ -88,8 +86,7 @@ data class FirebaseRaid(override val id: String,
             val raidMeetupId = dataSnapshot.child("raidMeetupId").value as? String
 
 
-            Log.v(TAG, "id: $id, level: $level, timeLeftEggHatches: $timeLeftEggHatches, timeLeft: $timeLeft, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
-
+//            Log.v(TAG, "id: $id, level: $level, timeLeftEggHatches: $timeLeftEggHatches, timeLeft: $timeLeft, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
             if (id != null && level != null && timeLeftEggHatches != null && timeLeft != null && timestamp != null) {
                 return FirebaseRaid(id, level, timeLeftEggHatches, timeLeft, timestamp, null, null, raidBossId, raidMeetupId)
             }

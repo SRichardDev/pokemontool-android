@@ -4,14 +4,14 @@
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:padding="@dimen/layout_padding_popup">
+              android:padding="@dimen/layout_margin_small">
 
     <ImageView
         android:id="@+id/raid_egg_1"
         style="@style/ImageButton"
         android:layout_width="0dp"
         android:layout_weight="1"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/layout_padding_popup"
         android:src="@drawable/icon_level_1_30dp"
         tools:ignore="ContentDescription"/>
