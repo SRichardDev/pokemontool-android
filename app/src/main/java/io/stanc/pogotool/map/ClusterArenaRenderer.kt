@@ -1,11 +1,6 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -31,7 +26,9 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
-        markerOptions?.title(item?.title)?.icon(arenaIcon(context, item?.arena))?.anchor(ANCHOR_X, ANCHOR_Y)
+        KotlinUtils.safeLet(item, markerOptions) { clusterItem, markerOptions ->
+            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena)).anchor(ANCHOR_X, ANCHOR_Y)
+        }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
@@ -46,64 +43,24 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private val TAG = javaClass.name
 
-        private const val ICON_HEIGHT: Int = 100
-        private const val ICON_WIDTH: Int = 100
-        private const val INNER_ICON_HEIGHT: Int = 60
-        private const val INNER_ICON_WIDTH: Int = 60
+        private const val ICON_SIZE: Int = 100
+        private const val INNER_ICON_SIZE: Int = 60
+        private val ICON_CONFIG = FirebaseArena.IconConfig(ICON_SIZE, INNER_ICON_SIZE)
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun arenaIcon(context: Context, arena: FirebaseArena?): BitmapDescriptor {
-
-            val foregroundDrawable = RaidBossImageMapper.raidDrawable(context, arena)
-            Log.i(TAG, "Debug:: arenaIcon(arena: $arena), foregroundDrawable: $foregroundDrawable")
-
-            return arena?.isEX?.let { isExArena ->
-
-                if (isExArena) {
-                    getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp, foregroundDrawable)
-                } else {
-                    getBitmapDescriptor(context, R.drawable.icon_arena_30dp, foregroundDrawable)
-                }
-
-            } ?: kotlin.run {
-                getBitmapDescriptor(context, R.drawable.icon_arena_30dp, foregroundDrawable)
-            }
-
+        private fun getBitmapDescriptor(context: Context, arena: FirebaseArena): BitmapDescriptor {
+            val arenaIconBitmap = arena.icon(context, ICON_CONFIG)
+            return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
-        private fun arenaBaseIcon(context: Context, isExArena: Boolean): BitmapDescriptor {
-
-            return if (isExArena) {
-                getBitmapDescriptor(context, R.drawable.icon_arena_ex_30dp)
-            } else {
-                getBitmapDescriptor(context, R.drawable.icon_arena_30dp)
-            }
-        }
-
-        private fun getBitmapDescriptor(context: Context, @DrawableRes backgroundDrawableRes: Int, foregroundDrawable: Drawable? = null): BitmapDescriptor {
-
-            val bitmap = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-
-            val backgroundDrawable = context.getDrawable(backgroundDrawableRes)
-            backgroundDrawable?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
-            backgroundDrawable?.draw(canvas)
-
-            foregroundDrawable?.let {
-
-                val marginLeft = (ICON_WIDTH-INNER_ICON_WIDTH)/2
-                val marginTop = (ICON_HEIGHT-INNER_ICON_HEIGHT)/2
-                it.setBounds(marginLeft, marginTop, ICON_WIDTH-marginLeft, ICON_HEIGHT-marginTop)
-                it.draw(canvas)
-            }
-
-//            Log.i(TAG, "Debug:: getBitmapDescriptor(), backgroundDrawable: $backgroundDrawable, foregroundDrawable: $foregroundDrawable")
-            return BitmapDescriptorFactory.fromBitmap(bitmap)
+        private fun getBitmapDescriptor(context: Context, isEx: Boolean = false): BitmapDescriptor {
+            val arenaIconBitmap = FirebaseArena.baseIcon(context, isEx, ICON_CONFIG)
+            return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
         fun arenaMarkerOptions(context: Context, isEx: Boolean = false): MarkerOptions {
-            return MarkerOptions().icon(arenaBaseIcon(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
+            return MarkerOptions().icon(getBitmapDescriptor(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {

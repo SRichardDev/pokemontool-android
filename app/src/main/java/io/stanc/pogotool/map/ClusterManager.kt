@@ -66,19 +66,19 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     interface MarkerDelegate {
-        fun onArenaInfoWindowClicked(id: String, geoHash: GeoHash)
-        fun onPokestopInfoWindowClicked(id: String, geoHash: GeoHash)
+        fun onArenaInfoWindowClicked(arena: FirebaseArena)
+        fun onPokestopInfoWindowClicked(pokestop: FirebasePokestop)
     }
 
     private fun onInfoWindowClicked(marker: Marker) {
         val tag = marker.tag
 
         (tag as? FirebaseArena)?.let {
-            delegate.onArenaInfoWindowClicked(it.id, it.geoHash)
+            delegate.onArenaInfoWindowClicked(it)
         }
 
         (tag as? FirebasePokestop)?.let {
-            delegate.onPokestopInfoWindowClicked(it.id, it.geoHash)
+            delegate.onPokestopInfoWindowClicked(it)
         }
     }
 

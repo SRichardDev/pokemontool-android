@@ -85,8 +85,19 @@
     <string name="raid_text_time_raid">Wieviele Minuten läuft der Raid noch?</string>
     <string name="raid_check_participation">Nimmst du am Raid teil?</string>
     <string name="raid_text_time_meetup">Treffzeitpunkt [h/min]:</string>
-
     <string name="raid_button_send">Raid melden</string>
+
+    <!-- Arena -->
+    <string name="arena_gold_arena">Gold Arena:</string>
+    <string name="arena_coordinates">Koordinaten:</string>
+    <string name="arena_coordinates_format">(%s, %s)</string>
+    <string name="arena_added_from">Hinzugefügt von:</string>
+
+    <string name="arena_raid_participants">Anzahl der Teilnehmer:</string>
+    <string name="arena_raid_participants_list">Teilnehmerliste</string>
+    <string name="arena_raid_chat">Chat</string>
+    <string name="arena_raid_register">Anmelden</string>
+    <string name="arena_raid_deregister">Abmelden</string>
 
     <!-- Exceptions -->
     <string name="exceptions_no_user">User wurde nicht gefunden.</string>

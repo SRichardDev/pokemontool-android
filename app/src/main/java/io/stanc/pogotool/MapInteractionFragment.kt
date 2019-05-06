@@ -17,6 +17,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
@@ -94,13 +96,17 @@ class MapInteractionFragment: Fragment() {
 
                 context?.let {
                     ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
-                        override fun onArenaInfoWindowClicked(id: String, geoHash: GeoHash) {
-                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($id, $geoHash)")
-                            showRaidFragment(id, geoHash)
+                        override fun onArenaInfoWindowClicked(arena: FirebaseArena) {
+                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($arena)")
+                            if (arena.raid != null) {
+                                showArenaFragment(arena)
+                            } else {
+                                showRaidFragment(arena)
+                            }
                         }
 
-                        override fun onPokestopInfoWindowClicked(id: String, geoHash: GeoHash) {
-                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($id, $geoHash)")
+                        override fun onPokestopInfoWindowClicked(pokestop: FirebasePokestop) {
+                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($pokestop)")
                         }
 
                     }).let { manager ->
@@ -234,23 +240,39 @@ class MapInteractionFragment: Fragment() {
     }
 
     /**
-     * info window fragments
+     * arena & pokestop fragments
      */
 
-    private fun showRaidFragment(arenaId: String, arenaGeoHash: GeoHash) {
+    private fun showRaidFragment(arena: FirebaseArena) {
 
         val fragmentTag = RaidFragment::class.java.name
 
-        fragmentManager?.findFragmentByTag(fragmentTag)?.let { oldFragment ->
-            fragmentManager?.beginTransaction()?.remove(oldFragment)?.commit()
-        }
+        removeFragmentIfExists(fragmentTag)
 
         firebase?.let {
-//            TODO: if raid already announced show another screen !!!
-            val fragment = RaidFragment.newInstance(it, arenaId, arenaGeoHash)
+            val fragment = RaidFragment.newInstance(it, arena.id, arena.geoHash)
             fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
         }
     }
+
+    private fun showArenaFragment(arena: FirebaseArena) {
+
+        val fragmentTag = ArenaFragment::class.java.name
+
+        removeFragmentIfExists(fragmentTag)
+
+        firebase?.let {
+            val fragment = ArenaFragment.newInstance(it, arena)
+            fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
+        }
+    }
+
+    private fun removeFragmentIfExists(fragmentTag: String) {
+        fragmentManager?.findFragmentByTag(fragmentTag)?.let {
+            fragmentManager?.beginTransaction()?.remove(it)?.commit()
+        }
+    }
+
 
     /**
      * FABs

@@ -21,6 +21,7 @@
     <dimen name="text_margin">4dp</dimen>
 
     <dimen name="image_size_big">128dp</dimen>
+    <dimen name="image_size_small">32dp</dimen>
     <dimen name="raid_eggs_height">64dp</dimen>
     <dimen name="raid_raidboss_list_height">96dp</dimen>
     <dimen name="raid_picker_height">128dp</dimen>

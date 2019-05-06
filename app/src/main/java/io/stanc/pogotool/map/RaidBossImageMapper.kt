@@ -2,12 +2,13 @@ package io.stanc.pogotool.map
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
+import android.support.v4.content.ContextCompat
+import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.Log
-import android.widget.ImageView
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import io.stanc.pogotool.utils.WaitingSpinner
 import java.io.IOException
@@ -30,21 +31,20 @@ object RaidBossImageMapper {
     }
 
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
-        Log.d(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, eggIsAlreadyHatched: ${arena?.raid?.eggIsAlreadyHatched()}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
+        Log.d(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
 
         arena?.raid?.let { raid ->
 
-            raid.eggIsAlreadyHatched()?.let { eggIsHatched ->
+            when(raid.currentRaidState()) {
 
-                if (eggIsHatched) {
-
+                RaidState.RAID_RUNNING -> {
                     raid.raidBossId?.let { id ->
                         val imageName = raidBosses.first { it.id == id }.imageName
                         return raidBossDrawable(context, raidBossImageName = imageName)
                     }
+                }
 
-                } else {
-
+                RaidState.EGG_HATCHES -> {
                     return when(raid.level) {
                         "1" -> context.getDrawable(R.drawable.icon_level_1_30dp)
                         "2" -> context.getDrawable(R.drawable.icon_level_2_30dp)
@@ -55,6 +55,10 @@ object RaidBossImageMapper {
                     }
                 }
 
+                RaidState.NONE -> {
+                    Log.e(TAG, "RaidState is None, no raid image could be picked!")
+                    return null
+                }
             }
         }
 

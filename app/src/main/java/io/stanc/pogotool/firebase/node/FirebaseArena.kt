@@ -1,11 +1,18 @@
 package io.stanc.pogotool.firebase.node
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
+import android.support.annotation.DrawableRes
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
+import io.stanc.pogotool.map.RaidBossImageMapper
 
 data class FirebaseArena(
     override val id: String,
@@ -27,6 +34,20 @@ data class FirebaseArena(
         data["submitter"] = submitter
 
         return data
+    }
+
+    data class IconConfig(val iconSize: Int, val innerIconSize: Int)
+
+    fun icon(context: Context, iconConfig: IconConfig): Bitmap {
+
+        val foregroundDrawable = RaidBossImageMapper.raidDrawable(context, this)
+        Log.i(TAG, "Debug:: icon(arena: $this), foregroundDrawable: $foregroundDrawable")
+
+        return if (isEX) {
+            bitmap(context, iconConfig, R.drawable.icon_arena_ex_30dp, foregroundDrawable)
+        } else {
+            bitmap(context, iconConfig, R.drawable.icon_arena_30dp, foregroundDrawable)
+        }
     }
 
     companion object {
@@ -61,5 +82,34 @@ data class FirebaseArena(
 
             return null
         }
+
+        fun baseIcon(context: Context, isEX: Boolean, iconConfig: IconConfig): Bitmap {
+            return if (isEX) {
+                bitmap(context, iconConfig, R.drawable.icon_arena_ex_30dp)
+            } else {
+                bitmap(context, iconConfig, R.drawable.icon_arena_30dp)
+            }
+        }
+
+        private fun bitmap(context: Context, iconConfig: IconConfig, @DrawableRes backgroundDrawableRes: Int, foregroundDrawable: Drawable? = null): Bitmap {
+
+            val bitmap = Bitmap.createBitmap(iconConfig.iconSize, iconConfig.iconSize, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            val backgroundDrawable = context.getDrawable(backgroundDrawableRes)
+            backgroundDrawable?.setBounds(0, 0, iconConfig.iconSize, iconConfig.iconSize)
+            backgroundDrawable?.draw(canvas)
+
+            foregroundDrawable?.let {
+
+                val marginLeft = (iconConfig.iconSize - iconConfig.innerIconSize)/2
+                val marginTop = (iconConfig.iconSize - iconConfig.innerIconSize)/2
+                it.setBounds(marginLeft, marginTop, iconConfig.iconSize - marginLeft, iconConfig.iconSize - marginTop)
+                it.draw(canvas)
+            }
+
+            return bitmap
+        }
+
     }
 }
