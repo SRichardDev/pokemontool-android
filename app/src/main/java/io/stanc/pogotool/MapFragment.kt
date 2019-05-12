@@ -146,18 +146,6 @@ open class MapFragment : Fragment() {
         updateMyLocationEnabledPOI()
     }
 
-    // TODO: does not work
-//    fun enableUIInteraction(enabled: Boolean) {
-//        map?.uiSettings?.let { uiSettings ->
-//
-//            uiSettings.isScrollGesturesEnabled = enabled
-//            uiSettings.isTiltGesturesEnabled = enabled
-//            uiSettings.isRotateGesturesEnabled = enabled
-//            uiSettings.isZoomGesturesEnabled = enabled
-//            uiSettings.isZoomControlsEnabled = enabled
-//        }
-//    }
-
     @SuppressLint("MissingPermission") // permission check exists
     // for showing myPOI and button to my location
     private fun updateMyLocationEnabledPOI() {

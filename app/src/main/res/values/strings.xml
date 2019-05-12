@@ -62,12 +62,14 @@
     <string name="user_name">Benutzer: %s</string>
 
     <!-- Map -->
+    <string name="map_title_arena">Neue Arena</string>
+    <string name="map_title_pokestop">Neuer Pokestop</string>
     <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
     <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
     <string name="map_map_item_button_cancel">Abbrechen</string>
     <string name="map_map_item_button_send">Daten senden</string>
-    <string name="map_map_item_switch_isex_arena">Ist eine EX-Arena?</string>
+    <string name="map_map_item_checkbox_isex_arena">Ist eine EX-Arena?</string>
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
@@ -93,6 +95,7 @@
     <string name="arena_coordinates_format">(%s, %s)</string>
     <string name="arena_added_from">Hinzugefügt von:</string>
 
+    <string name="arena_raid_button_new_raid">Neuen Raid melden</string>
     <string name="arena_raid_participants">Anzahl der Teilnehmer:</string>
     <string name="arena_raid_participants_list">Teilnehmerliste</string>
     <string name="arena_raid_chat">Chat</string>

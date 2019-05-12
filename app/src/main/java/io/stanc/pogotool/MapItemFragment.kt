@@ -17,6 +17,7 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
 import io.stanc.pogotool.MapInteractionFragment.MapMode
+import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
@@ -30,10 +31,10 @@ class MapItemFragment: Fragment() {
     private var mapMode: MapMode? = null
     private var mapItemName: String? = null
     private var position: LatLng? = null
-    private var firebase: FirebaseDatabase? = null
+
+    private var firebase: FirebaseDatabase = FirebaseDatabase()
 
     private var mapFragment: MapFragment? = null
-
     private var map: GoogleMap? = null
     private var arenaMarker: Marker? = null
     private var checkboxIsExArena: CheckBox? = null
@@ -75,6 +76,15 @@ class MapItemFragment: Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (mapMode == MapMode.NEW_ARENA) {
+            AppbarManager.setTitle(getString(R.string.map_title_arena))
+        } else if (mapMode == MapMode.NEW_POKESTOP) {
+            AppbarManager.setTitle(getString(R.string.map_title_pokestop))
+        }
+    }
+
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
@@ -113,7 +123,7 @@ class MapItemFragment: Fragment() {
 
     private fun sendMapItem() {
 
-        FirebaseUser.userData?.id?.let { uid ->
+        FirebaseUser.userData?.trainerName?.let { userName ->
             position?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
@@ -121,7 +131,7 @@ class MapItemFragment: Fragment() {
                     MapMode.NEW_ARENA -> {
                         map_item_edittext?.text?.toString()?.let { name ->
                             val isEX = map_item_checkbox_isex_arena?.isChecked?:kotlin.run { false }
-                            val arena = FirebaseArena("", name, geoHash, uid, isEX)
+                            val arena = FirebaseArena("", name, geoHash, userName, isEX)
                             Log.d(TAG, "push arena: $arena")
                             firebase?.pushArena(arena)
                         }
@@ -130,7 +140,7 @@ class MapItemFragment: Fragment() {
 
                     MapMode.NEW_POKESTOP -> {
                         map_item_edittext?.text?.toString()?.let { name ->
-                            val pokestop = FirebasePokestop("", name, geoHash, uid)
+                            val pokestop = FirebasePokestop("", name, geoHash, userName)
                             Log.d(TAG, "push pokestop: $pokestop")
                             firebase?.pushPokestop(pokestop)
                         }
@@ -149,11 +159,10 @@ class MapItemFragment: Fragment() {
 
     companion object {
 
-        fun newInstance(mapMode: MapMode, latLng: LatLng, firebase: FirebaseDatabase): MapItemFragment {
+        fun newInstance(mapMode: MapMode, latLng: LatLng): MapItemFragment {
             val fragment = MapItemFragment()
             fragment.mapMode = mapMode
             fragment.position = latLng
-            fragment.firebase = firebase
 
             fragment.mapItemName = when(mapMode) {
 

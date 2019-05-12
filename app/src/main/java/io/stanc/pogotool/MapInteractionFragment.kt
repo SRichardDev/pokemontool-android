@@ -24,6 +24,7 @@ import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
 import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.PermissionManager
+import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
 
@@ -64,8 +65,6 @@ class MapInteractionFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_map_grid, container, false)
 
-        AppbarManager.setTitle(getString(R.string.app_name))
-
         setupMapFragment()
 
         // floating action buttons
@@ -80,6 +79,7 @@ class MapInteractionFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        AppbarManager.setTitle(getString(R.string.app_name))
         firebase?.let { RaidBossImageMapper.loadRaidBosses(it) }
     }
 
@@ -97,12 +97,7 @@ class MapInteractionFragment: Fragment() {
                 context?.let {
                     ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
                         override fun onArenaInfoWindowClicked(arena: FirebaseArena) {
-                            Log.i(TAG, "Debug:: onArenaInfoWindowClicked($arena)")
-                            if (arena.raid != null) {
-                                showArenaFragment(arena)
-                            } else {
-                                showRaidFragment(arena)
-                            }
+                            showArenaFragment(arena)
                         }
 
                         override fun onPokestopInfoWindowClicked(pokestop: FirebasePokestop) {
@@ -201,17 +196,9 @@ class MapInteractionFragment: Fragment() {
 
     private fun showMapItemFragment(mapMode: MapMode, latLng: LatLng) {
 
-        val fragmentTag = MapItemFragment::class.java.name
-
-        fragmentManager?.findFragmentByTag(fragmentTag)?.let { oldFragment ->
-            fragmentManager?.beginTransaction()?.remove(oldFragment)?.commit()
-        }
-
-        firebase?.let {
-            val fragment = MapItemFragment.newInstance(mapMode, latLng, it)
-            Log.d(TAG, "Debug:: showMapItemFragment(${currentMode.name}, $latLng)")
-            fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
-        }
+        val fragment = MapItemFragment.newInstance(mapMode, latLng)
+        Log.d(TAG, "Debug:: showMapItemFragment(${currentMode.name}, $latLng)")
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     private fun toggleSubscriptions(geoHash: GeoHash) {
@@ -243,36 +230,10 @@ class MapInteractionFragment: Fragment() {
      * arena & pokestop fragments
      */
 
-    private fun showRaidFragment(arena: FirebaseArena) {
-
-        val fragmentTag = RaidFragment::class.java.name
-
-        removeFragmentIfExists(fragmentTag)
-
-        firebase?.let {
-            val fragment = RaidFragment.newInstance(it, arena.id, arena.geoHash)
-            fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
-        }
-    }
-
     private fun showArenaFragment(arena: FirebaseArena) {
-
-        val fragmentTag = ArenaFragment::class.java.name
-
-        removeFragmentIfExists(fragmentTag)
-
-        firebase?.let {
-            val fragment = ArenaFragment.newInstance(it, arena)
-            fragmentManager?.beginTransaction()?.add(R.id.fragment_map_layout, fragment, fragmentTag)?.addToBackStack(null)?.commit()
-        }
+        val fragment = ArenaFragment.newInstance(arena)
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
-
-    private fun removeFragmentIfExists(fragmentTag: String) {
-        fragmentManager?.findFragmentByTag(fragmentTag)?.let {
-            fragmentManager?.beginTransaction()?.remove(it)?.commit()
-        }
-    }
-
 
     /**
      * FABs

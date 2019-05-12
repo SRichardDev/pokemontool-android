@@ -16,8 +16,8 @@ data class FirebaseRaid(override val id: String,
                         val timeLeftEggHatches: String,
                         val timeLeft: String,
                         val timestamp: Any,
-                        val geoHash: GeoHash?,
-                        val arenaId: String?,
+                        val geoHash: GeoHash,
+                        val arenaId: String,
                         var raidBossId: String? = null,
                         var raidMeetupId: String? = null): FirebaseNode {
 
@@ -25,10 +25,17 @@ data class FirebaseRaid(override val id: String,
 
     init {
 //        TODO: should do fragment, because of lifecyle handling: removeNodeEventListener !!!
-        raidMeetupId?.let { id ->
-            FirebaseServer.addNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$id", meetupDidChangeCallback)
-        }
+//        raidMeetupId?.let { id ->
+//            FirebaseServer.addNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$id", meetupDidChangeCallback)
+//        }
     }
+//    private val meetupDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
+//
+//        override fun nodeChanged(dataSnapshot: DataSnapshot) {
+//            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
+//            FirebaseRaidMeetup.new(dataSnapshot)?.let { meetup = it }
+//        }
+//    }
 
     override fun databasePath(): String = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$DATABASE_ARENA_RAID"
 
@@ -47,18 +54,6 @@ data class FirebaseRaid(override val id: String,
         }
 
         return data
-    }
-
-    /**
-     * Node Listener
-     */
-
-    private val meetupDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
-
-        override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
-            FirebaseRaidMeetup.new(dataSnapshot)?.let { meetup = it }
-        }
     }
 
     /**
@@ -139,8 +134,8 @@ data class FirebaseRaid(override val id: String,
 
         private val TAG = javaClass.name
 
-        fun new(dataSnapshot: DataSnapshot): FirebaseRaid? {
-//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+        fun new(arenaId: String, geoHash: GeoHash, dataSnapshot: DataSnapshot): FirebaseRaid? {
+            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val level = dataSnapshot.child("level").value as? String
@@ -151,9 +146,9 @@ data class FirebaseRaid(override val id: String,
             val raidBossId = dataSnapshot.child("raidBossId").value as? String
             val raidMeetupId = dataSnapshot.child("raidMeetupId").value as? String
 
-//            Log.v(TAG, "id: $id, level: $level, timeLeftEggHatches: $timeLeftEggHatches, timeLeft: $timeLeft, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
+            Log.v(TAG, "id: $id, level: $level, timeLeftEggHatches: $timeLeftEggHatches, timeLeft: $timeLeft, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
             if (id != null && level != null && timeLeftEggHatches != null && timeLeft != null && timestamp != null) {
-                return FirebaseRaid(id, level, timeLeftEggHatches, timeLeft, timestamp, null, null, raidBossId, raidMeetupId)
+                return FirebaseRaid(id, level, timeLeftEggHatches, timeLeft, timestamp, geoHash, arenaId, raidBossId, raidMeetupId)
             }
 
             return null

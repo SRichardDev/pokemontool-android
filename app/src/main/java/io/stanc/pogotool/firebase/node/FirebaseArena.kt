@@ -20,6 +20,7 @@ data class FirebaseArena(
     val geoHash: GeoHash,
     val submitter: String,
     val isEX: Boolean = false,
+    // TODO: this should be a raidId, not a raidObject -> has to be changed on the firebase server structure: arenas/<geohash>/<arenaId>/data["raidId"] = raidId
     val raid: FirebaseRaid? = null): FirebaseNode {
 
     override fun databasePath() = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
@@ -56,7 +57,7 @@ data class FirebaseArena(
 
         fun new(dataSnapshot: DataSnapshot): FirebaseArena? {
 
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val name = dataSnapshot.child("name").value as? String
@@ -71,12 +72,11 @@ data class FirebaseArena(
             }
             val submitter = dataSnapshot.child("submitter").value as? String
 
-            val raid = FirebaseRaid.new(dataSnapshot.child(DATABASE_ARENA_RAID))
-
-            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
+//            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 
             if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
+                val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(DATABASE_ARENA_RAID))
                 return FirebaseArena(id, name, geoHash, submitter, isEX, raid)
             }
 

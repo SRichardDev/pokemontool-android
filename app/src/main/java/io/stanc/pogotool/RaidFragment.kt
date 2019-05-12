@@ -2,30 +2,30 @@ package io.stanc.pogotool
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
-import java.util.*
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import io.stanc.pogotool.appbar.AppbarManager
-import io.stanc.pogotool.firebase.FirebaseUser
+import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
-import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
+import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
+import java.util.*
 
 
 class RaidFragment: Fragment() {
 
-    private var firebase: FirebaseDatabase? = null
     private var geoHash: GeoHash? = null
     private var arenaId: String? = null
+
+    private var firebase: FirebaseDatabase = FirebaseDatabase()
+
     private var listAdapter: RaidBossAdapter? = null
     private var rootLayout: View? = null
 
@@ -62,6 +62,7 @@ class RaidFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        AppbarManager.setTitle(getString(R.string.raid_app_title, raidLevel))
         updateLayoutsForRaidLevel()
         selectEggImageButton(raidLevel)
     }
@@ -286,29 +287,29 @@ class RaidFragment: Fragment() {
     }
 
     private fun pushRaidAndMeetupIfUserParticipates(raid: FirebaseRaid) {
-
-        val raidMeetup = getMeetupIfUserParticipates()
-        firebase?.pushRaid(raid, raidMeetup)
+        Log.e(TAG, "pushRaidAndMeetupIfUserParticipates not implemented yet!")
+//        val raidMeetup = getMeetupIfUserParticipates()
+        firebase.pushRaid(raid, null)
     }
 
-    private fun getMeetupIfUserParticipates(): FirebaseRaidMeetup? {
-
-        return if (isUserParticipating) {
-
-            FirebaseUser.userData?.id?.let {
-
-                val participants: List<String> = listOf(it)
-                FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
-
-            } ?: kotlin.run {
-                Log.e(TAG, "could not send raid meetup, because user is logged out. (userData: ${FirebaseUser.userData}, userData?.id: ${FirebaseUser.userData?.id})")
-                null
-            }
-
-        } else {
-            null
-        }
-    }
+//    private fun getMeetupIfUserParticipates(): FirebaseRaidMeetup? {
+//
+//        return if (isUserParticipating) {
+//
+//            FirebaseUser.userData?.id?.let {
+//
+//                val participants: List<String> = listOf(it)
+//                FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
+//
+//            } ?: kotlin.run {
+//                Log.e(TAG, "could not send raid meetup, because user is logged out. (userData: ${FirebaseUser.userData}, userData?.id: ${FirebaseUser.userData?.id})")
+//                null
+//            }
+//
+//        } else {
+//            null
+//        }
+//    }
 
     private fun closeScreen() {
         fragmentManager?.findFragmentByTag(this::class.java.name)?.let {
@@ -322,9 +323,8 @@ class RaidFragment: Fragment() {
 
         private val TAG = javaClass.name
 
-        fun newInstance(firebase: FirebaseDatabase, arenaId: String, geoHash: GeoHash): RaidFragment {
+        fun newInstance(arenaId: String, geoHash: GeoHash): RaidFragment {
             val fragment = RaidFragment()
-            fragment.firebase = firebase
             fragment.arenaId = arenaId
             fragment.geoHash = geoHash
             return fragment

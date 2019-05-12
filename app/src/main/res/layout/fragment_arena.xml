@@ -1,110 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <data>
+        <variable
+            name="viewmodel"
+            type="io.stanc.pogotool.viewmodels.RaidViewModel" />
+        <import type="android.view.View"/>
+    </data>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/layout_padding_screen">
-
-        <ImageView
-            android:id="@+id/arena_icon"
-            style="@style/Image"
-            android:layout_width="@dimen/image_size_big"
-            android:layout_height="@dimen/image_size_big"
-            android:layout_gravity="center"
-            android:src="@drawable/icon_arena_30dp"
-            tools:ignore="ContentDescription"/>
-
-        <include layout="@layout/layout_divider"/>
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <LinearLayout
-            android:id="@+id/arena_layout_raid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:padding="@dimen/layout_padding_screen">
 
             <ImageView
-                android:id="@+id/arena_raid_icon"
+                android:id="@+id/arena_icon"
                 style="@style/Image"
-                android:layout_width="@dimen/image_size_small"
-                android:layout_height="@dimen/image_size_small"
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
                 android:layout_gravity="center"
-                tools:src="@drawable/icon_crosshair_100dp"
+                android:src="@drawable/icon_arena_30dp"
                 tools:ignore="ContentDescription"/>
 
-            <TextView
-                android:id="@+id/arena_raid_time"
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                tools:text="-00:00:00"/>
-
             <include layout="@layout/layout_divider"/>
 
-            <TextView
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_raid_participants"/>
-
-            <TextView
-                android:id="@+id/arena_raid_number_participants"
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                tools:text="1000"/>
-
             <Button
-                android:id="@+id/arena_raid_button_participants_list"
+                android:id="@+id/arena_raid_button_new_raid"
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_raid_participants_list"/>
+                android:text="@string/arena_raid_button_new_raid"
+                android:visibility="@{viewmodel.isRaidAnnounced ? View.GONE : View.VISIBLE}"
+                tools:visibility="visible"/>
 
-            <Button
-                android:id="@+id/arena_raid_button_chat"
-                style="@style/ButtonStyle"
+            <LinearLayout
+                android:id="@+id/arena_layout_raid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_raid_chat"/>
+                android:orientation="vertical"
+                android:visibility="@{viewmodel.isRaidAnnounced ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
 
-            <Button
-                android:id="@+id/arena_raid_button_register"
-                style="@style/ButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_raid_register"/>
+                <ImageView
+                    android:id="@+id/arena_raid_icon"
+                    style="@style/Image"
+                    android:layout_width="@dimen/image_size_small"
+                    android:layout_height="@dimen/image_size_small"
+                    android:layout_gravity="center"
+                    tools:src="@drawable/icon_crosshair_100dp"
+                    tools:ignore="ContentDescription"/>
 
-            <include layout="@layout/layout_divider"/>
+                <TextView
+                    android:id="@+id/arena_raid_time"
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    tools:text="-00:00:00"/>
 
-        </LinearLayout>
+                <include layout="@layout/layout_divider"/>
 
-        <!--<TextView-->
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_participants"/>
+
+                <TextView
+                    android:id="@+id/arena_raid_number_participants"
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    tools:text="1000"/>
+
+                <Button
+                    android:id="@+id/arena_raid_button_participants_list"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_participants_list"/>
+
+                <Button
+                    android:id="@+id/arena_raid_button_chat"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_chat"/>
+
+                <Button
+                    android:id="@+id/arena_raid_button_register"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_register"/>
+
+                <include layout="@layout/layout_divider"/>
+
+            </LinearLayout>
+
+            <!--<TextView-->
             <!--style="@style/TextStyle_bold"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_gravity="start"-->
             <!--android:text="@string/arena_gold_arena"/>-->
 
-        <!--<ImageView-->
+            <!--<ImageView-->
             <!--style="@style/Image"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
@@ -113,40 +134,42 @@
             <!--android:src="@drawable/icon_star_gold_30dp"-->
             <!--tools:ignore="ContentDescription"/>-->
 
-        <TextView
-            style="@style/TextStyle_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            android:text="@string/arena_coordinates"/>
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/arena_coordinates"/>
 
-        <TextView
-            android:id="@+id/arena_textview_coordinates"
-            style="@style/TextStyle_default"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            android:text="@string/arena_coordinates_format"/>
+            <TextView
+                android:id="@+id/arena_textview_coordinates"
+                style="@style/TextStyle_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/arena_coordinates_format"/>
 
-        <TextView
-            style="@style/TextStyle_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            android:text="@string/arena_added_from"/>
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/arena_added_from"/>
 
-        <TextView
-            android:id="@+id/arena_textview_added_from_user"
-            style="@style/TextStyle_default"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            tools:text="Debug User Name"/>
+            <TextView
+                android:id="@+id/arena_textview_added_from_user"
+                style="@style/TextStyle_default"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                tools:text="Debug User Name"/>
 
-    </LinearLayout>
+        </LinearLayout>
 
-</ScrollView>
+    </ScrollView>
+
+</layout>

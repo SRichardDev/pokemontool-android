@@ -8,12 +8,13 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
 import io.stanc.pogotool.utils.Async.awaitResponse
 import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.ObserverManager
 import kotlinx.coroutines.*
 import java.lang.Exception
 import java.lang.ref.WeakReference
 
-class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
-                       arenaDelegate: Delegate<FirebaseArena>) {
+class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
+                       arenaDelegate: Delegate<FirebaseArena>? = null) {
 
     private val TAG = this.javaClass.name
 
@@ -21,7 +22,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         private val arenaDelegate = WeakReference(arenaDelegate)
 
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
-//            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
             dataSnapshot.children.forEach { child ->
                 FirebaseArena.new(child)?.let { this.arenaDelegate.get()?.onItemChanged(it) }
             }
@@ -32,15 +32,23 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         private val pokestopDelegate = WeakReference(pokestopDelegate)
 
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
+//            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
             dataSnapshot.children.forEach { child ->
                 FirebasePokestop.new(child)?.let { this.pokestopDelegate.get()?.onItemChanged(it) }
             }
         }
     }
 
+    private val arenaDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
+        override fun nodeChanged(dataSnapshot: DataSnapshot) {
+            FirebaseArena.new(dataSnapshot)?.let { arena ->
+                arenaObserverManager.observers(arena.id).filterNotNull().forEach { it.onItemChanged(arena) }
+            }
+        }
+    }
+
     /**
-     * data
+     * delegation & observing
      */
 
     interface Delegate<Item> {
@@ -48,6 +56,12 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         fun onItemChanged(item: Item)
         fun onItemRemoved(item: Item)
     }
+
+    interface Observer<Item> {
+        fun onItemChanged(item: Item)
+    }
+
+    private val arenaObserverManager = ObserverManager<Observer<FirebaseArena>>()
 
     /**
      * arenas
@@ -59,6 +73,16 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
 
     fun pushArena(arena: FirebaseArena) {
         FirebaseServer.createNodeByAutoId(arena.databasePath(), arena.data())
+    }
+
+    fun addObserver(observer: Observer<FirebaseArena>, arena: FirebaseArena) {
+        FirebaseServer.addNodeEventListener("${arena.databasePath()}/${arena.id}", arenaDidChangeCallback)
+        arenaObserverManager.addObserver(observer, subId = arena.id)
+    }
+
+    fun removeObserver(observer: Observer<FirebaseArena>, arena: FirebaseArena) {
+        FirebaseServer.removeNodeEventListener("${arena.databasePath()}/${arena.id}", arenaDidChangeCallback)
+        arenaObserverManager.removeObserver(observer, subId = arena.id)
     }
 
     /**
@@ -232,24 +256,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>,
         val geoHashes = mutableListOf<GeoHash>()
 
         for (child in dataSnapshots) {
-            for (registered_user in child.child(DATABASE_REG_USER).children) {
-//                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
-                if (registered_user.key == usersNotificationToken) {
-//                    Log.d(TAG, "Debug:: new geoHash: key: ${child.key}, value: ${child.value}")
-                    val geoHash = GeoHash(child.key as String)
-                    geoHashes.add(geoHash)
-                }
-            }
-        }
-
-        return geoHashes
-    }
-
-    private fun registeredGeoHashes(snapshot: DataSnapshot, usersNotificationToken: String): List<GeoHash> {
-
-        val geoHashes = mutableListOf<GeoHash>()
-
-        for (child in snapshot.children) {
             for (registered_user in child.child(DATABASE_REG_USER).children) {
 //                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
                 if (registered_user.key == usersNotificationToken) {

@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference
 object FirebaseServer {
     private val TAG = javaClass.name
 
-    //    TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
+    // TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
     internal val database = FirebaseDatabase.getInstance().reference
 
     /**
@@ -43,9 +43,9 @@ object FirebaseServer {
     fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
         if (!alreadyAddedToList(databasePath, callback)) {
 
-            val newChildEventListener = NodeEventListener(callback)
-            nodeDidChangeListener[Pair(callback.hashCode(), databasePath)] = newChildEventListener
-            database.child(databasePath).addValueEventListener(newChildEventListener)
+            val eventListener = NodeEventListener(callback)
+            nodeDidChangeListener[Pair(callback.hashCode(), databasePath)] = eventListener
+            database.child(databasePath).addValueEventListener(eventListener)
         }
     }
 
@@ -73,7 +73,7 @@ object FirebaseServer {
         }
 
         override fun onDataChange(p0: DataSnapshot) {
-            Log.v(TAG, "onDataChange(${p0.value}), p0.key: ${p0.key}")
+            Log.v(TAG, "onDataChange($p0), key: ${p0.key}, value: ${p0.value}, childs: ${p0.childrenCount}")
             callback.get()?.nodeChanged(p0)
         }
     }
@@ -114,9 +114,7 @@ object FirebaseServer {
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
     fun createNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        Log.i(TAG, "Debug:: createNode($firebaseNode)....")
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
-            Log.i(TAG, "Debug:: onCompleteListener for createNode($firebaseNode): task: ${task.isSuccessful}")
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

@@ -8,6 +8,7 @@ import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USERS
 import io.stanc.pogotool.firebase.data.UsernameData
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
+import io.stanc.pogotool.utils.ObserverManager
 import io.stanc.pogotool.utils.WaitingSpinner
 import java.lang.ref.WeakReference
 
@@ -16,14 +17,15 @@ object FirebaseUser {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    private val authStateObservers = HashMap<Int, WeakReference<AuthStateObserver>>()
-    private val userDataObservers = HashMap<Int, WeakReference<UserDataObserver>>()
+    private val authStateObserverManager = ObserverManager<AuthStateObserver>()
+
+    private val userDataObserverManager = ObserverManager<UserDataObserver>()
 
     var userData: FirebaseUserNode? = null
         private set(value) {
             field = value
             Log.i(TAG, "user data changed: $value")
-            userDataObservers.forEach { it.value.get()?.let { FirebaseUser.notifyObserver(it) } }
+            userDataObserverManager.observers().filterNotNull().forEach { it.userDataChanged(userData) }
         }
 
     /**
@@ -224,18 +226,17 @@ object FirebaseUser {
     }
 
     fun addAuthStateObserver(observer: AuthStateObserver) {
-        val weakObserver = WeakReference(observer)
-        authStateObservers[observer.hashCode()] = weakObserver
-        notifyObserver(observer)
+        authStateObserverManager.addObserver(observer)
+        observer.authStateChanged(authState())
     }
 
     fun removeAuthStateObserver(observer: AuthStateObserver) {
-        authStateObservers.remove(observer.hashCode())
+        authStateObserverManager.removeObserver(observer)
     }
 
     private val onAuthStateChanged: () -> Unit = {
         Log.i(TAG, "onAuthStateChanged(${authState().name}) for user: $userData")
-        authStateObservers.forEach { it.value.get()?.let { notifyObserver(it) } }
+        authStateObserverManager.observers().filterNotNull().forEach { it.authStateChanged(authState()) }
         updateUserDataDependingOnAuthState()
     }
 
@@ -252,10 +253,6 @@ object FirebaseUser {
         }
     }
 
-    private fun notifyObserver(observer: AuthStateObserver) {
-        observer.authStateChanged(authState())
-    }
-
     /**
      * User Data Listener
      */
@@ -265,17 +262,12 @@ object FirebaseUser {
     }
 
     fun addUserDataObserver(observer: UserDataObserver) {
-        val weakObserver = WeakReference(observer)
-        userDataObservers[observer.hashCode()] = weakObserver
-        notifyObserver(observer)
+        userDataObserverManager.addObserver(observer)
+        observer.userDataChanged(userData)
     }
 
     fun removeUserDataObserver(observer: UserDataObserver) {
-        userDataObservers.remove(observer.hashCode())
-    }
-
-    private fun notifyObserver(observer: UserDataObserver) {
-        observer.userDataChanged(userData)
+        userDataObserverManager.removeObserver(observer)
     }
 
     private fun startListenForUserDataChanges() {

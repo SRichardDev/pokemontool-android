@@ -34,22 +34,23 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     }
 
     override fun onDeletedMessages() {
-        Log.i(TAG, "Debug:: onDeletedMessages()")
+        Log.i(TAG, "onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
-        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
+        Log.i(TAG, "onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
-        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
+        Log.i(TAG, "onSendError(var1: $var1, var2: ${var2.message})")
     }
 
     override fun onNewToken(var1: String) {
-        Log.i(TAG, "Debug:: onNewToken(var1: $var1)")
+        Log.i(TAG, "onNewToken(var1: $var1)")
     }
 
     private fun postNotification(notification: Notification) {
+        Log.d(TAG, "postNotification(notification: $notification)")
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -72,6 +73,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             .setContentText(text).setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
+        Log.d(TAG, "buildNotification(title: $title, text: $title)")
         return builder.build()
     }
 
