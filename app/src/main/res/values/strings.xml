@@ -96,6 +96,8 @@
     <string name="arena_added_from">Hinzugefügt von:</string>
 
     <string name="arena_raid_button_new_raid">Neuen Raid melden</string>
+    <string name="arena_raid_time_until_egg_hatches">Ei schlüpft um:</string>
+    <string name="arena_raid_time_until_raid_ends">Raid endet um:</string>
     <string name="arena_raid_participants">Anzahl der Teilnehmer:</string>
     <string name="arena_raid_participants_list">Teilnehmerliste</string>
     <string name="arena_raid_chat">Chat</string>
