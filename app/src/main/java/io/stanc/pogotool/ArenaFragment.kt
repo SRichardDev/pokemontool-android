@@ -4,11 +4,13 @@ import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.NumberPicker
 import android.widget.TextView
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
@@ -17,7 +19,9 @@ import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils.safeLet
 import io.stanc.pogotool.utils.ShowFragmentManager
+import io.stanc.pogotool.utils.TimeCalculator
 import io.stanc.pogotool.viewmodels.RaidViewModel
+import java.util.*
 
 
 class ArenaFragment: Fragment() {
@@ -39,7 +43,10 @@ class ArenaFragment: Fragment() {
     private var viewModel: RaidViewModel? = null
     private var viewBinding: FragmentArenaBinding? = null
 
-    private val observer = object: FirebaseDatabase.Observer<FirebaseArena> {
+    private var meetupTimeHour: Int = Calendar.getInstance().time.hours
+    private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
+
+    private val arenaObserver = object: FirebaseDatabase.Observer<FirebaseArena> {
         override fun onItemChanged(item: FirebaseArena) {
             arena = item
         }
@@ -58,11 +65,11 @@ class ArenaFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         arena?.let { AppbarManager.setTitle(it.name) }
-        arena?.let { firebase.addObserver(observer, it) }
+        arena?.let { firebase.addObserver(arenaObserver, it) }
     }
 
     override fun onPause() {
-        arena?.let { firebase.removeObserver(observer, it) }
+        arena?.let { firebase.removeObserver(arenaObserver, it) }
         super.onPause()
     }
 
@@ -100,21 +107,21 @@ class ArenaFragment: Fragment() {
         }
     }
 
-    private fun setupRaidInfos(rootLayout: View) {
+    private fun setupRaidIcon(rootLayout: View) {
+        safeLet(context, arena) { context, arena ->
+            rootLayout.findViewById<ImageView>(R.id.arena_raid_icon)?.let {
+                setIconRaid(it, context, arena)
+            }
+        }
+    }
+
+    private fun setupRaidButtons(rootLayout: View) {
         safeLet(context, arena) { context, arena ->
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_new_raid)?.let {
                 it.setOnClickListener {
                     showRaidFragment(arena)
                 }
-            }
-
-            rootLayout.findViewById<ImageView>(R.id.arena_raid_icon)?.let {
-                setIconRaid(it, context, arena)
-            }
-
-            rootLayout.findViewById<TextView>(R.id.arena_raid_number_participants)?.let {
-                //                    it.text = arena.raid?.... TODO
             }
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.let {
@@ -129,14 +136,44 @@ class ArenaFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let {
-                //                    it.text = TODO: is registered or not?
-//                    it.isActivated = TODO: is registered or not?
-                it.setOnClickListener {
-                    // TODO...
+            rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let { button ->
+                button.setOnClickListener {
+                    button.isActivated = !button.isActivated
+                    Log.d(TAG, "Debug:: button participant pressed, now: isActivated: ${button.isActivated} ")
+
+                    viewModel?.let { viewModel ->
+
+                        if (viewModel.isRaidMeetupAnnounced.get()!!) {
+                            viewModel.changeParticipation(button.isActivated)
+                        } else {
+                            val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
+                            viewModel.createMeetup(meetupTime)
+                        }
+                    }
                 }
             }
 
+        }
+    }
+
+    private fun setupTimePicker(rootLayout: View) {
+
+        // meetup formattedTime
+
+        val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_hour)
+        meetupPickerHour.minValue = 0
+        meetupPickerHour.maxValue = 23
+        meetupPickerHour.value = meetupTimeHour
+        meetupPickerHour.setOnValueChangedListener { _, _, newValue ->
+            meetupTimeHour = newValue
+        }
+
+        val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_minutes)
+        meetupPickerMinutes.minValue = 0
+        meetupPickerMinutes.maxValue = 60
+        meetupPickerMinutes.value = meetupTimeMinutes
+        meetupPickerMinutes.setOnValueChangedListener { _, _, newValue ->
+            meetupTimeMinutes = newValue
         }
     }
 
@@ -162,7 +199,9 @@ class ArenaFragment: Fragment() {
         viewBinding?.root?.apply {
             setupArenaIcon(this)
             setupArenaInfos(this)
-            setupRaidInfos(this)
+            setupRaidIcon(this)
+            setupRaidButtons(this)
+            setupTimePicker(this)
         }
     }
 

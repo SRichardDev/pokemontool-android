@@ -125,6 +125,12 @@ object FirebaseServer {
         }
     }
 
+    fun setData(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        database.child(databasePath).setValue(data).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
+
     fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
         val newNode = database.child(databasePath).push()
         newNode.setValue(data).addOnCompleteListener { task ->
@@ -133,14 +139,36 @@ object FirebaseServer {
         return newNode.key
     }
 
+    fun setDataByAutoId(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
+        val newNode = database.child(databasePath).push()
+        newNode.setValue(data).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+        return newNode.key
+    }
+
+    fun setDataKey(databasePath: String, key: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        val data = HashMap<String, String>()
+        data[key] = ""
+        database.child(databasePath).setValue(data).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
+
     fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
-    fun removeValue(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(firebaseData.databasePath()).removeValue().addOnCompleteListener { task ->
+//    fun removeData(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+//        database.child(firebaseData.databasePath()).removeData().addOnCompleteListener { task ->
+//            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+//        }
+//    }
+
+    fun removeData(databasePath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        database.child(databasePath).removeValue().addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

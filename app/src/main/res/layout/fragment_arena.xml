@@ -8,6 +8,7 @@
             name="viewmodel"
             type="io.stanc.pogotool.viewmodels.RaidViewModel" />
         <import type="android.view.View"/>
+        <import type="io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState"/>
     </data>
 
     <ScrollView
@@ -60,14 +61,30 @@
                     tools:src="@drawable/icon_crosshair_100dp"
                     tools:ignore="ContentDescription"/>
 
-                <TextView
-                    android:id="@+id/arena_raid_time"
-                    style="@style/TextStyle_bold"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/layout_margin_small"
-                    tools:text="-00:00:00"/>
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small">
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{viewmodel.raidState == RaidState.EGG_HATCHES ? @string/arena_raid_time_until_egg_hatches : @string/arena_raid_time_until_raid_ends}"
+                        tools:text="Until:"/>
+
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/layout_margin_small"
+                        android:text="@{viewmodel.time}"
+                        tools:text="-00:00:00"/>
+
+                </LinearLayout>
 
                 <include layout="@layout/layout_divider"/>
 
@@ -80,12 +97,13 @@
                     android:text="@string/arena_raid_participants"/>
 
                 <TextView
-                    android:id="@+id/arena_raid_number_participants"
                     style="@style/TextStyle_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:text="@{viewmodel.participants}"
                     tools:text="1000"/>
+
 
                 <Button
                     android:id="@+id/arena_raid_button_participants_list"
@@ -104,6 +122,10 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/layout_margin_small"
                     android:text="@string/arena_raid_chat"/>
+
+                <include layout="@layout/layout_raid_meetup_time"
+                         android:id="@+id/raid_layout_meetup"
+                        android:visibility="@{viewmodel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
 
                 <Button
                     android:id="@+id/arena_raid_button_register"

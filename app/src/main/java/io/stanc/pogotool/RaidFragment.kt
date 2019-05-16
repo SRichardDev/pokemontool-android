@@ -11,11 +11,14 @@ import android.view.ViewGroup
 import android.widget.*
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseRaid
+import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
 
 
@@ -168,7 +171,7 @@ class RaidFragment: Fragment() {
 
         // meetup formattedTime
 
-        val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_meetup_1)
+        val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_hour)
         meetupPickerHour.minValue = 0
         meetupPickerHour.maxValue = 23
         meetupPickerHour.value = meetupTimeHour
@@ -176,7 +179,7 @@ class RaidFragment: Fragment() {
             meetupTimeHour = newValue
         }
 
-        val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_meetup_2)
+        val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_minutes)
         meetupPickerMinutes.minValue = 0
         meetupPickerMinutes.maxValue = 60
         meetupPickerMinutes.value = meetupTimeMinutes
@@ -287,29 +290,16 @@ class RaidFragment: Fragment() {
     }
 
     private fun pushRaidAndMeetupIfUserParticipates(raid: FirebaseRaid) {
-        Log.e(TAG, "pushRaidAndMeetupIfUserParticipates not implemented yet!")
-//        val raidMeetup = getMeetupIfUserParticipates()
-        firebase.pushRaid(raid, null)
-    }
 
-//    private fun getMeetupIfUserParticipates(): FirebaseRaidMeetup? {
-//
-//        return if (isUserParticipating) {
-//
-//            FirebaseUser.userData?.id?.let {
-//
-//                val participants: List<String> = listOf(it)
-//                FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), participants)
-//
-//            } ?: kotlin.run {
-//                Log.e(TAG, "could not send raid meetup, because user is logged out. (userData: ${FirebaseUser.userData}, userData?.id: ${FirebaseUser.userData?.id})")
-//                null
-//            }
-//
-//        } else {
-//            null
-//        }
-//    }
+        val raidMeetup = if (isUserParticipating) {
+            val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
+            FirebaseRaidMeetup("", meetupTime, participants = emptyList(), chat = emptyList())
+        } else {
+            null
+        }
+
+        firebase.pushRaid(raid, raidMeetup, FirebaseUser.userData?.id)
+    }
 
     private fun closeScreen() {
         fragmentManager?.findFragmentByTag(this::class.java.name)?.let {

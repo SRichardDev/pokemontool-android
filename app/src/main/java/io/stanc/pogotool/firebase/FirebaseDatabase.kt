@@ -2,7 +2,6 @@ package io.stanc.pogotool.firebase
 
 import android.util.Log
 import com.google.firebase.database.*
-import io.stanc.pogotool.firebase.data.RaidMeetup
 import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
@@ -47,6 +46,14 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
+    private val raidMeetupDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
+        override fun nodeChanged(dataSnapshot: DataSnapshot) {
+            FirebaseRaidMeetup.new(dataSnapshot)?.let { raidMeetup ->
+                raidMeetupObserverManager.observers(raidMeetup.id).filterNotNull().forEach { it.onItemChanged(raidMeetup) }
+            }
+        }
+    }
+
     /**
      * delegation & observing
      */
@@ -62,6 +69,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     private val arenaObserverManager = ObserverManager<Observer<FirebaseArena>>()
+    private val raidMeetupObserverManager = ObserverManager<Observer<FirebaseRaidMeetup>>()
 
     /**
      * arenas
@@ -83,6 +91,68 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun removeObserver(observer: Observer<FirebaseArena>, arena: FirebaseArena) {
         FirebaseServer.removeNodeEventListener("${arena.databasePath()}/${arena.id}", arenaDidChangeCallback)
         arenaObserverManager.removeObserver(observer, subId = arena.id)
+    }
+
+    /**
+     * raids & meetups
+     */
+
+    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null, userId: String? = null) {
+        FirebaseServer.createNode(raid)
+        raidMeetup?.let {
+            val raidMeetupId = pushRaidMeetup(raidMeetup, userId)
+            Log.i(TAG, "Debug:: pushRaid() raidMeetupId: $raidMeetupId")
+            raidMeetupId?.let { id ->
+                FirebaseServer.setData("${raid.databasePath()}/$DATABASE_ARENA_RAID_MEETUP_ID", id, callbackForVoid())
+            }
+        }
+    }
+
+    fun pushRaidMeetup(raidMeetup: FirebaseRaidMeetup, userId: String? = null): String? {
+        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
+        raidMeetupId?.let { pushRaidMeetupParticipation(it) }
+        Log.i(TAG, "Debug:: pushRaidMeetup() raidMeetupId: $raidMeetupId")
+        return raidMeetupId
+    }
+
+//    fun requestRaidMeetup(raidMeetupId: String, callback: FirebaseServer.OnCompleteCallback) {
+//        FirebaseServer.requestDataValue("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", object: FirebaseServer.OnCompleteCallback<DataSnapshot>{
+//            override fun onSuccess(data: DataSnapshot?) {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+//
+//            override fun onFailed(message: String?) {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+//
+//        })
+//    }
+
+    fun addObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
+        FirebaseServer.addNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
+        raidMeetupObserverManager.addObserver(observer, subId = raidMeetupId)
+    }
+
+    fun removeObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
+        FirebaseServer.removeNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
+        raidMeetupObserverManager.removeObserver(observer, subId = raidMeetupId)
+    }
+
+    fun pushRaidMeetupParticipation(raidMeetupId: String) {
+
+        FirebaseUser.userData?.id?.let {
+            FirebaseServer.setDataKey("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId/$DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS", it)
+        } ?: kotlin.run {
+            Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
+        }
+    }
+
+    fun cancelRaidMeetupParticipation(raidMeetupId: String) {
+        FirebaseUser.userData?.id?.let {
+            FirebaseServer.removeData("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId/$DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS/$it")
+        } ?: kotlin.run {
+            Log.e(TAG, "could not cancel raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
+        }
     }
 
     /**
@@ -117,18 +187,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             }
 
         })
-    }
-
-    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null) {
-        FirebaseServer.createNode(raid)
-        raidMeetup?.let {
-            val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-            Log.i(TAG, "Debug:: pushRaid, raidMeetupId: $raidMeetupId")
-            raidMeetupId?.let { id ->
-                val data = RaidMeetup(raid.databasePath(), id)
-                FirebaseServer.setData(data, callbackForVoid())
-            }
-        }
     }
 
     /**
@@ -194,7 +252,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun removeSubscription(geoHash: GeoHash) {
         FirebaseUser.userData?.notificationToken?.let { userToken ->
             Log.e(TAG, "NOT implemented yet: removeSubscription($geoHash) !")
-//            FirebaseServer.removeValue()
+//            FirebaseServer.removeData()
         }
     }
 
@@ -283,6 +341,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         const val DATABASE_ARENA_RAID = "raid"
         const val DATABASE_ARENA_RAID_BOSSES = "raidBosses"
         const val DATABASE_ARENA_RAID_MEETUPS = "raidMeetups"
+        const val DATABASE_ARENA_RAID_MEETUP_ID = "raidMeetupId"
+        const val DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS = "participants"
 
         //    const val DATABASE_POKESTOPS = "pokestops"
         const val DATABASE_POKESTOPS = "test_pokestops"

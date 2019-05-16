@@ -94,45 +94,10 @@
                 android:text="@string/raid_check_participation"
                 android:switchPadding="@dimen/layout_margin_large"/>
 
+        <include layout="@layout/layout_raid_meetup_time"
+                 android:id="@+id/layout_raid_participation"/>
+
         <include layout="@layout/layout_divider"/>
-
-        <LinearLayout
-            android:id="@+id/layout_raid_participation"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:orientation="vertical">
-
-            <TextView
-                style="@style/TextStyle_bold"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_gravity="start"
-                android:text="@string/raid_text_time_meetup"/>
-
-            <LinearLayout
-                android:id="@+id/raid_layout_meetup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small">
-
-                <NumberPicker
-                    android:id="@+id/raid_picker_time_meetup_1"
-                    android:layout_height="@dimen/raid_picker_height"
-                    android:layout_width="wrap_content"/>
-
-                <NumberPicker
-                    android:id="@+id/raid_picker_time_meetup_2"
-                    android:layout_height="@dimen/raid_picker_height"
-                    android:layout_width="wrap_content"
-                    android:layout_marginStart="@dimen/layout_margin_small"/>
-
-            </LinearLayout>
-
-            <include layout="@layout/layout_divider"/>
-
-        </LinearLayout>
 
         <Button
             android:id="@+id/raid_button_send"

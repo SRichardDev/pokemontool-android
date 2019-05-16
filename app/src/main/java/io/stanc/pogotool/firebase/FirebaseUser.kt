@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USERS
+import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USER_TRAINER_NAME
 import io.stanc.pogotool.firebase.data.UsernameData
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.utils.ObserverManager
@@ -36,7 +37,7 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            FirebaseServer.setData(UsernameData(userNode.id, newUserName), object: FirebaseServer.OnCompleteCallback<Void> {
+            FirebaseServer.setData("$DATABASE_USERS/${userNode.id}/$DATABASE_USER_TRAINER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
                 override fun onSuccess(data: Void?) {
                     onCompletionCallback(true)
                 }

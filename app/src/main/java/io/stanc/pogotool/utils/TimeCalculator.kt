@@ -13,6 +13,12 @@ object TimeCalculator {
     val clock = SimpleDateFormat("HH:mm")
 
     fun format(date: Date): String = clock.format(date)
+    fun format(hours: Int, minutes: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR, hours)
+        calendar.add(Calendar.MINUTE, minutes)
+        return format(calendar.time)
+    }
 
     fun currentTime(): Date = Calendar.getInstance().time
 
