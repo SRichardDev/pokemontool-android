@@ -1,10 +1,14 @@
 package io.stanc.pogotool.firebase.node
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID_MEETUPS
+import io.stanc.pogotool.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_LEVEL
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_TIME_LEFT
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_TIME_LEFT_EGG_HATCHES
+import io.stanc.pogotool.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider
@@ -21,20 +25,20 @@ data class FirebaseRaid(override val id: String,
                         var raidBossId: String? = null,
                         var raidMeetupId: String? = null): FirebaseNode {
 
-    override fun databasePath(): String = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$DATABASE_ARENA_RAID"
+    override fun databasePath(): String = "$ARENAS/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$RAID"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
-        data["level"] = level
-        data["timeLeftEggHatches"] = timeLeftEggHatches
-        data["timeLeft"] = timeLeft
-        data["timestamp"] = timestamp
+        data[RAID_LEVEL] = level
+        data[RAID_TIME_LEFT_EGG_HATCHES] = timeLeftEggHatches
+        data[RAID_TIME_LEFT] = timeLeft
+        data[TIMESTAMP] = timestamp
         raidBossId?.let {
-            data["raidBossId"] = it
+            data[RAID_BOSS_ID] = it
         }
         raidMeetupId?.let {
-            data["raidMeetupId"] = it
+            data[RAID_MEETUP_ID] = it
         }
 
         return data
@@ -122,13 +126,13 @@ data class FirebaseRaid(override val id: String,
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
-            val level = dataSnapshot.child("level").value as? String
-            val timeLeftEggHatches = dataSnapshot.child("timeLeftEggHatches").value as? String
-            val timeLeft = dataSnapshot.child("timeLeft").value as? String
-            val timestamp = dataSnapshot.child("timestamp").value as? Long
+            val level = dataSnapshot.child(RAID_LEVEL).value as? String
+            val timeLeftEggHatches = dataSnapshot.child(RAID_TIME_LEFT_EGG_HATCHES).value as? String
+            val timeLeft = dataSnapshot.child(RAID_TIME_LEFT).value as? String
+            val timestamp = dataSnapshot.child(TIMESTAMP).value as? Long
 
-            val raidBossId = dataSnapshot.child("raidBossId").value as? String
-            val raidMeetupId = dataSnapshot.child("raidMeetupId").value as? String
+            val raidBossId = dataSnapshot.child(RAID_BOSS_ID).value as? String
+            val raidMeetupId = dataSnapshot.child(RAID_MEETUP_ID).value as? String
 
 //            Log.v(TAG, "id: $id, level: $level, timeLeftEggHatches: $timeLeftEggHatches, timeLeft: $timeLeft, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
             if (id != null && level != null && timeLeftEggHatches != null && timeLeft != null && timestamp != null) {

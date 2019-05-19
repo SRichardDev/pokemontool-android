@@ -293,7 +293,7 @@ class RaidFragment: Fragment() {
 
         val raidMeetup = if (isUserParticipating) {
             val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
-            FirebaseRaidMeetup("", meetupTime, participants = emptyList(), chat = emptyList())
+            FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
         } else {
             null
         }

@@ -1,8 +1,11 @@
 package io.stanc.pogotool.firebase.node
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.NAME
+import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
 import java.util.*
@@ -14,16 +17,16 @@ data class FirebasePokestop(
     val submitter: String): FirebaseNode {
 
     override fun databasePath(): String {
-        return "${FirebaseDatabase.DATABASE_POKESTOPS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+        return "$POKESTOPS/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
     }
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
-        data["name"] = name
-        data["latitude"] = geoHash.toLocation().latitude
-        data["longitude"] = geoHash.toLocation().longitude
-        data["submitter"] = submitter
+        data[NAME] = name
+        data[LATITUDE] = geoHash.toLocation().latitude
+        data[LONGITUDE] = geoHash.toLocation().longitude
+        data[SUBMITTER] = submitter
 
         return data
     }
@@ -41,14 +44,14 @@ data class FirebasePokestop(
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = id(dataSnapshot)
-            val name = dataSnapshot.child("name").value as? String
-            val latitude = (dataSnapshot.child("latitude").value as? Number)?.toDouble() ?: kotlin.run {
-                (dataSnapshot.child("latitude").value as? String)?.toDouble()
+            val name = dataSnapshot.child(NAME).value as? String
+            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child("longitude").value as? Number)?.toDouble() ?: kotlin.run {
-                (dataSnapshot.child("longitude").value as? String)?.toDouble()
+            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
             }
-            val submitter = dataSnapshot.child("submitter").value as? String
+            val submitter = dataSnapshot.child(SUBMITTER).value as? String
 
 //            Log.v(TAG, "id: $id, name: $name, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 

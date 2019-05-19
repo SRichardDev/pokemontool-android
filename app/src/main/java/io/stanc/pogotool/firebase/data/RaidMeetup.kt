@@ -1,11 +1,12 @@
 package io.stanc.pogotool.firebase.data
 
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
 
 class RaidMeetup(private val raidDatabasePath: String,
                  private val raidMeetupId: String): FirebaseData {
 
-    override val key: String = "raidMeetupId"
-    override fun databasePath(): String = "$raidDatabasePath/$DATABASE_ARENA_RAID"
+    override val key: String = RAID_MEETUP_ID
+    override fun databasePath(): String = "$raidDatabasePath/$RAID"
     override fun data(): String = raidMeetupId
 }

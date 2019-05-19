@@ -2,11 +2,10 @@ package io.stanc.pogotool.map
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
-import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.Log
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
@@ -68,7 +67,7 @@ object RaidBossImageMapper {
     fun raidBossDrawable(context: Context, raidBossImageName: String): Drawable? {
 
         return try {
-            val inputStream = context.assets.open("raidbosses/$raidBossImageName.png")
+            val inputStream = context.assets.open("$RAID_BOSSES/$raidBossImageName.png")
             Drawable.createFromStream(inputStream, null)
 
         } catch (ex: IOException) {

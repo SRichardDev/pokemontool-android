@@ -8,8 +8,13 @@ import android.support.annotation.DrawableRes
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.R
-import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_ARENA_RAID
+import io.stanc.pogotool.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.IS_EX
+import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.NAME
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.map.RaidBossImageMapper
@@ -23,16 +28,16 @@ data class FirebaseArena(
     // TODO: this should be a raidId, not a raidObject -> has to be changed on the firebase server structure: arenas/<geohash>/<arenaId>/data["raidId"] = raidId
     val raid: FirebaseRaid? = null): FirebaseNode {
 
-    override fun databasePath() = "${FirebaseDatabase.DATABASE_ARENAS}/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+    override fun databasePath() = "$ARENAS/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
-        data["name"] = name
-        data["isEX"] = isEX
-        data["latitude"] = geoHash.toLocation().latitude
-        data["longitude"] = geoHash.toLocation().longitude
-        data["submitter"] = submitter
+        data[NAME] = name
+        data[IS_EX] = isEX
+        data[LATITUDE] = geoHash.toLocation().latitude
+        data[LONGITUDE] = geoHash.toLocation().longitude
+        data[SUBMITTER] = submitter
 
         return data
     }
@@ -60,23 +65,23 @@ data class FirebaseArena(
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
-            val name = dataSnapshot.child("name").value as? String
-            val isEX = (dataSnapshot.child("isEX").value as? Boolean) ?: kotlin.run {
-                (dataSnapshot.child("isEX").value as? String)?.toBoolean()
+            val name = dataSnapshot.child(NAME).value as? String
+            val isEX = (dataSnapshot.child(IS_EX).value as? Boolean) ?: kotlin.run {
+                (dataSnapshot.child(IS_EX).value as? String)?.toBoolean()
             }
-            val latitude = (dataSnapshot.child("latitude").value as? Number)?.toDouble() ?: kotlin.run {
-                (dataSnapshot.child("latitude").value as? String)?.toDouble()
+            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child("longitude").value as? Number)?.toDouble() ?: kotlin.run {
-                (dataSnapshot.child("longitude").value as? String)?.toDouble()
+            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+                (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
             }
-            val submitter = dataSnapshot.child("submitter").value as? String
+            val submitter = dataSnapshot.child(SUBMITTER).value as? String
 
 //            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 
             if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(DATABASE_ARENA_RAID))
+                val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(RAID))
                 return FirebaseArena(id, name, geoHash, submitter, isEX, raid)
             }
 

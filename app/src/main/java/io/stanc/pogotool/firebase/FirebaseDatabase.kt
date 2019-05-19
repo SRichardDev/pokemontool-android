@@ -2,6 +2,13 @@ package io.stanc.pogotool.firebase
 
 import android.util.Log
 import com.google.firebase.database.*
+import io.stanc.pogotool.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSSES
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUPS
+import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
+import io.stanc.pogotool.firebase.DatabaseKeys.PARTICIPANTS
+import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
@@ -76,7 +83,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      */
 
     fun loadArenas(geoHash: GeoHash) {
-        FirebaseServer.addNodeEventListener("$DATABASE_ARENAS/$geoHash", arenasDidChangeCallback)
+        FirebaseServer.addNodeEventListener("$ARENAS/$geoHash", arenasDidChangeCallback)
     }
 
     fun pushArena(arena: FirebaseArena) {
@@ -103,7 +110,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             val raidMeetupId = pushRaidMeetup(raidMeetup, userId)
             Log.i(TAG, "Debug:: pushRaid() raidMeetupId: $raidMeetupId")
             raidMeetupId?.let { id ->
-                FirebaseServer.setData("${raid.databasePath()}/$DATABASE_ARENA_RAID_MEETUP_ID", id, callbackForVoid())
+                FirebaseServer.setData("${raid.databasePath()}/$RAID_MEETUP_ID", id, callbackForVoid())
             }
         }
     }
@@ -116,7 +123,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
 //    fun requestRaidMeetup(raidMeetupId: String, callback: FirebaseServer.OnCompleteCallback) {
-//        FirebaseServer.requestDataValue("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", object: FirebaseServer.OnCompleteCallback<DataSnapshot>{
+//        FirebaseServer.requestDataValue("$RAID_MEETUPS/$raidMeetupId", object: FirebaseServer.OnCompleteCallback<DataSnapshot>{
 //            override fun onSuccess(data: DataSnapshot?) {
 //                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //            }
@@ -129,19 +136,19 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 //    }
 
     fun addObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
-        FirebaseServer.addNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
+        FirebaseServer.addNodeEventListener("$RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
         raidMeetupObserverManager.addObserver(observer, subId = raidMeetupId)
     }
 
     fun removeObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
-        FirebaseServer.removeNodeEventListener("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
+        FirebaseServer.removeNodeEventListener("$RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
         raidMeetupObserverManager.removeObserver(observer, subId = raidMeetupId)
     }
 
     fun pushRaidMeetupParticipation(raidMeetupId: String) {
 
         FirebaseUser.userData?.id?.let {
-            FirebaseServer.setDataKey("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId/$DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS", it)
+            FirebaseServer.setDataKey("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it)
         } ?: kotlin.run {
             Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
@@ -149,7 +156,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun cancelRaidMeetupParticipation(raidMeetupId: String) {
         FirebaseUser.userData?.id?.let {
-            FirebaseServer.removeData("$DATABASE_ARENA_RAID_MEETUPS/$raidMeetupId/$DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS/$it")
+            FirebaseServer.removeData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS/$it")
         } ?: kotlin.run {
             Log.e(TAG, "could not cancel raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
@@ -160,7 +167,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      */
 
     fun loadPokestops(geoHash: GeoHash) {
-        FirebaseServer.addNodeEventListener("$DATABASE_POKESTOPS/$geoHash", pokestopsDidChangeCallback)
+        FirebaseServer.addNodeEventListener("$POKESTOPS/$geoHash", pokestopsDidChangeCallback)
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
@@ -173,7 +180,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>?) -> Unit) {
 
-        FirebaseServer.requestDataChilds(DATABASE_ARENA_RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+        FirebaseServer.requestDataChilds(RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
                 val raidBosses = mutableListOf<FirebaseRaidboss>()
@@ -199,8 +206,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
             try {
 
-                val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(DATABASE_POKESTOPS, it) }
-                val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(DATABASE_ARENAS, it) }
+                val pokestopsGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(POKESTOPS, it) }
+                val arenaGeoHashes: List<GeoHash> = awaitResponse { loadSubscriptionsFromDatabase(ARENAS, it) }
 
                 notifyCompletionCallback(pokestopsGeoHashes, arenaGeoHashes, onCompletionCallback)
 
@@ -314,7 +321,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         val geoHashes = mutableListOf<GeoHash>()
 
         for (child in dataSnapshots) {
-            for (registered_user in child.child(DATABASE_REG_USER).children) {
+            for (registered_user in child.child(REGISTERED_USERS).children) {
 //                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
                 if (registered_user.key == usersNotificationToken) {
 //                    Log.d(TAG, "Debug:: new geoHash: key: ${child.key}, value: ${child.value}")
@@ -332,26 +339,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      */
 
     companion object {
-
         const val MAX_SUBSCRIPTIONS = 10
-
-        const val DATABASE_REG_USER = "registered_user"
-
-        const val DATABASE_ARENAS = "arenas"
-        const val DATABASE_ARENA_RAID = "raid"
-        const val DATABASE_ARENA_RAID_BOSSES = "raidBosses"
-        const val DATABASE_ARENA_RAID_MEETUPS = "raidMeetups"
-        const val DATABASE_ARENA_RAID_MEETUP_ID = "raidMeetupId"
-        const val DATABASE_ARENA_RAID_MEETUP_PARTICIPANTS = "participants"
-
-        //    const val DATABASE_POKESTOPS = "pokestops"
-        const val DATABASE_POKESTOPS = "test_pokestops"
-
-        const val DATABASE_USERS = "users"
-        const val DATABASE_USER_NOTIFICATION_TOKEN = "notificationToken"
-        const val DATABASE_USER_TRAINER_NAME = "trainerName"
-
-        const val NOTIFICATION_DATA_LATITUDE = "latitude"
-        const val NOTIFICATION_DATA_LONGITUDE = "longitude"
     }
 }

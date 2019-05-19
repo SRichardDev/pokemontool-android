@@ -101,7 +101,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{viewmodel.participants}"
+                    android:text="@{viewmodel.numParticipants}"
                     tools:text="1000"/>
 
 
@@ -134,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/layout_margin_small"
-                    android:text="@string/arena_raid_register"/>
+                    android:text="@{viewmodel.isUserParticipate ? @string/arena_raid_deregister : @string/arena_raid_register}"/>
 
                 <include layout="@layout/layout_divider"/>
 

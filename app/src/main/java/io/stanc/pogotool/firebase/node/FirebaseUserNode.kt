@@ -3,8 +3,17 @@ package io.stanc.pogotool.firebase.node
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USER_NOTIFICATION_TOKEN
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.EMAIL
+import io.stanc.pogotool.firebase.DatabaseKeys.USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.NOTIFICATION_TOKEN
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_Quests
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_RAIDS
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_ID
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_NAME
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_TEAM
+
 
 data class FirebaseUserNode(override var id: String,
                             var trainerName: String,
@@ -14,25 +23,22 @@ data class FirebaseUserNode(override var id: String,
                             var isVerified: Boolean? = false,
                             var submittedArenas: Number = 0,
                             var submittedPokestops: Number = 0,
+                            var submittedQuests: Number = 0,
+                            var submittedRaids: Number = 0,
                             var photoURL: Uri? = null): FirebaseNode {
 
     override fun databasePath(): String {
-        return "$DATABASE_USERS/$id"
+        return "$USERS/$id"
     }
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
-        data["id"] = id
-        data["trainerName"] = trainerName
-        data["email"] = email
-        data["team"] = team
-        notificationToken?.let { data[DATABASE_USER_NOTIFICATION_TOKEN] = it }
-
-//        isVerified ?
-//        submittedArenas?.let { data["submittedArenas"] = it }
-//        submittedPokestops?.let { data["submittedPokestops"] = it }
-//        photoURL ?
+        data[USER_ID] = id
+        data[USER_NAME] = trainerName
+        data[EMAIL] = email
+        data[USER_TEAM] = team
+        notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
 
         return data
     }
@@ -46,15 +52,19 @@ data class FirebaseUserNode(override var id: String,
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
-            val trainerName = dataSnapshot.child("trainerName").value as? String
-            val email = dataSnapshot.child("email").value as? String
-            val team = dataSnapshot.child("team").value as? Number
-            val notificationToken = dataSnapshot.child("notificationToken").value as? String
+            val trainerName = dataSnapshot.child(USER_NAME).value as? String
+            val email = dataSnapshot.child(EMAIL).value as? String
+            val team = dataSnapshot.child(USER_TEAM).value as? Number
+            val notificationToken = dataSnapshot.child(NOTIFICATION_TOKEN).value as? String
 
             val submittedArenas =
-                (dataSnapshot.child("submittedArenas").value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_ARENAS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
             val submittedPokestops =
-                (dataSnapshot.child("submittedPokestops").value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_POKESTOPS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+            val submittedQuests =
+                (dataSnapshot.child(SUBMITTED_Quests).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+            val submittedRaids =
+                (dataSnapshot.child(SUBMITTED_RAIDS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
 
             Log.v(
                 TAG,
@@ -67,6 +77,8 @@ data class FirebaseUserNode(override var id: String,
                 notificationToken?.let { user.notificationToken = it }
                 submittedArenas?.let { user.submittedArenas = it }
                 submittedPokestops?.let { user.submittedArenas = it }
+                submittedQuests?.let { user.submittedQuests = it }
+                submittedRaids?.let { user.submittedRaids = it }
 
                 return user
             }

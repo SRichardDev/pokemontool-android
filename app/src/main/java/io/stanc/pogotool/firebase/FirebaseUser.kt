@@ -5,13 +5,11 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.R
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USERS
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.DATABASE_USER_TRAINER_NAME
-import io.stanc.pogotool.firebase.data.UsernameData
+import io.stanc.pogotool.firebase.DatabaseKeys.USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_NAME
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.utils.ObserverManager
 import io.stanc.pogotool.utils.WaitingSpinner
-import java.lang.ref.WeakReference
 
 object FirebaseUser {
     private val TAG = javaClass.name
@@ -37,7 +35,7 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            FirebaseServer.setData("$DATABASE_USERS/${userNode.id}/$DATABASE_USER_TRAINER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
+            FirebaseServer.setData("$USERS/${userNode.id}/$USER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
                 override fun onSuccess(data: Void?) {
                     onCompletionCallback(true)
                 }
@@ -273,13 +271,13 @@ object FirebaseUser {
 
     private fun startListenForUserDataChanges() {
         auth.currentUser?.uid?.let { uid ->
-            FirebaseServer.addNodeEventListener("$DATABASE_USERS/$uid", userNodeDidChangeCallback)
+            FirebaseServer.addNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
         }
     }
 
     private fun stopListenForUserDataChanges() {
         auth.currentUser?.uid?.let { uid ->
-            FirebaseServer.removeNodeEventListener("$DATABASE_USERS/$uid", userNodeDidChangeCallback)
+            FirebaseServer.removeNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
         }
     }
 

@@ -16,6 +16,8 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogotool.appbar.AppbarManager
+import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
@@ -44,16 +46,16 @@ class MapInteractionFragment: Fragment() {
 
         activity?.intent?.extras?.let { bundle ->
 
-            Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"${FirebaseDatabase.NOTIFICATION_DATA_LONGITUDE}\"): ${bundle.containsKey(
-                FirebaseDatabase.NOTIFICATION_DATA_LONGITUDE
-            )}, bundle.containsKey(\"${FirebaseDatabase.NOTIFICATION_DATA_LATITUDE}\"): ${bundle.containsKey(
-                FirebaseDatabase.NOTIFICATION_DATA_LATITUDE
+            Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"$LONGITUDE\"): ${bundle.containsKey(
+                LONGITUDE
+            )}, bundle.containsKey(\"$LATITUDE\"): ${bundle.containsKey(
+                LATITUDE
             )}]")
 
-            if (bundle.containsKey(FirebaseDatabase.NOTIFICATION_DATA_LATITUDE) && bundle.containsKey(FirebaseDatabase.NOTIFICATION_DATA_LONGITUDE)) {
+            if (bundle.containsKey(LATITUDE) && bundle.containsKey(LONGITUDE)) {
 
-                val latitude = (bundle.get(FirebaseDatabase.NOTIFICATION_DATA_LATITUDE) as String).toDouble()
-                val longitude = (bundle.get(FirebaseDatabase.NOTIFICATION_DATA_LONGITUDE) as String).toDouble()
+                val latitude = (bundle.get(LATITUDE) as String).toDouble()
+                val longitude = (bundle.get(LONGITUDE) as String).toDouble()
 
                 Log.i(TAG, "Debug:: onCreate() NOTIFICATION: latitude: $latitude, longitude: $longitude")
                 mapFragment?.setNextStartPosition(latitude, longitude)

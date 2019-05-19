@@ -13,8 +13,8 @@ import android.content.Intent
 import android.support.v4.app.NotificationCompat
 import io.stanc.pogotool.NavDrawerActivity
 import io.stanc.pogotool.R
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LATITUDE
-import io.stanc.pogotool.firebase.FirebaseDatabase.Companion.NOTIFICATION_DATA_LONGITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
 
 
 class FirebaseMessagingService: FirebaseMessagingService() {
@@ -26,8 +26,8 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         Log.i(TAG, "onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
         val intent = Intent(this, NavDrawerActivity::class.java)
-        intent.putExtra(NOTIFICATION_DATA_LATITUDE, message.data[NOTIFICATION_DATA_LATITUDE])
-        intent.putExtra(NOTIFICATION_DATA_LONGITUDE, message.data[NOTIFICATION_DATA_LONGITUDE])
+        intent.putExtra(LATITUDE, message.data[LATITUDE])
+        intent.putExtra(LONGITUDE, message.data[LONGITUDE])
 
         val notification = buildNotification(message.notification?.title, message.notification?.body, intent)
         postNotification(notification)

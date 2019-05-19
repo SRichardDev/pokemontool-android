@@ -151,6 +151,7 @@ class ArenaFragment: Fragment() {
                         }
                     }
                 }
+                viewModel?.isUserParticipate?.get()?.let { button.isActivated = it }
             }
 
         }
