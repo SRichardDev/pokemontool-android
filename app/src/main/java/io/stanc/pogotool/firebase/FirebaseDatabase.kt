@@ -104,21 +104,19 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * raids & meetups
      */
 
-    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null, userId: String? = null) {
-        FirebaseServer.createNode(raid)
+    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null) {
+        FirebaseServer.setNode(raid)
         raidMeetup?.let {
-            val raidMeetupId = pushRaidMeetup(raidMeetup, userId)
-            Log.i(TAG, "Debug:: pushRaid() raidMeetupId: $raidMeetupId")
-            raidMeetupId?.let { id ->
-                FirebaseServer.setData("${raid.databasePath()}/$RAID_MEETUP_ID", id, callbackForVoid())
-            }
+            pushRaidMeetup(raid.databasePath(), it)
         }
     }
 
-    fun pushRaidMeetup(raidMeetup: FirebaseRaidMeetup, userId: String? = null): String? {
+    fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
         val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-        raidMeetupId?.let { pushRaidMeetupParticipation(it) }
-        Log.i(TAG, "Debug:: pushRaidMeetup() raidMeetupId: $raidMeetupId")
+        raidMeetupId?.let { id ->
+            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
+            pushRaidMeetupParticipation(id)
+        }
         return raidMeetupId
     }
 
@@ -250,7 +248,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     private fun subscribeFor(type: FirebaseSubscription.Type, uid: String, notificationToken: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         val data = FirebaseSubscription(id = notificationToken, uid = uid, geoHash = geoHash, type = type)
-        FirebaseServer.createNode(data, callbackForVoid(onCompletionCallback))
+        FirebaseServer.updateNode(data, callbackForVoid(onCompletionCallback))
     }
 
     // TODO: remove subscriptions in user data on firebase server
@@ -273,7 +271,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
 
         override fun onFailed(message: String?) {
-            Log.d(TAG, "Data request failed. Error: $message")
+            Log.e(TAG, "Data request failed. Error: $message")
             onCompletionCallback(false)
         }
     }

@@ -68,6 +68,8 @@ class RaidFragment: Fragment() {
         AppbarManager.setTitle(getString(R.string.raid_app_title, raidLevel))
         updateLayoutsForRaidLevel()
         selectEggImageButton(raidLevel)
+        meetupTimeHour = Calendar.getInstance().time.hours
+        meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
 
     /**
@@ -130,7 +132,6 @@ class RaidFragment: Fragment() {
     }
 
     private fun setupRaidbossList(rootLayout: View) {
-        Log.i(TAG, "Debug:: setupRaidbossList, raidLevel: $raidLevel, list: ${RaidBossImageMapper.raidBosses.size}, rootLayout: $rootLayout")
         val raidBossesToShow = RaidBossImageMapper.raidBosses.filter { it.level.toInt() == raidLevel }
         setupList(rootLayout, raidBossesToShow)
     }
@@ -298,7 +299,7 @@ class RaidFragment: Fragment() {
             null
         }
 
-        firebase.pushRaid(raid, raidMeetup, FirebaseUser.userData?.id)
+        firebase.pushRaid(raid, raidMeetup)
     }
 
     private fun closeScreen() {

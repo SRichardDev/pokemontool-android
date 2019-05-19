@@ -1,6 +1,7 @@
 package io.stanc.pogotool.utils
 
 import android.annotation.SuppressLint
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,9 +16,10 @@ object TimeCalculator {
     fun format(date: Date): String = clock.format(date)
     fun format(hours: Int, minutes: Int): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.HOUR, hours)
-        calendar.add(Calendar.MINUTE, minutes)
+        calendar.set(Calendar.HOUR, hours)
+        calendar.set(Calendar.MINUTE, minutes)
         return format(calendar.time)
+
     }
 
     fun currentTime(): Date = Calendar.getInstance().time

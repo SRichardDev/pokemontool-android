@@ -91,10 +91,15 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     }
 
     fun createMeetup(meetupTime: String) {
-        val raidMeetup = FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
-        firebase.pushRaidMeetup(raidMeetup, FirebaseUser.userData?.id)
-    }
 
+        arena.raid?.let { raid ->
+            val raidMeetup = FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
+            firebase.pushRaidMeetup(raid.databasePath(), raidMeetup)
+
+        } ?: kotlin.run {
+            Log.e(TAG, "Could not push raid meetup, because raid is null of arena: $arena")
+        }
+    }
 
 //    fun getNumParticipants(): List<String>? {
 //        return publicUser....

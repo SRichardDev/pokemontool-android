@@ -66,6 +66,8 @@ class ArenaFragment: Fragment() {
         super.onResume()
         arena?.let { AppbarManager.setTitle(it.name) }
         arena?.let { firebase.addObserver(arenaObserver, it) }
+        meetupTimeHour = Calendar.getInstance().time.hours
+        meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
 
     override fun onPause() {
@@ -139,7 +141,7 @@ class ArenaFragment: Fragment() {
             rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let { button ->
                 button.setOnClickListener {
                     button.isActivated = !button.isActivated
-                    Log.d(TAG, "Debug:: button participant pressed, now: isActivated: ${button.isActivated} ")
+                    Log.d(TAG, "Debug:: button participant pressed, now: isActivated: ${button.isActivated}, raidAnnounced: ${viewModel?.isRaidMeetupAnnounced?.get()}")
 
                     viewModel?.let { viewModel ->
 

@@ -113,14 +113,14 @@ object FirebaseServer {
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
-    fun createNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun updateNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
-    fun setData(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(firebaseData.databasePath()).child(firebaseData.key).setValue(firebaseData.data()).addOnCompleteListener { task ->
+    fun setNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        database.child(firebaseNode.databasePath()).setValue(firebaseNode.data()).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

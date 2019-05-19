@@ -30,7 +30,7 @@ object RaidBossImageMapper {
     }
 
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
-        Log.v(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
+//        Log.v(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
 
         arena?.raid?.let { raid ->
 
@@ -67,7 +67,7 @@ object RaidBossImageMapper {
     fun raidBossDrawable(context: Context, raidBossImageName: String): Drawable? {
 
         return try {
-            val inputStream = context.assets.open("$RAID_BOSSES/$raidBossImageName.png")
+            val inputStream = context.assets.open("raidbosses/$raidBossImageName.png")
             Drawable.createFromStream(inputStream, null)
 
         } catch (ex: IOException) {

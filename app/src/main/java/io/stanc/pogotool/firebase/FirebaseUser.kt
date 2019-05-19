@@ -76,7 +76,7 @@ object FirebaseUser {
                 userNotificationToken
             )
 
-            FirebaseServer.createNode(userData, object : FirebaseServer.OnCompleteCallback<Void> {
+            FirebaseServer.updateNode(userData, object : FirebaseServer.OnCompleteCallback<Void> {
 
                 override fun onSuccess(data: Void?) {
                     Log.i(TAG, "successfully created user: [$userData]")
