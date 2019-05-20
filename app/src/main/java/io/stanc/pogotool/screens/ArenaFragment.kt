@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
 import io.stanc.pogotool.R
+import io.stanc.pogotool.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
@@ -46,6 +47,7 @@ class ArenaFragment: Fragment() {
 
     private var meetupTimeHour: Int = Calendar.getInstance().time.hours
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
+    private var raidBossesFragment: RaidBossFragment? = null
 
     private val arenaObserver = object: FirebaseDatabase.Observer<FirebaseArena> {
 
@@ -133,6 +135,14 @@ class ArenaFragment: Fragment() {
                 }
             }
 
+            rootLayout.findViewById<Button>(R.id.arena_raid_button_raidboss)?.let {
+                it.setOnClickListener {
+                    raidBossesFragment?.selectedRaidBoss()?.let {
+                        viewModel?.sendRaidBoss(it)
+                    }
+                }
+            }
+
             rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.let {
                 it.setOnClickListener {
                     // TODO...
@@ -188,6 +198,11 @@ class ArenaFragment: Fragment() {
         }
     }
 
+    private fun setupRaidbossList() {
+        raidBossesFragment = childFragmentManager.findFragmentById(R.id.fragment_raidbosses) as? RaidBossFragment
+        arena?.raid?.level?.let { raidBossesFragment?.showRaidBossList(it.toInt()) }
+    }
+
     /**
      * Raid
      */
@@ -213,6 +228,7 @@ class ArenaFragment: Fragment() {
             setupRaidIcon(this)
             setupRaidButtons(this)
             setupTimePicker(this)
+            setupRaidbossList()
         }
     }
 

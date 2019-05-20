@@ -30,7 +30,7 @@ object RaidBossImageMapper {
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
 //        Log.v(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
 
-        arena?.raid?.let { raid -> 
+        arena?.raid?.let { raid ->
 
             when(raid.currentRaidState()) {
 

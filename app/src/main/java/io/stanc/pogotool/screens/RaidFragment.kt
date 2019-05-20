@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 import io.stanc.pogotool.R
 import io.stanc.pogotool.RaidBossAdapter
+import io.stanc.pogotool.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
@@ -20,6 +21,7 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.TimeCalculator
+import kotlinx.android.synthetic.main.fragment_raidbosses.*
 import java.util.*
 
 
@@ -30,8 +32,9 @@ class RaidFragment: Fragment() {
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
-    private var listAdapter: RaidBossAdapter? = null
     private var rootLayout: View? = null
+
+    private var raidBossesFragment: RaidBossFragment? = null
 
     private var eggImage: ImageView? = null
     private var eggImageButton1: ImageView? = null
@@ -41,7 +44,6 @@ class RaidFragment: Fragment() {
     private var eggImageButton5: ImageView? = null
 
     private var eggOrRaidTimerText: TextView? = null
-    private var layoutRaidBosses: View? = null
     private var layoutRaidParticipation: View? = null
 
     private var raidLevel: Int = 3
@@ -53,15 +55,20 @@ class RaidFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_raid, container, false)
+        Log.i(TAG, "Debug:: onCreateView()")
 
         setupEggImages(rootLayout)
-        setupRaidbossList(rootLayout)
         setupSwitches(rootLayout)
         setupTimePicker(rootLayout)
         setupButton(rootLayout)
 
         this.rootLayout = rootLayout
         return rootLayout
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRaidbossList()
     }
 
     override fun onResume() {
@@ -110,6 +117,10 @@ class RaidFragment: Fragment() {
         eggImageButton5?.setOnClickListener(EggOnClickListener(5))
     }
 
+    private fun setupRaidbossList() {
+        raidBossesFragment = childFragmentManager.findFragmentById(R.id.fragment_raidbosses) as? RaidBossFragment
+    }
+
     private fun setupSwitches(rootLayout: View) {
 
         eggOrRaidTimerText = rootLayout.findViewById(R.id.raid_text_egg_time)
@@ -130,36 +141,6 @@ class RaidFragment: Fragment() {
             switch.setOnCheckedChangeListener { _, isChecked ->
                 isUserParticipating = isChecked
                 layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
-            }
-        }
-    }
-
-    private fun setupRaidbossList(rootLayout: View) {
-        val raidBossesToShow = RaidBossImageMapper.raidBosses.filter { it.level.toInt() == raidLevel }
-        setupList(rootLayout, raidBossesToShow)
-    }
-
-    private fun setupList(rootLayout: View, firebaseRaidBosses: List<FirebaseRaidboss>) {
-        rootLayout.findViewById<RecyclerView>(R.id.raid_list_raidbosses)?.let { recyclerView ->
-
-            layoutRaidBosses = recyclerView
-
-            context?.let {
-                val adapter = RaidBossAdapter(
-                    it,
-                    firebaseRaidBosses,
-                    onItemClickListener = object : RaidBossAdapter.OnItemClickListener {
-                        override fun onClick(id: String) {
-                            // nothing todo
-                        }
-                    })
-
-                val layoutManager = LinearLayoutManager(it)
-                layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-                recyclerView.layoutManager = layoutManager
-
-                recyclerView.adapter = adapter
-                listAdapter = adapter
             }
         }
     }
@@ -210,7 +191,7 @@ class RaidFragment: Fragment() {
         override fun onClick(p0: View) {
             deselectAllEggImageButtons(butLevel=level)
             selectEggImageButton(level)
-            rootLayout?.let { setupRaidbossList(it) }
+            raidBossesFragment?.showRaidBossList(level)
         }
     }
 
@@ -281,7 +262,7 @@ class RaidFragment: Fragment() {
 
             if (isEggAlreadyHatched) {
 
-                val raidbossId = listAdapter?.getSelectedItem()?.id
+                val raidbossId = raidBossesFragment?.selectedRaidBoss()?.id
                 val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId, raidbossId)
                 pushRaidAndMeetupIfUserParticipates(raid)
 

@@ -11,6 +11,7 @@ import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
+import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 
 class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
@@ -31,6 +32,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         override fun onItemRemoved(itemId: String) {
             raidMeetup = null
             resetMeetupData()
+
         }
     }
 
@@ -40,13 +42,15 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     val isRaidAnnounced = ObservableField<Boolean>(false)
     val isRaidMeetupAnnounced = ObservableField<Boolean>(false)
-    val raidState = ObservableField<FirebaseRaid.RaidState>(FirebaseRaid.RaidState.NONE)
+    val raidState = ObservableField<RaidState>(RaidState.NONE)
     // TODO: update raidTime ? maybe server should change: egg -> raid -> expired
     val raidTime = ObservableField<String>(App.geString(R.string.arena_raid_time_none))
     val meetupTime = ObservableField<String>(App.geString(R.string.arena_raid_meetup_time_none))
     val numParticipants = ObservableField<String>("0")
     private val participants = ObservableField<List<String>>(emptyList())
     val isUserParticipate = ObservableField<Boolean>(false)
+    val isRaidBossMissing = ObservableField<Boolean>(false) // isRaidAnnounced && raidState == RaidState.RAID_RUNNING && arena.raid?.raidBossId == null
+
 
     init {
         updateData(arena)
@@ -71,11 +75,13 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
             isRaidAnnounced.set(raid.currentRaidState() != FirebaseRaid.RaidState.NONE)
             raidState.set(raid.currentRaidState())
             raidTime.set(raidTime(raid))
+            isRaidBossMissing.set(isRaidAnnounced.get() == true && raidState.get() == RaidState.RAID_RUNNING && raid.raidBossId == null)
 
         } ?: kotlin.run {
             isRaidAnnounced.set(false)
             raidState.set(FirebaseRaid.RaidState.NONE)
             raidTime.set(App.geString(R.string.arena_raid_time_none))
+            isRaidBossMissing.set(false)
         }
 
         this.arena = arena
@@ -110,29 +116,14 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         }
     }
 
-//    fun getNumParticipants(): List<String>? {
-//        return publicUser....
-//    }
 
+    fun sendRaidBoss(raidBoss: FirebaseRaidboss) {
 
-//    private fun getMeetupIfUserParticipates(): FirebaseRaidMeetup? {
-//
-//        return if (isUserParticipating) {
-//
-//            FirebaseUser.userData?.id?.let {
-//
-//                val numParticipants: List<String> = listOf(it)
-//                FirebaseRaidMeetup("",  formattedTime(meetupTimeHour, meetupTimeMinutes), numParticipants)
-//
-//            } ?: kotlin.run {
-//                Log.e(TAG, "could not send raid meetup, because user is logged out. (userData: ${FirebaseUser.userData}, userData?.id: ${FirebaseUser.userData?.id})")
-//                null
-//            }
-//
-//        } else {
-//            null
-//        }
-//    }
+        arena.raid?.let { raid ->
+            firebase.pushRaidBoss(raid.databasePath(), raidBoss)
+        }
+
+    }
 
     /**
      * private

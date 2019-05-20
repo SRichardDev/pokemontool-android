@@ -106,6 +106,7 @@
     <string name="arena_raid_chat">Chat</string>
     <string name="arena_raid_register">Anmelden</string>
     <string name="arena_raid_deregister">Abmelden</string>
+    <string name="arena_raid_raidboss">Raidboss melden</string>
 
     <!-- Exceptions -->
     <string name="exceptions_no_user">User wurde nicht gefunden.</string>

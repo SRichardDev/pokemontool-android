@@ -53,20 +53,10 @@
 
         <include layout="@layout/layout_divider"/>
 
-        <TextView
-            style="@style/TextStyle_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/raid_raidboss_selection"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/raid_list_raidbosses"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/raid_raidboss_list_height"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            android:orientation="horizontal">
-
-        </android.support.v7.widget.RecyclerView>
+        <include layout="@layout/fragment_raidbosses"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_marginTop="@dimen/layout_margin_small"/>
 
         <include layout="@layout/layout_divider"/>
 

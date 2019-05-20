@@ -86,6 +86,22 @@
 
                 </LinearLayout>
 
+                <include layout="@layout/fragment_raidbosses"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:layout_marginTop="@dimen/layout_margin_small"
+                        android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+
+                <Button
+                    android:id="@+id/arena_raid_button_raidboss"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_raidboss"
+                    android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+
                 <include layout="@layout/layout_divider"/>
 
                 <LinearLayout
@@ -128,7 +144,6 @@
                     android:layout_gravity="center"
                     android:text="@{viewmodel.numParticipants}"
                     tools:text="1000"/>
-
 
                 <Button
                     android:id="@+id/arena_raid_button_participants_list"
