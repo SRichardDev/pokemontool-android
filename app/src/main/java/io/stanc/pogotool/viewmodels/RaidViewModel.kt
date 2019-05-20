@@ -3,6 +3,8 @@ package io.stanc.pogotool.viewmodels
 import android.arch.lifecycle.ViewModel
 import android.databinding.ObservableField
 import android.util.Log
+import io.stanc.pogotool.App
+import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseArena
@@ -19,10 +21,16 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 //    private var publicUser: List<FirebasePublicUser>? = null
 
     private val raidMeetupObserver = object: FirebaseDatabase.Observer<FirebaseRaidMeetup> {
+
         override fun onItemChanged(item: FirebaseRaidMeetup) {
             Log.i(TAG, "Debug:: onItemChanged($item)")
             raidMeetup = item
             updateMeetupData(item)
+        }
+
+        override fun onItemRemoved(itemId: String) {
+            raidMeetup = null
+            resetMeetupData()
         }
     }
 
@@ -33,8 +41,9 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     val isRaidAnnounced = ObservableField<Boolean>(false)
     val isRaidMeetupAnnounced = ObservableField<Boolean>(false)
     val raidState = ObservableField<FirebaseRaid.RaidState>(FirebaseRaid.RaidState.NONE)
-    // TODO: update time ? maybe server should change: egg -> raid -> expired
-    val time = ObservableField<String>("-00:00")
+    // TODO: update raidTime ? maybe server should change: egg -> raid -> expired
+    val raidTime = ObservableField<String>(App.geString(R.string.arena_raid_time_none))
+    val meetupTime = ObservableField<String>(App.geString(R.string.arena_raid_meetup_time_none))
     val numParticipants = ObservableField<String>("0")
     private val participants = ObservableField<List<String>>(emptyList())
     val isUserParticipate = ObservableField<Boolean>(false)
@@ -61,17 +70,17 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         arena.raid?.let { raid ->
             isRaidAnnounced.set(raid.currentRaidState() != FirebaseRaid.RaidState.NONE)
             raidState.set(raid.currentRaidState())
-            time.set(raidTime(raid))
+            raidTime.set(raidTime(raid))
 
         } ?: kotlin.run {
             isRaidAnnounced.set(false)
             raidState.set(FirebaseRaid.RaidState.NONE)
-            time.set("-00:00")
+            raidTime.set(App.geString(R.string.arena_raid_time_none))
         }
 
         this.arena = arena
 
-        Log.i(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, time: ${time.get()}")
+        Log.i(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
     }
 
     fun changeParticipation(participate: Boolean) {
@@ -142,11 +151,12 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     }
 
     private fun updateMeetupData(raidMeetup: FirebaseRaidMeetup) {
-        Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup)")
+        Log.d(TAG, "Debug:: updateMeetupData(raidMeetup: $raidMeetup)")
         isRaidMeetupAnnounced.set(true)
         numParticipants.set(raidMeetup.participantUserIds.size.toString())
         participants.set(raidMeetup.participantUserIds)
         isUserParticipate.set(raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id))
+        meetupTime.set(raidMeetup.meetupTime)
     }
 
     private fun resetMeetupData() {
@@ -154,6 +164,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         numParticipants.set("0")
         participants.set(emptyList())
         isUserParticipate.set(false)
+        meetupTime.set(App.geString(R.string.arena_raid_meetup_time_none))
     }
 
     private fun requestParticipants() {
@@ -162,7 +173,8 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     private fun raidTime(raid: FirebaseRaid): String {
 
-        return when(raid.currentRaidState()) {
+
+        val time =  when(raid.currentRaidState()) {
             RaidState.EGG_HATCHES -> {
                 raid.timeEggHatches()
             }
@@ -172,6 +184,10 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
             else -> null
         } ?: kotlin.run { "00:00" }
+
+        Log.i(TAG, "Debug:: raidTime($raid) state: ${raid.currentRaidState().name}, time: $time")
+
+        return time
     }
 
     /**

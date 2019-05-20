@@ -8,7 +8,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import android.view.View
-import io.stanc.pogotool.map.RaidBossImageMapper
 
 
 class RaidBossAdapter(private val context: Context,

@@ -17,7 +17,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
-import io.stanc.pogotool.map.RaidBossImageMapper
+import io.stanc.pogotool.RaidBossImageMapper
 
 data class FirebaseArena(
     override val id: String,

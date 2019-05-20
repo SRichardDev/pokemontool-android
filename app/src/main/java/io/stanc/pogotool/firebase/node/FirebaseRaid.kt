@@ -90,7 +90,7 @@ data class FirebaseRaid(override val id: String,
     }
 
     /**
-     * Egg time
+     * Egg raidTime
      */
 
     fun timeEggHatches(): String? = dateEggHatches()?.let { TimeCalculator.format(it) } ?: kotlin.run { null }
@@ -104,7 +104,7 @@ data class FirebaseRaid(override val id: String,
     }
 
     /**
-     * Raid time
+     * Raid raidTime
      */
 
     fun timeRaidEnds(): String? = dateRaidEnds()?.let { TimeCalculator.format(it) } ?: kotlin.run { null }

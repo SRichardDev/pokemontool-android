@@ -1,11 +1,9 @@
-package io.stanc.pogotool.map
+package io.stanc.pogotool
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
-import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
@@ -32,14 +30,17 @@ object RaidBossImageMapper {
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
 //        Log.v(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
 
-        arena?.raid?.let { raid ->
+        arena?.raid?.let { raid -> 
 
             when(raid.currentRaidState()) {
 
                 RaidState.RAID_RUNNING -> {
                     raid.raidBossId?.let { id ->
                         val imageName = raidBosses.first { it.id == id }.imageName
-                        return raidBossDrawable(context, raidBossImageName = imageName)
+                        return raidBossDrawable(
+                            context,
+                            raidBossImageName = imageName
+                        )
                     }
                 }
 

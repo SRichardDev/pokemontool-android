@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.screens
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -9,14 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import io.stanc.pogotool.R
+import io.stanc.pogotool.RaidBossAdapter
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.map.RaidBossImageMapper
+import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
@@ -119,7 +120,9 @@ class RaidFragment: Fragment() {
         rootLayout.findViewById<Switch>(R.id.raid_switch_egg)?.let { switch ->
             switch.setOnCheckedChangeListener { _, isChecked ->
                 isEggAlreadyHatched = isChecked
-                eggOrRaidTimerText?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
+                eggOrRaidTimerText?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(
+                    R.string.raid_text_time_egg
+                )
             }
         }
 
@@ -142,11 +145,14 @@ class RaidFragment: Fragment() {
             layoutRaidBosses = recyclerView
 
             context?.let {
-                val adapter = RaidBossAdapter(it, firebaseRaidBosses, onItemClickListener = object: RaidBossAdapter.OnItemClickListener {
-                    override fun onClick(id: String) {
-                        // nothing todo
-                    }
-                })
+                val adapter = RaidBossAdapter(
+                    it,
+                    firebaseRaidBosses,
+                    onItemClickListener = object : RaidBossAdapter.OnItemClickListener {
+                        override fun onClick(id: String) {
+                            // nothing todo
+                        }
+                    })
 
                 val layoutManager = LinearLayoutManager(it)
                 layoutManager.orientation = LinearLayoutManager.HORIZONTAL

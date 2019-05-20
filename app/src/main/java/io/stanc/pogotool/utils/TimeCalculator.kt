@@ -16,7 +16,7 @@ object TimeCalculator {
     fun format(date: Date): String = clock.format(date)
     fun format(hours: Int, minutes: Int): String {
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR, hours)
+        calendar.set(Calendar.HOUR_OF_DAY, hours)
         calendar.set(Calendar.MINUTE, minutes)
         return format(calendar.time)
 

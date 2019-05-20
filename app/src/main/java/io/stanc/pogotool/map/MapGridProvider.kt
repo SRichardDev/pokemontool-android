@@ -6,7 +6,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
-import io.stanc.pogotool.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.geohash.GeoHash
 

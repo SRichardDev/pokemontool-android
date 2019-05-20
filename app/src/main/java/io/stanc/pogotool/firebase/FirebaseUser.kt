@@ -285,5 +285,8 @@ object FirebaseUser {
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
             FirebaseUserNode.new(dataSnapshot)?.let { FirebaseUser.userData = it }
         }
+        override fun nodeRemoved(key: String) {
+            FirebaseUser.userData = null
+        }
     }
 }

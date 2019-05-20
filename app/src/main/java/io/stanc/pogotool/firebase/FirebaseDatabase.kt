@@ -25,12 +25,17 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     private val TAG = this.javaClass.name
 
     private val arenasDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
+
         private val arenaDelegate = WeakReference(arenaDelegate)
 
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
             dataSnapshot.children.forEach { child ->
                 FirebaseArena.new(child)?.let { this.arenaDelegate.get()?.onItemChanged(it) }
             }
+        }
+
+        override fun nodeRemoved(key: String) {
+            this.arenaDelegate.get()?.onItemRemoved(key)
         }
     }
 
@@ -43,6 +48,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
                 FirebasePokestop.new(child)?.let { this.pokestopDelegate.get()?.onItemChanged(it) }
             }
         }
+
+        override fun nodeRemoved(key: String) {
+            this.pokestopDelegate.get()?.onItemRemoved(key)
+        }
     }
 
     private val arenaDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
@@ -51,6 +60,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
                 arenaObserverManager.observers(arena.id).filterNotNull().forEach { it.onItemChanged(arena) }
             }
         }
+
+        override fun nodeRemoved(key: String) {
+            arenaObserverManager.observers(key).filterNotNull().forEach { it.onItemRemoved(key) }
+        }
     }
 
     private val raidMeetupDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
@@ -58,6 +71,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             FirebaseRaidMeetup.new(dataSnapshot)?.let { raidMeetup ->
                 raidMeetupObserverManager.observers(raidMeetup.id).filterNotNull().forEach { it.onItemChanged(raidMeetup) }
             }
+        }
+
+        override fun nodeRemoved(key: String) {
+            raidMeetupObserverManager.observers(key).filterNotNull().forEach { it.onItemRemoved(key) }
         }
     }
 
@@ -68,11 +85,12 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     interface Delegate<Item> {
         fun onItemAdded(item: Item)
         fun onItemChanged(item: Item)
-        fun onItemRemoved(item: Item)
+        fun onItemRemoved(itemId: String)
     }
 
     interface Observer<Item> {
         fun onItemChanged(item: Item)
+        fun onItemRemoved(itemId: String)
     }
 
     private val arenaObserverManager = ObserverManager<Observer<FirebaseArena>>()
@@ -113,6 +131,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
         val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
+        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
         raidMeetupId?.let { id ->
             FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
             pushRaidMeetupParticipation(id)

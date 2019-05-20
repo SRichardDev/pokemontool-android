@@ -81,12 +81,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/layout_margin_small"
-                        android:text="@{viewmodel.time}"
+                        android:text="@{viewmodel.raidTime}"
                         tools:text="-00:00:00"/>
 
                 </LinearLayout>
 
                 <include layout="@layout/layout_divider"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small">
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/arena_raid_meetup_time"
+                        tools:text="Until:"/>
+
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/layout_margin_small"
+                        android:text="@{viewmodel.meetupTime}"
+                        tools:text="-00:00:00"/>
+
+                </LinearLayout>
 
                 <TextView
                     style="@style/TextStyle_bold"

@@ -127,23 +127,24 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         override fun onItemChanged(item: FirebasePokestop) {
             Log.v(TAG, "Debug:: onItemChanged($item)")
-            onItemRemoved(item)
+            onItemRemoved(item.id)
             onItemAdded(item)
             pokestopClustering.trigger()
         }
 
-        override fun onItemRemoved(item: FirebasePokestop) {
+        override fun onItemRemoved(itemId: String) {
 
-            items[item.id]?.get()?.let {
+            items[itemId]?.get()?.let {
                 pokestopClusterManager.removeItem(it)
             }
-            items.remove(item.id)
+            items.remove(itemId)
         }
 
         private val items: HashMap<String, WeakReference<ClusterPokestop>> = HashMap()
     }
 
     val arenaDelegate = object : FirebaseDatabase.Delegate<FirebaseArena> {
+
         override fun onItemAdded(item: FirebaseArena) {
 
             if (!items.containsKey(item.id)) {
@@ -155,17 +156,17 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         override fun onItemChanged(item: FirebaseArena) {
             Log.v(TAG, "Debug:: onItemChanged($item)")
-            onItemRemoved(item)
+            onItemRemoved(item.id)
             onItemAdded(item)
             arenaClustering.trigger()
         }
 
-        override fun onItemRemoved(item: FirebaseArena) {
+        override fun onItemRemoved(itemId: String) {
 
-            items[item.id]?.get()?.let {
+            items[itemId]?.get()?.let {
                 arenaClusterManager.removeItem(it)
             }
-            items.remove(item.id)
+            items.remove(itemId)
         }
 
         private val items: HashMap<String, WeakReference<ClusterArena>> = HashMap()

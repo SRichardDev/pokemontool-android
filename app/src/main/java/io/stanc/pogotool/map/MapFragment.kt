@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.map
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,6 +19,7 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.PermissionManager

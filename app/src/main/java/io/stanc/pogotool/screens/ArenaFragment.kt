@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.screens
 
 import android.content.Context
 import android.databinding.DataBindingUtil
@@ -12,11 +12,12 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
+import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.map.RaidBossImageMapper
+import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils.safeLet
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.TimeCalculator
@@ -47,13 +48,19 @@ class ArenaFragment: Fragment() {
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
 
     private val arenaObserver = object: FirebaseDatabase.Observer<FirebaseArena> {
+
         override fun onItemChanged(item: FirebaseArena) {
             arena = item
+        }
+
+        override fun onItemRemoved(itemId: String) {
+            arena = null
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentArenaBinding>(inflater, R.layout.fragment_arena, container, false)
+        val binding = DataBindingUtil.inflate<FragmentArenaBinding>(inflater,
+            R.layout.fragment_arena, container, false)
         binding.viewmodel = viewModel
         viewBinding = binding
 
@@ -149,6 +156,7 @@ class ArenaFragment: Fragment() {
                             viewModel.changeParticipation(button.isActivated)
                         } else {
                             val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
+                            Log.d(TAG, "Debug:: arena_raid_button_register: meetupTime: $meetupTime <= (meetupTimeHour: $meetupTimeHour, meetupTimeMinutes: $meetupTimeMinutes)")
                             viewModel.createMeetup(meetupTime)
                         }
                     }

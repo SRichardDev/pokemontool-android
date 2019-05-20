@@ -7,7 +7,7 @@
                                              android:padding="@dimen/layout_padding_screen"
                                              android:background="@color/white">
 
-    <fragment android:name="io.stanc.pogotool.MapFragment"
+    <fragment android:name="io.stanc.pogotool.map.MapFragment"
               android:id="@+id/map_item_mapview"
               android:layout_width="0dp"
               android:layout_height="0dp"

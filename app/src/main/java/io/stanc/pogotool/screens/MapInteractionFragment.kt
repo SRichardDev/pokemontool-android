@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.screens
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -15,6 +15,8 @@ import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import io.stanc.pogotool.map.MapFragment
+import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
 import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
@@ -24,7 +26,7 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
-import io.stanc.pogotool.map.RaidBossImageMapper
+import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -46,7 +48,8 @@ class MapInteractionFragment: Fragment() {
 
         activity?.intent?.extras?.let { bundle ->
 
-            Log.d(TAG, "Debug:: Intent has extras [bundle.containsKey(\"$LONGITUDE\"): ${bundle.containsKey(
+            Log.d(
+                TAG, "Debug:: Intent has extras [bundle.containsKey(\"$LONGITUDE\"): ${bundle.containsKey(
                 LONGITUDE
             )}, bundle.containsKey(\"$LATITUDE\"): ${bundle.containsKey(
                 LATITUDE

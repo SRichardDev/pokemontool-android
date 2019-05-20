@@ -1,4 +1,4 @@
-package io.stanc.pogotool
+package io.stanc.pogotool.screens
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -10,13 +10,15 @@ import android.widget.CheckBox
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogotool.map.MapFragment
+import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
-import io.stanc.pogotool.MapInteractionFragment.MapMode
+import io.stanc.pogotool.screens.MapInteractionFragment.MapMode
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
