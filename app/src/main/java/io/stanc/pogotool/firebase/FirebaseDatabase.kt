@@ -140,7 +140,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         return raidMeetupId
     }
 
-    fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidboss) {
+    fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidbossDefinition) {
         FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS_ID", raidBoss.id, callbackForVoid())
     }
 
@@ -187,13 +187,13 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * raid bosses
      */
 
-    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidboss>?) -> Unit) {
+    fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidbossDefinition>?) -> Unit) {
 
         FirebaseServer.requestDataChilds(RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
-                val raidBosses = mutableListOf<FirebaseRaidboss>()
-                data?.forEach { FirebaseRaidboss.new(it)?.let { raidBosses.add(it) } }
+                val raidBosses = mutableListOf<FirebaseRaidbossDefinition>()
+                data?.forEach { FirebaseRaidbossDefinition.new(it)?.let { raidBosses.add(it) } }
                 onCompletionCallback(raidBosses)
             }
 

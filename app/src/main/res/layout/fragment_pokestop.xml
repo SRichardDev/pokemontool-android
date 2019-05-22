@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="io.stanc.pogotool.viewmodels.RaidViewModel" />
+        <import type="android.view.View"/>
+        <!--<import type="io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState"/>-->
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/layout_padding_screen">
+
+            <fragment android:name="io.stanc.pogotool.map.MapFragment"
+                      android:id="@+id/map_item_mapview"
+                      android:layout_width="match_parent"
+                      android:layout_height="250dp"
+                      app:layout_constraintEnd_toEndOf="parent"
+                      app:layout_constraintStart_toStartOf="parent"
+                      app:layout_constraintTop_toTopOf="parent"/>
+
+            <LinearLayout
+                android:id="@+id/pokestop_layout_quest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/pokestop_active_quest"/>
+
+                <TextView
+                    style="@style/TextStyle_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    tools:text="Super cool quest"/>
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/pokestop_quest_reward"/>
+
+                <TextView
+                    style="@style/TextStyle_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    tools:text="Super big reward"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/layout_divider"/>
+
+            <include layout="@layout/layout_map_item_infos"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

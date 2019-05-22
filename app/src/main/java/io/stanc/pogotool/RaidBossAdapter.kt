@@ -6,27 +6,27 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
+import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 import android.view.View
 
 
 class RaidBossAdapter(private val context: Context,
-                      private val raidBosses: List<FirebaseRaidboss>,
+                      private val raidBosses: List<FirebaseRaidbossDefinition>,
                       private val onItemClickListener: OnItemClickListener): RecyclerView.Adapter<RaidBossAdapter.RaidBossHolder>() {
 
     private val TAG = javaClass.name
     private val itemViews = mutableListOf<View>()
-    private var selectedItem: FirebaseRaidboss? = null
+    private var selectedItem: FirebaseRaidbossDefinition? = null
 
     interface OnItemClickListener {
         fun onClick(id: String)
     }
 
-    fun getItem(id: String): FirebaseRaidboss {
+    fun getItem(id: String): FirebaseRaidbossDefinition {
         return raidBosses.first { it.id == id }
     }
 
-    fun getSelectedItem(): FirebaseRaidboss? = selectedItem
+    fun getSelectedItem(): FirebaseRaidbossDefinition? = selectedItem
 
     inner class RaidBossHolder(var id: String?, itemLayout: View) : RecyclerView.ViewHolder(itemLayout) {
         init {

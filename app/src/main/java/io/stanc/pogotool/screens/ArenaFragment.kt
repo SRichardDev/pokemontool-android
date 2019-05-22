@@ -106,13 +106,13 @@ class ArenaFragment: Fragment() {
 
         arena?.let { arena ->
 
-            rootLayout.findViewById<TextView>(R.id.arena_textview_coordinates)?.let { textView ->
+            rootLayout.findViewById<TextView>(R.id.map_item_infos_textview_coordinates)?.let { textView ->
                 val latitude = arena.geoHash.toLocation().latitude.toString()
                 val longitude = arena.geoHash.toLocation().longitude.toString()
-                textView.text = getString(R.string.arena_coordinates_format, latitude, longitude)
+                textView.text = getString(R.string.coordinates_format, latitude, longitude)
             }
 
-            rootLayout.findViewById<TextView>(R.id.arena_textview_added_from_user)?.let { textView ->
+            rootLayout.findViewById<TextView>(R.id.map_item_infos_textview_added_from_user)?.let { textView ->
                 textView.text = arena.submitter
             }
         }

@@ -4,10 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewmodel"
-            type="io.stanc.pogotool.viewmodels.RaidViewModel" />
+            type="io.stanc.pogotool.viewmodels.RaidViewModel"/>
+
         <import type="android.view.View"/>
+
         <import type="io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState"/>
     </data>
 
@@ -86,11 +89,12 @@
 
                 </LinearLayout>
 
-                <include layout="@layout/fragment_raidbosses"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_marginTop="@dimen/layout_margin_small"
-                        android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+                <include
+                    layout="@layout/fragment_raidbosses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
 
                 <Button
                     android:id="@+id/arena_raid_button_raidboss"
@@ -163,9 +167,10 @@
                     android:layout_marginTop="@dimen/layout_margin_small"
                     android:text="@string/arena_raid_chat"/>
 
-                <include layout="@layout/layout_raid_meetup_time"
-                         android:id="@+id/raid_layout_meetup"
-                        android:visibility="@{viewmodel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
+                <include
+                    layout="@layout/layout_raid_meetup_time"
+                    android:id="@+id/raid_layout_meetup"
+                    android:visibility="@{viewmodel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
 
                 <Button
                     android:id="@+id/arena_raid_button_register"
@@ -175,8 +180,6 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/layout_margin_small"
                     android:text="@{viewmodel.isUserParticipate ? @string/arena_raid_deregister : @string/arena_raid_register}"/>
-
-                <include layout="@layout/layout_divider"/>
 
             </LinearLayout>
 
@@ -196,39 +199,9 @@
             <!--android:src="@drawable/icon_star_gold_30dp"-->
             <!--tools:ignore="ContentDescription"/>-->
 
-            <TextView
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_coordinates"/>
+            <include layout="@layout/layout_divider"/>
 
-            <TextView
-                android:id="@+id/arena_textview_coordinates"
-                style="@style/TextStyle_default"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_coordinates_format"/>
-
-            <TextView
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/arena_added_from"/>
-
-            <TextView
-                android:id="@+id/arena_textview_added_from_user"
-                style="@style/TextStyle_default"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                tools:text="Debug User Name"/>
+            <include layout="@layout/layout_map_item_infos"/>
 
         </LinearLayout>
 

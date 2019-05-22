@@ -91,9 +91,6 @@
 
     <!-- Arena -->
     <string name="arena_gold_arena">Gold Arena:</string>
-    <string name="arena_coordinates">Koordinaten:</string>
-    <string name="arena_coordinates_format">(%s, %s)</string>
-    <string name="arena_added_from">Hinzugefügt von:</string>
 
     <string name="arena_raid_button_new_raid">Neuen Raid melden</string>
     <string name="arena_raid_meetup_time">Treffzeitpunkt:</string>
@@ -107,6 +104,15 @@
     <string name="arena_raid_register">Anmelden</string>
     <string name="arena_raid_deregister">Abmelden</string>
     <string name="arena_raid_raidboss">Raidboss melden</string>
+
+    <!-- Pokestop -->
+    <string name="pokestop_active_quest">Aktive Quest:</string>
+    <string name="pokestop_quest_reward">Belohnung:</string>
+
+    <!-- Commmon -->
+    <string name="coordinates">Koordinaten:</string>
+    <string name="coordinates_format">(%s, %s)</string>
+    <string name="added_from">Hinzugefügt von:</string>
 
     <!-- Exceptions -->
     <string name="exceptions_no_user">User wurde nicht gefunden.</string>

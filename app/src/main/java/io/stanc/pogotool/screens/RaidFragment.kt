@@ -2,26 +2,20 @@ package io.stanc.pogotool.screens
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import io.stanc.pogotool.R
-import io.stanc.pogotool.RaidBossAdapter
 import io.stanc.pogotool.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.KotlinUtils
 import io.stanc.pogotool.utils.TimeCalculator
-import kotlinx.android.synthetic.main.fragment_raidbosses.*
 import java.util.*
 
 

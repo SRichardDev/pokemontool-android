@@ -6,14 +6,14 @@ import android.util.Log
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
+import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 import io.stanc.pogotool.utils.WaitingSpinner
 import java.io.IOException
 
 object RaidBossImageMapper {
 
     private val TAG = javaClass.name
-    var raidBosses = listOf<FirebaseRaidboss>()
+    var raidBosses = listOf<FirebaseRaidbossDefinition>()
         private set
 
     // TODO: load optional sprites from: https://github.com/PokeAPI/sprites

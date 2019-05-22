@@ -125,7 +125,7 @@ class MapItemFragment: Fragment() {
 
     private fun sendMapItem() {
 
-        FirebaseUser.userData?.trainerName?.let { userName ->
+        FirebaseUser.userData?.id?.let { userId ->
             position?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
@@ -133,25 +133,25 @@ class MapItemFragment: Fragment() {
                     MapMode.NEW_ARENA -> {
                         map_item_edittext?.text?.toString()?.let { name ->
                             val isEX = map_item_checkbox_isex_arena?.isChecked?:kotlin.run { false }
-                            val arena = FirebaseArena("", name, geoHash, userName, isEX)
+                            val arena = FirebaseArena("", name, geoHash, userId, isEX)
                             Log.d(TAG, "push arena: $arena")
-                            firebase?.pushArena(arena)
+                            firebase.pushArena(arena)
                         }
 
                     }
 
                     MapMode.NEW_POKESTOP -> {
                         map_item_edittext?.text?.toString()?.let { name ->
-                            val pokestop = FirebasePokestop("", name, geoHash, userName)
+                            val pokestop = FirebasePokestop("", name, geoHash, userId)
                             Log.d(TAG, "push pokestop: $pokestop")
-                            firebase?.pushPokestop(pokestop)
+                            firebase.pushPokestop(pokestop)
                         }
                     }
 
                     else -> Log.e(TAG, "Could not sending map item to server! Reason: unknown mapMode: $mapMode")
                 }
             } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: position is $position") }
-        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter trainerName is missing, userData: ${FirebaseUser.userData}") }
+        } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter userId is missing, userData: ${FirebaseUser.userData}") }
     }
 
     private fun close() {

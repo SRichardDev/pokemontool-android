@@ -7,7 +7,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.CHAT_SENDER_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogotool.firebase.DatabaseKeys.TIMESTAMP
 
-class FirebaseChat(
+class FirebaseChat (
     override val id: String,
     private val raidMeetupId: String,
     val message: String,

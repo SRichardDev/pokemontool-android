@@ -11,7 +11,7 @@ import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
+import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 
 class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
@@ -117,7 +117,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     }
 
 
-    fun sendRaidBoss(raidBoss: FirebaseRaidboss) {
+    fun sendRaidBoss(raidBoss: FirebaseRaidbossDefinition) {
 
         arena.raid?.let { raid ->
             firebase.pushRaidBoss(raid.databasePath(), raidBoss)

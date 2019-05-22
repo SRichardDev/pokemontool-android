@@ -35,6 +35,7 @@ object DatabaseKeys {
     const val QUEST_IMAGE_NAME = "name"
     const val QUEST = "quest"
     const val QUEST_REWARD = "reward"
+    const val QUEST_ID = "definitionId"
 
     // Users
     const val USERS = "users"

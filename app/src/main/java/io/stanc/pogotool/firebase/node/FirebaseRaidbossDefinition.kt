@@ -6,7 +6,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_IMAGE_NAME
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_LEVEL
 
-data class FirebaseRaidboss(
+data class FirebaseRaidbossDefinition(
     override val id: String,
     val name: String,
     val level: String,
@@ -28,7 +28,7 @@ data class FirebaseRaidboss(
 
         private val TAG = javaClass.name
 
-        fun new(dataSnapshot: DataSnapshot): FirebaseRaidboss? {
+        fun new(dataSnapshot: DataSnapshot): FirebaseRaidbossDefinition? {
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
@@ -39,7 +39,7 @@ data class FirebaseRaidboss(
 //            Log.v(TAG, "id: $id, trainerName: $trainerName, level: $level, imageName: $imageName")
 
             if (id != null && name != null && level != null && imageName != null) {
-                return FirebaseRaidboss(id, name, level, imageName)
+                return FirebaseRaidbossDefinition(id, name, level, imageName)
             }
 
             return null

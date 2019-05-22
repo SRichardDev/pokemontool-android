@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.stanc.pogotool.firebase.node.FirebaseRaidboss
+import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 
 class RaidBossFragment: Fragment() {
     private val TAG = javaClass.name
@@ -28,17 +27,17 @@ class RaidBossFragment: Fragment() {
         setupList(raidBossesToShow)
     }
 
-    fun selectedRaidBoss(): FirebaseRaidboss? {
+    fun selectedRaidBoss(): FirebaseRaidbossDefinition? {
         return listAdapter?.getSelectedItem()
     }
 
-    private fun setupList(firebaseRaidBosses: List<FirebaseRaidboss>) {
+    private fun setupList(firebaseRaidBossDefinitions: List<FirebaseRaidbossDefinition>) {
         recyclerView?.let { recyclerView ->
 
             context?.let {
                 val adapter = RaidBossAdapter(
                     it,
-                    firebaseRaidBosses,
+                    firebaseRaidBossDefinitions,
                     onItemClickListener = object : RaidBossAdapter.OnItemClickListener {
                         override fun onClick(id: String) {
                             // nothing todo
