@@ -6,6 +6,7 @@ import android.util.Log
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebaseRaid
@@ -21,7 +22,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     private var raidMeetup: FirebaseRaidMeetup? = null
 //    private var publicUser: List<FirebasePublicUser>? = null
 
-    private val raidMeetupObserver = object: FirebaseDatabase.Observer<FirebaseRaidMeetup> {
+    private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 
         override fun onItemChanged(item: FirebaseRaidMeetup) {
             Log.i(TAG, "Debug:: onItemChanged($item)")
@@ -58,7 +59,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     override fun onCleared() {
         Log.i(TAG, "Debug:: onCleared()")
-        raidMeetup?.id?.let { firebase.removeObserver(raidMeetupObserver, it) }
+        raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
         super.onCleared()
     }
 
@@ -102,7 +103,6 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         } ?: kotlin.run {
             Log.e(TAG, "could not changed participation($participate), because: raidMeetup?.id: ${raidMeetup?.id}")
         }
-
     }
 
     fun createMeetup(meetupTime: String) {
@@ -131,11 +131,14 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     private fun requestRaidMeetupData(arena: FirebaseArena) {
 
-        raidMeetup?.id?.let { firebase.removeObserver(raidMeetupObserver, it) }
+        raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
         Log.d(TAG, "Debug:: requestRaidMeetupData(arena: $arena), arena.raid?.raidMeetupId?: ${arena.raid?.raidMeetupId}")
 
-        arena.raid?.raidMeetupId?.let {
-            firebase.addObserver(raidMeetupObserver, it)
+        arena.raid?.raidMeetupId?.let { id ->
+
+            val raidMeetup = FirebaseRaidMeetup(id, "", emptyList(), emptyList())
+            firebase.addObserver(raidMeetupObserver, raidMeetup)
+
         } ?: kotlin.run {
             resetMeetupData()
         }

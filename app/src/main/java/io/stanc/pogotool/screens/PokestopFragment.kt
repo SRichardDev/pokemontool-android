@@ -3,10 +3,11 @@ package io.stanc.pogotool.screens
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -14,54 +15,86 @@ import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentPokestopBinding
+import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.map.MapFragment
 import io.stanc.pogotool.utils.KotlinUtils
-import java.util.*
+import io.stanc.pogotool.viewmodels.QuestViewModel
+
 
 class PokestopFragment: Fragment() {
+    private val TAG = javaClass.name
 
+    private var firebase: FirebaseDatabase = FirebaseDatabase()
     private var mapFragment: MapFragment? = null
     private var map: GoogleMap? = null
-    private var arenaMarker: Marker? = null
     private var position: LatLng? = null
+    private var viewModel: QuestViewModel? = null
+    private var viewBinding: FragmentPokestopBinding? = null
 
     private var pokestop: FirebasePokestop? = null
         set(value) {
             field = value
-            updateLayout()
 
-            value?.let {
-                viewModel?.updateData(value) ?: kotlin.run {
-                    viewModel = RaidViewModel(it)
-                }
-            }
+            updateViewModel(value)
+            updateLayout()
         }
+
+    private val pokestopObserver = object: FirebaseNodeObserverManager.Observer<FirebasePokestop> {
+
+        override fun onItemChanged(item: FirebasePokestop) {
+            pokestop = item
+        }
+
+        override fun onItemRemoved(itemId: String) {
+            pokestop = null
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DataBindingUtil.inflate<FragmentPokestopBinding>(inflater, R.layout.fragment_pokestop, container, false)
-//        binding.viewmodel = viewModel
-//        viewBinding = binding
+        binding.viewmodel = viewModel
+        viewBinding = binding
 
         setupMapFragment()
-        updateLayout(binding.root)
+        updateLayout()
 
         return binding.root
     }
 
-    private fun updateLayout(rootLayout: View) {
+    private fun updateViewModel(pokestop: FirebasePokestop?) {
+        pokestop?.let {
+            viewModel?.updateData(it) ?: kotlin.run {
+                viewModel = QuestViewModel(it)
+            }
+            position = LatLng(it.geoHash.toLocation().latitude, it.geoHash.toLocation().longitude)
+        } ?: kotlin.run {
+            viewModel = null
+        }
+    }
+
+    private fun updateLayout() {
+        Log.d(TAG, "Debug:: updateLayout(), pokestop: $pokestop, viewBinding?.root: ${viewBinding?.root}")
 
         pokestop?.let { pokestop ->
 
-            rootLayout.findViewById<TextView>(R.id.map_item_infos_textview_coordinates)?.let { textView ->
-                val latitude = pokestop.geoHash.toLocation().latitude.toString()
-                val longitude = pokestop.geoHash.toLocation().longitude.toString()
-                textView.text = getString(R.string.coordinates_format, latitude, longitude)
-            }
+            viewBinding?.root?.apply {
 
-            rootLayout.findViewById<TextView>(R.id.map_item_infos_textview_added_from_user)?.let { textView ->
-                textView.text = pokestop.submitter
+                this.findViewById<TextView>(R.id.map_item_infos_textview_coordinates)?.let { textView ->
+                    val latitude = pokestop.geoHash.toLocation().latitude.toString()
+                    val longitude = pokestop.geoHash.toLocation().longitude.toString()
+                    textView.text = getString(R.string.coordinates_format, latitude, longitude)
+                }
+
+                this.findViewById<TextView>(R.id.map_item_infos_textview_added_from_user)?.let { textView ->
+                    textView.text = pokestop.submitter
+                }
+
+                this.findViewById<ImageView>(R.id.pokestop_layout_quest_image)?.let { imageView ->
+                    viewModel?.imageDrawable(context)?.let { imageView.setImageDrawable(it) }
+                }
             }
         }
     }
@@ -69,7 +102,12 @@ class PokestopFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         pokestop?.let { AppbarManager.setTitle(it.name) }
-//        arena?.let { firebase.addObserver(arenaObserver, it) }
+        pokestop?.let { firebase.addObserver(pokestopObserver, it) }
+    }
+
+    override fun onPause() {
+        pokestop?.let { firebase.removeObserver(pokestopObserver, it) }
+        super.onPause()
     }
 
     private fun setupMapFragment() {
@@ -99,9 +137,9 @@ class PokestopFragment: Fragment() {
 
     companion object {
 
-        fun newInstance(latLng: LatLng): PokestopFragment {
+        fun newInstance(pokestop: FirebasePokestop): PokestopFragment {
             val fragment = PokestopFragment()
-            fragment.position = latLng
+            fragment.pokestop = pokestop
             return fragment
         }
     }

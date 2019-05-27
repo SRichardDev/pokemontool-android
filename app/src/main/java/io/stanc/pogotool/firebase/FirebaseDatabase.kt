@@ -8,6 +8,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.PARTICIPANTS
 import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogotool.firebase.node.*
@@ -15,7 +16,6 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
 import io.stanc.pogotool.utils.Async.awaitResponse
 import io.stanc.pogotool.utils.KotlinUtils
-import io.stanc.pogotool.utils.ObserverManager
 import kotlinx.coroutines.*
 import java.lang.Exception
 import java.lang.ref.WeakReference
@@ -55,30 +55,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
-    private val arenaDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
-        override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            FirebaseArena.new(dataSnapshot)?.let { arena ->
-                arenaObserverManager.observers(arena.id).filterNotNull().forEach { it.onItemChanged(arena) }
-            }
-        }
-
-        override fun nodeRemoved(key: String) {
-            arenaObserverManager.observers(key).filterNotNull().forEach { it.onItemRemoved(key) }
-        }
-    }
-
-    private val raidMeetupDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
-        override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            FirebaseRaidMeetup.new(dataSnapshot)?.let { raidMeetup ->
-                raidMeetupObserverManager.observers(raidMeetup.id).filterNotNull().forEach { it.onItemChanged(raidMeetup) }
-            }
-        }
-
-        override fun nodeRemoved(key: String) {
-            raidMeetupObserverManager.observers(key).filterNotNull().forEach { it.onItemRemoved(key) }
-        }
-    }
-
     /**
      * delegation & observing
      */
@@ -89,13 +65,15 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         fun onItemRemoved(itemId: String)
     }
 
-    interface Observer<Item> {
-        fun onItemChanged(item: Item)
-        fun onItemRemoved(itemId: String)
-    }
-
-    private val arenaObserverManager = ObserverManager<Observer<FirebaseArena>>()
-    private val raidMeetupObserverManager = ObserverManager<Observer<FirebaseRaidMeetup>>()
+    private val arenaObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
+        FirebaseArena.new(dataSnapshot)
+    })
+    private val pokestopObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
+        FirebasePokestop.new(dataSnapshot)
+    })
+    private val raidMeetupObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
+        FirebaseRaidMeetup.new(dataSnapshot)
+    })
 
     /**
      * arenas
@@ -109,14 +87,12 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.createNodeByAutoId(arena.databasePath(), arena.data())
     }
 
-    fun addObserver(observer: Observer<FirebaseArena>, arena: FirebaseArena) {
-        FirebaseServer.addNodeEventListener("${arena.databasePath()}/${arena.id}", arenaDidChangeCallback)
-        arenaObserverManager.addObserver(observer, subId = arena.id)
+    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
+        arenaObserverManager.addObserver(observer, arena)
     }
 
-    fun removeObserver(observer: Observer<FirebaseArena>, arena: FirebaseArena) {
-        FirebaseServer.removeNodeEventListener("${arena.databasePath()}/${arena.id}", arenaDidChangeCallback)
-        arenaObserverManager.removeObserver(observer, subId = arena.id)
+    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
+        arenaObserverManager.removeObserver(observer, arena)
     }
 
     /**
@@ -144,14 +120,12 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS_ID", raidBoss.id, callbackForVoid())
     }
 
-    fun addObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
-        FirebaseServer.addNodeEventListener("$RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
-        raidMeetupObserverManager.addObserver(observer, subId = raidMeetupId)
+    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
+        raidMeetupObserverManager.addObserver(observer, raidMeetup)
     }
 
-    fun removeObserver(observer: Observer<FirebaseRaidMeetup>, raidMeetupId: String) {
-        FirebaseServer.removeNodeEventListener("$RAID_MEETUPS/$raidMeetupId", raidMeetupDidChangeCallback)
-        raidMeetupObserverManager.removeObserver(observer, subId = raidMeetupId)
+    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
+        raidMeetupObserverManager.removeObserver(observer, raidMeetup)
     }
 
     fun pushRaidMeetupParticipation(raidMeetupId: String) {
@@ -183,6 +157,14 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())
     }
 
+    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
+        pokestopObserverManager.addObserver(observer, pokestop)
+    }
+
+    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
+        pokestopObserverManager.removeObserver(observer, pokestop)
+    }
+
     /**
      * raid bosses
      */
@@ -192,13 +174,37 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.requestDataChilds(RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
+                Log.i(TAG, "Debug:: onSuccess, data: $data")
                 val raidBosses = mutableListOf<FirebaseRaidbossDefinition>()
                 data?.forEach { FirebaseRaidbossDefinition.new(it)?.let { raidBosses.add(it) } }
                 onCompletionCallback(raidBosses)
             }
 
             override fun onFailed(message: String?) {
-                Log.d(TAG, "loadRaidBosses failed. Error: $message")
+                Log.e(TAG, "loadRaidBosses failed. Error: $message")
+                onCompletionCallback(null)
+            }
+
+        })
+    }
+
+    /**
+     * Quests
+     */
+
+    fun loadQuests(onCompletionCallback: (quests: List<FirebaseQuestDefinition>?) -> Unit) {
+
+        FirebaseServer.requestDataChilds(QUESTS, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+
+            override fun onSuccess(data: List<DataSnapshot>?) {
+                Log.i(TAG, "Debug:: onSuccess, data: $data")
+                val quests = mutableListOf<FirebaseQuestDefinition>()
+                data?.forEach { FirebaseQuestDefinition.new(it)?.let { quests.add(it) } }
+                onCompletionCallback(quests)
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "loadQuests failed. Error: $message")
                 onCompletionCallback(null)
             }
 

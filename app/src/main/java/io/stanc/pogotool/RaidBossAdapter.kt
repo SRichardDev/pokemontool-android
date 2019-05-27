@@ -53,7 +53,7 @@ class RaidBossAdapter(private val context: Context,
 
         holder.id = raidBosses[position].id
 
-        val drawable = RaidBossImageMapper.raidBossDrawable(context, raidBosses[position].imageName)
+        val drawable = FirebaseImageMapper.raidBossDrawable(context, raidBosses[position].imageName)
         holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
 
         holder.itemView.findViewById<TextView>(R.id.list_item_raidboss_name).text = raidBosses[position].name

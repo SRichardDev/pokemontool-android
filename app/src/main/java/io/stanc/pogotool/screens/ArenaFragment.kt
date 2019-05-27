@@ -18,7 +18,8 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.RaidBossImageMapper
+import io.stanc.pogotool.FirebaseImageMapper
+import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.utils.KotlinUtils.safeLet
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.TimeCalculator
@@ -31,13 +32,9 @@ class ArenaFragment: Fragment() {
     private var arena: FirebaseArena? = null
         set(value) {
             field = value
-            updateLayout()
 
-            value?.let {
-                viewModel?.updateData(value) ?: kotlin.run {
-                    viewModel = RaidViewModel(it)
-                }
-            }
+            updateViewModel(value)
+            updateLayout()
         }
 
 
@@ -49,7 +46,7 @@ class ArenaFragment: Fragment() {
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
     private var raidBossesFragment: RaidBossFragment? = null
 
-    private val arenaObserver = object: FirebaseDatabase.Observer<FirebaseArena> {
+    private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
 
         override fun onItemChanged(item: FirebaseArena) {
             arena = item
@@ -61,8 +58,7 @@ class ArenaFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentArenaBinding>(inflater,
-            R.layout.fragment_arena, container, false)
+        val binding = DataBindingUtil.inflate<FragmentArenaBinding>(inflater, R.layout.fragment_arena, container, false)
         binding.viewmodel = viewModel
         viewBinding = binding
 
@@ -213,13 +209,21 @@ class ArenaFragment: Fragment() {
     }
 
     private fun setIconRaid(imageView: ImageView, context: Context, arena: FirebaseArena) {
-        val raidDrawable = RaidBossImageMapper.raidDrawable(context, arena)
+        val raidDrawable = FirebaseImageMapper.raidDrawable(context, arena)
         imageView.setImageDrawable(raidDrawable)
     }
 
     /**
      * viewmodel
      */
+
+    private fun updateViewModel(arena: FirebaseArena?) {
+        arena?.let {
+            viewModel?.updateData(arena) ?: kotlin.run {
+                viewModel = RaidViewModel(it)
+            }
+        }
+    }
 
     private fun updateLayout() {
         viewBinding?.root?.apply {

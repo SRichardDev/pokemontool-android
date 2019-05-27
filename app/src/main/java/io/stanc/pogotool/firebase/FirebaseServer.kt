@@ -6,7 +6,6 @@ import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
-import io.stanc.pogotool.firebase.data.FirebaseData
 import io.stanc.pogotool.firebase.node.FirebaseNode
 import java.lang.ref.WeakReference
 

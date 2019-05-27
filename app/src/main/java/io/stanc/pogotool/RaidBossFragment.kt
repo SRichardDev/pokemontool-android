@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 
 class RaidBossFragment: Fragment() {
@@ -23,7 +24,7 @@ class RaidBossFragment: Fragment() {
     }
 
     fun showRaidBossList(raidLevel: Int) {
-        val raidBossesToShow = RaidBossImageMapper.raidBosses.filter { it.level.toInt() == raidLevel }
+        val raidBossesToShow = FirebaseDefinitions.raidBosses.filter { it.level.toInt() == raidLevel }
         setupList(raidBossesToShow)
     }
 

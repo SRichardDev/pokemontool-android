@@ -17,7 +17,8 @@
     <string name="spinner_title_sign_in">Einloggen…</string>
     <string name="spinner_title_email_verification">Daten werden gesendet…</string>
     <string name="spinner_title_map_data">Kartenelemente werden geladen…</string>
-    <string name="spinner_title_raid_data">Raid Daten werden geladen…</string>
+    <string name="spinner_title_loading_data_1">Durchsuche hohes Gras in der Umgebung…</string>
+    <string name="spinner_title_loading_data_2">Befülle Rucksack…</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_header_account_state">Account Status:</string>
@@ -108,6 +109,7 @@
     <!-- Pokestop -->
     <string name="pokestop_active_quest">Aktive Quest:</string>
     <string name="pokestop_quest_reward">Belohnung:</string>
+    <string name="pokestop_quest_none">Kein Quest gemeldet</string>
 
     <!-- Commmon -->
     <string name="coordinates">Koordinaten:</string>

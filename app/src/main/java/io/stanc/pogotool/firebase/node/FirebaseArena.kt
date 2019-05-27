@@ -17,7 +17,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
-import io.stanc.pogotool.RaidBossImageMapper
+import io.stanc.pogotool.FirebaseImageMapper
 
 data class FirebaseArena(
     override val id: String,
@@ -46,7 +46,7 @@ data class FirebaseArena(
 
     fun icon(context: Context, iconConfig: IconConfig): Bitmap {
 
-        val foregroundDrawable = RaidBossImageMapper.raidDrawable(context, this)
+        val foregroundDrawable = FirebaseImageMapper.raidDrawable(context, this)
         Log.i(TAG, "Debug:: icon(arena: $this), foregroundDrawable: $foregroundDrawable")
 
         return if (isEX) {

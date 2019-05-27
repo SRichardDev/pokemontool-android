@@ -1,6 +1,6 @@
 #!/bin/bash
 
-input_dir=$(pwd)/../models/official-artwork
+input_dir=$(pwd)/../models/pokemon-artwork
 output_dir=$(pwd)/app/src/main/assets/raidbosses
 
 mkdir -p ${output_dir}

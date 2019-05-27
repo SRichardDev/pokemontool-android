@@ -32,7 +32,7 @@ object DatabaseKeys {
 
     // Quests
     const val QUESTS = "quests"
-    const val QUEST_IMAGE_NAME = "name"
+    const val QUEST_IMAGE_NAME = "imageName"
     const val QUEST = "quest"
     const val QUEST_REWARD = "reward"
     const val QUEST_ID = "definitionId"

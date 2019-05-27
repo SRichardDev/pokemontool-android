@@ -15,6 +15,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.map.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
@@ -26,7 +27,6 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
-import io.stanc.pogotool.RaidBossImageMapper
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -85,7 +85,7 @@ class MapInteractionFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.app_name))
-        firebase?.let { RaidBossImageMapper.loadRaidBosses(it) }
+        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
     }
 
     private fun setupMapFragment() {
@@ -106,12 +106,12 @@ class MapInteractionFragment: Fragment() {
                         }
 
                         override fun onPokestopInfoWindowClicked(pokestop: FirebasePokestop) {
-                            Log.i(TAG, "Debug:: onPokestopInfoWindowClicked($pokestop)")
+                            showPokestopFragment(pokestop)
                         }
 
                     }).let { manager ->
                         firebase = FirebaseDatabase(manager.pokestopDelegate, manager.arenaDelegate)
-                        firebase?.let { RaidBossImageMapper.loadRaidBosses(it) }
+                        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
                         clusterManager = manager
                     }
                 }
@@ -237,6 +237,11 @@ class MapInteractionFragment: Fragment() {
 
     private fun showArenaFragment(arena: FirebaseArena) {
         val fragment = ArenaFragment.newInstance(arena)
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+    }
+
+    private fun showPokestopFragment(pokestop: FirebasePokestop) {
+        val fragment = PokestopFragment.newInstance(pokestop)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
