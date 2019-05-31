@@ -126,7 +126,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
 
         override fun onItemChanged(item: FirebasePokestop) {
-            Log.v(TAG, "Debug:: onItemChanged($item)")
             onItemRemoved(item.id)
             onItemAdded(item)
             pokestopClustering.trigger()
@@ -155,7 +154,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
 
         override fun onItemChanged(item: FirebaseArena) {
-            Log.v(TAG, "Debug:: onItemChanged($item)")
             onItemRemoved(item.id)
             onItemAdded(item)
             arenaClustering.trigger()

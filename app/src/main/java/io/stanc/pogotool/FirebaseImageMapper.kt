@@ -40,10 +40,7 @@ object FirebaseImageMapper {
                     }
                 }
 
-                RaidState.NONE -> {
-                    Log.e(TAG, "RaidState is None, no raid image could be picked!")
-                    return null
-                }
+                RaidState.NONE -> return null
             }
         }
 

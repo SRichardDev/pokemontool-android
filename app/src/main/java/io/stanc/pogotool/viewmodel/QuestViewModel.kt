@@ -45,7 +45,7 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
                 questExists.set(true)
-                quest.set(questDefinition.quest)
+                quest.set(questDefinition.questDescription)
                 reward.set(questDefinition.reward)
                 imageName = questDefinition.imageName
 

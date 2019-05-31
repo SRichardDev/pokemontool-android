@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.support.v7.widget.DividerItemDecoration
-
 
 
 abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
@@ -61,7 +60,7 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
         val rootLayout = inflater.inflate(fragmentLayoutRes, container, false)
 
         recyclerView = rootLayout.findViewById(recyclerViewIdRes)
-        showList(initItemList)
+        setupList(initItemList)
 
         return rootLayout
     }

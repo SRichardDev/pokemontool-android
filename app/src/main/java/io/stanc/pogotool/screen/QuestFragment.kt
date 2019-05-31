@@ -1,7 +1,11 @@
 package io.stanc.pogotool.screen
 
 import android.content.Context
+import android.databinding.adapters.SearchViewBindingAdapter
+import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.SearchView
 import io.stanc.pogotool.recyclerviewadapter.QuestAdapter
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
@@ -18,6 +22,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
 
     private var pokestop: FirebasePokestop? = null
     private val firebase = FirebaseDatabase()
+    private var adapter: QuestAdapter? = null
 
     override val fragmentLayoutRes: Int
         get() = R.layout.fragment_quest
@@ -42,7 +47,29 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
             }
         }
 
+        this.adapter = adapter
         return adapter
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupQueryTextView(view)
+    }
+
+    private fun setupQueryTextView(rootLayout: View) {
+
+        rootLayout.findViewById<SearchView>(R.id.quest_searchview)?.setOnQueryTextListener(object: SearchViewBindingAdapter.OnQueryTextChange, SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(p0: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                adapter?.filter(newText)
+                return false
+            }
+
+        }) ?: kotlin.run { Log.e(TAG, "no quest_searchview found in view: $view") }
     }
 
     private fun tryToSendNewQuest(list: List<FirebaseQuestDefinition>, itemId: Any) {

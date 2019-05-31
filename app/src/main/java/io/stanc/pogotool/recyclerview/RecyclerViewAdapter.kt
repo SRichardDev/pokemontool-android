@@ -9,8 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
+
 abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Context,
-                                   private val itemList: List<ItemType>): RecyclerView.Adapter<RecyclerViewAdapter<ItemType>.Holder>() {
+                                   private var itemList: MutableList<ItemType>): RecyclerView.Adapter<RecyclerViewAdapter<ItemType>.Holder>() {
     private val TAG = javaClass.name
 
     private val itemViews = mutableListOf<View>()
@@ -27,7 +28,7 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
     @get:IdRes
     abstract val clickableItemViewIdRes: Int
 
-    abstract fun onItemViewCreated(holder: Holder, position: Int)
+    abstract fun onItemViewCreated(holder: Holder, id: Any)
 
     interface OnItemClickListener {
         fun onClick(id: Any)
@@ -41,11 +42,7 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
 
     var onItemClickListener: OnItemClickListener? = null
 
-    fun getItem(id: Any): ItemType {
-        val item = itemList.first { it.id == id }
-        Log.d(TAG, "Debug:: getItem(id: $id), found item: $item, in itemList: $itemList")
-        return item
-    }
+    fun getItem(id: Any): ItemType = itemList.first { it.id == id }
 
     override fun getItemCount() = itemList.size
 
@@ -54,6 +51,13 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
             it.isSelected = false
         }
         selectedItem = null
+    }
+
+    fun updateList(newItemList: List<ItemType>) {
+        itemViews.clear()
+        itemList.clear()
+        itemList.addAll(newItemList)
+        notifyDataSetChanged()
     }
 
     /**
@@ -71,6 +75,20 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
         }
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val itemLayout = LayoutInflater.from(context).inflate(itemLayoutRes, parent, false)
+        return Holder(null, itemLayout)
+    }
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        holder.itemView.isSelected = false
+
+        itemList[position].id.apply {
+            holder.id = this
+            onItemViewCreated(holder, this)
+        }
+    }
+
     private fun selectItem(itemLayout: View, itemId: Any) {
 
         if (onlyOneItemIsSelectable) {
@@ -81,17 +99,5 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
         selectedItem = getItem(itemId)
 
         onItemClickListener?.onClick(itemId)
-        Log.d(TAG, "Debug:: selectItem(itemId: $itemId), itemLayout.isSelected: ${itemLayout.isSelected}, selectedItem: $selectedItem")
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val itemLayout = LayoutInflater.from(context).inflate(itemLayoutRes, parent, false)
-        return Holder(null, itemLayout)
-    }
-
-    override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.itemView.isSelected = false
-        holder.id = itemList[position].id
-        onItemViewCreated(holder, position)
     }
 }

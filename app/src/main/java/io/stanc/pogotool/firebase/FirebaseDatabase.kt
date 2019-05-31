@@ -47,7 +47,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         private val pokestopDelegate = WeakReference(pokestopDelegate)
 
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
-//            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
             dataSnapshot.children.forEach { child ->
                 FirebasePokestop.new(child)?.let { this.pokestopDelegate.get()?.onItemChanged(it) }
             }
@@ -111,7 +110,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
         val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
+
         raidMeetupId?.let { id ->
             FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
             pushRaidMeetupParticipation(id)
@@ -159,28 +158,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun pushPokestop(pokestop: FirebasePokestop) {
         FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())
     }
-
-    fun pushQuest(quest: FirebaseQuest) {
-        FirebaseServer.setNode(quest)
-//        FirebaseServer.setData("$questDatabasePath/$QUEST_ID", quest.id, callbackForVoid())
-//        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-//        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
-//        raidMeetupId?.let { id ->
-//            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
-//            pushRaidMeetupParticipation(id)
-//        }
-//        return raidMeetupId
-    }
-
-//    fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
-//        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-//        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
-//        raidMeetupId?.let { id ->
-//            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
-//            pushRaidMeetupParticipation(id)
-//        }
-//        return raidMeetupId
-//    }
 
     fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
         pokestopObserverManager.addObserver(observer, pokestop)
@@ -232,6 +209,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             }
 
         })
+    }
+
+    fun pushQuest(quest: FirebaseQuest) {
+        FirebaseServer.setNode(quest)
     }
 
     /**
@@ -360,9 +341,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
         for (child in dataSnapshots) {
             for (registered_user in child.child(REGISTERED_USERS).children) {
-//                Log.v(TAG, "Debug:: registered_user key: ${registered_user.key}, value: ${registered_user.value}")
                 if (registered_user.key == usersNotificationToken) {
-//                    Log.d(TAG, "Debug:: new geoHash: key: ${child.key}, value: ${child.value}")
                     val geoHash = GeoHash(child.key as String)
                     geoHashes.add(geoHash)
                 }

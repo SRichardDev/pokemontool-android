@@ -10,7 +10,7 @@ import io.stanc.pogotool.recyclerview.RecyclerViewAdapter
 
 
 class RaidBossAdapter(private val context: Context,
-                      private val raidBosses: List<FirebaseRaidbossDefinition>): RecyclerViewAdapter<FirebaseRaidbossDefinition>(context, raidBosses) {
+                      private val raidBosses: List<FirebaseRaidbossDefinition>): RecyclerViewAdapter<FirebaseRaidbossDefinition>(context, raidBosses.toMutableList()) {
 
     override val itemLayoutRes: Int
         get() = R.layout.layout_list_item_raidboss
@@ -20,10 +20,14 @@ class RaidBossAdapter(private val context: Context,
 
     override val onlyOneItemIsSelectable: Boolean = true
 
-    override fun onItemViewCreated(holder: Holder, position: Int) {
-        val drawable = FirebaseImageMapper.raidBossDrawable(context, raidBosses[position].imageName)
-        holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
+    override fun onItemViewCreated(holder: Holder, id: Any) {
 
-        holder.itemView.findViewById<TextView>(R.id.list_item_raidboss_name).text = raidBosses[position].name
+        raidBosses.find { it.id == id }?.let { raidBossDefinition ->
+
+            val drawable = FirebaseImageMapper.raidBossDrawable(context, raidBossDefinition.imageName)
+            holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
+
+            holder.itemView.findViewById<TextView>(R.id.list_item_raidboss_name).text = raidBossDefinition.name
+        }
     }
 }

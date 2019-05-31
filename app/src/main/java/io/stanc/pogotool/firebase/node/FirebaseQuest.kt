@@ -38,15 +38,14 @@ data class FirebaseQuest private constructor(
         private val TAG = javaClass.name
 
         fun new(pokestopId: String, geoHash: GeoHash, dataSnapshot: DataSnapshot): FirebaseQuest? {
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val definitionId = dataSnapshot.child(QUEST_ID).value as? String
             val submitter = dataSnapshot.child(SUBMITTER).value as? String
             val timestamp = dataSnapshot.child(TIMESTAMP).value as? Long
 
-            Log.v(TAG, "id: $id, definitionId: $definitionId, submitter: $submitter, timestamp: $timestamp, pokestopId: $pokestopId, geoHash: $geoHash")
-
+//            Log.v(TAG, "id: $id, definitionId: $definitionId, submitter: $submitter, timestamp: $timestamp, pokestopId: $pokestopId, geoHash: $geoHash")
             if (id != null && definitionId != null && submitter != null && timestamp != null) {
                 return FirebaseQuest(id, definitionId, submitter, timestamp, geoHash, pokestopId)
             }
