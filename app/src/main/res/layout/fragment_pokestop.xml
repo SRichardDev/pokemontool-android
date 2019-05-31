@@ -6,9 +6,8 @@
     <data>
         <variable
             name="viewmodel"
-            type="io.stanc.pogotool.viewmodels.QuestViewModel" />
+            type="io.stanc.pogotool.viewmodel.QuestViewModel" />
         <import type="android.view.View"/>
-        <!--<import type="io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState"/>-->
     </data>
 
     <ScrollView
@@ -29,6 +28,17 @@
                       app:layout_constraintEnd_toEndOf="parent"
                       app:layout_constraintStart_toStartOf="parent"
                       app:layout_constraintTop_toTopOf="parent"/>
+
+            <Button
+                android:id="@+id/pokestop_button_new_quest"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/pokestop_quest_button_new_quest"
+                android:visibility="@{viewmodel.questExists ? View.GONE : View.VISIBLE}"
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

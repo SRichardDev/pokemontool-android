@@ -11,8 +11,8 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
-import io.stanc.pogotool.screens.AccountFragment
-import io.stanc.pogotool.screens.MapInteractionFragment
+import io.stanc.pogotool.screen.AccountFragment
+import io.stanc.pogotool.screen.MapInteractionFragment
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.activity_drawer.*

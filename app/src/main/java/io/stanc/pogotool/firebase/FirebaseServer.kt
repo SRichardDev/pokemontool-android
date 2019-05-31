@@ -13,8 +13,16 @@ import java.lang.ref.WeakReference
 object FirebaseServer {
     private val TAG = javaClass.name
 
+    init {
+        // TODO: syncing data and offline handling
+        // https@ //firebase.google.com/docs/database/android/offline-capabilities
+        // https://stackoverflow.com/questions/40190234/firebase-what-is-the-difference-between-setpersistenceenabled-and-keepsynced
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+
+    }
+
     // TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
-    internal val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance().reference
 
     /**
      * callbacks

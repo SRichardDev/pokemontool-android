@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.geohash.GeoHash
 
 class MapGridProvider(private val googleMap: GoogleMap) {
@@ -27,7 +28,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
         val geoHash = GeoHash(
             latlng.latitude,
             latlng.longitude,
-            MapGridProvider.GEO_HASH_AREA_PRECISION
+            GEO_HASH_AREA_PRECISION
         )
         toggleGeoHashGrid(geoHash)
     }
@@ -48,7 +49,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
     }
 
     fun showGeoHashGrid(location: Location) {
-        val geoHash = GeoHash(location, MapGridProvider.GEO_HASH_AREA_PRECISION)
+        val geoHash = GeoHash(location, GEO_HASH_AREA_PRECISION)
         showGeoHashGrid(geoHash)
     }
 
@@ -56,7 +57,7 @@ class MapGridProvider(private val googleMap: GoogleMap) {
         val geoHash = GeoHash(
             latlng.latitude,
             latlng.longitude,
-            MapGridProvider.GEO_HASH_AREA_PRECISION
+            GEO_HASH_AREA_PRECISION
         )
         showGeoHashGrid(geoHash)
     }
@@ -91,9 +92,5 @@ class MapGridProvider(private val googleMap: GoogleMap) {
             polygon.remove()
         }
         geoHashList.clear()
-    }
-
-    companion object {
-        const val GEO_HASH_AREA_PRECISION: Int = 6
     }
 }

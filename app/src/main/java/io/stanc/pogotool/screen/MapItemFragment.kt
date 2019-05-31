@@ -1,4 +1,4 @@
-package io.stanc.pogotool.screens
+package io.stanc.pogotool.screen
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,7 +18,7 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
-import io.stanc.pogotool.screens.MapInteractionFragment.MapMode
+import io.stanc.pogotool.screen.MapInteractionFragment.MapMode
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
@@ -133,7 +133,7 @@ class MapItemFragment: Fragment() {
                     MapMode.NEW_ARENA -> {
                         map_item_edittext?.text?.toString()?.let { name ->
                             val isEX = map_item_checkbox_isex_arena?.isChecked?:kotlin.run { false }
-                            val arena = FirebaseArena("", name, geoHash, userId, isEX)
+                            val arena = FirebaseArena.new(name, geoHash, userId, isEX)
                             Log.d(TAG, "push arena: $arena")
                             firebase.pushArena(arena)
                         }

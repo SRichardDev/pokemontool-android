@@ -110,6 +110,7 @@
     <string name="pokestop_active_quest">Aktive Quest:</string>
     <string name="pokestop_quest_reward">Belohnung:</string>
     <string name="pokestop_quest_none">Kein Quest gemeldet</string>
+    <string name="pokestop_quest_button_new_quest">Neue Quest melden</string>
 
     <!-- Commmon -->
     <string name="coordinates">Koordinaten:</string>

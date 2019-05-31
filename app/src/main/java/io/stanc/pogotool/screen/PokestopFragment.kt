@@ -1,4 +1,4 @@
-package io.stanc.pogotool.screens
+package io.stanc.pogotool.screen
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
@@ -21,7 +22,8 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.map.MapFragment
 import io.stanc.pogotool.utils.KotlinUtils
-import io.stanc.pogotool.viewmodels.QuestViewModel
+import io.stanc.pogotool.utils.ShowFragmentManager
+import io.stanc.pogotool.viewmodel.QuestViewModel
 
 
 class PokestopFragment: Fragment() {
@@ -82,6 +84,12 @@ class PokestopFragment: Fragment() {
 
             viewBinding?.root?.apply {
 
+                this.findViewById<Button>(R.id.pokestop_button_new_quest)?.let {
+                    it.setOnClickListener {
+                        showQuestFragment(pokestop)
+                    }
+                }
+
                 this.findViewById<TextView>(R.id.map_item_infos_textview_coordinates)?.let { textView ->
                     val latitude = pokestop.geoHash.toLocation().latitude.toString()
                     val longitude = pokestop.geoHash.toLocation().longitude.toString()
@@ -133,6 +141,11 @@ class PokestopFragment: Fragment() {
         return KotlinUtils.safeLet(context, position) { _context, _position->
             map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
         } ?: kotlin.run { null }
+    }
+
+    private fun showQuestFragment(pokestop: FirebasePokestop) {
+        val fragment = QuestFragment.newInstance(pokestop)
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     companion object {

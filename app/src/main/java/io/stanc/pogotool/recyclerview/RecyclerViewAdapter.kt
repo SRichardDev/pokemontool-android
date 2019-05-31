@@ -1,0 +1,97 @@
+package io.stanc.pogotool.recyclerview
+
+import android.content.Context
+import android.support.annotation.IdRes
+import android.support.annotation.LayoutRes
+import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+
+abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Context,
+                                   private val itemList: List<ItemType>): RecyclerView.Adapter<RecyclerViewAdapter<ItemType>.Holder>() {
+    private val TAG = javaClass.name
+
+    private val itemViews = mutableListOf<View>()
+    var selectedItem: ItemType? = null
+        private set
+
+    /**
+     * customize
+     */
+
+    @get:LayoutRes
+    abstract val itemLayoutRes: Int
+
+    @get:IdRes
+    abstract val clickableItemViewIdRes: Int
+
+    abstract fun onItemViewCreated(holder: Holder, position: Int)
+
+    interface OnItemClickListener {
+        fun onClick(id: Any)
+    }
+
+    abstract val onlyOneItemIsSelectable: Boolean
+
+    /**
+     * interface
+     */
+
+    var onItemClickListener: OnItemClickListener? = null
+
+    fun getItem(id: Any): ItemType {
+        val item = itemList.first { it.id == id }
+        Log.d(TAG, "Debug:: getItem(id: $id), found item: $item, in itemList: $itemList")
+        return item
+    }
+
+    override fun getItemCount() = itemList.size
+
+    fun deselectAllItems() {
+        itemViews.forEach {
+            it.isSelected = false
+        }
+        selectedItem = null
+    }
+
+    /**
+     * private
+     */
+
+    inner class Holder(var id: Any?, itemLayout: View) : RecyclerView.ViewHolder(itemLayout) {
+        init {
+            itemViews.add(itemLayout)
+            itemLayout.findViewById<View>(clickableItemViewIdRes).setOnClickListener {
+                id?.let {
+                    selectItem(itemLayout, it)
+                }
+            }
+        }
+    }
+
+    private fun selectItem(itemLayout: View, itemId: Any) {
+
+        if (onlyOneItemIsSelectable) {
+            deselectAllItems()
+        }
+
+        itemLayout.isSelected = true
+        selectedItem = getItem(itemId)
+
+        onItemClickListener?.onClick(itemId)
+        Log.d(TAG, "Debug:: selectItem(itemId: $itemId), itemLayout.isSelected: ${itemLayout.isSelected}, selectedItem: $selectedItem")
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val itemLayout = LayoutInflater.from(context).inflate(itemLayoutRes, parent, false)
+        return Holder(null, itemLayout)
+    }
+
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        holder.itemView.isSelected = false
+        holder.id = itemList[position].id
+        onItemViewCreated(holder, position)
+    }
+}

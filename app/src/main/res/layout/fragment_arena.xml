@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="io.stanc.pogotool.viewmodels.RaidViewModel"/>
+            type="io.stanc.pogotool.viewmodel.RaidViewModel"/>
 
         <import type="android.view.View"/>
 

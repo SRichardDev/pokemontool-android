@@ -30,15 +30,14 @@ class FirebaseQuestDefinition(
         private val TAG = javaClass.name
 
         fun new(dataSnapshot: DataSnapshot): FirebaseQuestDefinition? {
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val quest = dataSnapshot.child(QUEST).value as? String
             val imageName = dataSnapshot.child(QUEST_IMAGE_NAME).value as? String
             val reward = dataSnapshot.child(QUEST_REWARD).value as? String
 
-            Log.v(TAG, "id: $id, quest: $quest, imageName: $imageName, reward: $reward")
-
+//            Log.v(TAG, "id: $id, quest: $quest, imageName: $imageName, reward: $reward")
             if (id != null && quest != null && imageName != null && reward != null) {
                 return FirebaseQuestDefinition(id, quest, imageName, reward)
             }

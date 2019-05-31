@@ -1,7 +1,9 @@
 package io.stanc.pogotool.firebase.node
 
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogotool.firebase.DatabaseKeys
 import io.stanc.pogotool.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_LEVEL
@@ -9,13 +11,14 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_TIME_LEFT
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_TIME_LEFT_EGG_HATCHES
 import io.stanc.pogotool.firebase.DatabaseKeys.TIMESTAMP
+import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider
 import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
 
-data class FirebaseRaid(override val id: String,
+data class FirebaseRaid private constructor(override val id: String,
                         val level: String,
                         val timeLeftEggHatches: String,
                         val timeLeft: String,
@@ -25,7 +28,7 @@ data class FirebaseRaid(override val id: String,
                         var raidBossId: String? = null,
                         var raidMeetupId: String? = null): FirebaseNode {
 
-    override fun databasePath(): String = "$ARENAS/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$arenaId/$RAID"
+    override fun databasePath(): String = "$ARENAS/${firebaseGeoHash(geoHash)}/$arenaId/$RAID"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()

@@ -1,4 +1,4 @@
-package io.stanc.pogotool.screens
+package io.stanc.pogotool.screen
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -200,7 +200,6 @@ class AccountFragment: Fragment(), View.OnClickListener {
     }
 
     private fun updateUserStateTexts() {
-        Log.d(TAG, "Debug:: updateUserStateTexts(), authentication_layout_user_name: $authentication_layout_user_name, authentication_layout_user_email: $authentication_layout_user_email")
 
         FirebaseUser.userData?.photoURL?.let { authentication_imageview_user?.setImageURI(it) }
 

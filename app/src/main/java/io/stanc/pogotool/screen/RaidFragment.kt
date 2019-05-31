@@ -1,4 +1,4 @@
-package io.stanc.pogotool.screens
+package io.stanc.pogotool.screen
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import io.stanc.pogotool.R
-import io.stanc.pogotool.RaidBossFragment
+import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
@@ -49,7 +49,6 @@ class RaidFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_raid, container, false)
-        Log.i(TAG, "Debug:: onCreateView()")
 
         setupEggImages(rootLayout)
         setupSwitches(rootLayout)
@@ -185,7 +184,7 @@ class RaidFragment: Fragment() {
         override fun onClick(p0: View) {
             deselectAllEggImageButtons(butLevel=level)
             selectEggImageButton(level)
-            raidBossesFragment?.showRaidBossList(level)
+            raidBossesFragment?.showList(level)
         }
     }
 
@@ -256,7 +255,7 @@ class RaidFragment: Fragment() {
 
             if (isEggAlreadyHatched) {
 
-                val raidbossId = raidBossesFragment?.selectedRaidBoss()?.id
+                val raidbossId = raidBossesFragment?.selectedItem()?.id
                 val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId, raidbossId)
                 pushRaidAndMeetupIfUserParticipates(raid)
 

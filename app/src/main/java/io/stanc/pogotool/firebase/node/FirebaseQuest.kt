@@ -2,15 +2,18 @@ package io.stanc.pogotool.firebase.node
 
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogotool.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.QUEST
 import io.stanc.pogotool.firebase.DatabaseKeys.QUEST_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.firebase.DatabaseKeys.TIMESTAMP
+import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
+import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.MapGridProvider
 
-class FirebaseQuest(
+data class FirebaseQuest private constructor(
     override val id: String,
     val definitionId: String,
     val submitter: String,
@@ -18,7 +21,7 @@ class FirebaseQuest(
     val geoHash: GeoHash,
     val pokestopId: String): FirebaseNode {
 
-    override fun databasePath(): String = "$POKESTOPS/${geoHash.toString().substring(0, MapGridProvider.GEO_HASH_AREA_PRECISION)}/$pokestopId/$QUEST"
+    override fun databasePath(): String = "$POKESTOPS/${firebaseGeoHash(geoHash)}/$pokestopId/$QUEST"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -49,6 +52,10 @@ class FirebaseQuest(
             }
 
             return null
+        }
+
+        fun new(pokestopId: String, geoHash: GeoHash, questDefinitionId: String, userId: String): FirebaseQuest {
+            return FirebaseQuest(QUEST, questDefinitionId, userId, FirebaseServer.timestamp(), geoHash, pokestopId)
         }
     }
 }

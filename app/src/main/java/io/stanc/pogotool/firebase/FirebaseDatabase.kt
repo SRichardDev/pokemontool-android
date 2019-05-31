@@ -3,14 +3,17 @@ package io.stanc.pogotool.firebase
 import android.util.Log
 import com.google.firebase.database.*
 import io.stanc.pogotool.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.PARTICIPANTS
 import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
+import io.stanc.pogotool.firebase.DatabaseKeys.QUEST_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
@@ -157,6 +160,28 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())
     }
 
+    fun pushQuest(quest: FirebaseQuest) {
+        FirebaseServer.setNode(quest)
+//        FirebaseServer.setData("$questDatabasePath/$QUEST_ID", quest.id, callbackForVoid())
+//        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
+//        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
+//        raidMeetupId?.let { id ->
+//            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
+//            pushRaidMeetupParticipation(id)
+//        }
+//        return raidMeetupId
+    }
+
+//    fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
+//        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
+//        Log.d(TAG, "Debug:: pushRaidMeetup(raidMeetup: $raidMeetup), raidMeetupId: $raidMeetupId")
+//        raidMeetupId?.let { id ->
+//            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
+//            pushRaidMeetupParticipation(id)
+//        }
+//        return raidMeetupId
+//    }
+
     fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
         pokestopObserverManager.addObserver(observer, pokestop)
     }
@@ -174,7 +199,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.requestDataChilds(RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
-                Log.i(TAG, "Debug:: onSuccess, data: $data")
                 val raidBosses = mutableListOf<FirebaseRaidbossDefinition>()
                 data?.forEach { FirebaseRaidbossDefinition.new(it)?.let { raidBosses.add(it) } }
                 onCompletionCallback(raidBosses)
@@ -197,7 +221,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.requestDataChilds(QUESTS, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
-                Log.i(TAG, "Debug:: onSuccess, data: $data")
                 val quests = mutableListOf<FirebaseQuestDefinition>()
                 data?.forEach { FirebaseQuestDefinition.new(it)?.let { quests.add(it) } }
                 onCompletionCallback(quests)
@@ -324,8 +347,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun formattedFirebaseGeoHash(geoHash: GeoHash): GeoHash? {
 
         val precision = geoHash.toString().length
-        return if (precision >= 6) {
-            GeoHash(geoHash.toString().substring(0, 6))
+        return if (precision >= GEO_HASH_AREA_PRECISION) {
+            GeoHash(firebaseGeoHash(geoHash))
         } else {
             null
         }

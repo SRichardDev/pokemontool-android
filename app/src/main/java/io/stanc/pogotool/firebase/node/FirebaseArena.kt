@@ -16,19 +16,18 @@ import io.stanc.pogotool.firebase.DatabaseKeys.NAME
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.map.MapGridProvider.Companion.GEO_HASH_AREA_PRECISION
 import io.stanc.pogotool.FirebaseImageMapper
+import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
 
-data class FirebaseArena(
+data class FirebaseArena private constructor(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
     val submitter: String,
     val isEX: Boolean = false,
-    // TODO: this should be a raidId, not a raidObject -> has to be changed on the firebase server structure: arenas/<geohash>/<arenaId>/data["raidId"] = raidId
     val raid: FirebaseRaid? = null): FirebaseNode {
 
-    override fun databasePath() = "$ARENAS/${geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)}"
+    override fun databasePath() = "$ARENAS/${firebaseGeoHash(geoHash)}"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -86,6 +85,10 @@ data class FirebaseArena(
             }
 
             return null
+        }
+
+        fun new(name: String, geoHash: GeoHash, userId: String, isEX: Boolean): FirebaseArena {
+            return FirebaseArena("", name, geoHash, userId, isEX)
         }
 
         fun baseIcon(context: Context, isEX: Boolean, iconConfig: IconConfig): Bitmap {

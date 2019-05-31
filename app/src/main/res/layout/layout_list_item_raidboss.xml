@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:layout_height="@dimen/raid_raidboss_list_height"
-              android:layout_width="@dimen/raid_raidboss_list_height"
+              android:id="@+id/list_item_raidboss"
+              android:layout_height="@dimen/recycleview_list_item_height"
+              android:layout_width="@dimen/recycleview_list_item_height"
               android:padding="@dimen/layout_margin_small"
               style="@style/ImageButton"
               android:orientation="vertical">

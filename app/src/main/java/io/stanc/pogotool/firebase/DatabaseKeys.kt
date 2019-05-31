@@ -1,5 +1,7 @@
 package io.stanc.pogotool.firebase
 
+import io.stanc.pogotool.geohash.GeoHash
+
 object DatabaseKeys {
 
     // Arenas
@@ -59,5 +61,8 @@ object DatabaseKeys {
     const val LATITUDE = "latitude"
     const val LONGITUDE = "longitude"
     const val TIMESTAMP = "timestamp"
+    const val GEO_HASH_AREA_PRECISION: Int = 6
+
+    fun firebaseGeoHash(geoHash: GeoHash): String = geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)
 
 }

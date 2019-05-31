@@ -1,4 +1,4 @@
-package io.stanc.pogotool.screens
+package io.stanc.pogotool.screen
 
 import android.content.Context
 import android.databinding.DataBindingUtil
@@ -13,7 +13,7 @@ import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
 import io.stanc.pogotool.R
-import io.stanc.pogotool.RaidBossFragment
+import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
@@ -23,7 +23,7 @@ import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.utils.KotlinUtils.safeLet
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.TimeCalculator
-import io.stanc.pogotool.viewmodels.RaidViewModel
+import io.stanc.pogotool.viewmodel.RaidViewModel
 import java.util.*
 
 
@@ -133,7 +133,7 @@ class ArenaFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_raidboss)?.let {
                 it.setOnClickListener {
-                    raidBossesFragment?.selectedRaidBoss()?.let {
+                    raidBossesFragment?.selectedItem()?.let {
                         viewModel?.sendRaidBoss(it)
                     }
                 }
@@ -196,7 +196,7 @@ class ArenaFragment: Fragment() {
 
     private fun setupRaidbossList() {
         raidBossesFragment = childFragmentManager.findFragmentById(R.id.fragment_raidbosses) as? RaidBossFragment
-        arena?.raid?.level?.let { raidBossesFragment?.showRaidBossList(it.toInt()) }
+        arena?.raid?.level?.let { raidBossesFragment?.showList(it.toInt()) }
     }
 
     /**

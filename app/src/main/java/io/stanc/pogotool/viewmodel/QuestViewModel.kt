@@ -1,4 +1,4 @@
-package io.stanc.pogotool.viewmodels
+package io.stanc.pogotool.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.content.Context
