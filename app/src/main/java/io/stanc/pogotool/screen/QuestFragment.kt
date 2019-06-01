@@ -16,6 +16,10 @@ import io.stanc.pogotool.firebase.node.FirebaseQuest
 import io.stanc.pogotool.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogotool.recyclerview.RecyclerViewAdapter
 import io.stanc.pogotool.recyclerview.RecyclerViewFragment
+import android.support.v7.app.AlertDialog
+import io.stanc.pogotool.App
+import io.stanc.pogotool.FirebaseImageMapper
+
 
 class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     private val TAG = javaClass.name
@@ -42,8 +46,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
         adapter.onItemClickListener = object : RecyclerViewAdapter.OnItemClickListener {
             override fun onClick(id: Any) {
                 // TODO: PopupFragment/AlertFragment
-                tryToSendNewQuest(list, id)
-                closeScreen()
+                showPopup(list, id)
             }
         }
 
@@ -72,26 +75,21 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
         }) ?: kotlin.run { Log.e(TAG, "no quest_searchview found in view: $view") }
     }
 
-    private fun tryToSendNewQuest(list: List<FirebaseQuestDefinition>, itemId: Any) {
+    @Throws(Exception::class)
+    private fun tryToSendNewQuest(questDefinition: FirebaseQuestDefinition) {
 
         pokestop?.let { pokestop ->
 
-            list.find { it.id == itemId }?.let { questDefinition ->
+            FirebaseUser.userData?.id?.let { userId ->
 
-                FirebaseUser.userData?.id?.let { userId ->
-
-                    sendNewQuest(pokestop, questDefinition, userId)
-
-                } ?: kotlin.run {
-                    Log.e(TAG, "could not send quest because user is not logged in. FirebaseUser.userData?: ${FirebaseUser.userData}")
-                }
+                sendNewQuest(pokestop, questDefinition, userId)
 
             } ?: kotlin.run {
-                Log.e(TAG, "could not find quest definition with id: $id in list: $list!")
+                throw Exception("could not send quest because user is not logged in. FirebaseUser.userData?: ${FirebaseUser.userData}")
             }
 
         } ?: kotlin.run {
-            Log.e(TAG, "could not send quest, because pokestop: $pokestop!")
+            throw Exception("could not send quest, because pokestop: $pokestop!")
         }
     }
 
@@ -103,6 +101,39 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     private fun closeScreen() {
         fragmentManager?.findFragmentByTag(this::class.java.name)?.let {
             fragmentManager?.beginTransaction()?.remove(it)?.commit()
+        }
+    }
+
+    private fun showPopup(list: List<FirebaseQuestDefinition>, itemId: Any) {
+
+        list.find { it.id == itemId }?.let { questDefinition ->
+
+            context?.let { context ->
+
+                val alertDialogBuilder = AlertDialog.Builder(context)
+                    .setTitle(App.geString(R.string.pokestop_quest_popup_title))
+                    .setMessage(questDefinition.questDescription)
+                    .setPositiveButton(R.string.pokestop_quest_popup_button_send) { dialog, which ->
+
+                        try {
+                            tryToSendNewQuest(questDefinition)
+                            closeScreen()
+
+                        } catch (e: Exception) {
+                            Log.e(TAG, e.message)
+                        }
+                    }
+                    .setNegativeButton(R.string.pokestop_quest_popup_button_cancel, null)
+
+                FirebaseImageMapper.questDrawable(context, questDefinition.imageName)?.let {
+                    alertDialogBuilder.setIcon(it)
+                }
+
+                alertDialogBuilder.show()
+            }
+
+        } ?: kotlin.run {
+            Log.e(TAG, "could not find quest definition with id: $id in list: $list!")
         }
     }
 

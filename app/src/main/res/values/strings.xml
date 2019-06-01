@@ -113,6 +113,9 @@
     <string name="pokestop_quest_button_new_quest">Neue Quest melden</string>
     <string name="pokestop_quest_title_new_quest">Neue Quest:</string>
     <string name="pokestop_quest_search_field_hint">Quests durchsuchen</string>
+    <string name="pokestop_quest_popup_title">Quest wirklich melden?</string>
+    <string name="pokestop_quest_popup_button_send">Senden</string>
+    <string name="pokestop_quest_popup_button_cancel">Abbrechen</string>
 
     <!-- Commmon -->
     <string name="coordinates">Koordinaten:</string>
