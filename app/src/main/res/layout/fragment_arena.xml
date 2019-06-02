@@ -10,8 +10,7 @@
             type="io.stanc.pogotool.viewmodel.RaidViewModel"/>
 
         <import type="android.view.View"/>
-
-        <import type="io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState"/>
+        <import type="io.stanc.pogotool.viewmodel.RaidStateViewModel.RaidState"/>
     </data>
 
     <ScrollView

@@ -11,8 +11,9 @@ object DatabaseKeys {
     const val RAID_LEVEL = "level"
     const val RAID_BOSS_ID = "raidBossId"
     const val RAID_MEETUP_ID = "raidMeetupId"
-    const val RAID_TIME_LEFT = "timeLeft"
-    const val RAID_TIME_LEFT_EGG_HATCHES = "timeLeftEggHatches"
+    const val RAID_TIME_END = "endTime"
+    const val RAID_TIME_EGG_HATCHES = "hatchTime"
+    const val RAID_DURATION = 45
 
     // Pokestops
     //    const val POKESTOPS = "pokestops"

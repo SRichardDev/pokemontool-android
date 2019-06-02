@@ -11,7 +11,7 @@ object ShowFragmentManager {
     fun showFragment(fragment: Fragment?, fragmentManager: FragmentManager?, @IdRes layoutResId: Int) {
 
         if (fragment == null || fragmentManager == null) {
-            Log.e(TAG, "could not show fragment: $fragment, fragmentManager: $fragmentManager!")
+            Log.e(TAG, "could not showInfo fragment: $fragment, fragmentManager: $fragmentManager!")
             return
         }
 
@@ -23,7 +23,7 @@ object ShowFragmentManager {
     fun replaceFragment(fragment: Fragment?, fragmentManager: FragmentManager?, @IdRes layoutResId: Int) {
 
         if (fragment == null || fragmentManager == null) {
-            Log.e(TAG, "could not show fragment: $fragment, fragmentManager: $fragmentManager!")
+            Log.e(TAG, "could not showInfo fragment: $fragment, fragmentManager: $fragmentManager!")
             return
         }
 

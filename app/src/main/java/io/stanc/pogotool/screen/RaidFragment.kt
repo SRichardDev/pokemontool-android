@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import io.stanc.pogotool.Popup
 import io.stanc.pogotool.R
 import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
@@ -43,7 +44,8 @@ class RaidFragment: Fragment() {
     private var raidLevel: Int = 3
     private var isEggAlreadyHatched: Boolean = false
     private var isUserParticipating: Boolean = false
-    private var timeUntilEvent: Int = 0
+    private var timeUntilEventHour: Int = Calendar.getInstance().time.hours
+    private var timeUntilEventMinutes: Int = Calendar.getInstance().time.minutes
     private var meetupTimeHour: Int = Calendar.getInstance().time.hours
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
 
@@ -140,14 +142,22 @@ class RaidFragment: Fragment() {
 
     private fun setupTimePicker(rootLayout: View) {
 
-        // egg formattedTime
+        // egg/raid formattedTime
 
-        val eggPicker = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg)
-        eggPicker.minValue = 0
-        eggPicker.maxValue = 60
-        eggPicker.value = timeUntilEvent
-        eggPicker.setOnValueChangedListener { _, _, newValue ->
-            timeUntilEvent = newValue
+        val eventPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg_hours)
+        eventPickerHour.minValue = 0
+        eventPickerHour.maxValue = 23
+        eventPickerHour.value = timeUntilEventHour
+        eventPickerHour.setOnValueChangedListener { _, _, newValue ->
+            timeUntilEventHour = newValue
+        }
+
+        val eventPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg_minutes)
+        eventPickerMinutes.minValue = 0
+        eventPickerMinutes.maxValue = 59
+        eventPickerMinutes.value = timeUntilEventMinutes
+        eventPickerMinutes.setOnValueChangedListener { _, _, newValue ->
+            timeUntilEventMinutes = newValue
         }
 
         // meetup formattedTime
@@ -162,7 +172,7 @@ class RaidFragment: Fragment() {
 
         val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_minutes)
         meetupPickerMinutes.minValue = 0
-        meetupPickerMinutes.maxValue = 60
+        meetupPickerMinutes.maxValue = 59
         meetupPickerMinutes.value = meetupTimeMinutes
         meetupPickerMinutes.setOnValueChangedListener { _, _, newValue ->
             meetupTimeMinutes = newValue
@@ -171,7 +181,7 @@ class RaidFragment: Fragment() {
 
     private fun setupButton(rootLayout: View) {
         rootLayout.findViewById<Button>(R.id.raid_button_send)?.setOnClickListener {
-            sendData()
+            tryToSendData()
         }
     }
 
@@ -249,25 +259,37 @@ class RaidFragment: Fragment() {
      * send data
      */
 
-    private fun sendData() {
+    private fun tryToSendData() {
 
-        KotlinUtils.safeLet(arenaId, geoHash, raidLevel) { arenaId, geoHash, raidLevel ->
+        KotlinUtils.safeLet(arenaId, geoHash) { arenaId, geoHash ->
 
             if (isEggAlreadyHatched) {
 
-                val raidbossId = raidBossesFragment?.selectedItem()?.id
-                val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId, raidbossId)
-                pushRaidAndMeetupIfUserParticipates(raid)
+                raidBossesFragment?.selectedItem()?.id?.let {  raidbossId ->
+                    sendRaid(geoHash, arenaId, raidbossId)
+                } ?: kotlin.run {
+                    Popup.showInfo(context, R.string.popup_info_missing_raidboss_id_title)
+                }
 
             } else {
-
-                val raid = FirebaseRaid.new(raidLevel, timeUntilEvent, geoHash, arenaId)
-                pushRaidAndMeetupIfUserParticipates(raid)
+                sendEgg(geoHash, arenaId)
             }
 
-            closeScreen()
+        } ?: kotlin.run {
+            Log.e(TAG, "tryToSendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!")
+        }
+    }
 
-        } ?: kotlin.run { Log.e(TAG, "sendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!") }
+    private fun sendRaid(geoHash: GeoHash, arenaId: String, raidbossId: String) {
+        val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId, raidbossId)
+        pushRaidAndMeetupIfUserParticipates(raid)
+        closeScreen()
+    }
+
+    private fun sendEgg(geoHash: GeoHash, arenaId: String) {
+        val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId)
+        pushRaidAndMeetupIfUserParticipates(raid)
+        closeScreen()
     }
 
     private fun pushRaidAndMeetupIfUserParticipates(raid: FirebaseRaid) {

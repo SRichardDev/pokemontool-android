@@ -10,6 +10,7 @@ import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.node.FirebasePokestop
+import io.stanc.pogotool.utils.TimeCalculator.currentDay
 
 class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
 
@@ -44,7 +45,11 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
 
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
-                questExists.set(true)
+                val validQuest = (firebaseQuest.timestamp as? Long)?.let { timestamp ->
+                    currentDay(timestamp)
+                } ?: kotlin.run { false }
+
+                questExists.set(validQuest)
                 quest.set(questDefinition.questDescription)
                 reward.set(questDefinition.reward)
                 imageName = questDefinition.imageName

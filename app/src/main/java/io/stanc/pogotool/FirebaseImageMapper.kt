@@ -5,7 +5,8 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import io.stanc.pogotool.firebase.FirebaseDefinitions.raidBosses
 import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.firebase.node.FirebaseRaid.RaidState
+import io.stanc.pogotool.viewmodel.RaidStateViewModel
+import io.stanc.pogotool.viewmodel.RaidStateViewModel.RaidState
 import java.io.IOException
 
 object FirebaseImageMapper {
@@ -13,11 +14,11 @@ object FirebaseImageMapper {
     private val TAG = javaClass.name
 
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
-//        Log.v(TAG, "Debug:: raidDrawable for raid: ${arena?.raid}, currentRaidState: ${arena?.raid?.currentRaidState()?.name}, raidBossId: ${arena?.raid?.raidBossId}, level: ${arena?.raid?.level}")
 
         arena?.raid?.let { raid ->
+//            Log.v(TAG, "Debug:: raidDrawable for raid: $raid, currentRaidState: ${RaidStateViewModel(raid).currentRaidState().name}, raidBossId: ${raid.raidBossId}, level: ${raid.level}")
 
-            when(raid.currentRaidState()) {
+            when(RaidStateViewModel(raid).currentRaidState()) {
 
                 RaidState.RAID_RUNNING -> {
                     raid.raidBossId?.let { id ->

@@ -84,8 +84,8 @@
     <string name="raid_eggs_title">Raid Level:</string>
     <string name="raid_check_egg">Raid läuft bereits?</string>
     <string name="raid_raidboss_selection">Mögliche Raidbosse:</string>
-    <string name="raid_text_time_egg">Ei schlüpft nach wie vielen Minuten?</string>
-    <string name="raid_text_time_raid">Wieviele Minuten läuft der Raid noch?</string>
+    <string name="raid_text_time_egg">Das Ei schlüpft um [h/min]:</string>
+    <string name="raid_text_time_raid">Der Raid läuft ab um [h/min]:</string>
     <string name="raid_check_participation">Nimmst du am Raid teil?</string>
     <string name="raid_text_time_meetup">Treffzeitpunkt [h/min]:</string>
     <string name="raid_button_send">Raid melden</string>
@@ -124,5 +124,10 @@
 
     <!-- Exceptions -->
     <string name="exceptions_no_user">User wurde nicht gefunden.</string>
+
+    <!-- Popups -->
+    <string name="popup_info_button_neutral">OK</string>
+
+    <string name="popup_info_missing_raidboss_id_title">Bitte wähle den korrekten Raidboss aus.</string>
 
 </resources>
