@@ -72,6 +72,20 @@ object TimeCalculator {
         return calendar.time
     }
 
+    fun minutesUntil(timestamp: Long, time: String): Long? {
+        val diff = nextDateAfterTimestamp(timestamp, time)?.let { date ->
+            Log.d(TAG, "Time:: minutesUntil($timestamp, $time) date: $date, current: ${currentDate()}")
+            val diffTime = date.time - currentDate().time
+            diffTime / (1000 * 60)
+        } ?: kotlin.run {
+            null
+        }
+
+        Log.d(TAG, "Time:: minutesUntil($timestamp, $time) => $diff")
+
+        return diff
+    }
+
     /**
      * time comparison
      */

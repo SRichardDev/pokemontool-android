@@ -12,6 +12,14 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.DelayedTrigger
 import java.lang.ref.WeakReference
+import android.databinding.adapters.TextViewBindingAdapter.setText
+import android.os.CountDownTimer
+import io.stanc.pogotool.firebase.node.FirebaseRaid
+import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.TimeCalculator
+import io.stanc.pogotool.viewmodel.RaidStateViewModel
+import io.stanc.pogotool.viewmodel.RaidViewModel
+import java.util.concurrent.TimeUnit
 
 
 class ClusterManager(context: Context, googleMap: GoogleMap, private val delegate: MarkerDelegate) {
@@ -150,6 +158,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
                 val clusterItem = ClusterArena.new(item)
                 arenaClusterManager.addItem(clusterItem)
                 items[clusterItem.arena.id] = WeakReference(clusterItem)
+
+                startRaidRefreshTimerIfValid(item)
             }
         }
 
@@ -168,5 +178,47 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
 
         private val items: HashMap<String, WeakReference<ClusterArena>> = HashMap()
+    }
+
+    /**
+     * timer
+     */
+
+    private fun startRaidRefreshTimerIfValid(arena: FirebaseArena) {
+
+        arena.raid?.let { raid ->
+
+            val viewModel = RaidStateViewModel(raid)
+
+            KotlinUtils.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
+                TimeCalculator.minutesUntil(timestamp, raidTime)?.let { minutes ->
+                    if (minutes > 0) {
+                        runRefreshTimer(minutes+1, arena)
+                    }
+                }
+
+            } ?: kotlin.run {
+                Log.e(
+                    TAG,
+                    "Debug:: viewModel.raidTime: ${viewModel.raidTime.get()}, raid.timestamp: ${raid.timestamp} for $raid"
+                )
+            }
+        }
+    }
+
+    private fun runRefreshTimer(minutes: Long, arena: FirebaseArena) {
+
+        Log.i(TAG, "Timer:: runRefreshTimer for $minutes minutes for arena: ${arena.name}")
+        object : CountDownTimer(TimeUnit.MINUTES.toMillis(minutes), TimeUnit.MINUTES.toMillis(1)) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                Log.i(TAG, "Timer:: millisUntilFinished: $millisUntilFinished for arena: ${arena.name}")
+            }
+
+            override fun onFinish() {
+                Log.i(TAG, "Timer:: onFinish for arena: ${arena.name}")
+                arenaDelegate.onItemChanged(arena)
+            }
+        }.start()
     }
 }

@@ -14,7 +14,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
     val raidState = ObservableField<RaidState>()
     // TODO: update raidTime ? maybe server should change: egg -> raid -> expired
-    val raidTime = ObservableField<String>()
+    val raidTime = ObservableField<String?>()
     val isRaidAnnounced = ObservableField<Boolean>()
 
     init {
@@ -26,7 +26,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
         this.raid = raid
 
         raid?.let {
-            changeRaidData(raid)
+            changeRaidData()
         } ?: kotlin.run {
             resetRaidData()
         }
@@ -34,15 +34,15 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 //        Log.d(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
     }
 
-    private fun changeRaidData(raid: FirebaseRaid) {
+    private fun changeRaidData() {
         raidState.set(currentRaidState())
-        raidTime.set(raidTime(raid))
+        raidTime.set(raidTime())
         isRaidAnnounced.set(currentRaidState() != RaidState.NONE)
     }
 
     private fun resetRaidData() {
         raidState.set(RaidState.NONE)
-        raidTime.set(App.geString(R.string.arena_raid_time_none))
+        raidTime.set(null)
         isRaidAnnounced.set(false)
     }
 
@@ -91,9 +91,9 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
         }
     }
 
-    private fun raidTime(raid: FirebaseRaid): String {
+    private fun raidTime(): String? {
 
-        val time =  when(currentRaidState()) {
+        return when(currentRaidState()) {
             RaidState.EGG_HATCHES -> {
                 timeEggHatches()
             }
@@ -101,10 +101,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
                 timeRaidEnds()
             }
             else -> null
-
-        } ?: kotlin.run { "00:00" }
-
-        return time
+        }
     }
 
     fun timeEggHatches(): String? = raid?.timeEggHatches
