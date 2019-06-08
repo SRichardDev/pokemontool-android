@@ -23,7 +23,7 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 
 
 class MapItemFragment: Fragment() {
@@ -108,7 +108,7 @@ class MapItemFragment: Fragment() {
 
     private fun addMarker(isArenaEx: Boolean): Marker? {
 
-        return KotlinUtils.safeLet(context, position) { _context, _position->
+        return Kotlin.safeLet(context, position) { _context, _position->
 
             when(mapMode) {
                 MapMode.NEW_ARENA ->  map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(_context, isArenaEx).position(_position))

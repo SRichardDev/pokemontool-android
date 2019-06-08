@@ -21,7 +21,7 @@ import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.map.MapFragment
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.viewmodel.QuestViewModel
 
@@ -138,7 +138,7 @@ class PokestopFragment: Fragment() {
 
     private fun addMarker(): Marker? {
 
-        return KotlinUtils.safeLet(context, position) { _context, _position->
+        return Kotlin.safeLet(context, position) { _context, _position->
             map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
         } ?: kotlin.run { null }
     }

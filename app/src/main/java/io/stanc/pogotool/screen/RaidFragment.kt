@@ -15,7 +15,7 @@ import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.geohash.GeoHash
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
 
@@ -261,7 +261,7 @@ class RaidFragment: Fragment() {
 
     private fun tryToSendData() {
 
-        KotlinUtils.safeLet(arenaId, geoHash) { arenaId, geoHash ->
+        Kotlin.safeLet(arenaId, geoHash) { arenaId, geoHash ->
 
             if (isEggAlreadyHatched) {
 

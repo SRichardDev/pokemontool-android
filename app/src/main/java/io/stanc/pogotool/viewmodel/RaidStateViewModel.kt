@@ -2,11 +2,8 @@ package io.stanc.pogotool.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.databinding.ObservableField
-import android.util.Log
-import io.stanc.pogotool.App
-import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.node.FirebaseRaid
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.TimeCalculator
 
 class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
@@ -64,7 +61,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
     private fun eggIsHatching(): Boolean {
 
-        return KotlinUtils.safeLet(raid?.timestamp as? Long, raid?.timeEggHatches) { timestamp, timeEggHatches ->
+        return Kotlin.safeLet(raid?.timestamp as? Long, raid?.timeEggHatches) { timestamp, timeEggHatches ->
 
             TimeCalculator.timeExpired(timestamp, timeEggHatches)?.let { alreadyHatched ->
                 !alreadyHatched
@@ -79,7 +76,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
     private fun raidIsExpired(): Boolean {
 
-        return KotlinUtils.safeLet(raid?.timestamp as? Long, raid?.timeEnd) { timestamp, timeEnd ->
+        return Kotlin.safeLet(raid?.timestamp as? Long, raid?.timeEnd) { timestamp, timeEnd ->
 
             TimeCalculator.timeExpired(timestamp, timeEnd)?.let {
                 it

@@ -9,16 +9,12 @@ import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
-import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.DelayedTrigger
 import java.lang.ref.WeakReference
-import android.databinding.adapters.TextViewBindingAdapter.setText
 import android.os.CountDownTimer
-import io.stanc.pogotool.firebase.node.FirebaseRaid
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.TimeCalculator
 import io.stanc.pogotool.viewmodel.RaidStateViewModel
-import io.stanc.pogotool.viewmodel.RaidViewModel
 import java.util.concurrent.TimeUnit
 
 
@@ -190,7 +186,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
             val viewModel = RaidStateViewModel(raid)
 
-            KotlinUtils.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
+            Kotlin.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
                 TimeCalculator.minutesUntil(timestamp, raidTime)?.let { minutes ->
                     if (minutes > 0) {
                         runRefreshTimer(minutes+1, arena)

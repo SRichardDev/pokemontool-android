@@ -1,6 +1,5 @@
 package io.stanc.pogotool.utils
 
-import android.support.annotation.IdRes
 import android.support.annotation.StringRes
 import android.view.View
 import android.view.Window
@@ -24,7 +23,7 @@ object WaitingSpinner {
 
     fun showProgress(@StringRes textId: Int) {
         progressBarView?.get()?.let { it.visibility = View.VISIBLE }
-        KotlinUtils.safeLet(progressBarTitle?.get(), window?.get()?.context) { title, context ->
+        Kotlin.safeLet(progressBarTitle?.get(), window?.get()?.context) { title, context ->
             title.text = context.getText(textId)
         }
         window?.get()?.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)

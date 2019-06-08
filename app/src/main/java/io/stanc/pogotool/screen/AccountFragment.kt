@@ -3,7 +3,6 @@ package io.stanc.pogotool.screen
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,7 @@ import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.fragment_authentication.*
@@ -90,7 +89,7 @@ class AccountFragment: Fragment(), View.OnClickListener {
 
                     authentication_edittext_user_name.visibility = View.GONE
                     authentication_button_user_name.text = getString(R.string.authentication_button_open_user_name)
-                    KotlinUtils.safeLet(context, rootView) { _context, view -> SystemUtils.hideKeyboardFrom(_context, view) }
+                    Kotlin.safeLet(context, rootView) { _context, view -> SystemUtils.hideKeyboardFrom(_context, view) }
 
                 } else {
                     authentication_edittext_user_name.visibility = View.VISIBLE

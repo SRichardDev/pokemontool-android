@@ -10,7 +10,6 @@ import io.stanc.pogotool.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.PARTICIPANTS
 import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
-import io.stanc.pogotool.firebase.DatabaseKeys.QUEST_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
@@ -18,7 +17,7 @@ import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
 import io.stanc.pogotool.utils.Async.awaitResponse
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.Kotlin
 import kotlinx.coroutines.*
 import java.lang.Exception
 import java.lang.ref.WeakReference
@@ -260,7 +259,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         Log.v(TAG, "subscribeForPush(geoHash: $geoHash), userID: ${FirebaseUser.userData?.id}, notificationToken: ${FirebaseUser.userData?.notificationToken}")
-        KotlinUtils.safeLet(FirebaseUser.userData?.id, FirebaseUser.userData?.notificationToken) { uid, notificationToken ->
+        Kotlin.safeLet(FirebaseUser.userData?.id, FirebaseUser.userData?.notificationToken) { uid, notificationToken ->
 
             subscribeFor(FirebaseSubscription.Type.Arena, uid, notificationToken, geoHash, onCompletionCallback)
             subscribeFor(FirebaseSubscription.Type.Pokestop, uid, notificationToken, geoHash, onCompletionCallback)
