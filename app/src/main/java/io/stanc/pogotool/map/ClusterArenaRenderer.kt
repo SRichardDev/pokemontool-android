@@ -14,7 +14,8 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.utils.KotlinUtils
+import io.stanc.pogotool.utils.IconFactory
+import io.stanc.pogotool.utils.Kotlin
 
 
 class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
@@ -26,14 +27,14 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
-        KotlinUtils.safeLet(item, markerOptions) { clusterItem, markerOptions ->
+        Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
             markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena)).anchor(ANCHOR_X, ANCHOR_Y)
         }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
     override fun onClusterItemRendered(clusterItem: ClusterArena?, marker: Marker?) {
-        KotlinUtils.safeLet(clusterItem, marker) { _clusterItem, _marker ->
+        Kotlin.safeLet(clusterItem, marker) { _clusterItem, _marker ->
             _marker.tag = _clusterItem.arena
         }
         super.onClusterItemRendered(clusterItem, marker)
@@ -45,7 +46,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private const val ICON_SIZE: Int = 100
         private const val INNER_ICON_SIZE: Int = 60
-        private val ICON_CONFIG = FirebaseArena.IconConfig(ICON_SIZE, INNER_ICON_SIZE)
+        private val ICON_CONFIG = IconFactory.IconSizeConfig(ICON_SIZE, INNER_ICON_SIZE)
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 

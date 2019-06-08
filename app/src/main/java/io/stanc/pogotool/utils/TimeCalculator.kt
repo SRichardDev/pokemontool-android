@@ -2,6 +2,8 @@ package io.stanc.pogotool.utils
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.google.common.math.LongMath
+import java.math.RoundingMode
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -73,17 +75,15 @@ object TimeCalculator {
     }
 
     fun minutesUntil(timestamp: Long, time: String): Long? {
-        val diff = nextDateAfterTimestamp(timestamp, time)?.let { date ->
-            Log.d(TAG, "Time:: minutesUntil($timestamp, $time) date: $date, current: ${currentDate()}")
+
+        return nextDateAfterTimestamp(timestamp, time)?.let { date ->
+
             val diffTime = date.time - currentDate().time
-            diffTime / (1000 * 60)
+            LongMath.divide(diffTime, 1000 * 60, RoundingMode.CEILING)
+
         } ?: kotlin.run {
             null
         }
-
-        Log.d(TAG, "Time:: minutesUntil($timestamp, $time) => $diff")
-
-        return diff
     }
 
     /**
@@ -131,7 +131,7 @@ object TimeCalculator {
             nextClockDate(clockDate, Date(timestamp))
 
         } ?: kotlin.run {
-            Log.e(TAG, "could not nextDate clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
+            Log.e(TAG, "could not get next date clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
             null
         }
     }
