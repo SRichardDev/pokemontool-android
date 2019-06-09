@@ -1,6 +1,7 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -47,6 +48,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
         private const val ICON_SIZE: Int = 100
         private const val INNER_ICON_SIZE: Int = 60
         private val ICON_CONFIG = IconFactory.IconSizeConfig(ICON_SIZE, INNER_ICON_SIZE)
+        // TODO: calculate anchor, depending on header & footer text, the bottom of arena icon should be the map location position !
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 

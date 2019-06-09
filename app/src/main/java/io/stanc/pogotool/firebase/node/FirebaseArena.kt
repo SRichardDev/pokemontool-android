@@ -54,13 +54,14 @@ data class FirebaseArena private constructor(
                 iconConfig.foregroundConfig = IconFactory.DrawableConfig(foregroundDrawable, iconSizeConfig.foregroundSize)
             }
 
-            // TODO: debug:
             raid?.let {
                 val viewModel = RaidStateViewModel(it)
                 if (viewModel.isRaidAnnounced.get() == true) {
                     iconConfig.headerText = "[${viewModel.raidTime.get()}]"
                 }
             }
+
+            iconConfig.footerText = name
 
             return IconFactory.bitmap(context, iconConfig)
 

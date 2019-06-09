@@ -3,7 +3,6 @@ package io.stanc.pogotool.utils
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.util.Log
 
 object IconFactory {
     private val TAG = javaClass.name
@@ -21,10 +20,12 @@ object IconFactory {
     data class IconConfig (
         val backgroundConfig: DrawableConfig,
         var foregroundConfig: DrawableConfig? = null,
-        var headerText: String? = null
+        var headerText: String? = null,
+        var footerText: String? = null
     )
 
-    private const val TEXT_RAW_SIZE: Float = 10.0f
+    private const val HEADER_TEXT_RAW_SIZE: Float = 10.0f
+    private const val FOOTER_TEXT_RAW_SIZE: Float = 10.0f
     private const val TEXT_COLOR = Color.BLACK
 
     fun bitmap(context: Context, iconConfig: IconConfig): Bitmap {
@@ -35,14 +36,18 @@ object IconFactory {
         // TODO: for debugging
 //        canvas.drawColor(Color.YELLOW)
 
-        val backgroundDrawable = drawBackground(canvas, iconConfig)
+        val backgroundDrawable = drawBackground(canvas, iconConfig, context)
 
         iconConfig.foregroundConfig?.let { foregroundConfig ->
             drawForeground(canvas, foregroundConfig, backgroundDrawable, iconConfig.backgroundConfig.size)
         }
 
         iconConfig.headerText?.let { headerText ->
-            drawText(canvas, headerText, context)
+            drawHeaderText(canvas, headerText, context)
+        }
+
+        iconConfig.footerText?.let { footerText ->
+            drawFooterText(canvas, footerText, context)
         }
 
         return bitmap
@@ -50,29 +55,33 @@ object IconFactory {
 
     private fun createBitmap(context: Context, iconConfig: IconConfig): Bitmap {
 
-        val textWidth = iconConfig.headerText?.let { headerText ->
-            textPaint(context).measureText(headerText).toInt()
-        } ?: kotlin.run {
-            0
+        var iconWidth = iconConfig.backgroundConfig.size
+        iconConfig.headerText?.let { headerText ->
+            iconWidth = maxOf(iconWidth, textPaint(context, HEADER_TEXT_RAW_SIZE).measureText(headerText).toInt())
+        }
+        iconConfig.footerText?.let { footerText ->
+            iconWidth = maxOf(iconWidth, textPaint(context, FOOTER_TEXT_RAW_SIZE).measureText(footerText).toInt())
         }
 
-        val textSize = iconConfig.headerText?.let {
-            textPaint(context).textSize.toInt()
-        } ?: kotlin.run {
-            0
+        var iconHeight = iconConfig.backgroundConfig.size
+        iconConfig.headerText?.let {
+            iconHeight += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         }
-
-        val iconWidth = maxOf(textWidth, iconConfig.backgroundConfig.size)
-        val iconHeight = if(!iconConfig.headerText.isNullOrEmpty()) iconConfig.backgroundConfig.size + textSize else iconConfig.backgroundConfig.size
+        iconConfig.footerText?.let {
+            iconHeight += textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
+        }
 
         return Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
     }
 
-    private fun drawBackground(canvas: Canvas, iconConfig: IconConfig): Drawable {
-        val widthMargin = (canvas.width - iconConfig.backgroundConfig.size) / 2
+    private fun drawBackground(canvas: Canvas, iconConfig: IconConfig, context: Context): Drawable {
+        val marginHorizontal = (canvas.width - iconConfig.backgroundConfig.size) / 2
+
+        val marginTop = if (iconConfig.headerText.isNullOrEmpty()) 0 else textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
+        val marginBottom = if (iconConfig.footerText.isNullOrEmpty()) 0 else textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
 
         val backgroundDrawable = iconConfig.backgroundConfig.drawable
-        backgroundDrawable.setBounds(widthMargin, canvas.height - iconConfig.backgroundConfig.size,  iconConfig.backgroundConfig.size + widthMargin, canvas.height)
+        backgroundDrawable.setBounds(marginHorizontal, marginTop,  iconConfig.backgroundConfig.size + marginHorizontal, canvas.height - marginBottom)
         backgroundDrawable.draw(canvas)
 
         return backgroundDrawable
@@ -86,22 +95,31 @@ object IconFactory {
         foregroundDrawable.draw(canvas)
     }
 
-    private fun drawText(canvas: Canvas, text: String, context: Context) {
-        val paint = textPaint(context)
+    private fun drawHeaderText(canvas: Canvas, headerText: String, context: Context) {
+        val paint = textPaint(context, HEADER_TEXT_RAW_SIZE)
 
         val x = canvas.width / 2.0f
         val y = paint.textSize
 
-        canvas.drawText(text, x, y, paint)
+        canvas.drawText(headerText, x, y, paint)
     }
 
-    private fun textPaint(context: Context): Paint {
+    private fun drawFooterText(canvas: Canvas, subText: String, context: Context) {
+        val paint = textPaint(context, FOOTER_TEXT_RAW_SIZE)
+
+        val x = canvas.width / 2.0f
+        val y = canvas.height - paint.textSize / 4.0
+
+        canvas.drawText(subText, x, y.toFloat(), paint)
+    }
+
+    private fun textPaint(context: Context, textRawSize: Float): Paint {
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         textPaint.textAlign = Paint.Align.CENTER
         textPaint.style = Paint.Style.FILL_AND_STROKE
         textPaint.typeface = Typeface.DEFAULT_BOLD
         textPaint.color = TEXT_COLOR
-        textPaint.textSize = TEXT_RAW_SIZE * context.resources.displayMetrics.density
+        textPaint.textSize = textRawSize * context.resources.displayMetrics.density
         return textPaint
     }
 }
