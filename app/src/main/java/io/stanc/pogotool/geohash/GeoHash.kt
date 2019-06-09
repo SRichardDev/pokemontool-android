@@ -256,6 +256,8 @@ open class GeoHash : Parcelable {
 
     fun toLocation(): Location = boundingBox.center
 
+    fun toLatLng(): LatLng = LatLng(toLocation().latitude, toLocation().longitude)
+
     override fun toString(): String {
         checkConvert()
         val buf = StringBuilder()

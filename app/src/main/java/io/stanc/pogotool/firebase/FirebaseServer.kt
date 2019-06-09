@@ -81,7 +81,7 @@ object FirebaseServer {
         }
 
         override fun onDataChange(p0: DataSnapshot) {
-            Log.v(TAG, "onDataChange($p0), key: ${p0.key}, value: ${p0.value}, childs: ${p0.childrenCount}")
+//            Log.v(TAG, "onDataChange($p0), key: ${p0.key}, value: ${p0.value}, childs: ${p0.childrenCount}")
             if (p0.value == null) {
                 p0.key?.let {
                     callback.get()?.nodeRemoved(it)
@@ -107,7 +107,7 @@ object FirebaseServer {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseDataPath")
+//                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseDataPath")
                 onCompletionCallback?.onSuccess(p0.value)
             }
         })

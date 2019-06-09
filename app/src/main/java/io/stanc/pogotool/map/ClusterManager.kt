@@ -1,11 +1,16 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.View
+//import com.arsy.maps_library.MapRipple
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
+import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
@@ -23,9 +28,15 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
     private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
+
+    private val context = WeakReference(context)
+    private val map = WeakReference(googleMap)
     
     private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
+    // https://github.com/aarsy/GoogleMapsAnimations
+//    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
+    private val arenaCircles = HashMap<Any, Circle>()
 
     private val arenaInfoWindowAdapter = ClusterArenaRenderer.Companion.InfoWindowAdapter(context)
     private val pokestopInfoWindowAdapter = ClusterPokestopRenderer.Companion.InfoWindowAdapter(context)
@@ -168,6 +179,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
             items[itemId]?.get()?.let {
                 arenaClusterManager.removeItem(it)
+                stopRefreshTimer(it.arena)
             }
             items.remove(itemId)
         }
@@ -176,7 +188,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     /**
-     * timer
+     * timer & animation
      */
 
     private fun startArenaRefreshTimerIfRaidAnnounced(arena: FirebaseArena) {
@@ -189,27 +201,80 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
                 Kotlin.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
 
-                    startArenaRefreshTimer(arena, raidTime, timestamp)
+                    startRefreshTimer(arena, raidTime, timestamp)
 
                 } ?: kotlin.run {
-                    Log.e(
-                        TAG,
-                        "Debug:: viewModel.raidTime: ${viewModel.raidTime.get()}, raid.timestamp: ${raid.timestamp} for $raid"
-                    )
+                    Log.e(TAG,"Debug:: viewModel.raidTime: ${viewModel.raidTime.get()}, raid.timestamp: ${raid.timestamp} for $raid")
                 }
             }
         }
     }
 
-    private fun startArenaRefreshTimer(arena: FirebaseArena, raidTime: String, timestamp: Long) {
+    private fun startRefreshTimer(arena: FirebaseArena, raidTime: String, timestamp: Long) {
 
         TimeCalculator.minutesUntil(timestamp, raidTime)?.let { minutes ->
 
             if (minutes > 0) {
+                startAnimation(arena)
                 RefreshTimer.run(minutes, arena.id, onFinished = {
+                    stopAnimation(arena)
                     arenaDelegate.onItemChanged(arena)
                 })
             }
         }
     }
+
+    private fun stopRefreshTimer(arena: FirebaseArena) {
+        stopAnimation(arena)
+        RefreshTimer.stop(arena.id)
+    }
+
+    private fun startAnimation(arena: FirebaseArena) {
+        map.get()?.let {
+
+            stopAnimation(arena)
+
+            val circleOptions = CircleOptions().apply {
+                center(arena.geoHash.toLatLng())
+                radius(100.0)
+                strokeColor(Color.TRANSPARENT)
+                fillColor(R.color.redTransparent)
+            }
+
+            arenaCircles[arena.id] = it.addCircle(circleOptions)
+        }
+
+        // TODO: search for performant googlemap pulse animation
+//        Kotlin.safeLet(map.get(), context.get()) { map, context ->
+//
+//            stopAnimation(arena)
+//
+//            val mapRipple = mapRipple(map, arena, context)
+//            arenaRippleAnimations[arena.id] = WeakReference(mapRipple)
+//            mapRipple.startRippleMapAnimation()
+//
+//        } ?: kotlin.run {
+//            Log.e(TAG, "could not start map animation, because map.get(): ${map.get()} or context.get(): ${context.get()}")
+//        }
+    }
+
+    private fun stopAnimation(arena: FirebaseArena) {
+        arenaCircles.remove(arena.id)?.remove()
+//        arenaRippleAnimations.remove(arena.id)?.get()?.stopRippleMapAnimation()
+    }
+
+//    private fun mapRipple(googleMap: GoogleMap, arena: FirebaseArena, context: Context): MapRipple {
+//
+//        return MapRipple(googleMap, arena.geoHash.toLatLng(), context).apply {
+//
+//            withNumberOfRipples(5)
+//            withFillColor(Color.RED)
+//            withStrokeColor(Color.TRANSPARENT)
+//            withStrokewidth(0)
+//            withDistance(200.0)
+//            withRippleDuration(5000)
+//            withDurationBetweenTwoRipples(1000)
+//            withTransparency(0.8f)
+//        }
+//    }
 }

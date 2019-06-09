@@ -28,6 +28,10 @@ object RefreshTimer {
         countDownTimer.start()
     }
 
+    fun stop(id: Any) {
+        removeFromList(id)
+    }
+
     private fun removeFromList(id: Any) {
         countDownTimerList.remove(id)?.let {
             it.get()?.cancel()

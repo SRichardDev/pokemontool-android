@@ -9,6 +9,8 @@
 
     <color name="colorLayoutBackground">#ffffff</color>
     <color name="colorText">#800000</color>
+    <color name="redTransparent">#80CC0000</color>
+
 
     <color name="white">#ffffff</color>
     <color name="aliceBlue">#F0F8FF</color>
