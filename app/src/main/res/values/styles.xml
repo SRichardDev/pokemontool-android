@@ -76,6 +76,12 @@
         <item name="android:textColor">@color/colorRedDarkPoke</item>
     </style>
 
+    <style name="TextStyle_error">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorRed</item>
+    </style>
+
     <!-- Buttons -->
 
     <style name="ButtonStyle" parent="android:style/Widget.Button">

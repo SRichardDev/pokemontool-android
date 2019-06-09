@@ -35,7 +35,6 @@ class MapGridProvider(private val googleMap: GoogleMap) {
 
     fun toggleGeoHashGrid(geoHash: GeoHash) {
 
-        Log.d(TAG, "Debug:: toggleGeoHashGrid($geoHash), geoHashList: $geoHashList")
         if (geoHashList.contains(geoHash)) {
             removeGeoHashGrid(geoHash)
         } else {

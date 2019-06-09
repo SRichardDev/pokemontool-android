@@ -29,6 +29,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
+        <TextView
+            style="@style/TextStyle_error"
+            android:id="@+id/app_info_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/layout_margin_small"
+            app:layout_constraintTop_toBottomOf="@id/activity_toolbar"
+            android:background="@color/white"
+            android:visibility="gone"
+            tools:text="Debug Info Label"/>
+
         <include
             layout="@layout/layout_progress"
             android:layout_width="match_parent"

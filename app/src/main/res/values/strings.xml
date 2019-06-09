@@ -130,4 +130,7 @@
 
     <string name="popup_info_missing_raidboss_id_title">Bitte wähle den korrekten Raidboss aus.</string>
 
+    <!-- App Info Label -->
+    <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell sein.</string>
+
 </resources>

@@ -5,10 +5,13 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
+import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.screen.AccountFragment
@@ -24,6 +27,18 @@ import java.lang.ref.WeakReference
 
 class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private var textView: TextView? = null
+    private val connectionListener = object : (Boolean) -> Unit {
+        override fun invoke(connected: Boolean) {
+            if (connected) {
+                textView?.visibility = View.GONE
+            } else {
+                textView?.visibility = View.VISIBLE
+                textView?.text = resources.getText(R.string.info_label_connection_lost)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,6 +47,9 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         // app bar
         setupToolbar()
+
+        // app info label
+        setupAppLabel()
 
         // navigation drawer
         setupDrawer()
@@ -48,12 +66,14 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseUser.addAuthStateObserver(authStateObserver)
         FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
+        FirebaseServer.addConnectionListener(connectionListener)
     }
 
     override fun onPause() {
         FirebaseUser.stopAuthentication()
         FirebaseUser.removeAuthStateObserver(authStateObserver)
         FirebaseUser.removeUserDataObserver(userDataObserver)
+        FirebaseServer.removeConnectionListener(connectionListener)
         super.onPause()
     }
 
@@ -65,6 +85,10 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 drawer_layout?.openDrawer(nav_view)
             })
         }
+    }
+
+    private fun setupAppLabel() {
+        textView = findViewById(R.id.app_info_label)
     }
 
     private fun setupDrawer() {

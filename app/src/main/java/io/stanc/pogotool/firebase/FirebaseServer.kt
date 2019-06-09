@@ -13,16 +13,54 @@ import java.lang.ref.WeakReference
 object FirebaseServer {
     private val TAG = javaClass.name
 
+    private val connectionRef: DatabaseReference
+    var connected: Boolean = false
+        private set
+    private val connectionChangeListener = HashMap<Int, (Boolean) -> Unit>()
+    private val connectionEventListener = object : ValueEventListener {
+
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val connected = snapshot.getValue(Boolean::class.java) ?: false
+            FirebaseServer.connected = connected
+            for (listener in connectionChangeListener.values) {
+                listener.invoke(connected)
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e(TAG, "ConnectionEventListener: onCancelled(errorCode: ${error.code}, errorMsg: ${error.message})")
+        }
+    }
+
     init {
         // TODO: syncing data and offline handling
-        // https@ //firebase.google.com/docs/database/android/offline-capabilities
+        // https@ //firebase.google.com/docs/databaseRef/android/offline-capabilities
         // https://stackoverflow.com/questions/40190234/firebase-what-is-the-difference-between-setpersistenceenabled-and-keepsynced
         FirebaseDatabase.getInstance().setPersistenceEnabled(true)
 
+        connectionRef = FirebaseDatabase.getInstance().getReference(".info/connected")
+        connectionRef.addValueEventListener(connectionEventListener)
     }
 
     // TODO?: use FirebaseFirestore instead of realtime FirebaseDatabase, but iOS uses FirebaseDatabase
-    private val database = FirebaseDatabase.getInstance().reference
+    private val databaseRef = FirebaseDatabase.getInstance().reference
+
+
+    /**
+     * Connection
+     */
+
+    fun addConnectionListener(onConnectionDidChange: (connected: Boolean) -> Unit) {
+        if (!connectionChangeListener.containsKey(onConnectionDidChange.hashCode())) {
+            onConnectionDidChange.invoke(connected)
+            connectionChangeListener[onConnectionDidChange.hashCode()] = onConnectionDidChange
+        }
+    }
+
+    fun removeConnectionListener(onConnectionDidChange: (connected: Boolean) -> Unit) {
+        connectionChangeListener.remove(onConnectionDidChange.hashCode())
+    }
+
 
     /**
      * callbacks
@@ -52,13 +90,13 @@ object FirebaseServer {
 
             val eventListener = NodeEventListener(callback)
             nodeDidChangeListener[Pair(callback.hashCode(), databasePath)] = eventListener
-            database.child(databasePath).addValueEventListener(eventListener)
+            databaseRef.child(databasePath).addValueEventListener(eventListener)
         }
     }
 
     fun removeNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
         nodeDidChangeListener.remove(Pair(callback.hashCode(), databasePath))?.let {
-            database.child(databasePath).removeEventListener(it)
+            databaseRef.child(databasePath).removeEventListener(it)
         }
     }
 
@@ -71,7 +109,7 @@ object FirebaseServer {
         fun nodeRemoved(key: String)
     }
 
-    class NodeEventListener(callback: OnNodeDidChangeCallback): ValueEventListener {
+    private class NodeEventListener(callback: OnNodeDidChangeCallback): ValueEventListener {
         private val TAG = this.javaClass.name
 
         private val callback = WeakReference(callback)
@@ -99,30 +137,30 @@ object FirebaseServer {
      */
 
     fun requestDataValue(databaseDataPath: String, onCompletionCallback: OnCompleteCallback<Any?>? = null) {
-        FirebaseServer.database.child(databaseDataPath).addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseServer.databaseRef.child(databaseDataPath).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onCancelled(p0: DatabaseError) {
-                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databaseDataPath")
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for databaseRef path: $databaseDataPath")
                 onCompletionCallback?.onFailed(p0.message)
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-//                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseDataPath")
+//                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for databaseRef path: $databaseDataPath")
                 onCompletionCallback?.onSuccess(p0.value)
             }
         })
     }
 
     fun requestDataChilds(databaseChildPath: String, onCompletionCallback: OnCompleteCallback<List<DataSnapshot>>? = null) {
-        FirebaseServer.database.child(databaseChildPath).addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseServer.databaseRef.child(databaseChildPath).addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onCancelled(p0: DatabaseError) {
-                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for database path: $databaseChildPath")
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for databaseRef path: $databaseChildPath")
                 onCompletionCallback?.onFailed(p0.message)
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for database path: $databaseChildPath")
+                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for databaseRef path: $databaseChildPath")
                 onCompletionCallback?.onSuccess(p0.children.toList())
             }
         })
@@ -130,25 +168,25 @@ object FirebaseServer {
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
     fun updateNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
+        databaseRef.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
     fun setNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(firebaseNode.databasePath()).setValue(firebaseNode.data()).addOnCompleteListener { task ->
+        databaseRef.child(firebaseNode.databasePath()).setValue(firebaseNode.data()).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
     fun setData(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(databasePath).setValue(data).addOnCompleteListener { task ->
+        databaseRef.child(databasePath).setValue(data).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
     fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
-        val newNode = database.child(databasePath).push()
+        val newNode = databaseRef.child(databasePath).push()
         newNode.setValue(data).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
@@ -156,7 +194,7 @@ object FirebaseServer {
     }
 
     fun setDataByAutoId(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
-        val newNode = database.child(databasePath).push()
+        val newNode = databaseRef.child(databasePath).push()
         newNode.setValue(data).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
@@ -166,25 +204,25 @@ object FirebaseServer {
     fun setDataKey(databasePath: String, key: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         val data = HashMap<String, String>()
         data[key] = ""
-        database.child(databasePath).setValue(data).addOnCompleteListener { task ->
+        databaseRef.child(databasePath).setValue(data).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
     fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { task ->
+        databaseRef.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
 //    fun removeData(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-//        database.child(firebaseData.databasePath()).removeData().addOnCompleteListener { task ->
+//        databaseRef.child(firebaseData.databasePath()).removeData().addOnCompleteListener { task ->
 //            onCompletionCallback?.let { callback<Void, Void>(task, it) }
 //        }
 //    }
 
     fun removeData(databasePath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        database.child(databasePath).removeValue().addOnCompleteListener { task ->
+        databaseRef.child(databasePath).removeValue().addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

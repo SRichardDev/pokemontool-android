@@ -25,7 +25,6 @@ class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
     }
 
     fun updateData(raidMeetup: FirebaseRaidMeetup?) {
-        Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup)")
         this.raidMeetup = raidMeetup
 
         raidMeetup?.let {
@@ -33,8 +32,7 @@ class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
         } ?: kotlin.run {
             resetMeetupData()
         }
-        Log.d(TAG, "Debug:: updateData(), isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.get()}, meetupTime: ${meetupTime.get()}, isUserParticipate: ${isUserParticipate.get()}")
-
+//        Log.d(TAG, "Debug:: updateData(), isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.get()}, meetupTime: ${meetupTime.get()}, isUserParticipate: ${isUserParticipate.get()}")
     }
 
     private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
