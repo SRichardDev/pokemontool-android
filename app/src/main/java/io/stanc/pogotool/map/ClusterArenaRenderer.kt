@@ -66,8 +66,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {
 
-            // TODO: windows have different size, depending on header title
-            private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_arena, null)
+            private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_arena, null, false)
 
             private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_header) as TextView
             private val subheader = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_subheader) as TextView

@@ -42,7 +42,7 @@ class ClusterPokestopRenderer(
 
     companion object {
 
-        private const val ICON_HEIGHT: Int = 50
+        private const val ICON_HEIGHT: Int = 75
         private const val ICON_WIDTH: Int = 25
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
@@ -66,7 +66,7 @@ class ClusterPokestopRenderer(
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {
 
-            private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_pokestop, null)
+            private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_pokestop, null, false)
 
             private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_pokestop_textview_header) as TextView
 

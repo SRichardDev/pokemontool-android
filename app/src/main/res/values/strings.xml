@@ -74,7 +74,7 @@
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
-    <string name="map_info_window_arena_button_info">Details/\nNeuer Raid</string>
+    <string name="map_info_window_arena_button_info">Details / Neuer Raid</string>
 
     <string name="map_info_window_pokestop_subheader">Pokestop</string>
     <string name="map_info_window_pokestop_button_info">Details &amp; Quest</string>

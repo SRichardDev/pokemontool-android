@@ -1,57 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="200dp"
-                                             android:layout_height="200dp"
-                                             android:padding="@dimen/layout_padding_popup"
-                                             android:background="@color/white">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/info_window_arena_imageview"
-        android:layout_width="0dp"
-        app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.3"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/icon_arena_30dp"
-        tools:ignore="ContentDescription"/>
+    <android.support.constraint.ConstraintLayout
+         android:layout_width="200dp"
+         android:layout_height="200dp"
+         android:padding="@dimen/layout_margin_small"
+         android:background="@color/white">
 
-    <TextView
-        android:id="@+id/info_window_arena_textview_header"
-        style="@style/TextStyle_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_padding_popup"
-        app:layout_constraintTop_toBottomOf="@id/info_window_arena_imageview"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:text="debug header"/>
+        <ImageView
+            android:id="@+id/info_window_arena_imageview"
+            android:layout_width="0dp"
+            app:layout_constraintWidth_default="percent"
+            app:layout_constraintWidth_percent="0.3"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_default="percent"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:src="@drawable/icon_arena_30dp"
+            tools:ignore="ContentDescription"/>
 
-    <TextView
-        android:id="@+id/info_window_arena_textview_subheader"
-        style="@style/TextStyle_sub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_padding_popup"
-        app:layout_constraintTop_toBottomOf="@id/info_window_arena_textview_header"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/map_info_window_arena_subheader_default"/>
+        <TextView
+            android:id="@+id/info_window_arena_textview_header"
+            style="@style/TextStyle_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            app:layout_constraintTop_toBottomOf="@id/info_window_arena_imageview"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textAlignment="center"
+            tools:text="debug header"/>
 
-    <TextView
-        android:id="@+id/info_window_arena_button_info"
-        style="@style/ButtonStyle_margin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/info_window_arena_textview_subheader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/map_info_window_arena_button_info"/>
+        <TextView
+            android:id="@+id/info_window_arena_textview_subheader"
+            style="@style/TextStyle_sub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            app:layout_constraintTop_toBottomOf="@id/info_window_arena_textview_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textAlignment="center"
+            android:text="@string/map_info_window_arena_subheader_default"/>
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/info_window_arena_button_info"
+            style="@style/ButtonStyle_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/map_info_window_arena_button_info"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>
