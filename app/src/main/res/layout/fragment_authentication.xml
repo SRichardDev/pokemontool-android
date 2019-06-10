@@ -18,7 +18,7 @@
         app:layout_constraintHeight_percent=".15"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/icon_id_card"/>
+        android:src="@drawable/icon_account_30dp"/>
 
     <LinearLayout
         android:id="@+id/authentication_layout_user"

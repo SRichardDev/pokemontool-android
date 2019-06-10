@@ -17,6 +17,7 @@ import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin
+import io.stanc.pogotool.viewmodel.ArenaViewModel
 
 
 class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
@@ -37,6 +38,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     override fun onClusterItemRendered(clusterItem: ClusterArena?, marker: Marker?) {
         Kotlin.safeLet(clusterItem, marker) { _clusterItem, _marker ->
             _marker.tag = _clusterItem.arena
+            _marker.isVisible = ArenaViewModel(_clusterItem.arena).isArenaVisibleOnMap.get() == true
         }
         super.onClusterItemRendered(clusterItem, marker)
     }

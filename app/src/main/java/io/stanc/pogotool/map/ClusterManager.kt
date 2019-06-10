@@ -1,6 +1,7 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
+import android.databinding.Observable
 import android.graphics.Color
 import android.util.Log
 import android.view.View
@@ -19,6 +20,8 @@ import java.lang.ref.WeakReference
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.RefreshTimer
 import io.stanc.pogotool.utils.TimeCalculator
+import io.stanc.pogotool.viewmodel.ArenaViewModel
+import io.stanc.pogotool.viewmodel.PokestopViewModel
 import io.stanc.pogotool.viewmodel.RaidStateViewModel
 
 
@@ -73,6 +76,32 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         googleMap.setOnInfoWindowClickListener {this.onInfoWindowClicked(it)}
 
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
+
+        MapSettings.enableArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                Log.i(TAG, "Debug:: onPropertyChanged() enableArenas: ${MapSettings.enableArenas.get()}, markers: ${arenaClusterManager.markerCollection.markers.size}")
+                val markers = arenaClusterManager.markerCollection.markers
+                for (marker in markers) {
+                    (marker.tag as? FirebaseArena)?.let {
+                        marker.isVisible = ArenaViewModel(it).isArenaVisibleOnMap.get() == true
+                    }
+                }
+            }
+        })
+
+        MapSettings.enablePokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                Log.i(TAG, "Debug:: onPropertyChanged() enablePokestops: ${MapSettings.enablePokestops.get()}, markers: ${pokestopClusterManager.markerCollection.markers.size}")
+                MapSettings.enablePokestops.get()?.let { enablePokestops ->
+                    val markers = pokestopClusterManager.markerCollection.markers
+                    for (marker in markers) {
+                        (marker.tag as? FirebasePokestop)?.let {
+                            marker.isVisible = PokestopViewModel(it).isPokestopVisibleOnMap.get() == true
+                        }
+                    }
+                }
+            }
+        })
     }
 
     /**

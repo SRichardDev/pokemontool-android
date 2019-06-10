@@ -1,6 +1,7 @@
 package io.stanc.pogotool.screen
 
 import android.annotation.SuppressLint
+import android.databinding.Observable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -28,6 +29,7 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
+import io.stanc.pogotool.map.MapSettings
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -245,6 +247,11 @@ class MapInteractionFragment: Fragment() {
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
+    private fun showMapSettingsFragment() {
+        val fragment = MapSettingsFragment()
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+    }
+
     /**
      * FABs
      */
@@ -270,6 +277,7 @@ class MapInteractionFragment: Fragment() {
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_edit_geo_hashs)?.let { fab ->
             fab.setOnClickListener {
 
+                // TODO: refactor subscriptions !
                 dismissCrosshair()
                 mapGridProvider?.clearGeoHashGridList()
                 currentMode = MapMode.EDIT_GEO_HASHES
@@ -302,6 +310,13 @@ class MapInteractionFragment: Fragment() {
 
                 showCrosshair()
                 currentMode = MapMode.NEW_POKESTOP
+            }
+        }
+
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_settings)?.let { fab ->
+            fab.setOnClickListener {
+
+                showMapSettingsFragment()
             }
         }
     }

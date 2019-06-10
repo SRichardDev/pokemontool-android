@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="mapSettings"
+            type="io.stanc.pogotool.map.MapSettings"/>
+    </data>
+
+    <LinearLayout
+          android:orientation="vertical"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:padding="@dimen/layout_padding_screen"
+          android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_arena"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_arena"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_arena"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.enableArenas}"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/layout_margin_small">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_arena_raid"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_arena_raid"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_arena_raid"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.justRaidArenas}"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/layout_margin_small">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_arena_ex"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_arena_ex"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_arena_ex"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.justEXArenas}"/>
+
+        </LinearLayout>
+
+        <include layout="@layout/layout_divider"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/layout_margin_small">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_pokestop"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_pokestop"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_pokestop"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.enablePokestops}"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="@dimen/layout_margin_small">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_pokestop_quest"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_pokestop_quest"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_pokestop_quest"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.justQuestPokestops}"/>
+
+        </LinearLayout>
+
+        <include layout="@layout/layout_divider"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/layout_margin_small">
+
+            <TextView
+                android:id="@+id/map_settings_textview_filter_subscriptions"
+                style="@style/TextStyle_default"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:text="@string/map_setting_subscriptions"/>
+
+            <Switch
+                android:id="@+id/map_settings_switch_filter_subscriptions"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"
+                android:checked="@={mapSettings.enableSubscriptions}"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

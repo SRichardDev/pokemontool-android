@@ -24,4 +24,9 @@
         android:id="@+id/fab_edit_geo_hashs"
         fab:fab_icon="@drawable/icon_map_30dp"/>
 
+    <com.getbase.floatingactionbutton.FloatingActionButton
+        style="@style/FABEx_menu_subbutton"
+        android:id="@+id/fab_settings"
+        fab:fab_icon="@drawable/icon_filter_30dp"/>
+
 </com.getbase.floatingactionbutton.FloatingActionsMenu>

@@ -79,6 +79,15 @@
     <string name="map_info_window_pokestop_subheader">Pokestop</string>
     <string name="map_info_window_pokestop_button_info">Details &amp; Quest</string>
 
+    <!-- Map Settings -->
+    <string name="map_settings_title">Karten Filter</string>
+    <string name="map_setting_arena">Arenas anzeigen</string>
+    <string name="map_setting_arena_raid">nur mit Raid</string>
+    <string name="map_setting_arena_ex">nur EX</string>
+    <string name="map_setting_pokestop">Pokestops anzeigen</string>
+    <string name="map_setting_pokestop_quest">nur mit Quest</string>
+    <string name="map_setting_subscriptions">Notifications anschalten</string>
+
     <!-- Raid -->
     <string name="raid_app_title">Neuer Level %d Raid</string>
     <string name="raid_eggs_title">Raid Level:</string>

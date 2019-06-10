@@ -17,6 +17,7 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
 import io.stanc.pogotool.utils.Kotlin
+import io.stanc.pogotool.viewmodel.PokestopViewModel
 
 
 class ClusterPokestopRenderer(
@@ -36,6 +37,7 @@ class ClusterPokestopRenderer(
     override fun onClusterItemRendered(clusterItem: ClusterPokestop?, marker: Marker?) {
         Kotlin.safeLet(clusterItem, marker) { _clusterItem, _marker ->
             _marker.tag = _clusterItem.pokestop
+            _marker.isVisible = PokestopViewModel(_clusterItem.pokestop).isPokestopVisibleOnMap.get() == true
         }
         super.onClusterItemRendered(clusterItem, marker)
     }
