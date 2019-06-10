@@ -64,6 +64,8 @@ object DatabaseKeys {
     const val TIMESTAMP = "timestamp"
     const val GEO_HASH_AREA_PRECISION: Int = 6
 
+    const val MAX_SUBSCRIPTIONS = 16
+
     fun firebaseGeoHash(geoHash: GeoHash): String = geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)
 
 }

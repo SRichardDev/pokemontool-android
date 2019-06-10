@@ -21,6 +21,7 @@ import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
 import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
+import io.stanc.pogotool.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
@@ -218,7 +219,7 @@ class MapInteractionFragment: Fragment() {
             } else {
 
                 Log.i(TAG, "Debug:: add subscription and geoHashGrid for $geoHash...")
-                if (it.geoHashes().size < FirebaseDatabase.MAX_SUBSCRIPTIONS) {
+                if (it.geoHashes().size < MAX_SUBSCRIPTIONS) {
                     firebase?.subscribeForPush(geoHash) { successful ->
                         Log.i(TAG, "Debug:: subscribeForPush($geoHash), successful: $successful")
                         it.showGeoHashGrid(geoHash)

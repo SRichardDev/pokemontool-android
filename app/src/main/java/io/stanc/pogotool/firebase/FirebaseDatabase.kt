@@ -349,12 +349,4 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
         return geoHashes
     }
-
-    /**
-     * database constants
-     */
-
-    companion object {
-        const val MAX_SUBSCRIPTIONS = 10
-    }
 }
