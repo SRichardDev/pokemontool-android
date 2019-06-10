@@ -1,4 +1,4 @@
-package io.stanc.pogotool.map
+package io.stanc.pogotool.subscreen
 
 import android.annotation.SuppressLint
 import android.content.Context

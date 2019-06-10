@@ -12,7 +12,7 @@
          android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <fragment android:name="io.stanc.pogotool.map.MapFragment"
+        <fragment android:name="io.stanc.pogotool.subscreen.MapFragment"
                   android:id="@+id/map_item_mapview"
                   android:layout_width="match_parent"
                   android:layout_height="250dp"/>

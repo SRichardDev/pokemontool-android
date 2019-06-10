@@ -6,7 +6,7 @@
                                              android:layout_height="match_parent"
                                              android:id="@+id/fragment_map_layout">
 
-    <fragment android:name="io.stanc.pogotool.map.MapFragment"
+    <fragment android:name="io.stanc.pogotool.subscreen.MapFragment"
               android:id="@+id/map_mapview"
               android:layout_width="match_parent"
               android:layout_height="match_parent"/>

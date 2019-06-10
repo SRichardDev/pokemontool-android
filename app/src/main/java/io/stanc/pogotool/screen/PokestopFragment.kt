@@ -20,7 +20,7 @@ import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.map.ClusterPokestopRenderer
-import io.stanc.pogotool.map.MapFragment
+import io.stanc.pogotool.subscreen.MapFragment
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.viewmodel.QuestViewModel

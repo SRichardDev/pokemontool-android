@@ -16,7 +16,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogotool.firebase.FirebaseDefinitions
-import io.stanc.pogotool.map.MapFragment
+import io.stanc.pogotool.subscreen.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
@@ -136,7 +136,7 @@ class MapInteractionFragment: Fragment() {
 
             MapMode.NEW_ARENA, MapMode.NEW_POKESTOP -> {
                 mapFragment?.centeredPosition()?.let { latlng ->
-                    showMapItemFragment(currentMode, latlng)
+                    showMapItemCreationFragment(currentMode, latlng)
                 }
             }
 
@@ -199,10 +199,9 @@ class MapInteractionFragment: Fragment() {
     }
     private var currentMode = MapMode.DEFAULT
 
-    private fun showMapItemFragment(mapMode: MapMode, latLng: LatLng) {
+    private fun showMapItemCreationFragment(mapMode: MapMode, latLng: LatLng) {
 
-        val fragment = MapItemFragment.newInstance(mapMode, latLng)
-        Log.d(TAG, "Debug:: showMapItemFragment(${currentMode.name}, $latLng)")
+        val fragment = MapItemCreationFragment.newInstance(mapMode, latLng)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 

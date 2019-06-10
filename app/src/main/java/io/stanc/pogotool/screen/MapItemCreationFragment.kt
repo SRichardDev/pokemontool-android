@@ -10,7 +10,7 @@ import android.widget.CheckBox
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import io.stanc.pogotool.map.MapFragment
+import io.stanc.pogotool.subscreen.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
@@ -26,7 +26,7 @@ import io.stanc.pogotool.map.ClusterPokestopRenderer
 import io.stanc.pogotool.utils.Kotlin
 
 
-class MapItemFragment: Fragment() {
+class MapItemCreationFragment: Fragment() {
 
     private val TAG = javaClass.name
 
@@ -161,8 +161,8 @@ class MapItemFragment: Fragment() {
 
     companion object {
 
-        fun newInstance(mapMode: MapMode, latLng: LatLng): MapItemFragment {
-            val fragment = MapItemFragment()
+        fun newInstance(mapMode: MapMode, latLng: LatLng): MapItemCreationFragment {
+            val fragment = MapItemCreationFragment()
             fragment.mapMode = mapMode
             fragment.position = latLng
 
