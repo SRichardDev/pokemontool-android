@@ -39,7 +39,6 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
     }
 
     fun updateData(pokestop: FirebasePokestop) {
-        Log.i(TAG, "Debug:: updateData($pokestop)")
 
         pokestop.quest?.let { firebaseQuest ->
 
@@ -60,7 +59,6 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
             }
 
         } ?: kotlin.run {
-            Log.d(TAG, "Debug:: No quest defined in pokestop: $pokestop")
             resetData()
         }
 

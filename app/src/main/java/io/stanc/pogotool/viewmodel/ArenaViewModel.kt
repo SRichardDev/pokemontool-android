@@ -13,10 +13,10 @@ class ArenaViewModel(arena: FirebaseArena): ViewModel() {
 
         var visible = MapSettings.enableArenas.get() == true
         if (visible) {
-            visible = !(!arena.isEX && MapSettings.justQuestPokestops.get() == true)
+            visible = !(!arena.isEX && MapSettings.justEXArenas.get() == true)
             if (visible) {
                 val viewModel = RaidStateViewModel(arena.raid)
-                visible = !(viewModel.isRaidAnnounced.get() == false && MapSettings.justQuestPokestops.get() == true)
+                visible = !(viewModel.isRaidAnnounced.get() == false && MapSettings.justRaidArenas.get() == true)
             }
         }
         isArenaVisibleOnMap.set(visible)

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.support.annotation.DrawableRes
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -26,12 +27,12 @@ class ClusterPokestopRenderer(
 ) : DefaultClusterRenderer<ClusterPokestop>(context, map, clusterManager) {
 
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterPokestop>): Boolean {
-        return cluster.size > 5 // when count of markers is more than 5, render as cluster
+        return cluster.items.filter { PokestopViewModel(it.pokestop).isPokestopVisibleOnMap.get() == true }.size > 5
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
-        super.onBeforeClusterItemRendered(item, markerOptions)
         markerOptions?.title(item?.title)?.icon(icon(context))?.anchor(ANCHOR_X, ANCHOR_Y)
+        super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
     override fun onClusterItemRendered(clusterItem: ClusterPokestop?, marker: Marker?) {
@@ -43,6 +44,8 @@ class ClusterPokestopRenderer(
     }
 
     companion object {
+
+        private val TAG = javaClass.name
 
         private const val ICON_HEIGHT: Int = 75
         private const val ICON_WIDTH: Int = 25

@@ -68,6 +68,29 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
     }
 
+    private val mapSettingsObserver = object : MapSettings.MapSettingObserver {
+
+        override fun onArenasVisibilityDidChange() {
+            val markers = arenaClusterManager.markerCollection.markers
+            for (marker in markers) {
+                (marker.tag as? FirebaseArena)?.let {
+                    marker.isVisible = ArenaViewModel(it).isArenaVisibleOnMap.get() == true
+                }
+            }
+            arenaClusterManager.cluster()
+        }
+
+        override fun onPokestopsVisibilityDidChange() {
+            val markers = pokestopClusterManager.markerCollection.markers
+            for (marker in markers) {
+                (marker.tag as? FirebasePokestop)?.let {
+                    marker.isVisible = PokestopViewModel(it).isPokestopVisibleOnMap.get() == true
+                }
+            }
+            pokestopClusterManager.cluster()
+        }
+    }
+
     init {
         pokestopClusterManager.renderer = ClusterPokestopRenderer(context, googleMap, pokestopClusterManager)
         arenaClusterManager.renderer = ClusterArenaRenderer(context, googleMap, arenaClusterManager)
@@ -77,31 +100,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
 
-        MapSettings.enableArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                Log.i(TAG, "Debug:: onPropertyChanged() enableArenas: ${MapSettings.enableArenas.get()}, markers: ${arenaClusterManager.markerCollection.markers.size}")
-                val markers = arenaClusterManager.markerCollection.markers
-                for (marker in markers) {
-                    (marker.tag as? FirebaseArena)?.let {
-                        marker.isVisible = ArenaViewModel(it).isArenaVisibleOnMap.get() == true
-                    }
-                }
-            }
-        })
-
-        MapSettings.enablePokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                Log.i(TAG, "Debug:: onPropertyChanged() enablePokestops: ${MapSettings.enablePokestops.get()}, markers: ${pokestopClusterManager.markerCollection.markers.size}")
-                MapSettings.enablePokestops.get()?.let { enablePokestops ->
-                    val markers = pokestopClusterManager.markerCollection.markers
-                    for (marker in markers) {
-                        (marker.tag as? FirebasePokestop)?.let {
-                            marker.isVisible = PokestopViewModel(it).isPokestopVisibleOnMap.get() == true
-                        }
-                    }
-                }
-            }
-        })
+        MapSettings.addObserver(mapSettingsObserver)
     }
 
     /**
