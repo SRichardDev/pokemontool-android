@@ -14,6 +14,11 @@ class App: Application() {
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
+    override fun onTerminate() {
+        appContext = null
+        super.onTerminate()
+    }
+
     companion object {
 
         private var appContext: Context? = null

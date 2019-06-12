@@ -62,9 +62,7 @@ object MapSettings {
         enablePokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 preferences.edit().putBoolean(::enablePokestops.name, enablePokestops.get() == true)?.apply()
-                Log.d(TAG, "Debug:: enablePokestops.onPropertyChanged(), observers: ${observers.size}")
                 observers.forEach {
-                    Log.d(TAG, "Debug:: enablePokestops.onPropertyChanged(), observer.value.get(): ${it.value.get()}")
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
             }
@@ -73,9 +71,7 @@ object MapSettings {
         justQuestPokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 preferences.edit().putBoolean(::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
-                Log.d(TAG, "Debug:: justQuestPokestops.onPropertyChanged(), observers: ${observers.size}")
                 observers.forEach {
-                    Log.d(TAG, "Debug:: justQuestPokestops.onPropertyChanged(), observer.value.get(): ${it.value.get()}")
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
             }
@@ -84,6 +80,9 @@ object MapSettings {
         enableSubscriptions.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 preferences.edit().putBoolean(::enableSubscriptions.name, enableSubscriptions.get() == true)?.apply()
+                observers.forEach {
+                    it.value.get()?.onSubscriptionsEnableDidChange()
+                }
             }
         })
     }
@@ -95,6 +94,7 @@ object MapSettings {
     interface MapSettingObserver {
         fun onArenasVisibilityDidChange()
         fun onPokestopsVisibilityDidChange()
+        fun onSubscriptionsEnableDidChange() {}
     }
 
     private val observers = HashMap<Int, WeakReference<MapSettingObserver>>()
@@ -102,6 +102,9 @@ object MapSettings {
     fun addObserver(observer: MapSettingObserver) {
         val weakObserver = WeakReference(observer)
         observers[observer.hashCode()] = weakObserver
+        observer.onArenasVisibilityDidChange()
+        observer.onPokestopsVisibilityDidChange()
+        observer.onSubscriptionsEnableDidChange()
     }
 
     fun removeObserver(observer: MapSettingObserver) {

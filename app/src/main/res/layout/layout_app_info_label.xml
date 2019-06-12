@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="@dimen/layout_margin_small"
+              android:background="@color/white">
+
+    <TextView
+        style="@style/TextStyle_error"
+        android:id="@+id/app_info_label_connection_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="Debug Connection Error"
+        tools:visibility="visible"/>
+
+    <TextView
+        style="@style/TextStyle_error"
+        android:id="@+id/app_info_label_arena_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="Debug Arena Filter"
+        tools:visibility="visible"/>
+
+    <TextView
+        style="@style/TextStyle_error"
+        android:id="@+id/app_info_label_pokestop_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="Debug Pokestop Filter"
+        tools:visibility="visible"/>
+
+    <TextView
+        style="@style/TextStyle_error"
+        android:id="@+id/app_info_label_subscriptions_enable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="Debug Subscription Filter"
+        tools:visibility="visible"/>
+
+</LinearLayout>

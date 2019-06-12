@@ -16,6 +16,7 @@ import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.screen.AccountFragment
 import io.stanc.pogotool.screen.MapInteractionFragment
+import io.stanc.pogotool.subscreen.AppInfoLabelController
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.activity_drawer.*
@@ -27,17 +28,7 @@ import java.lang.ref.WeakReference
 
 class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private var textView: TextView? = null
-    private val connectionListener = object : (Boolean) -> Unit {
-        override fun invoke(connected: Boolean) {
-            if (connected) {
-                textView?.visibility = View.GONE
-            } else {
-                textView?.visibility = View.VISIBLE
-                textView?.text = resources.getText(R.string.info_label_connection_lost)
-            }
-        }
-    }
+    private var appInfoLabelController: AppInfoLabelController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,14 +57,14 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseUser.addAuthStateObserver(authStateObserver)
         FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
-        FirebaseServer.addConnectionListener(connectionListener)
+        appInfoLabelController?.start()
     }
 
     override fun onPause() {
         FirebaseUser.stopAuthentication()
         FirebaseUser.removeAuthStateObserver(authStateObserver)
         FirebaseUser.removeUserDataObserver(userDataObserver)
-        FirebaseServer.removeConnectionListener(connectionListener)
+        appInfoLabelController?.stop()
         super.onPause()
     }
 
@@ -88,7 +79,9 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     private fun setupAppLabel() {
-        textView = findViewById(R.id.app_info_label)
+        findViewById<View>(R.id.app_info_label)?.let {
+            appInfoLabelController = AppInfoLabelController(it)
+        }
     }
 
     private fun setupDrawer() {

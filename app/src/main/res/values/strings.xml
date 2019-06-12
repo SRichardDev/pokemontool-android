@@ -141,5 +141,8 @@
 
     <!-- App Info Label -->
     <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell sein.</string>
+    <string name="info_label_arena_filter">Achtung: Arena filter ist aktiviert!</string>
+    <string name="info_label_pokestop_filter">Achtung: Pokestop filter ist aktiviert!</string>
+    <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
 
 </resources>
