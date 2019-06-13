@@ -10,23 +10,22 @@
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_arena"
-        fab:fab_icon="@drawable/icon_arena_30dp"/>
+        android:id="@+id/fab_new_poi"
+        fab:fab_icon="@drawable/icon_map_menu_crosshair_30dp"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_pokestop"
-        android:scaleType="matrix"
-        fab:fab_icon="@drawable/icon_pstop_30dp"/>
+        android:id="@+id/fab_push_registration"
+        fab:fab_icon="@drawable/icon_map_menu_push_30dp"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_edit_geo_hashs"
-        fab:fab_icon="@drawable/icon_map_30dp"/>
+        android:id="@+id/fab_map_type"
+        fab:fab_icon="@drawable/icon_map_menu_map_30dp"/>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
         style="@style/FABEx_menu_subbutton"
-        android:id="@+id/fab_settings"
+        android:id="@+id/fab_map_filter"
         fab:fab_icon="@drawable/icon_filter_30dp"/>
 
 </com.getbase.floatingactionbutton.FloatingActionsMenu>

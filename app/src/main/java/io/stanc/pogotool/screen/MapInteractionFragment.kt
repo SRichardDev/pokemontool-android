@@ -1,7 +1,6 @@
 package io.stanc.pogotool.screen
 
 import android.annotation.SuppressLint
-import android.databinding.Observable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
@@ -29,7 +28,6 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
-import io.stanc.pogotool.map.MapSettings
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -41,6 +39,7 @@ class MapInteractionFragment: Fragment() {
     private var clusterManager: ClusterManager? = null
     private var firebase: FirebaseDatabase? = null
 
+    private var map: GoogleMap? = null
     private var crosshairImage: ImageView? = null
     private var crosshairAnimation: Animation? = null
 
@@ -101,6 +100,8 @@ class MapInteractionFragment: Fragment() {
                 googleMap.setOnMapClickListener(onMapClickListener)
                 googleMap.setOnMapLongClickListener(onMapLongClickListener)
                 googleMap.setOnCameraIdleListener(onCameraIdleListener)
+                googleMap.uiSettings.isCompassEnabled = true
+                googleMap.uiSettings.setAllGesturesEnabled(true)
 
                 context?.let {
                     ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
@@ -121,6 +122,8 @@ class MapInteractionFragment: Fragment() {
 
                 mapGridProvider = MapGridProvider(googleMap)
                 mapGridProvider?.showGeoHashGridList()
+
+                map = googleMap
             }
 
             override fun onCameraStartAnimationFinished() {
@@ -274,50 +277,50 @@ class MapInteractionFragment: Fragment() {
             }
         })
 
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_edit_geo_hashs)?.let { fab ->
-            fab.setOnClickListener {
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_push_registration)?.setOnClickListener {
 
-                // TODO: refactor subscriptions !
-                dismissCrosshair()
-                mapGridProvider?.clearGeoHashGridList()
-                currentMode = MapMode.EDIT_GEO_HASHES
+            // TODO: refactor subscriptions !
+            dismissCrosshair()
+            mapGridProvider?.clearGeoHashGridList()
+            currentMode = MapMode.EDIT_GEO_HASHES
 
-                WaitingSpinner.showProgress(R.string.spinner_title_map_data)
-                firebase?.loadSubscriptions { geoHashes ->
-                    Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
+            WaitingSpinner.showProgress(R.string.spinner_title_map_data)
+            firebase?.loadSubscriptions { geoHashes ->
+                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
 
-                    geoHashes?.let {
-                        for (geoHash in geoHashes) {
-                            mapGridProvider?.showGeoHashGrid(geoHash)
-                        }
+                geoHashes?.let {
+                    for (geoHash in geoHashes) {
+                        mapGridProvider?.showGeoHashGrid(geoHash)
                     }
-
-                    WaitingSpinner.hideProgress()
                 }
+
+                WaitingSpinner.hideProgress()
             }
         }
 
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_arena)?.let { fab ->
-            fab.setOnClickListener {
-
-                showCrosshair()
-                currentMode = MapMode.NEW_ARENA
-            }
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
+            map?.mapType = nextMapType()
         }
 
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_pokestop)?.let { fab ->
-            fab.setOnClickListener {
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
 
-                showCrosshair()
-                currentMode = MapMode.NEW_POKESTOP
-            }
+            // TODO: new new-poi layout !
+            showCrosshair()
+            currentMode = MapMode.NEW_POKESTOP
         }
 
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_settings)?.let { fab ->
-            fab.setOnClickListener {
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
 
-                showMapSettingsFragment()
-            }
+            showMapSettingsFragment()
+        }
+    }
+
+    private fun nextMapType(): Int {
+        return when(map?.mapType) {
+            GoogleMap.MAP_TYPE_NORMAL -> GoogleMap.MAP_TYPE_SATELLITE
+            GoogleMap.MAP_TYPE_SATELLITE -> GoogleMap.MAP_TYPE_HYBRID
+            GoogleMap.MAP_TYPE_HYBRID -> GoogleMap.MAP_TYPE_NORMAL
+            else -> GoogleMap.MAP_TYPE_NORMAL
         }
     }
 
