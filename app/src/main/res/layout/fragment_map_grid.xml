@@ -19,17 +19,23 @@
              app:layout_constraintBottom_toBottomOf="parent"
              app:layout_constraintEnd_toEndOf="parent"/>
 
+    <android.support.constraint.Guideline
+        android:id="@+id/vertical_center_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
+
     <ImageView
-        android:id="@+id/fragment_map_imageview_crosshair"
-        android:src="@drawable/icon_crosshair_100dp"
+        android:id="@+id/fragment_map_imageview_poi"
+        android:src="@drawable/icon_map_poi"
         android:layout_height="0dp"
         android:layout_width="0dp"
-        app:layout_constraintHeight_percent=".5"
-        app:layout_constraintWidth_percent=".5"
+        app:layout_constraintHeight_percent=".1"
+        app:layout_constraintWidth_percent=".1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/vertical_center_guideline"
         android:visibility="gone"
         tools:visibility="visible"
         tools:ignore="ContentDescription"/>

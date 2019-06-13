@@ -18,7 +18,6 @@ import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.SystemUtils
 import kotlinx.android.synthetic.main.fragment_map_item.*
-import io.stanc.pogotool.screen.MapInteractionFragment.MapMode
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.map.ClusterArenaRenderer
@@ -30,8 +29,6 @@ class MapItemCreationFragment: Fragment() {
 
     private val TAG = javaClass.name
 
-    private var mapMode: MapMode? = null
-    private var mapItemName: String? = null
     private var position: LatLng? = null
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
@@ -63,7 +60,7 @@ class MapItemCreationFragment: Fragment() {
             close()
         }
 
-        if (mapMode == MapMode.NEW_ARENA) {
+        if (mapItem == MapItem.ARENA) {
 
             view.findViewById<CheckBox>(R.id.map_item_checkbox_isex_arena)?.let { checkbox ->
 
@@ -80,9 +77,9 @@ class MapItemCreationFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (mapMode == MapMode.NEW_ARENA) {
+        if (mapItem == MapItem.ARENA) {
             AppbarManager.setTitle(getString(R.string.map_title_arena))
-        } else if (mapMode == MapMode.NEW_POKESTOP) {
+        } else if (mapItem == MapItem.POKESTOP) {
             AppbarManager.setTitle(getString(R.string.map_title_pokestop))
         }
     }
@@ -110,9 +107,9 @@ class MapItemCreationFragment: Fragment() {
 
         return Kotlin.safeLet(context, position) { _context, _position->
 
-            when(mapMode) {
-                MapMode.NEW_ARENA ->  map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(_context, isArenaEx).position(_position))
-                MapMode.NEW_POKESTOP ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
+            when(mapItem) {
+                MapItem.ARENA ->  map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(_context, isArenaEx).position(_position))
+                MapItem.POKESTOP ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
                 else -> null
             }
 
@@ -129,8 +126,8 @@ class MapItemCreationFragment: Fragment() {
             position?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
-                when(mapMode) {
-                    MapMode.NEW_ARENA -> {
+                when(mapItem) {
+                    MapItem.ARENA -> {
                         map_item_edittext?.text?.toString()?.let { name ->
                             val isEX = map_item_checkbox_isex_arena?.isChecked?:kotlin.run { false }
                             val arena = FirebaseArena.new(name, geoHash, userId, isEX)
@@ -140,7 +137,7 @@ class MapItemCreationFragment: Fragment() {
 
                     }
 
-                    MapMode.NEW_POKESTOP -> {
+                    MapItem.POKESTOP -> {
                         map_item_edittext?.text?.toString()?.let { name ->
                             val pokestop = FirebasePokestop("", name, geoHash, userId)
                             Log.d(TAG, "push pokestop: $pokestop")
@@ -148,7 +145,7 @@ class MapItemCreationFragment: Fragment() {
                         }
                     }
 
-                    else -> Log.e(TAG, "Could not sending map item to server! Reason: unknown mapMode: $mapMode")
+                    else -> Log.e(TAG, "Could not sending map item to server! Reason: unknown mapItem: $mapItem")
                 }
             } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: position is $position") }
         } ?: kotlin.run { Log.e(TAG, "Could not sending map item to server! Reason: submitter userId is missing, userData: ${FirebaseUser.userData}") }
@@ -161,17 +158,14 @@ class MapItemCreationFragment: Fragment() {
 
     companion object {
 
-        fun newInstance(mapMode: MapMode, latLng: LatLng): MapItemCreationFragment {
+        enum class MapItem {
+            ARENA,
+            POKESTOP
+        }
+
+        fun newInstance(latLng: LatLng): MapItemCreationFragment {
             val fragment = MapItemCreationFragment()
-            fragment.mapMode = mapMode
             fragment.position = latLng
-
-            fragment.mapItemName = when(mapMode) {
-
-                MapMode.NEW_ARENA -> "Arena"
-                MapMode.NEW_POKESTOP -> "Pokestop"
-                else -> "<Unknown Item>"
-            }
 
             return fragment
         }

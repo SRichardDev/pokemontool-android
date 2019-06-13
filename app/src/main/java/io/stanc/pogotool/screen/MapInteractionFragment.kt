@@ -7,8 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.Toast
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -40,8 +38,7 @@ class MapInteractionFragment: Fragment() {
     private var firebase: FirebaseDatabase? = null
 
     private var map: GoogleMap? = null
-    private var crosshairImage: ImageView? = null
-    private var crosshairAnimation: Animation? = null
+    private var poiImage: ImageView? = null
 
     private var mapFragment: MapFragment? = null
 
@@ -77,9 +74,8 @@ class MapInteractionFragment: Fragment() {
         // floating action buttons
         setupFAB(rootLayout)
 
-        // crosshair
-        crosshairAnimation = AnimationUtils.loadAnimation(context, R.anim.flashing)
-        crosshairImage = rootLayout.findViewById(R.id.fragment_map_imageview_crosshair)
+        // poi
+        poiImage = rootLayout.findViewById(R.id.fragment_map_imageview_poi)
 
         return rootLayout
     }
@@ -140,9 +136,9 @@ class MapInteractionFragment: Fragment() {
 
         when(currentMode) {
 
-            MapMode.NEW_ARENA, MapMode.NEW_POKESTOP -> {
+            MapMode.SET_NEW_POI -> {
                 mapFragment?.centeredPosition()?.let { latlng ->
-                    showMapItemCreationFragment(currentMode, latlng)
+                    showMapItemCreationFragment(latlng)
                 }
             }
 
@@ -153,7 +149,7 @@ class MapInteractionFragment: Fragment() {
     private val onMapLongClickListener = GoogleMap.OnMapLongClickListener {
 
         if (PermissionManager.isLocationPermissionGranted(context)) {
-            if (currentMode == MapMode.EDIT_GEO_HASHES) {
+            if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
 
                 firebase?.formattedFirebaseGeoHash(GeoHash(it))?.let { geoHash ->
                     toggleSubscriptions(geoHash)
@@ -197,17 +193,17 @@ class MapInteractionFragment: Fragment() {
      * map
      */
 
-    enum class MapMode {
+    private enum class MapMode {
         DEFAULT,
-        EDIT_GEO_HASHES,
-        NEW_ARENA,
-        NEW_POKESTOP
+        EDIT_PUSH_REGISTRATION,
+        SET_NEW_POI
     }
+
     private var currentMode = MapMode.DEFAULT
 
-    private fun showMapItemCreationFragment(mapMode: MapMode, latLng: LatLng) {
+    private fun showMapItemCreationFragment(latLng: LatLng) {
 
-        val fragment = MapItemCreationFragment.newInstance(mapMode, latLng)
+        val fragment = MapItemCreationFragment.newInstance(latLng)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
@@ -271,7 +267,7 @@ class MapInteractionFragment: Fragment() {
             }
 
             private fun resetMap() {
-                dismissCrosshair()
+                dismissNewPoiIcon()
                 mapGridProvider?.clearGeoHashGridList()
                 currentMode = MapMode.DEFAULT
             }
@@ -280,9 +276,9 @@ class MapInteractionFragment: Fragment() {
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_push_registration)?.setOnClickListener {
 
             // TODO: refactor subscriptions !
-            dismissCrosshair()
+            dismissNewPoiIcon()
             mapGridProvider?.clearGeoHashGridList()
-            currentMode = MapMode.EDIT_GEO_HASHES
+            currentMode = MapMode.EDIT_PUSH_REGISTRATION
 
             WaitingSpinner.showProgress(R.string.spinner_title_map_data)
             firebase?.loadSubscriptions { geoHashes ->
@@ -305,8 +301,8 @@ class MapInteractionFragment: Fragment() {
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
 
             // TODO: new new-poi layout !
-            showCrosshair()
-            currentMode = MapMode.NEW_POKESTOP
+            showNewPoiIcon()
+            currentMode = MapMode.SET_NEW_POI
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
@@ -328,17 +324,13 @@ class MapInteractionFragment: Fragment() {
      * Crosshair
      */
 
-    private fun showCrosshair() {
-        crosshairImage?.visibility = View.VISIBLE
-        crosshairImage?.startAnimation(crosshairAnimation)
+    private fun showNewPoiIcon() {
+        poiImage?.visibility = View.VISIBLE
 
     }
 
-    private fun dismissCrosshair() {
-        crosshairAnimation?.cancel()
-        crosshairAnimation?.reset()
-        crosshairImage?.clearAnimation()
-        crosshairImage?.visibility = View.GONE
+    private fun dismissNewPoiIcon() {
+        poiImage?.visibility = View.GONE
     }
 
     companion object {
