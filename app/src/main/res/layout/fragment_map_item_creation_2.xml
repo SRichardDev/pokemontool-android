@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewmodel.MapItemViewModel" />
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layout_padding_screen"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/map_map_item_name_of_item"/>
+
+            <TextView
+                style="@style/TextStyle_sub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/map_map_item_name_of_item_subtext"
+                android:layout_marginTop="@dimen/layout_margin_small"/>
+
+            <EditText
+                style="@style/TextStyle_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="2"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@={viewModel.name}"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

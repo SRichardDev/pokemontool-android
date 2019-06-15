@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewpager.ViewPagerFragment" />
+
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/white">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/viewpager_button"
+            android:background="@color/white">
+
+            <android.support.v4.view.PagerTabStrip
+                android:id="@+id/viewpager_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp" />
+
+        </android.support.v4.view.ViewPager>
+
+        <Button
+            android:id="@+id/viewpager_button"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/viewpager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@{viewModel.viewPagerButtonText}"
+            android:onClick="@{viewModel::onButtonClicked}"
+            android:layout_margin="@dimen/layout_padding_screen"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

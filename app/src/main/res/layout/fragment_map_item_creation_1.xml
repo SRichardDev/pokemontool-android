@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewmodel.MapItemViewModel" />
+        <import type="android.view.View"/>
+        <import type="io.stanc.pogotool.viewmodel.MapItemViewModel.Type"/>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layout_padding_screen"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/map_map_item_which_item_to_add"/>
+
+            <!-- TODO: multistate layout here ! -->
+            <Switch
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:checked="@={viewModel.debug_typeIsArena}"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:visibility="@{viewModel.type == Type.Arena ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/TextStyle_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_map_item_isex_arena"/>
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/layout_margin_default"
+                    android:checked="@={viewModel.isEx}"/>
+
+            </LinearLayout>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/map_map_item_position_correct"
+                android:layout_marginTop="@dimen/layout_margin_default"/>
+
+            <TextView
+                style="@style/TextStyle_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/map_map_item_position_correct_subtext"
+                android:layout_marginTop="@dimen/layout_margin_small"/>
+
+            <fragment android:name="io.stanc.pogotool.subscreen.MapFragment"
+                      android:id="@+id/map_item_mapview"
+                      android:layout_width="match_parent"
+                      android:layout_height="300dp"
+                      android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

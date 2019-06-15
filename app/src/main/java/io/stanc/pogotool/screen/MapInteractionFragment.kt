@@ -201,12 +201,6 @@ class MapInteractionFragment: Fragment() {
 
     private var currentMode = MapMode.DEFAULT
 
-    private fun showMapItemCreationFragment(latLng: LatLng) {
-
-        val fragment = MapItemCreationFragment.newInstance(latLng)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
-    }
-
     private fun toggleSubscriptions(geoHash: GeoHash) {
 
         mapGridProvider?.let {
@@ -237,16 +231,25 @@ class MapInteractionFragment: Fragment() {
      */
 
     private fun showArenaFragment(arena: FirebaseArena) {
+        resetInteractionMap()
         val fragment = ArenaFragment.newInstance(arena)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     private fun showPokestopFragment(pokestop: FirebasePokestop) {
+        resetInteractionMap()
         val fragment = PokestopFragment.newInstance(pokestop)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
+    private fun showMapItemCreationFragment(latLng: LatLng) {
+        resetInteractionMap()
+        val fragment = MapItemCreationFragment.newInstance(latLng)
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+    }
+
     private fun showMapSettingsFragment() {
+        resetInteractionMap()
         val fragment = MapSettingsFragment()
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
@@ -259,24 +262,18 @@ class MapInteractionFragment: Fragment() {
 
         rootLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
             override fun onMenuCollapsed() {
-                resetMap()
+                resetInteractionMap()
             }
 
             override fun onMenuExpanded() {
-                resetMap()
-            }
-
-            private fun resetMap() {
-                dismissNewPoiIcon()
-                mapGridProvider?.clearGeoHashGridList()
-                currentMode = MapMode.DEFAULT
+                resetInteractionMap()
             }
         })
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_push_registration)?.setOnClickListener {
+            resetInteractionMap()
 
             // TODO: refactor subscriptions !
-            dismissNewPoiIcon()
             mapGridProvider?.clearGeoHashGridList()
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
 
@@ -295,20 +292,29 @@ class MapInteractionFragment: Fragment() {
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
+            resetInteractionMap()
+
             map?.mapType = nextMapType()
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
+            resetInteractionMap()
 
-            // TODO: new new-poi layout !
             showNewPoiIcon()
             currentMode = MapMode.SET_NEW_POI
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
+            resetInteractionMap()
 
             showMapSettingsFragment()
         }
+    }
+
+    private fun resetInteractionMap() {
+        dismissNewPoiIcon()
+        mapGridProvider?.clearGeoHashGridList()
+        currentMode = MapMode.DEFAULT
     }
 
     private fun nextMapType(): Int {
@@ -321,7 +327,7 @@ class MapInteractionFragment: Fragment() {
     }
 
     /**
-     * Crosshair
+     * poi
      */
 
     private fun showNewPoiIcon() {

@@ -68,9 +68,17 @@
     <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
     <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
-    <string name="map_map_item_button_cancel">Abbrechen</string>
-    <string name="map_map_item_button_send">Daten senden</string>
-    <string name="map_map_item_checkbox_isex_arena">Ist eine EX-Arena?</string>
+    <!--<string name="map_map_item_button_cancel">Abbrechen</string>-->
+    <string name="map_map_item_which_item_to_add">Was möchtest du einrichten?</string>
+    <string name="map_map_item_position_correct">Stimmt die Position?</string>
+    <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest und schiebe es bis die Position passt.</string>
+    <string name="map_map_item_name_of_item">Wie heißt der Pokestop/die Arena?</string>
+    <string name="map_map_item_name_of_item_subtext">Bitte gebe genau den Namen ein, den du auch im Spiel findest.</string>
+    <string name="map_map_item_isex_arena">EX-Arena?</string>
+    <string name="map_map_item_check_data">Sind deine Eingaben korrekt?</string>
+    <string name="map_map_item_check_data_subtext">Bitte beachte, dass es sich hier um nutzergenerierte Daten handelt. Stelle sicher, dass alles korrekt ist, damit andere Spieler den Pokestop/ die Arena auch finden können.</string>
+    <string name="map_map_item_button_further">Weiter</string>
+    <string name="map_map_item_button_send">Absenden</string>
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
@@ -132,7 +140,11 @@
     <string name="added_from">Hinzugefügt von:</string>
 
     <!-- Exceptions -->
-    <string name="exceptions_no_user">User wurde nicht gefunden.</string>
+    <string name="exceptions_send_map_item_invalid_type">Fehler! Unbekannter Kartentyp.</string>
+    <string name="exceptions_send_map_item_missing_position">Fehler! Fehlende position.</string>
+    <string name="exceptions_send_map_item_missing_user_id">Fehler! Fehlende User Id.</string>
+    <string name="exceptions_send_map_item_missing_arena_name">Fehler! Fehlender Arena Name.</string>
+    <string name="exceptions_send_map_item_missing_pokestop_name">Fehler! Fehlender Pokestop Name.</string>
 
     <!-- Popups -->
     <string name="popup_info_button_neutral">OK</string>

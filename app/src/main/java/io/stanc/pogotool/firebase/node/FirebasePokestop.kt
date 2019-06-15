@@ -11,7 +11,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogotool.geohash.GeoHash
 import java.util.*
 
-data class FirebasePokestop (
+data class FirebasePokestop private constructor(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
@@ -64,6 +64,10 @@ data class FirebasePokestop (
             }
 
             return null
+        }
+
+        fun new(name: String, geoHash: GeoHash, userId: String): FirebasePokestop {
+            return FirebasePokestop("", name, geoHash, userId)
         }
     }
 }
