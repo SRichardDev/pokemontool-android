@@ -11,7 +11,9 @@
         <import type="io.stanc.pogotool.viewmodel.MapItemViewModel.Type"/>
     </data>
 
-    <ScrollView
+    <io.stanc.pogotool.utils.InterceptableScrollView
+        android:orientation="vertical"
+        android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/layout_padding_screen"
@@ -80,6 +82,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+    </io.stanc.pogotool.utils.InterceptableScrollView>
 
 </layout>

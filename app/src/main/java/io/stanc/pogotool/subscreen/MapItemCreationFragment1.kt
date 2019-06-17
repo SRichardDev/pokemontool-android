@@ -13,12 +13,15 @@ import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.R
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
+import io.stanc.pogotool.utils.IconFactory
+import io.stanc.pogotool.utils.InterceptableScrollView
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 
 class MapItemCreationFragment1: Fragment() {
 
     private var viewModel: MapItemViewModel? = null
+    private var scrollview: InterceptableScrollView? = null
     private var mapFragment: MapFragment? = null
     private var map: GoogleMap? = null
     private var mapItemMarker: Marker? = null
@@ -37,7 +40,8 @@ class MapItemCreationFragment1: Fragment() {
         val binding = DataBindingUtil.inflate<io.stanc.pogotool.databinding.FragmentMapItemCreation1Binding>(inflater, R.layout.fragment_map_item_creation_1, container, false)
         binding.viewModel = viewModel
 
-        viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
+        scrollview = binding.root.findViewById(R.id.scrollview)
+            viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
         viewModel?.isEx?.addOnPropertyChangedCallback(onTypeChangeCallback)
         setupMapFragment()
 
@@ -47,6 +51,7 @@ class MapItemCreationFragment1: Fragment() {
     override fun onDestroyView() {
         viewModel?.type?.removeOnPropertyChangedCallback(onTypeChangeCallback)
         viewModel?.isEx?.removeOnPropertyChangedCallback(onTypeChangeCallback)
+        mapFragment?.mapView?.let { scrollview?.removeInterceptScrollView(it) }
         super.onDestroyView()
     }
 
@@ -65,6 +70,7 @@ class MapItemCreationFragment1: Fragment() {
             override fun onMapReady(googleMap: GoogleMap) {
                 map = googleMap
                 updateMarker()
+                mapFragment?.mapView?.let { scrollview?.addInterceptScrollView(it) }
             }
         })
     }
@@ -75,17 +81,30 @@ class MapItemCreationFragment1: Fragment() {
 
     private fun addMarker(): Marker? {
 
-        return Kotlin.safeLet(context, viewModel?.type?.get(), viewModel?.position?.get()) { context, mapItemType, position->
+        val markerOptions = Kotlin.safeLet(context, viewModel?.type?.get()) { context, mapItemType ->
 
             when(mapItemType) {
                 MapItemViewModel.Type.Arena ->  {
                     val isArenaEx = viewModel?.isEx?.get()?: kotlin.run { false }
-                    map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx).position(position))
+                    ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG)
                 }
-                MapItemViewModel.Type.Pokestop ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context).position(position))
+                MapItemViewModel.Type.Pokestop ->  {
+                    ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG)
+                }
             }
 
         } ?: kotlin.run { null }
+
+
+        return markerOptions?.let { _markerOptions ->
+
+            viewModel?.position?.get()?.let { _markerOptions.position(it) }
+            _markerOptions.draggable(true)
+            map?.addMarker(_markerOptions)
+
+        } ?: kotlin.run {
+            null
+        }
     }
 
     private fun close() {

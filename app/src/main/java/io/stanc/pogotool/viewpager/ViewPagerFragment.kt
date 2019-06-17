@@ -13,14 +13,13 @@ import android.view.ViewGroup
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.databinding.LayoutViewpagerBinding
-import java.text.FieldPosition
 
 abstract class ViewPagerFragment: Fragment() {
 
     private val TAG = javaClass.name
 
     protected var viewPager: ViewPager? = null
-    protected abstract fun viewPagerAdapter(): FragmentPagerAdapter?
+    protected abstract val viewPagerAdapter: FragmentPagerAdapter
     protected abstract fun navigationButtonClickedOnTheLastPage()
     protected abstract fun onPageChanged(position: Int)
 
@@ -31,7 +30,7 @@ abstract class ViewPagerFragment: Fragment() {
 
         binding.root.findViewById<ViewPager>(R.id.viewpager)?.let { viewpager ->
 
-            viewpager.adapter = viewPagerAdapter()
+            viewpager.adapter = viewPagerAdapter
             viewpager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
 
                 override fun onPageScrollStateChanged(p0: Int) {}

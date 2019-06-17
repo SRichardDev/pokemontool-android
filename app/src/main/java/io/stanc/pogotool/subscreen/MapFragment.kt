@@ -31,7 +31,8 @@ open class MapFragment : Fragment() {
 
     var map: GoogleMap? = null
 
-    private var mapView: MapView? = null
+    var mapView: MapView? = null
+        private set
     private var delegate: MapDelegate? = null
     private var locationManager: LocationManager? = null
 

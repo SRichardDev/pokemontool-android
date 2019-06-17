@@ -3,6 +3,7 @@ package io.stanc.pogotool.firebase.node
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.FirebaseImageMapper
@@ -42,16 +43,16 @@ data class FirebaseArena private constructor(
         return data
     }
 
-    fun icon(context: Context, iconSizeConfig: IconFactory.IconSizeConfig): Bitmap? {
+    fun icon(context: Context, sizeMod: IconFactory.SizeMod): Bitmap? {
 
         return backgroundDrawable(context, isEX)?.let { backgroundDrawable ->
 
             val iconConfig = IconFactory.IconConfig(
-                backgroundConfig = IconFactory.DrawableConfig(backgroundDrawable, iconSizeConfig.backgroundSize)
+                backgroundDrawable
             )
 
             FirebaseImageMapper.raidDrawable(context, this)?.let { foregroundDrawable ->
-                iconConfig.foregroundConfig = IconFactory.DrawableConfig(foregroundDrawable, iconSizeConfig.foregroundSize)
+                iconConfig.foregroundDrawable = foregroundDrawable
             }
 
             raid?.let {
@@ -62,6 +63,7 @@ data class FirebaseArena private constructor(
             }
 
             iconConfig.footerText = name
+            iconConfig.sizeMod = sizeMod
 
             return IconFactory.bitmap(context, iconConfig)
 
@@ -106,13 +108,11 @@ data class FirebaseArena private constructor(
             return FirebaseArena("", name, geoHash, userId, isEX)
         }
 
-        fun baseIcon(context: Context, isEX: Boolean, iconSize: IconFactory.IconSizeConfig): Bitmap? {
+        fun baseIcon(context: Context, isEX: Boolean, sizeMod: IconFactory.SizeMod): Bitmap? {
 
             backgroundDrawable(context, isEX)?.let { drawable ->
 
-                val iconConfig = IconFactory.IconConfig (
-                    backgroundConfig = IconFactory.DrawableConfig(drawable, iconSize.backgroundSize)
-                )
+                val iconConfig = IconFactory.IconConfig(drawable, null, sizeMod)
                 return IconFactory.bitmap(context, iconConfig)
 
             } ?: kotlin.run {
@@ -123,9 +123,9 @@ data class FirebaseArena private constructor(
 
         private fun backgroundDrawable(context: Context, isEX: Boolean): Drawable? {
             return if (isEX) {
-                context.getDrawable(R.drawable.icon_arena_ex_30dp)
+                ContextCompat.getDrawable(context, R.drawable.icon_arena_ex_30dp)
             } else {
-                context.getDrawable(R.drawable.icon_arena_30dp)
+                ContextCompat.getDrawable(context, R.drawable.icon_arena_30dp)
             }
         }
     }

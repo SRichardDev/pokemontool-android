@@ -49,16 +49,9 @@ class MapItemCreationFragment: ViewPagerFragment() {
         super.onPause()
     }
 
-    override fun viewPagerAdapter(): FragmentPagerAdapter? {
 
-        return fragmentManager?.let { fragmentManager ->
-
-            MatItemCreationViewPagerAdapter(fragmentManager, viewModel)
-
-        } ?: kotlin.run {
-            Log.e(TAG, "fragmentManager: $fragmentManager is null, therefore could not create a viewPagerAdapter")
-            null
-        }
+    override val viewPagerAdapter: FragmentPagerAdapter by lazy {
+        MatItemCreationViewPagerAdapter(childFragmentManager, viewModel)
     }
 
     override fun navigationButtonClickedOnTheLastPage() {

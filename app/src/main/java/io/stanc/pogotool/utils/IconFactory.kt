@@ -3,23 +3,23 @@ package io.stanc.pogotool.utils
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.support.annotation.DrawableRes
+import android.support.v4.content.ContextCompat
+import android.util.Log
 
 object IconFactory {
     private val TAG = javaClass.name
 
-    data class IconSizeConfig (
-        val backgroundSize: Int,
-        val foregroundSize: Int
-    )
-
-    data class DrawableConfig (
-        val drawable: Drawable,
-        val size: Int
-    )
+    enum class SizeMod {
+        DEFAULT,
+        BIG,
+        LARGE
+    }
 
     data class IconConfig (
-        val backgroundConfig: DrawableConfig,
-        var foregroundConfig: DrawableConfig? = null,
+        val backgroundDrawable: Drawable,
+        var foregroundDrawable: Drawable? = null,
+        var sizeMod: SizeMod = IconFactory.SizeMod.DEFAULT,
         var headerText: String? = null,
         var footerText: String? = null
     )
@@ -28,18 +28,37 @@ object IconFactory {
     private const val FOOTER_TEXT_RAW_SIZE: Float = 10.0f
     private const val TEXT_COLOR = Color.BLACK
 
+    fun bitmap(context: Context, @DrawableRes id: Int, sizeMode: SizeMod = IconFactory.SizeMod.DEFAULT): Bitmap? {
+
+        ContextCompat.getDrawable(context, id)?.let { drawable ->
+
+            val height = scaledLength(drawable.intrinsicHeight, sizeMode)
+            val width = scaledLength(drawable.intrinsicWidth, sizeMode)
+
+            drawable.setBounds(0, 0, width, height)
+            val bm = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bm)
+            drawable.draw(canvas)
+
+            return bm
+
+        } ?: kotlin.run {
+            return null
+        }
+    }
+
     fun bitmap(context: Context, iconConfig: IconConfig): Bitmap {
 
         val bitmap = createBitmap(context, iconConfig)
         val canvas = Canvas(bitmap)
 
-        // TODO: for debugging
+        // TODO: for debugging only
 //        canvas.drawColor(Color.YELLOW)
 
         val backgroundDrawable = drawBackground(canvas, iconConfig, context)
 
-        iconConfig.foregroundConfig?.let { foregroundConfig ->
-            drawForeground(canvas, foregroundConfig, backgroundDrawable, iconConfig.backgroundConfig.size)
+        iconConfig.foregroundDrawable?.let { foregroundDrawable ->
+            drawForeground(canvas, foregroundDrawable, backgroundDrawable, iconConfig.sizeMod)
         }
 
         iconConfig.headerText?.let { headerText ->
@@ -55,7 +74,7 @@ object IconFactory {
 
     private fun createBitmap(context: Context, iconConfig: IconConfig): Bitmap {
 
-        var iconWidth = iconConfig.backgroundConfig.size
+        var iconWidth = scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod)
         iconConfig.headerText?.let { headerText ->
             iconWidth = maxOf(iconWidth, textPaint(context, HEADER_TEXT_RAW_SIZE).measureText(headerText).toInt())
         }
@@ -63,7 +82,7 @@ object IconFactory {
             iconWidth = maxOf(iconWidth, textPaint(context, FOOTER_TEXT_RAW_SIZE).measureText(footerText).toInt())
         }
 
-        var iconHeight = iconConfig.backgroundConfig.size
+        var iconHeight = scaledLength(iconConfig.backgroundDrawable.intrinsicHeight, iconConfig.sizeMod)
         iconConfig.headerText?.let {
             iconHeight += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         }
@@ -75,23 +94,23 @@ object IconFactory {
     }
 
     private fun drawBackground(canvas: Canvas, iconConfig: IconConfig, context: Context): Drawable {
-        val marginHorizontal = (canvas.width - iconConfig.backgroundConfig.size) / 2
+        val marginHorizontal = (canvas.width - scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod)) / 2
 
         val marginTop = if (iconConfig.headerText.isNullOrEmpty()) 0 else textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         val marginBottom = if (iconConfig.footerText.isNullOrEmpty()) 0 else textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
 
-        val backgroundDrawable = iconConfig.backgroundConfig.drawable
-        backgroundDrawable.setBounds(marginHorizontal, marginTop,  iconConfig.backgroundConfig.size + marginHorizontal, canvas.height - marginBottom)
+        val backgroundDrawable = iconConfig.backgroundDrawable
+        backgroundDrawable.setBounds(marginHorizontal, marginTop,  scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod) + marginHorizontal, canvas.height - marginBottom)
         backgroundDrawable.draw(canvas)
 
         return backgroundDrawable
     }
 
-    private fun drawForeground(canvas: Canvas, foregroundConfig: DrawableConfig, backgroundDrawable: Drawable, backgroundSize: Int) {
-        val margin = (backgroundSize - foregroundConfig.size) / 2
+    private fun drawForeground(canvas: Canvas, foregroundDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
+        val marginHorizontal = (scaledLength(backgroundDrawable.intrinsicWidth, sizeMod) - scaledLength(foregroundDrawable.intrinsicWidth, sizeMod)) / 2
+        val marginVertically = (scaledLength(backgroundDrawable.intrinsicHeight, sizeMod) - scaledLength(foregroundDrawable.intrinsicHeight, sizeMod)) / 2
 
-        val foregroundDrawable = foregroundConfig.drawable
-        foregroundDrawable.setBounds(backgroundDrawable.bounds.left + margin, backgroundDrawable.bounds.top + margin, backgroundDrawable.bounds.right - margin, backgroundDrawable.bounds.bottom - margin)
+        foregroundDrawable.setBounds(backgroundDrawable.bounds.left + marginHorizontal, backgroundDrawable.bounds.top + marginVertically, backgroundDrawable.bounds.right - marginHorizontal, backgroundDrawable.bounds.bottom - marginVertically)
         foregroundDrawable.draw(canvas)
     }
 
@@ -121,5 +140,14 @@ object IconFactory {
         textPaint.color = TEXT_COLOR
         textPaint.textSize = textRawSize * context.resources.displayMetrics.density
         return textPaint
+    }
+
+    private fun scaledLength(length: Int, sizeMode: SizeMod): Int {
+        val scaleFactor = when(sizeMode) {
+            IconFactory.SizeMod.DEFAULT -> 1.0f
+            IconFactory.SizeMod.BIG -> 1.5f
+            IconFactory.SizeMod.LARGE -> 3.0f
+        }
+        return (length * scaleFactor).toInt()
     }
 }

@@ -1,7 +1,6 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -30,7 +29,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
         Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
-            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena)).anchor(ANCHOR_X, ANCHOR_Y)
+            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena, IconFactory.SizeMod.DEFAULT)).anchor(ANCHOR_X, ANCHOR_Y)
         }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
@@ -47,25 +46,22 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private val TAG = javaClass.name
 
-        private const val ICON_SIZE: Int = 100
-        private const val INNER_ICON_SIZE: Int = 60
-        private val ICON_CONFIG = IconFactory.IconSizeConfig(ICON_SIZE, INNER_ICON_SIZE)
         // TODO: calculate anchor, depending on header & footer text, the bottom of arena icon should be the map location position !
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun getBitmapDescriptor(context: Context, arena: FirebaseArena): BitmapDescriptor {
-            val arenaIconBitmap = arena.icon(context, ICON_CONFIG)
+        private fun getBitmapDescriptor(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
+            val arenaIconBitmap = arena.icon(context, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
-        private fun getBitmapDescriptor(context: Context, isEx: Boolean = false): BitmapDescriptor {
-            val arenaIconBitmap = FirebaseArena.baseIcon(context, isEx, ICON_CONFIG)
+        private fun getBitmapDescriptor(context: Context, isEx: Boolean = false, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
+            val arenaIconBitmap = FirebaseArena.baseIcon(context, isEx, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
-        fun arenaMarkerOptions(context: Context, isEx: Boolean = false): MarkerOptions {
-            return MarkerOptions().icon(getBitmapDescriptor(context, isEx)).anchor(ANCHOR_X, ANCHOR_Y)
+        fun arenaMarkerOptions(context: Context, isEx: Boolean = false, sizeMod: IconFactory.SizeMod = IconFactory.SizeMod.DEFAULT): MarkerOptions {
+            return MarkerOptions().icon(getBitmapDescriptor(context, isEx, sizeMod)).anchor(ANCHOR_X, ANCHOR_Y)
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {

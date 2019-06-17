@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.support.annotation.DrawableRes
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
+import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.viewmodel.PokestopViewModel
 
@@ -31,7 +33,7 @@ class ClusterPokestopRenderer(
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
-        markerOptions?.title(item?.title)?.icon(icon(context))?.anchor(ANCHOR_X, ANCHOR_Y)
+        markerOptions?.title(item?.title)?.icon(getBitmapDescriptor(context, IconFactory.SizeMod.DEFAULT))?.anchor(ANCHOR_X, ANCHOR_Y)
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
@@ -47,26 +49,16 @@ class ClusterPokestopRenderer(
 
         private val TAG = javaClass.name
 
-        private const val ICON_HEIGHT: Int = 75
-        private const val ICON_WIDTH: Int = 25
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun icon(context: Context) = getBitmapDescriptor(context, R.drawable.icon_pstop_30dp)
-
-        private fun getBitmapDescriptor(context: Context, @DrawableRes id: Int): BitmapDescriptor {
-            val vectorDrawable = context.getDrawable(id)
-
-            vectorDrawable?.setBounds(0, 0, ICON_WIDTH, ICON_HEIGHT)
-            val bm = Bitmap.createBitmap(ICON_WIDTH, ICON_HEIGHT, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bm)
-            vectorDrawable?.draw(canvas)
-
+        private fun getBitmapDescriptor(context: Context, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
+            val bm = IconFactory.bitmap(context, R.drawable.icon_pstop_30dp, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(bm)
         }
 
-        fun pokestopMarkerOptions(context: Context): MarkerOptions {
-            return MarkerOptions().icon(icon(context)).anchor(ANCHOR_X, ANCHOR_Y)
+        fun pokestopMarkerOptions(context: Context, sizeMod: IconFactory.SizeMod = IconFactory.SizeMod.DEFAULT): MarkerOptions {
+            return MarkerOptions().icon(getBitmapDescriptor(context, sizeMod)).anchor(ANCHOR_X, ANCHOR_Y)
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {

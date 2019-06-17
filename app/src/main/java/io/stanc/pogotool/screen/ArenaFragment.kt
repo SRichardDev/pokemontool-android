@@ -94,8 +94,7 @@ class ArenaFragment: Fragment() {
     }
 
     private fun setIconArena(imageView: ImageView, context: Context, arena: FirebaseArena) {
-        val iconConfig = IconFactory.IconSizeConfig(backgroundSize = 128, foregroundSize = 64)
-        val arenaIcon = arena.icon(context, iconConfig)
+        val arenaIcon = arena.icon(context, IconFactory.SizeMod.LARGE)
         imageView.setImageBitmap(arenaIcon)
     }
 
