@@ -40,4 +40,36 @@
         tools:visibility="visible"
         tools:ignore="ContentDescription"/>
 
+    <LinearLayout
+        android:id="@+id/fragment_map_layout_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="@dimen/layout_margin_default"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageButton
+            style="@style/ImageButton"
+            android:id="@+id/fragment_map_button_negative"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:tint="@color/colorRed"
+            android:src="@drawable/icon_cancel_24dp"
+            android:background="@color/transparent"/>
+
+        <ImageButton
+            style="@style/ImageButton"
+            android:id="@+id/fragment_map_button_positive"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="@dimen/layout_margin_large"
+            android:src="@drawable/icon_check_24dp"
+            android:background="@color/transparent"/>
+
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

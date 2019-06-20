@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -39,8 +40,10 @@ class MapInteractionFragment: Fragment() {
 
     private var map: GoogleMap? = null
     private var poiImage: ImageView? = null
+    private var actionButtonLayout: View? = null
 
     private var mapFragment: MapFragment? = null
+    private var famButton: FloatingActionsMenu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +80,9 @@ class MapInteractionFragment: Fragment() {
         // poi
         poiImage = rootLayout.findViewById(R.id.fragment_map_imageview_poi)
 
+        // button layout
+        setupNewPoiViews(rootLayout)
+
         return rootLayout
     }
 
@@ -93,7 +99,6 @@ class MapInteractionFragment: Fragment() {
 
             override fun onMapReady(googleMap: GoogleMap) {
 
-                googleMap.setOnMapClickListener(onMapClickListener)
                 googleMap.setOnMapLongClickListener(onMapLongClickListener)
                 googleMap.setOnCameraIdleListener(onCameraIdleListener)
                 googleMap.uiSettings.isCompassEnabled = true
@@ -131,20 +136,6 @@ class MapInteractionFragment: Fragment() {
     /**
      * map listener
      */
-
-    private val onMapClickListener = GoogleMap.OnMapClickListener {
-
-        when(currentMode) {
-
-            MapMode.SET_NEW_POI -> {
-                mapFragment?.centeredPosition()?.let { latlng ->
-                    showMapItemCreationFragment(latlng)
-                }
-            }
-
-            else -> {}
-        }
-    }
 
     private val onMapLongClickListener = GoogleMap.OnMapLongClickListener {
 
@@ -260,20 +251,18 @@ class MapInteractionFragment: Fragment() {
 
     private fun setupFAB(rootLayout: View) {
 
-        rootLayout.findViewById<FloatingActionsMenu>(R.id.fab_menu)?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
+        famButton = rootLayout.findViewById(R.id.fab_menu)
+        famButton?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
             override fun onMenuCollapsed() {
                 resetInteractionMap()
             }
 
-            override fun onMenuExpanded() {
-                resetInteractionMap()
-            }
+            override fun onMenuExpanded() {}
         })
 
+        // TODO: refactor subscriptions !
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_push_registration)?.setOnClickListener {
-            resetInteractionMap()
 
-            // TODO: refactor subscriptions !
             mapGridProvider?.clearGeoHashGridList()
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
 
@@ -292,22 +281,36 @@ class MapInteractionFragment: Fragment() {
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
-            resetInteractionMap()
-
             map?.mapType = nextMapType()
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
             resetInteractionMap()
-
             showNewPoiIcon()
             currentMode = MapMode.SET_NEW_POI
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
-            resetInteractionMap()
-
             showMapSettingsFragment()
+        }
+    }
+
+    private fun setupNewPoiViews(rootLayout: View) {
+        actionButtonLayout = rootLayout.findViewById(R.id.fragment_map_layout_buttons)
+        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_positive)?.setOnClickListener {
+            when(currentMode) {
+
+                MapMode.SET_NEW_POI -> {
+                    mapFragment?.centeredPosition()?.let { latlng ->
+                        showMapItemCreationFragment(latlng)
+                    }
+                }
+
+                else -> {}
+            }
+        }
+        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_negative)?.setOnClickListener {
+            resetInteractionMap()
         }
     }
 
@@ -315,6 +318,7 @@ class MapInteractionFragment: Fragment() {
         dismissNewPoiIcon()
         mapGridProvider?.clearGeoHashGridList()
         currentMode = MapMode.DEFAULT
+        famButton?.collapse()
     }
 
     private fun nextMapType(): Int {
@@ -332,11 +336,12 @@ class MapInteractionFragment: Fragment() {
 
     private fun showNewPoiIcon() {
         poiImage?.visibility = View.VISIBLE
-
+        actionButtonLayout?.visibility = View.VISIBLE
     }
 
     private fun dismissNewPoiIcon() {
         poiImage?.visibility = View.GONE
+        actionButtonLayout?.visibility = View.GONE
     }
 
     companion object {

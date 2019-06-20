@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.R
 import io.stanc.pogotool.map.ClusterArenaRenderer
 import io.stanc.pogotool.map.ClusterPokestopRenderer
+import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 
@@ -68,9 +69,9 @@ class MapItemCreationFragment3: Fragment() {
             when(mapItemType) {
                 MapItemViewModel.Type.Arena ->  {
                     val isArenaEx = viewModel?.isEx?.get()?: kotlin.run { false }
-                    map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx).position(position))
+                    map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG).position(position))
                 }
-                MapItemViewModel.Type.Pokestop ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context).position(position))
+                MapItemViewModel.Type.Pokestop ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG).position(position))
             }
 
         } ?: kotlin.run { null }
