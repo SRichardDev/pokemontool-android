@@ -25,6 +25,8 @@
     <dimen name="raid_eggs_height">64dp</dimen>
     <dimen name="raid_picker_height">128dp</dimen>
 
+    <dimen name="stroke_line">2dp</dimen>
+
     <dimen name="recycleview_list_item_height">96dp</dimen>
 
 </resources>

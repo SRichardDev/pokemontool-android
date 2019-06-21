@@ -3,29 +3,28 @@ package io.stanc.pogotool.viewmodel
 import android.arch.lifecycle.ViewModel
 import android.databinding.Observable
 import android.databinding.ObservableField
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
+import io.stanc.pogotool.utils.SegmentedControlView
 
 class MapItemViewModel: ViewModel() {
+    private val TAG = javaClass.name
 
     val position = ObservableField<LatLng>()
     val type = ObservableField<Type>(Type.Pokestop)
-    // TODO: remove this field
-    val debug_typeIsArena = ObservableField<Boolean>(false)
     val isEx = ObservableField<Boolean?>()
     val name = ObservableField<String>()
     val nameWithType = ObservableField<String>()
 
-    init {
-        debug_typeIsArena.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                if (debug_typeIsArena.get() == true) {
-                    type.set(Type.Arena)
-                } else {
-                    type.set(Type.Pokestop)
-                }
-            }
-        })
+    fun onSelectedStateDidChange(selection: SegmentedControlView.Selection) {
+        when(selection) {
+            SegmentedControlView.Selection.LEFT -> type.set(Type.Pokestop)
+            SegmentedControlView.Selection.RIGHT -> type.set(Type.Arena)
+            else -> {}
+        }
+    }
 
+    init {
         type.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
                 updateNameWithType()
