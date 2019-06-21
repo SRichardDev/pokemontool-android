@@ -75,12 +75,10 @@ class SegmentedControlView: LinearLayout {
     }
 
     fun setOnSelectionChangeListener(listener: OnSelectionChangeListener) {
-        Log.i(TAG, "Debug:: setOnSelectionChangeListener(listener: $listener)")
         onSelectionChangeListener = WeakReference(listener)
     }
 
     fun setSegment(text: String, selection: Selection) {
-        Log.i(TAG, "Debug:: setSegment(text: $text, selection: ${selection.name})")
         when(selection) {
             Selection.LEFT -> buttonLeft.text = text
             Selection.MIDDLE -> buttonMiddle.text = text
@@ -91,7 +89,6 @@ class SegmentedControlView: LinearLayout {
     }
 
     private fun selectButton(selection: Selection) {
-        Log.i(TAG, "Debug:: selectButton(selection: ${selection.name})")
         when(selection) {
             Selection.LEFT -> {
                 buttonLeft.isSelected = true

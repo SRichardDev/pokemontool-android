@@ -55,7 +55,6 @@ class MapItemCreationFragment1: Fragment() {
         super.onDestroyView()
     }
 
-    // TODO: add functionality to move marker on map
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
@@ -105,10 +104,6 @@ class MapItemCreationFragment1: Fragment() {
         } ?: kotlin.run {
             null
         }
-    }
-
-    private fun close() {
-        fragmentManager?.popBackStack()
     }
 
     companion object {

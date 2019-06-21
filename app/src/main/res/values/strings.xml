@@ -26,7 +26,7 @@
     <string name="nav_menu_item_map">Karte</string>
 
     <!-- Authentication -->
-    <string name="authentication_app_title">Account Daten</string>
+    <string name="authentication_app_title">Account</string>
     <string name="authentication_user_state">Account: %s</string>
     <string name="authentication_user_name">Benutzer: %s</string>
     <string name="authentication_user_email">Email: %s</string>
@@ -46,6 +46,13 @@
     <string name="authentication_button_verify_email">Email verifizieren</string>
     <string name="authentication_button_open_user_name">Benutzername ändern</string>
     <string name="authentication_button_send_user_name">Neuen Benutzernamen senden</string>
+    <string name="authentication_button_edit_infos">Infos bearbeiten</string>
+    <string name="authentication_button_enable_push_notifications">Push Nachrichten</string>
+    <string name="authentication_button_medal">Medaillien:</string>
+    <string name="authentication_medal_text_pokestops">Eingereichte Pokestops</string>
+    <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
+    <string name="authentication_medal_text_raids">Eingereichte Raids</string>
+    <string name="authentication_medal_text_quests">Eingereichte Quests</string>
 
     <string name="authentication_hint_email">Gebe deine Emailadresse hier ein.</string>
     <string name="authentication_hint_password">Gebe dein Passwort hier ein.</string>
@@ -89,12 +96,11 @@
 
     <!-- Map Settings -->
     <string name="map_settings_title">Karten Filter</string>
-    <string name="map_setting_arena">Arenas anzeigen</string>
+    <string name="map_setting_arena">Arenen anzeigen</string>
     <string name="map_setting_arena_raid">nur mit Raid</string>
     <string name="map_setting_arena_ex">nur EX</string>
     <string name="map_setting_pokestop">Pokestops anzeigen</string>
     <string name="map_setting_pokestop_quest">nur mit Quest</string>
-    <string name="map_setting_subscriptions">Notifications anschalten</string>
 
     <!-- Raid -->
     <string name="raid_app_title">Neuer Level %d Raid</string>

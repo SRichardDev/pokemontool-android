@@ -8,7 +8,7 @@ import io.stanc.pogotool.subscreen.MapItemCreationFragment2
 import io.stanc.pogotool.subscreen.MapItemCreationFragment3
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 
-class MatItemCreationViewPagerAdapter(fragmentManager: FragmentManager, private val mapItemViewModel: MapItemViewModel): FragmentPagerAdapter(fragmentManager) {
+class MapItemCreationFragmentPagerAdapter(fragmentManager: FragmentManager, private val mapItemViewModel: MapItemViewModel): FragmentPagerAdapter(fragmentManager) {
 
     private val NUM_PAGES = 3
 

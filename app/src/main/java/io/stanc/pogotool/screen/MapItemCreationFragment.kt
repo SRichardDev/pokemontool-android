@@ -51,7 +51,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
 
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
-        MatItemCreationViewPagerAdapter(childFragmentManager, viewModel)
+        MapItemCreationFragmentPagerAdapter(childFragmentManager, viewModel)
     }
 
     override fun navigationButtonClickedOnTheLastPage() {

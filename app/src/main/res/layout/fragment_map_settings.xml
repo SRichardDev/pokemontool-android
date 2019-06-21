@@ -5,8 +5,8 @@
     <data>
 
         <variable
-            name="mapSettings"
-            type="io.stanc.pogotool.map.MapSettings"/>
+            name="settings"
+            type="io.stanc.pogotool.AppSettings"/>
     </data>
 
     <LinearLayout
@@ -35,7 +35,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.enableArenas}"/>
+                android:checked="@={settings.enableArenas}"/>
 
         </LinearLayout>
 
@@ -59,7 +59,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.justRaidArenas}"/>
+                android:checked="@={settings.justRaidArenas}"/>
 
         </LinearLayout>
 
@@ -83,7 +83,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.justEXArenas}"/>
+                android:checked="@={settings.justEXArenas}"/>
 
         </LinearLayout>
 
@@ -109,7 +109,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.enablePokestops}"/>
+                android:checked="@={settings.enablePokestops}"/>
 
         </LinearLayout>
 
@@ -133,33 +133,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.justQuestPokestops}"/>
-
-        </LinearLayout>
-
-        <include layout="@layout/layout_divider"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/layout_margin_small">
-
-            <TextView
-                android:id="@+id/map_settings_textview_filter_subscriptions"
-                style="@style/TextStyle_default"
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:layout_height="wrap_content"
-                android:text="@string/map_setting_subscriptions"/>
-
-            <Switch
-                android:id="@+id/map_settings_switch_filter_subscriptions"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/layout_margin_small"
-                android:checked="@={mapSettings.enableSubscriptions}"/>
+                android:checked="@={settings.justQuestPokestops}"/>
 
         </LinearLayout>
 

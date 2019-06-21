@@ -5,7 +5,7 @@ import android.widget.TextView
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseServer
-import io.stanc.pogotool.map.MapSettings
+import io.stanc.pogotool.AppSettings
 import java.lang.ref.WeakReference
 
 class AppInfoLabelController(layout: View) {
@@ -18,12 +18,12 @@ class AppInfoLabelController(layout: View) {
 
     fun start() {
         FirebaseServer.addConnectionListener(connectionListener)
-        MapSettings.addObserver(mapSettingsObserver)
+        AppSettings.addObserver(mapSettingsObserver)
     }
 
     fun stop() {
         FirebaseServer.removeConnectionListener(connectionListener)
-        MapSettings.removeObserver(mapSettingsObserver)
+        AppSettings.removeObserver(mapSettingsObserver)
     }
 
 
@@ -39,10 +39,10 @@ class AppInfoLabelController(layout: View) {
         }
     }
 
-    private val mapSettingsObserver = object : MapSettings.MapSettingObserver {
+    private val mapSettingsObserver = object : AppSettings.MapSettingObserver {
 
         override fun onArenasVisibilityDidChange() {
-            val filterActivated =  MapSettings.enableArenas.get() == false || MapSettings.justEXArenas.get() == true || MapSettings.justRaidArenas.get() == true
+            val filterActivated =  AppSettings.enableArenas.get() == false || AppSettings.justEXArenas.get() == true || AppSettings.justRaidArenas.get() == true
             if (filterActivated) {
                 arenaFilterTextView.get()?.visibility = View.VISIBLE
                 arenaFilterTextView.get()?.text = App.geString(R.string.info_label_arena_filter)
@@ -53,7 +53,7 @@ class AppInfoLabelController(layout: View) {
         }
 
         override fun onPokestopsVisibilityDidChange() {
-            val filterActivated =  MapSettings.enablePokestops.get() == false || MapSettings.justQuestPokestops.get() == true
+            val filterActivated =  AppSettings.enablePokestops.get() == false || AppSettings.justQuestPokestops.get() == true
             if (filterActivated) {
                 pokestopFilterTextView.get()?.visibility = View.VISIBLE
                 pokestopFilterTextView.get()?.text = App.geString(R.string.info_label_pokestop_filter)
@@ -64,7 +64,7 @@ class AppInfoLabelController(layout: View) {
         }
 
         override fun onSubscriptionsEnableDidChange() {
-            if (MapSettings.enableSubscriptions.get() == false) {
+            if (AppSettings.enableSubscriptions.get() == false) {
                 subscriptionsEnableTextView.get()?.visibility = View.VISIBLE
                 subscriptionsEnableTextView.get()?.text = App.geString(R.string.info_label_subscriptions_disabled)
             } else {

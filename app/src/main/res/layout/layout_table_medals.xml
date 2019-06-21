@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewmodel.AccountViewModel" />
+        <import type="android.view.View"/>
+    </data>
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TableRow>
+            <io.stanc.pogotool.subscreen.MedalView
+                number="@{viewModel.numberPokestops}"
+                medalDescription="@{@string/authentication_medal_text_pokestops}"
+                android:layout_margin="@dimen/layout_padding_screen"/>
+            <io.stanc.pogotool.subscreen.MedalView
+                number="@{viewModel.numberArenas}"
+                medalDescription="@{@string/authentication_medal_text_arenas}"
+                android:layout_margin="@dimen/layout_padding_screen"/>
+        </TableRow>
+
+        <TableRow>
+            <io.stanc.pogotool.subscreen.MedalView
+                number="@{viewModel.numberRaids}"
+                medalDescription="@{@string/authentication_medal_text_raids}"
+                android:layout_margin="@dimen/layout_padding_screen"/>
+            <io.stanc.pogotool.subscreen.MedalView
+                number="@{viewModel.numberQuests}"
+                medalDescription="@{@string/authentication_medal_text_quests}"
+                android:layout_margin="@dimen/layout_padding_screen"/>
+        </TableRow>
+
+    </TableLayout>
+
+</layout>

@@ -1,14 +1,12 @@
-package io.stanc.pogotool.map
+package io.stanc.pogotool
 
 import android.content.SharedPreferences
 import android.databinding.Observable
 import android.databinding.ObservableField
-import android.util.Log
-import io.stanc.pogotool.App
 import java.lang.ref.WeakReference
 
 
-object MapSettings {
+object AppSettings {
     private val TAG = javaClass.name
 
     val enableArenas = ObservableField<Boolean>()
@@ -28,40 +26,40 @@ object MapSettings {
     }
 
     private fun setupInitFieldValues(preferences: SharedPreferences) {
-        enableArenas.set(preferences.getBoolean(::enableArenas.name, true))
-        justRaidArenas.set(preferences.getBoolean(::justRaidArenas.name, false))
-        justEXArenas.set(preferences.getBoolean(::justEXArenas.name, false))
-        enablePokestops.set(preferences.getBoolean(::enablePokestops.name, true))
-        justQuestPokestops.set(preferences.getBoolean(::justQuestPokestops.name, false))
-        enableSubscriptions.set(preferences.getBoolean(::enableSubscriptions.name, true))
+        enableArenas.set(preferences.getBoolean(AppSettings::enableArenas.name, true))
+        justRaidArenas.set(preferences.getBoolean(AppSettings::justRaidArenas.name, false))
+        justEXArenas.set(preferences.getBoolean(AppSettings::justEXArenas.name, false))
+        enablePokestops.set(preferences.getBoolean(AppSettings::enablePokestops.name, true))
+        justQuestPokestops.set(preferences.getBoolean(AppSettings::justQuestPokestops.name, false))
+        enableSubscriptions.set(preferences.getBoolean(AppSettings::enableSubscriptions.name, true))
     }
 
     private fun setupOnPropertiesChanged(preferences: SharedPreferences) {
 
         enableArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::enableArenas.name, enableArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::enableArenas.name, enableArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         })
 
         justRaidArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::justRaidArenas.name, justRaidArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::justRaidArenas.name, justRaidArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         })
 
         justEXArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::justEXArenas.name, justEXArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::justEXArenas.name, justEXArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         })
 
         enablePokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::enablePokestops.name, enablePokestops.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::enablePokestops.name, enablePokestops.get() == true)?.apply()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
@@ -70,7 +68,7 @@ object MapSettings {
 
         justQuestPokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
@@ -79,7 +77,7 @@ object MapSettings {
 
         enableSubscriptions.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(::enableSubscriptions.name, enableSubscriptions.get() == true)?.apply()
+                preferences.edit().putBoolean(AppSettings::enableSubscriptions.name, enableSubscriptions.get() == true)?.apply()
                 observers.forEach {
                     it.value.get()?.onSubscriptionsEnableDidChange()
                 }

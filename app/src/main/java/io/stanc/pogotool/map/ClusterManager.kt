@@ -1,7 +1,6 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
-import android.databinding.Observable
 import android.graphics.Color
 import android.util.Log
 import android.view.View
@@ -11,6 +10,7 @@ import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
+import io.stanc.pogotool.AppSettings
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
@@ -68,7 +68,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
     }
 
-    private val mapSettingsObserver = object : MapSettings.MapSettingObserver {
+    private val mapSettingsObserver = object : AppSettings.MapSettingObserver {
 
         override fun onArenasVisibilityDidChange() {
             val markers = arenaClusterManager.markerCollection.markers
@@ -100,7 +100,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
 
-        MapSettings.addObserver(mapSettingsObserver)
+        AppSettings.addObserver(mapSettingsObserver)
     }
 
     /**

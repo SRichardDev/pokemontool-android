@@ -3,7 +3,7 @@ package io.stanc.pogotool.viewmodel
 import android.arch.lifecycle.ViewModel
 import android.databinding.ObservableField
 import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.map.MapSettings
+import io.stanc.pogotool.AppSettings
 
 class ArenaViewModel(arena: FirebaseArena): ViewModel() {
 
@@ -11,12 +11,12 @@ class ArenaViewModel(arena: FirebaseArena): ViewModel() {
 
     init {
 
-        var visible = MapSettings.enableArenas.get() == true
+        var visible = AppSettings.enableArenas.get() == true
         if (visible) {
-            visible = !(!arena.isEX && MapSettings.justEXArenas.get() == true)
+            visible = !(!arena.isEX && AppSettings.justEXArenas.get() == true)
             if (visible) {
                 val viewModel = RaidStateViewModel(arena.raid)
-                visible = !(viewModel.isRaidAnnounced.get() == false && MapSettings.justRaidArenas.get() == true)
+                visible = !(viewModel.isRaidAnnounced.get() == false && AppSettings.justRaidArenas.get() == true)
             }
         }
         isArenaVisibleOnMap.set(visible)
