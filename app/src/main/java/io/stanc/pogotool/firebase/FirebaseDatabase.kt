@@ -85,7 +85,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     fun pushArena(arena: FirebaseArena) {
-        FirebaseServer.createNodeByAutoId(arena.databasePath(), arena.data())
+        FirebaseServer.createNodeByAutoId(arena.databasePath(), arena.data())?.let { id ->
+            FirebaseUser.saveSubmittedArena(id, arena.geoHash)
+        }
     }
 
     fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
@@ -105,6 +107,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         raidMeetup?.let {
             pushRaidMeetup(raid.databasePath(), it)
         }
+        FirebaseUser.saveSubmittedRaids()
     }
 
     fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
@@ -155,7 +158,9 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
-        FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())
+        FirebaseServer.createNodeByAutoId(pokestop.databasePath(), pokestop.data())?.let { id ->
+            FirebaseUser.saveSubmittedPokestop(id, pokestop.geoHash)
+        }
     }
 
     fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
@@ -212,6 +217,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun pushQuest(quest: FirebaseQuest) {
         FirebaseServer.setNode(quest)
+        FirebaseUser.saveSubmittedQuests()
     }
 
     /**

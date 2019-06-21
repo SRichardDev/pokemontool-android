@@ -45,6 +45,7 @@ object DatabaseKeys {
     const val EMAIL = "email"
     const val USER_ID = "id"
     const val NOTIFICATION_TOKEN = "notificationToken"
+    const val NOTIFICATION_ACTIVE = "isPushActive"
     const val USER_PUBLIC_DATA = "publicData"
     const val USER_NAME = "trainerName"
     const val USER_LEVEL = "level"
@@ -52,7 +53,7 @@ object DatabaseKeys {
     const val USER_CODE = "trainerCode"
     const val SUBMITTED_ARENAS = "submittedArenas"
     const val SUBMITTED_POKESTOPS = "submittedPokestops"
-    const val SUBMITTED_Quests = "submittedQuests"
+    const val SUBMITTED_QUESTS = "submittedQuests"
     const val SUBMITTED_RAIDS = "submittedRaids"
 
     // common

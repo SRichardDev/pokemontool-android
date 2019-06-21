@@ -4,28 +4,44 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.firebase.DatabaseKeys.EMAIL
+import io.stanc.pogotool.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
 import io.stanc.pogotool.firebase.DatabaseKeys.USERS
 import io.stanc.pogotool.firebase.DatabaseKeys.NOTIFICATION_TOKEN
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
-import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_Quests
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_RAIDS
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_ID
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_LEVEL
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_NAME
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_TEAM
 
+enum class Team {
+    MYSTIC,
+    VALOR,
+    INSTINCT;
 
-data class FirebaseUserNode(override var id: String,
-                            var trainerName: String,
-                            var email: String,
-                            var team: Number,
-                            var notificationToken: String? = null,
-                            var isVerified: Boolean? = false,
-                            var submittedArenas: Number = 0,
-                            var submittedPokestops: Number = 0,
-                            var submittedQuests: Number = 0,
-                            var submittedRaids: Number = 0,
-                            var photoURL: Uri? = null): FirebaseNode {
+    companion object {
+        fun valueOf(number: Number): Team? = Team.values().find { it.ordinal == number.toInt() }
+    }
+}
+
+data class FirebaseUserNode private constructor(override var id: String,
+                                                var email: String,
+                                                var name: String,
+                                                var team: Team,
+                                                var level: Number,
+                                                var notificationToken: String,
+                                                var code: String? = null,
+                                                var isNotificationActive: Boolean = false,
+                                                var isVerified: Boolean = false,
+                                                var submittedArenas: Number = 0,
+                                                var submittedPokestops: Number = 0,
+                                                var submittedQuests: Number = 0,
+                                                var submittedRaids: Number = 0,
+                                                var photoURL: Uri? = null): FirebaseNode {
 
     override fun databasePath(): String {
         return "$USERS/$id"
@@ -35,10 +51,19 @@ data class FirebaseUserNode(override var id: String,
         val data = HashMap<String, Any>()
 
         data[USER_ID] = id
-        data[USER_NAME] = trainerName
         data[EMAIL] = email
-        data[USER_TEAM] = team
-        notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
+        data[NOTIFICATION_ACTIVE] = isNotificationActive
+        data[NOTIFICATION_TOKEN] = notificationToken
+
+        val publicData = HashMap<String, Any>()
+        publicData[USER_NAME] = name
+        publicData[USER_TEAM] = team
+        publicData[USER_LEVEL] = level
+        code?.let { publicData[USER_CODE] = it }
+
+        data[USER_PUBLIC_DATA] = publicData
+
+        // TODO: submitted stuff !
 
         return data
     }
@@ -52,29 +77,34 @@ data class FirebaseUserNode(override var id: String,
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
-            val trainerName = dataSnapshot.child(USER_NAME).value as? String
             val email = dataSnapshot.child(EMAIL).value as? String
-            val team = dataSnapshot.child(USER_TEAM).value as? Number
             val notificationToken = dataSnapshot.child(NOTIFICATION_TOKEN).value as? String
+            val notificationActive = dataSnapshot.child(NOTIFICATION_ACTIVE).value as? Boolean
 
             val submittedArenas =
                 (dataSnapshot.child(SUBMITTED_ARENAS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
             val submittedPokestops =
                 (dataSnapshot.child(SUBMITTED_POKESTOPS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
-            val submittedQuests =
-                (dataSnapshot.child(SUBMITTED_Quests).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
-            val submittedRaids =
-                (dataSnapshot.child(SUBMITTED_RAIDS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+            val submittedQuests = dataSnapshot.child(SUBMITTED_QUESTS).value as? Number
+            val submittedRaids = dataSnapshot.child(SUBMITTED_RAIDS).value as? Number
 
-            Log.v(
-                TAG,
-                "id: $id, trainerName: $trainerName, email: $email, team: $team, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops"
-            )
+            // public data
+            val name = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_NAME).value as? String
+            val team = (dataSnapshot.child(USER_PUBLIC_DATA).child(USER_TEAM).value as? Number)?.let { teamNumber ->
+                Team.valueOf(teamNumber)
+            }
+            val code = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_CODE).value as? String
+            val level = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_LEVEL).value as? Number
 
-            if (id != null && trainerName != null && email != null && team != null) {
-                val user = FirebaseUserNode(id, trainerName, email, team)
+            Log.v(TAG, "id: $id, name: $name, email: $email, team: $team, level: $level, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops")
 
-                notificationToken?.let { user.notificationToken = it }
+            if (id != null && name != null && email != null && team != null && level != null && notificationToken != null) {
+                val user = FirebaseUserNode.new(id, email, name, team, level, notificationToken)
+
+                // optionals
+                code?.let { user.code = it }
+                notificationActive?.let { user.isNotificationActive = it }
+
                 submittedArenas?.let { user.submittedArenas = it }
                 submittedPokestops?.let { user.submittedArenas = it }
                 submittedQuests?.let { user.submittedQuests = it }
@@ -84,6 +114,10 @@ data class FirebaseUserNode(override var id: String,
             }
 
             return null
+        }
+
+        fun new(uid: String, name: String, email: String, team: Team, level: Number, notificationToken: String): FirebaseUserNode {
+            return FirebaseUserNode(uid, email, name, team, level, notificationToken)
         }
     }
 }

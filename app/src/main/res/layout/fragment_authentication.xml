@@ -11,7 +11,7 @@
             name="settings"
             type="io.stanc.pogotool.AppSettings"/>
         <import type="android.view.View"/>
-        <import type="io.stanc.pogotool.viewmodel.AccountViewModel.Team"/>
+        <import type="io.stanc.pogotool.firebase.node.Team"/>
     </data>
 
     <ScrollView

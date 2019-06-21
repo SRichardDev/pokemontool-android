@@ -4,15 +4,10 @@ import android.arch.lifecycle.ViewModel
 import android.databinding.ObservableField
 import android.util.Log
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
+import io.stanc.pogotool.firebase.node.Team
 
 class AccountViewModel: ViewModel() {
     private val TAG = javaClass.name
-
-    enum class Team {
-        MYSTIC,
-        VALOR,
-        INSTINCT
-    }
 
     val name = ObservableField<String>()
     val email = ObservableField<String>()
@@ -26,11 +21,11 @@ class AccountViewModel: ViewModel() {
 
     fun update(user: FirebaseUserNode) {
 
-        name.set(user.trainerName)
+        name.set(user.name)
         email.set(user.email)
         // TODO: refactore user data structure (firebase)
 //        level.set(user.trainerLevel)
-        teamOf(user.team)?.let { team.set(it) }
+        team.set(user.team)
         numberPokestops.set(user.submittedPokestops.toInt())
         numberArenas.set(user.submittedArenas.toInt())
         numberRaids.set(user.submittedRaids.toInt())
@@ -38,6 +33,4 @@ class AccountViewModel: ViewModel() {
 
         Log.i(TAG, "Debug:: update($user), team: ${team.get()?.name}")
     }
-
-    private fun teamOf(value: Number): Team? = Team.values().find { it.ordinal == value.toInt() }
 }

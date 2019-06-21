@@ -5,9 +5,16 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_ARENAS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_QUESTS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_RAIDS
 import io.stanc.pogotool.firebase.DatabaseKeys.USERS
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_NAME
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
+import io.stanc.pogotool.firebase.node.Team
+import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.ObserverManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
@@ -35,7 +42,7 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            FirebaseServer.setData("$USERS/${userNode.id}/$USER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
+            FirebaseServer.setData("$USERS/${userNode.id}/$USER_PUBLIC_DATA/$USER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
                 override fun onSuccess(data: Void?) {
                     onCompletionCallback(true)
                 }
@@ -46,6 +53,70 @@ object FirebaseUser {
                 }
             })
         } ?: kotlin.run { Log.e(TAG, "cannot change username: $newUserName, because: userData: $userData") }
+    }
+
+    fun saveSubmittedArena(arenaId: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        saveSubmittedMapItem(arenaId, geoHash, SUBMITTED_ARENAS, onCompletionCallback)
+    }
+
+    fun saveSubmittedPokestop(pokestopId: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        saveSubmittedMapItem(pokestopId, geoHash, SUBMITTED_POKESTOPS, onCompletionCallback)
+    }
+
+    fun saveSubmittedRaids(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        userData?.submittedRaids?.let { numSubmittedRaids ->
+            saveIncreasedSubmission(numSubmittedRaids.toInt()+1, SUBMITTED_RAIDS, onCompletionCallback)
+        } ?: kotlin.run {
+            onCompletionCallback(false)
+        }
+    }
+
+    fun saveSubmittedQuests(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        userData?.submittedQuests?.let { numSubmittedQuests ->
+            saveIncreasedSubmission(numSubmittedQuests.toInt()+1, SUBMITTED_QUESTS, onCompletionCallback)
+        } ?: kotlin.run {
+            onCompletionCallback(false)
+        }
+    }
+
+    private fun saveIncreasedSubmission(value: Number, submissionFirebaseKey: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit) {
+
+        userData?.let { userNode ->
+
+            FirebaseServer.setData("$USERS/${userNode.id}/$submissionFirebaseKey", value, object: FirebaseServer.OnCompleteCallback<Void> {
+                override fun onSuccess(data: Void?) {
+                    onCompletionCallback(true)
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "sending $submissionFirebaseKey of $value failed. Error: $message")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: kotlin.run {
+            Log.e(TAG, "cannot send $submissionFirebaseKey of $value, because: userData: $userData")
+        }
+    }
+
+    private fun saveSubmittedMapItem(id: String, geoHash: GeoHash, submissionFirebaseKey: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit) {
+
+        userData?.let { userNode ->
+
+            val data = HashMap<String, String>()
+            data[id] = DatabaseKeys.firebaseGeoHash(geoHash)
+            FirebaseServer.setData("$USERS/${userNode.id}/$submissionFirebaseKey", data, object: FirebaseServer.OnCompleteCallback<Void> {
+                override fun onSuccess(data: Void?) {
+                    onCompletionCallback(true)
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "sending $submissionFirebaseKey of $id failed. Error: $message")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: kotlin.run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
     }
 
     private fun requestNotificationTokenToCreateUser(userConfig: UserConfig) {
@@ -68,11 +139,12 @@ object FirebaseUser {
 
         auth.currentUser?.let { firebaseUser ->
 
-            val userData = FirebaseUserNode(
+            val userData = FirebaseUserNode.new(
                 firebaseUser.uid,
                 userConfig.name,
                 userConfig.email,
                 userConfig.team,
+                userConfig.level,
                 userNotificationToken
             )
 
@@ -145,8 +217,9 @@ object FirebaseUser {
 
     data class UserConfig(val email: String,
                           val password: String,
-                          val name: String = "<not defined>",
-                          val team: Int = -1)
+                          val name: String,
+                          val team: Team,
+                          val level: Int)
 
     fun signUp(userConfig: UserConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 

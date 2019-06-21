@@ -36,7 +36,7 @@ data class FirebaseRaidbossDefinition(
             val level = dataSnapshot.child(RAID_BOSS_LEVEL).value as? String
             val imageName = dataSnapshot.child(RAID_BOSS_IMAGE_NAME).value as? String
 
-//            Log.v(TAG, "id: $id, trainerName: $trainerName, level: $level, imageName: $imageName")
+//            Log.v(TAG, "id: $id, name: $name, level: $level, imageName: $imageName")
 
             if (id != null && name != null && level != null && imageName != null) {
                 return FirebaseRaidbossDefinition(id, name, level, imageName)

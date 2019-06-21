@@ -5,13 +5,10 @@ import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
-import io.stanc.pogotool.firebase.FirebaseServer
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.screen.AccountFragment
@@ -168,7 +165,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseUser.authStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseUser.userData?.trainerName)
+        nav_info?.text = getString(R.string.user_name, FirebaseUser.userData?.name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
