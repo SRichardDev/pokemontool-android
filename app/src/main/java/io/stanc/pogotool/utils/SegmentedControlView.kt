@@ -1,18 +1,32 @@
 package io.stanc.pogotool.utils
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.databinding.BindingAdapter
+import android.graphics.PorterDuff
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.StateListDrawable
+import android.graphics.drawable.shapes.RoundRectShape
+import android.support.annotation.ColorRes
+import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import io.stanc.pogotool.R
 import java.lang.ref.WeakReference
+import android.graphics.drawable.ColorDrawable
+import android.util.StateSet
+
 
 @BindingAdapter("onSelectionChangeListener")
 fun setOnSelectionChangeListener(view: SegmentedControlView, listener: SegmentedControlView.OnSelectionChangeListener?) {
     listener?.let { view.setOnSelectionChangeListener(listener) }
+}
+
+@BindingAdapter("startSelection")
+fun setStartSelection(view: SegmentedControlView, selection: SegmentedControlView.Selection?) {
+    selection?.let { view.selection = selection }
 }
 
 @BindingAdapter("textLeft")
@@ -28,6 +42,11 @@ fun setTextMiddle(view: SegmentedControlView, text: String?) {
 @BindingAdapter("textRight")
 fun setTextRight(view: SegmentedControlView, text: String?) {
     text?.let { view.setSegment(text, SegmentedControlView.Selection.RIGHT) }
+}
+
+@BindingAdapter("selectionColor")
+fun setSelectionColor(view: SegmentedControlView, @ColorRes color: Int?) {
+    color?.let { view.setSelectionColor(color) }
 }
 
 class SegmentedControlView: LinearLayout {
@@ -51,6 +70,8 @@ class SegmentedControlView: LinearLayout {
     private val buttonMiddle: TextView
     private val buttonRight: TextView
     private var onSelectionChangeListener: WeakReference<OnSelectionChangeListener>? = null
+    @ColorRes
+    private var selectionColor: Int = R.color.segmentedControlSelected
 
     var selection: Selection = Selection.LEFT
         set(value) {
@@ -71,7 +92,8 @@ class SegmentedControlView: LinearLayout {
         buttonRight = this.findViewById(R.id.button_right)
         buttonRight.setOnClickListener { selection = Selection.RIGHT }
 
-        selectButton(Selection.LEFT)
+        updateUI()
+        selectButton(selection)
     }
 
     fun setOnSelectionChangeListener(listener: OnSelectionChangeListener) {
@@ -86,6 +108,47 @@ class SegmentedControlView: LinearLayout {
         }
 
         changeVisibility()
+    }
+
+    fun setSelectionColor(@ColorRes color: Int) {
+        this.selectionColor = color
+        updateUI()
+    }
+
+    private fun updateUI() {
+
+        buttonLeft.background = buttonBackgroundSelector(selectionColor)
+        buttonLeft.setTextColor(buttonTextSelector(selectionColor))
+
+        buttonMiddle.background = buttonBackgroundSelector(selectionColor)
+        buttonMiddle.setTextColor(buttonTextSelector(selectionColor))
+
+        buttonRight.background = buttonBackgroundSelector(selectionColor)
+        buttonRight.setTextColor(buttonTextSelector(selectionColor))
+
+        this.background = shapeDrawable(selectionColor)
+    }
+
+    private fun buttonBackgroundSelector(@ColorRes selectionColor: Int): StateListDrawable {
+        val drawable = StateListDrawable()
+        drawable.addState(intArrayOf(android.R.attr.state_selected), shapeDrawable(selectionColor))
+        drawable.addState(StateSet.WILD_CARD, shapeDrawable(R.color.white))
+        return drawable
+    }
+
+    private fun buttonTextSelector(@ColorRes selectionColor: Int): ColorStateList {
+        return ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_selected), StateSet.WILD_CARD),
+            intArrayOf(ContextCompat.getColor(context, R.color.white), ContextCompat.getColor(context, selectionColor))
+        )
+    }
+
+    private fun shapeDrawable(@ColorRes color: Int): ShapeDrawable {
+        val drawable = ShapeDrawable()
+        val outerRadius = floatArrayOf(10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f, 10.0f)
+        drawable.shape = RoundRectShape(outerRadius, null, null)
+        drawable.paint.color = ContextCompat.getColor(context, color)
+        return drawable
     }
 
     private fun selectButton(selection: Selection) {

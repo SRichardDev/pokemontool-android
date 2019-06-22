@@ -100,10 +100,8 @@
     <style name="SegmentedControlButtonStyle" parent="android:style/Widget.Button">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@drawable/segmented_control_button_text_selector</item>
         <item name="android:gravity">center</item>
         <item name="android:padding">@dimen/text_margin</item>
-        <item name="android:background">@drawable/segmented_control_button_background_selector</item>
         <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
     </style>
 

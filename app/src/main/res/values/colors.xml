@@ -24,8 +24,11 @@
     <color name="colorBlueDarkPoke">#3c5aa6</color>
     <color name="colorBlueLightPoke">#2a75bb</color>
 
-    <color name="segmentedControlSelected">#2a75bb</color>
-    <color name="segmentedControlBackground">#3c5aa6</color>
+    <color name="segmentedControlSelected">#3c5aa6</color>
+
+    <color name="teamMystic">#0077E9</color>
+    <color name="teamValor">#EC1709</color>
+    <color name="teamInstinct">#FBD233</color>
 
     <color name="colorRedDarkPoke">#CC0000</color>
     <color name="colorRedLightPoke">#FF0000</color>

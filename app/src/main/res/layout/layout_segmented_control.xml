@@ -4,9 +4,9 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/segmented_control_background"
                     android:padding="@dimen/stroke_line"
-                    tools:layout_height="60dp">
+                    tools:layout_height="60dp"
+                    tools:background="@color/segmentedControlSelected">
 
     <TextView
         android:id="@+id/button_left"
