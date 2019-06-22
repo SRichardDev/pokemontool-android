@@ -1,11 +1,9 @@
 package io.stanc.pogotool.subscreen
 
 import android.content.Context
-import android.util.Log
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
-import io.stanc.pogotool.recyclerview.RecyclerViewAdapter
 import io.stanc.pogotool.recyclerview.RecyclerViewFragment
 import io.stanc.pogotool.recyclerviewadapter.RaidBossAdapter
 
@@ -15,7 +13,7 @@ class RaidBossFragment: RecyclerViewFragment<FirebaseRaidbossDefinition>() {
     private val initRaidLevel = 3
 
     override val fragmentLayoutRes: Int
-        get() = R.layout.layout_fragment_raidbosses
+        get() = R.layout.layout_raidbosses
 
     override val recyclerViewIdRes: Int
         get() = R.id.raidbosses_recyclerview

@@ -22,6 +22,7 @@
 
     <!-- Navigation Drawer -->
     <string name="nav_header_account_state">Account Status:</string>
+    <string name="nav_menu_item_account_create">Login</string>
     <string name="nav_menu_item_account">Account</string>
     <string name="nav_menu_item_map">Karte</string>
 
@@ -53,6 +54,29 @@
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
     <string name="authentication_medal_text_raids">Eingereichte Raids</string>
     <string name="authentication_medal_text_quests">Eingereichte Quests</string>
+    <string name="authentication_login_description">Lege einen Account an oder melde dich an, um den vollen Umfang der App zu benutzen.</string>
+    <string name="authentication_login_button_signin">Anmelden</string>
+    <string name="authentication_login_button_signup">Account anlegen</string>
+    <string name="authentication_login_button_signout">Abmelden</string>
+    <string name="authentication_login_email_description">Um einen Account zu erstellen benötigen wir eine gültige E-Mail Adresse von dir. Bitte achte darauf, dass die E-Mail Adresse korrekt ist, da du von uns eine Bestätigungs-E-Mail bekommst.</string>
+    <string name="authentication_login_email_edit_hint_text">Trage hier deine E-Mail Adresse ein</string>
+    <string name="authentication_login_password_description">Bitte wähle ein Passwort aus. Dieses muss mindestens 6 Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.</string>
+    <string name="authentication_login_password_edit_hint_text">Trage hier dein Passwort ein</string>
+    <string name="authentication_login_name_description">Bitte gebe deinen Trainer Namen ein, den du auch im Spiel verwendest.</string>
+    <string name="authentication_login_name_edit_hint_text">Trage hier deinen Trainer Namen ein</string>
+
+    <string name="authentication_login_screen_title_1">E-Mail</string>
+    <string name="authentication_login_screen_title_2">Password</string>
+    <string name="authentication_login_screen_title_3">Trainer Name</string>
+    <string name="authentication_login_screen_title_4">Account Details</string>
+    <string name="authentication_login_screen_title_5">Prüfen</string>
+
+    <string name="authentication_login_details_email">E-Mail:</string>
+    <string name="authentication_login_details_password">Password:</string>
+    <string name="authentication_login_details_name">Trainer Name:</string>
+    <string name="authentication_login_details_team">Team:</string>
+    <string name="authentication_login_details_level">Level:</string>
+
 
     <string name="authentication_hint_email">Gebe deine Emailadresse hier ein.</string>
     <string name="authentication_hint_password">Gebe dein Passwort hier ein.</string>
@@ -65,9 +89,6 @@
     <string name="dialog_gps_disabled_button_positive">Ja</string>
     <string name="dialog_gps_disabled_button_negative">Nein</string>
     <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.</string>
-
-    <!-- Firebase -->
-    <string name="user_name">Benutzer: %s</string>
 
     <!-- Map -->
     <string name="map_title_arena">Neue Arena</string>
@@ -151,6 +172,10 @@
     <string name="exceptions_send_map_item_missing_user_id">Fehler! Fehlende User Id.</string>
     <string name="exceptions_send_map_item_missing_arena_name">Fehler! Fehlender Arena Name.</string>
     <string name="exceptions_send_map_item_missing_pokestop_name">Fehler! Fehlender Pokestop Name.</string>
+    <string name="exceptions_signup_password">Fehler! Passwort ist zu kurz.</string>
+    <string name="exceptions_signup_email">Fehler! Email scheint falsches Format zu haben.</string>
+    <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
+    <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
 
     <!-- Popups -->
     <string name="popup_info_button_neutral">OK</string>

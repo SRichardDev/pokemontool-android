@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewmodel.AccountViewModel" />
+        <import type="io.stanc.pogotool.firebase.node.Team"/>
+        <import type="io.stanc.pogotool.utils.SegmentedControlView.Selection"/>
+    </data>
+
+    <LinearLayout
+      android:orientation="vertical"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:padding="@dimen/layout_padding_screen">
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authentication_login_details_team"/>
+
+        <io.stanc.pogotool.utils.SegmentedControlView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:textLeft="@{viewModel.teamOrder[0].name}"
+            app:textMiddle="@{viewModel.teamOrder[1].name}"
+            app:textRight="@{viewModel.teamOrder[2].name}"
+            app:startSelection="@{Selection.LEFT}"
+            app:selectionColor="@{viewModel.teamColor}"
+            app:onSelectionChangeListener="@{viewModel.onSelectedStateDidChange}"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authentication_login_details_level"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        <NumberPicker
+            android:id="@+id/account_numberpicker_level"
+            android:layout_height="@dimen/raid_picker_height"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</layout>

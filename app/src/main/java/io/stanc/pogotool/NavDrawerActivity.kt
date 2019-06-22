@@ -11,7 +11,8 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
-import io.stanc.pogotool.screen.AccountFragment
+import io.stanc.pogotool.screen.AccountInfoFragment
+import io.stanc.pogotool.screen.AccountLoginRequestFragment
 import io.stanc.pogotool.screen.MapInteractionFragment
 import io.stanc.pogotool.subscreen.AppInfoLabelController
 import io.stanc.pogotool.utils.SystemUtils
@@ -115,24 +116,28 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
-    private fun showAuthFragment() {
+    private fun showAccountInfoFragment() {
 
-        val fragmentTag = AccountFragment::class.java.name
+        val fragmentTag = AccountInfoFragment::class.java.name
         var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = AccountFragment()
+            fragment = AccountInfoFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
-    private fun removeAuthFragment() {
+    private fun showAccountLoginFragment() {
 
-        val fragmentTag = AccountFragment::class.java.name
-        supportFragmentManager?.findFragmentByTag(fragmentTag)?.let { fragment ->
-            supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
+        val fragmentTag = AccountLoginRequestFragment::class.java.name
+        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+
+        if (fragment == null) {
+            fragment = AccountLoginRequestFragment()
         }
+
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
     /**
@@ -165,14 +170,16 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun updateNavText() {
         nav_header_subtitle?.text = FirebaseUser.authStateText(baseContext)
-        nav_info?.text = getString(R.string.user_name, FirebaseUser.userData?.name)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
+            R.id.nav_account_create -> {
+                showAccountLoginFragment()
+            }
             R.id.nav_account -> {
-                showAuthFragment()
+                showAccountInfoFragment()
             }
             R.id.nav_map -> {
                 showMapFragment()

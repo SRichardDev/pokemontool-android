@@ -2,8 +2,10 @@ package io.stanc.pogotool.firebase
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
@@ -18,13 +20,14 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.ObserverManager
 import io.stanc.pogotool.utils.WaitingSpinner
 
+
 object FirebaseUser {
     private val TAG = javaClass.name
 
+    const val MIN_PASSWORD_LENGTH = 6
+
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val authStateObserverManager = ObserverManager<AuthStateObserver>()
-
     private val userDataObserverManager = ObserverManager<UserDataObserver>()
 
     var userData: FirebaseUserNode? = null
@@ -223,8 +226,18 @@ object FirebaseUser {
 
     fun signUp(userConfig: UserConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 
-        // TODO: verify user config data (valid email, secure password, valid name and valid team value)
-        if (userConfig.email.isEmpty() || userConfig.password.isEmpty() || userConfig.name.isEmpty()) {
+        if (userConfig.password.length < MIN_PASSWORD_LENGTH) {
+            onCompletionCallback(false, App.geString(R.string.exceptions_signup_password))
+            return
+        }
+
+        if (!isEmailValid(userConfig.email)) {
+            onCompletionCallback(false, App.geString(R.string.exceptions_signup_email))
+            return
+        }
+
+        if (userConfig.name.isEmpty()) {
+            onCompletionCallback(false, App.geString(R.string.exceptions_signup_name))
             return
         }
 
@@ -246,6 +259,7 @@ object FirebaseUser {
     fun signIn(userConfig: UserConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 
         if (userConfig.email.isEmpty() || userConfig.password.isEmpty()) {
+            onCompletionCallback(false, App.geString(R.string.exceptions_sigin_email_password))
             return
         }
 
@@ -361,5 +375,13 @@ object FirebaseUser {
         override fun nodeRemoved(key: String) {
             FirebaseUser.userData = null
         }
+    }
+
+    /**
+     * private
+     */
+
+    fun isEmailValid(email: CharSequence): Boolean {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
