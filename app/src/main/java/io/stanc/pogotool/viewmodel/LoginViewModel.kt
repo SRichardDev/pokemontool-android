@@ -8,12 +8,19 @@ import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.firebase.node.Team
 import io.stanc.pogotool.utils.SegmentedControlView
 
-class AccountViewModel: ViewModel() {
+class LoginViewModel: ViewModel() {
     private val TAG = javaClass.name
 
-    val name = ObservableField<String>("-")
-    val email = ObservableField<String>("-")
-    val password = ObservableField<String>("-")
+    enum class SignType {
+        SIGN_IN,
+        SIGN_UP
+    }
+
+    val signType = ObservableField<SignType>()
+
+    val name = ObservableField<String>()
+    val email = ObservableField<String>()
+    val password = ObservableField<String>()
     val level = ObservableField<String>("0")
     val team = ObservableField<Team>()
     val teamOrder = ObservableField<List<Team>>()
@@ -31,9 +38,8 @@ class AccountViewModel: ViewModel() {
         val shuffledTeamOrder = Team.values().toList().shuffled()
 
         teamOrder.set(shuffledTeamOrder)
-        teamOrder.get()?.get(0)?.let {
-            teamColor.set(teamColorMap[shuffledTeamOrder[0]])
-        }
+        team.set(shuffledTeamOrder[0])
+        teamColor.set(teamColorMap[shuffledTeamOrder[0]])
     }
 
     fun update(user: FirebaseUserNode) {

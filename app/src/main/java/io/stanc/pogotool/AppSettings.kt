@@ -3,6 +3,8 @@ package io.stanc.pogotool
 import android.content.SharedPreferences
 import android.databinding.Observable
 import android.databinding.ObservableField
+import io.stanc.pogotool.firebase.FirebaseUser
+import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import java.lang.ref.WeakReference
 
 
@@ -16,6 +18,14 @@ object AppSettings {
     val justQuestPokestops = ObservableField<Boolean>()
     val enableSubscriptions = ObservableField<Boolean>()
 
+    private val userDataObserver = object: FirebaseUser.UserDataObserver {
+        override fun userDataChanged(user: FirebaseUserNode?) {
+            user?.isNotificationActive?.let {
+                enableSubscriptions.set(it)
+            }
+        }
+    }
+
     init {
 
         App.preferences?.let { preferences ->
@@ -23,6 +33,8 @@ object AppSettings {
             setupInitFieldValues(preferences)
             setupOnPropertiesChanged(preferences)
         }
+
+        FirebaseUser.addUserDataObserver(userDataObserver)
     }
 
     private fun setupInitFieldValues(preferences: SharedPreferences) {
@@ -31,7 +43,6 @@ object AppSettings {
         justEXArenas.set(preferences.getBoolean(AppSettings::justEXArenas.name, false))
         enablePokestops.set(preferences.getBoolean(AppSettings::enablePokestops.name, true))
         justQuestPokestops.set(preferences.getBoolean(AppSettings::justQuestPokestops.name, false))
-        enableSubscriptions.set(preferences.getBoolean(AppSettings::enableSubscriptions.name, true))
     }
 
     private fun setupOnPropertiesChanged(preferences: SharedPreferences) {
@@ -77,7 +88,7 @@ object AppSettings {
 
         enableSubscriptions.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
             override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                preferences.edit().putBoolean(AppSettings::enableSubscriptions.name, enableSubscriptions.get() == true)?.apply()
+                FirebaseUser.changePushNotifications(enableSubscriptions.get() == true)
                 observers.forEach {
                     it.value.get()?.onSubscriptionsEnableDidChange()
                 }

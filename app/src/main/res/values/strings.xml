@@ -36,10 +36,10 @@
     <string name="authentication_state_signed_in_but_missing_verification">Ausstehende Email Bestätigung…</string>
     <string name="authentication_state_signed_out">Ausgeloggt</string>
 
-    <string name="authentication_state_synchronization_failed">Synchronisation fehlgeschlagen!\n%s</string>
-    <string name="authentication_state_authentication_failed">Anmeldung fehlgeschlagen!\n%s</string>
-    <string name="authentication_state_verification_failed">Email Verifikation fehlgeschlagen!\n%s</string>
-    <string name="authentication_state_verification_successful">Email Verifikation wurde an %s gesendet.</string>
+    <string name="authentication_state_synchronization_failed">Synchronisation fehlgeschlagen!</string>
+    <string name="authentication_state_authentication_failed">Anmeldung fehlgeschlagen!</string>
+    <string name="authentication_state_verification_failed">Email Verifikation fehlgeschlagen!</string>
+    <string name="authentication_state_verification_successful">Email Verifikation wurde an %1$s gesendet.</string>
 
     <string name="authentication_button_sign_in">Anmelden</string>
     <string name="authentication_button_sign_up">Registrieren</string>
@@ -58,6 +58,7 @@
     <string name="authentication_login_button_signin">Anmelden</string>
     <string name="authentication_login_button_signup">Account anlegen</string>
     <string name="authentication_login_button_signout">Abmelden</string>
+    <string name="authentication_login_button_verification">Sende Verifikations-E-Mail\n(User wird ausgeloggt)</string>
     <string name="authentication_login_email_description">Um einen Account zu erstellen benötigen wir eine gültige E-Mail Adresse von dir. Bitte achte darauf, dass die E-Mail Adresse korrekt ist, da du von uns eine Bestätigungs-E-Mail bekommst.</string>
     <string name="authentication_login_email_edit_hint_text">Trage hier deine E-Mail Adresse ein</string>
     <string name="authentication_login_password_description">Bitte wähle ein Passwort aus. Dieses muss mindestens 6 Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.</string>
@@ -176,6 +177,7 @@
     <string name="exceptions_signup_email">Fehler! Email scheint falsches Format zu haben.</string>
     <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
     <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
+    <string name="exceptions_login_missing_data">Fehler! Anmeldedaten sind unvollständig.</string>
 
     <!-- Popups -->
     <string name="popup_info_button_neutral">OK</string>

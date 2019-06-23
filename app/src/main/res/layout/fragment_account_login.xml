@@ -69,6 +69,14 @@
             android:text="@string/authentication_login_button_signup"/>
 
         <Button
+            android:id="@+id/account_button_verification"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_default"
+            android:text="@string/authentication_login_button_verification"/>
+
+        <Button
             android:id="@+id/account_button_signout"
             style="@style/ButtonStyle"
             android:layout_width="match_parent"

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.AccountViewModel" />
+            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
         <variable
             name="settings"
             type="io.stanc.pogotool.AppSettings"/>

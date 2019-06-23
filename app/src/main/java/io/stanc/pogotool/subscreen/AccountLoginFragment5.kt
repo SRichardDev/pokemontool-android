@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import io.stanc.pogotool.R
 import io.stanc.pogotool.databinding.FragmentAccountLogin5Binding
-import io.stanc.pogotool.viewmodel.AccountViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel
 
 class AccountLoginFragment5: Fragment() {
 
-    private var viewModel: AccountViewModel? = null
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DataBindingUtil.inflate<FragmentAccountLogin5Binding>(inflater, R.layout.fragment_account_login_5, container, false)
@@ -25,7 +25,7 @@ class AccountLoginFragment5: Fragment() {
 
         private val TAG = javaClass.name
 
-        fun newInstance(viewModel: AccountViewModel): AccountLoginFragment5 {
+        fun newInstance(viewModel: LoginViewModel): AccountLoginFragment5 {
             val fragment = AccountLoginFragment5()
             fragment.viewModel = viewModel
             return fragment

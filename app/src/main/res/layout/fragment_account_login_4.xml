@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.AccountViewModel" />
+            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
         <import type="io.stanc.pogotool.firebase.node.Team"/>
         <import type="io.stanc.pogotool.utils.SegmentedControlView.Selection"/>
     </data>

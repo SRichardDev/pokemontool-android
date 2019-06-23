@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_QUESTS
@@ -56,6 +57,23 @@ object FirebaseUser {
                 }
             })
         } ?: kotlin.run { Log.e(TAG, "cannot change username: $newUserName, because: userData: $userData") }
+    }
+
+    fun changePushNotifications(isPushAktive: Boolean, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        userData?.let { userNode ->
+
+            FirebaseServer.setData("$USERS/${userNode.id}/$NOTIFICATION_ACTIVE", isPushAktive, object: FirebaseServer.OnCompleteCallback<Void> {
+                override fun onSuccess(data: Void?) {
+                    onCompletionCallback(true)
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "User profile update failed. Error: $message")
+                    onCompletionCallback(false)
+                }
+            })
+        } ?: kotlin.run { Log.e(TAG, "cannot change push notifications: $isPushAktive, because: userData: $userData") }
     }
 
     fun saveSubmittedArena(arenaId: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
@@ -142,10 +160,10 @@ object FirebaseUser {
 
         auth.currentUser?.let { firebaseUser ->
 
-            val userData = FirebaseUserNode.new(
+            val userData = FirebaseUserNode.new (
                 firebaseUser.uid,
-                userConfig.name,
                 userConfig.email,
+                userConfig.name,
                 userConfig.team,
                 userConfig.level,
                 userNotificationToken
@@ -256,16 +274,16 @@ object FirebaseUser {
         }
     }
 
-    fun signIn(userConfig: UserConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
+    fun signIn(email: String, password: String, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 
-        if (userConfig.email.isEmpty() || userConfig.password.isEmpty()) {
+        if (email.isEmpty() || password.isEmpty()) {
             onCompletionCallback(false, App.geString(R.string.exceptions_sigin_email_password))
             return
         }
 
         WaitingSpinner.showProgress(R.string.spinner_title_sign_in)
 
-        auth.signInWithEmailAndPassword(userConfig.email, userConfig.password).addOnCompleteListener { task ->
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
 
             if (!task.isSuccessful) {
                 Log.w(TAG, "signing in failed with error: ${task.exception?.message}")
@@ -349,6 +367,7 @@ object FirebaseUser {
 
     fun addUserDataObserver(observer: UserDataObserver) {
         userDataObserverManager.addObserver(observer)
+        Log.i(TAG, "Debug:: addUserDataObserver() userData: $userData")
         observer.userDataChanged(userData)
     }
 
@@ -357,7 +376,9 @@ object FirebaseUser {
     }
 
     private fun startListenForUserDataChanges() {
+        Log.i(TAG, "Debug:: startListenForUserDataChanges() auth.currentUser?.uid: ${auth.currentUser?.uid}, path: ${"$USERS/${auth.currentUser?.uid}"}")
         auth.currentUser?.uid?.let { uid ->
+            FirebaseServer.removeNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
             FirebaseServer.addNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
         }
     }
@@ -370,7 +391,10 @@ object FirebaseUser {
 
     private val userNodeDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            FirebaseUserNode.new(dataSnapshot)?.let { FirebaseUser.userData = it }
+            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
+            FirebaseUserNode.new(dataSnapshot)?.let {
+                Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot) done.")
+                FirebaseUser.userData = it }
         }
         override fun nodeRemoved(key: String) {
             FirebaseUser.userData = null

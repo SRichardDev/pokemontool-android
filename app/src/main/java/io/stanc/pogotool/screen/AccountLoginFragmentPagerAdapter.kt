@@ -6,25 +6,29 @@ import android.support.v4.app.FragmentPagerAdapter
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.subscreen.*
-import io.stanc.pogotool.viewmodel.AccountViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel.SignType
 
-class AccountLoginFragmentPagerAdapter(fragmentManager: FragmentManager, private val accountViewModel: AccountViewModel): FragmentPagerAdapter(fragmentManager) {
-
-    //TODO: two ways for login/signup
-    private val NUM_PAGES = 5
+class AccountLoginFragmentPagerAdapter(fragmentManager: FragmentManager, private val loginViewModel: LoginViewModel): FragmentPagerAdapter(fragmentManager) {
 
     override fun getItem(position: Int): Fragment? {
         return when (position) {
-            0 -> AccountLoginFragment1.newInstance(accountViewModel)
-            1 -> AccountLoginFragment2.newInstance(accountViewModel)
-            2 -> AccountLoginFragment3.newInstance(accountViewModel)
-            3 -> AccountLoginFragment4.newInstance(accountViewModel)
-            4 -> AccountLoginFragment5.newInstance(accountViewModel)
+            0 -> AccountLoginFragment1.newInstance(loginViewModel)
+            1 -> AccountLoginFragment2.newInstance(loginViewModel)
+            2 -> AccountLoginFragment3.newInstance(loginViewModel)
+            3 -> AccountLoginFragment4.newInstance(loginViewModel)
+            4 -> AccountLoginFragment5.newInstance(loginViewModel)
             else -> null
         }
     }
 
-    override fun getCount() = NUM_PAGES
+    override fun getCount(): Int {
+        return when(loginViewModel.signType.get()) {
+            SignType.SIGN_IN -> 2
+            SignType.SIGN_UP -> 5
+            else -> 0
+        }
+    }
 
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {

@@ -13,11 +13,11 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentAccountInfoBinding
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
-import io.stanc.pogotool.viewmodel.AccountViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel
 
 class AccountInfoFragment: Fragment() {
 
-    private val viewModel = AccountViewModel()
+    private val viewModel = LoginViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DataBindingUtil.inflate<FragmentAccountInfoBinding>(inflater, R.layout.fragment_account_info, container, false)

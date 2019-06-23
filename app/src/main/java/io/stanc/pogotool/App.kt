@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.support.annotation.StringRes
+import android.util.Log
 
 class App: Application() {
 
@@ -26,8 +27,12 @@ class App: Application() {
         var preferences: SharedPreferences? = null
             private set
 
-        fun geString(@StringRes stringResId: Int): String? {
-            return appContext?.resources?.getString(stringResId)
+        fun geString(@StringRes stringResId: Int, formatArg1: String? = null): String? {
+            formatArg1?.let {
+                return appContext?.resources?.getString(stringResId, formatArg1)
+            } ?: kotlin.run {
+                return appContext?.resources?.getString(stringResId)
+            }
         }
     }
 }

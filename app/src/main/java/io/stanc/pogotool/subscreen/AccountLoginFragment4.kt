@@ -10,11 +10,11 @@ import android.view.ViewGroup
 import android.widget.NumberPicker
 import io.stanc.pogotool.R
 import io.stanc.pogotool.databinding.FragmentAccountLogin4Binding
-import io.stanc.pogotool.viewmodel.AccountViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel
 
 class AccountLoginFragment4: Fragment() {
 
-    private var viewModel: AccountViewModel? = null
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = DataBindingUtil.inflate<FragmentAccountLogin4Binding>(inflater, R.layout.fragment_account_login_4, container, false)
@@ -38,7 +38,7 @@ class AccountLoginFragment4: Fragment() {
 
         private val TAG = javaClass.name
 
-        fun newInstance(viewModel: AccountViewModel): AccountLoginFragment4 {
+        fun newInstance(viewModel: LoginViewModel): AccountLoginFragment4 {
             val fragment = AccountLoginFragment4()
             fragment.viewModel = viewModel
             return fragment

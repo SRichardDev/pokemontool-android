@@ -7,15 +7,15 @@ import android.widget.Toast
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
-import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.utils.SystemUtils
-import io.stanc.pogotool.viewmodel.AccountViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel
+import io.stanc.pogotool.viewmodel.LoginViewModel.SignType
 import io.stanc.pogotool.viewpager.ViewPagerFragment
 
 class AccountLoginFragment: ViewPagerFragment() {
 
-    var viewModel: AccountViewModel? = null
-    private val firebase = FirebaseDatabase()
+    var viewModel: LoginViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
@@ -23,24 +23,13 @@ class AccountLoginFragment: ViewPagerFragment() {
     }
 
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
-
-        viewModel?.let {
-
-            AccountLoginFragmentPagerAdapter(childFragmentManager, it)
-
-        } ?: kotlin.run {
-
-            val viewModel = AccountViewModel()
-            this.viewModel = viewModel
-            AccountLoginFragmentPagerAdapter(childFragmentManager, viewModel)
-        }
+        AccountLoginFragmentPagerAdapter(childFragmentManager, viewModel!!)
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
-        Log.i(TAG, "Debug:: navigationButtonClickedOnTheLastPage()")
+        Log.i(TAG, "Debug:: navigationButtonClickedOnTheLastPage() email: ${viewModel?.email?.get()}, password: ${viewModel?.password?.get()}")
         try {
             tryToSendLoginData()
-            close()
 
         } catch (e: Exception) {
             // TODO: Popup implementation
@@ -53,11 +42,47 @@ class AccountLoginFragment: ViewPagerFragment() {
     }
 
     private fun tryToSendLoginData() {
-        // TODO...
+        try {
+            viewModel?.let { viewModel ->
+
+                when(viewModel.signType.get()) {
+
+                    SignType.SIGN_IN -> {
+                        FirebaseUser.signIn(viewModel.email.get()!!, viewModel.password.get()!!, signInUpCompletionCallback)
+                    }
+
+                    SignType.SIGN_UP -> {
+
+                        val userConfig = FirebaseUser.UserConfig(viewModel.email.get()!!,
+                            viewModel.password.get()!!,
+                            viewModel.name.get()!!,
+                            viewModel.team.get()!!,
+                            viewModel.level.get()!!.toInt())
+
+                        FirebaseUser.signUp(userConfig, signInUpCompletionCallback)
+                    }
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "could not sending login data! exception: ${e.message}")
+            throw Exception(App.geString(R.string.exceptions_login_missing_data))
+        }
+    }
+
+    private val signInUpCompletionCallback = object: (Boolean, String?) -> Unit {
+        override fun invoke(taskSuccessful: Boolean, exception: String?) {
+            if (taskSuccessful) {
+                close()
+            } else {
+                val message = exception ?: App.geString(R.string.authentication_state_authentication_failed)
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun close() {
-        Log.i(TAG, "Debug:: close()")
+        activity?.let { SystemUtils.hideKeyboard(it) }
         fragmentManager?.popBackStack()
     }
 
@@ -65,7 +90,7 @@ class AccountLoginFragment: ViewPagerFragment() {
 
         private val TAG = javaClass.name
 
-        fun newInstance(viewModel: AccountViewModel): AccountLoginFragment {
+        fun newInstance(viewModel: LoginViewModel): AccountLoginFragment {
             val fragment = AccountLoginFragment()
             fragment.viewModel = viewModel
             return fragment

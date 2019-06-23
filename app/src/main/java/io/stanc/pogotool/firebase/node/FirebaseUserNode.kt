@@ -23,6 +23,8 @@ enum class Team {
     VALOR,
     INSTINCT;
 
+    fun toNumber(): Number = ordinal
+
     companion object {
         fun valueOf(number: Number): Team? = Team.values().find { it.ordinal == number.toInt() }
     }
@@ -35,7 +37,7 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var level: Number,
                                                 var notificationToken: String,
                                                 var code: String? = null,
-                                                var isNotificationActive: Boolean = false,
+                                                var isNotificationActive: Boolean = true,
                                                 var isVerified: Boolean = false,
                                                 var submittedArenas: Number = 0,
                                                 var submittedPokestops: Number = 0,
@@ -57,7 +59,7 @@ data class FirebaseUserNode private constructor(override var id: String,
 
         val publicData = HashMap<String, Any>()
         publicData[USER_NAME] = name
-        publicData[USER_TEAM] = team
+        publicData[USER_TEAM] = team.toNumber()
         publicData[USER_LEVEL] = level
         code?.let { publicData[USER_CODE] = it }
 
@@ -116,7 +118,7 @@ data class FirebaseUserNode private constructor(override var id: String,
             return null
         }
 
-        fun new(uid: String, name: String, email: String, team: Team, level: Number, notificationToken: String): FirebaseUserNode {
+        fun new(uid: String, email: String, name: String, team: Team, level: Number, notificationToken: String): FirebaseUserNode {
             return FirebaseUserNode(uid, email, name, team, level, notificationToken)
         }
     }
