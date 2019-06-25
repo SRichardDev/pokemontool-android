@@ -93,6 +93,11 @@
         <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
     </style>
 
+    <style name="ButtonStyle_bold" parent="ButtonStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
     <style name="ButtonStyle_margin" parent="ButtonStyle">
         <item name="android:layout_margin">@dimen/layout_margin_small</item>
     </style>

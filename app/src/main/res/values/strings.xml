@@ -25,6 +25,7 @@
     <string name="nav_menu_item_account_create">Login</string>
     <string name="nav_menu_item_account">Account</string>
     <string name="nav_menu_item_map">Karte</string>
+    <string name="nav_menu_item_policy">Lizenzen &amp; Privacy Policy</string>
 
     <!-- Authentication -->
     <string name="authentication_app_title">Account</string>
@@ -97,7 +98,6 @@
     <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
     <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
-    <!--<string name="map_map_item_button_cancel">Abbrechen</string>-->
     <string name="map_map_item_which_item_to_add">Was möchtest du einrichten?</string>
     <string name="map_map_item_position_correct">Stimmt die Position?</string>
     <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest und schiebe es bis die Position passt.</string>
@@ -189,5 +189,9 @@
     <string name="info_label_arena_filter">Achtung: Arena filter ist aktiviert!</string>
     <string name="info_label_pokestop_filter">Achtung: Pokestop filter ist aktiviert!</string>
     <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
+
+    <!-- Policy -->
+    <string name="policy_button_privacy_policy">Datenschutzerklärung</string>
+    <string name="policy_button_license">Lizensen</string>
 
 </resources>

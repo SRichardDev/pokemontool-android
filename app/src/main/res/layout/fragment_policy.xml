@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="@dimen/layout_padding_screen">
+
+    <Button
+        android:id="@+id/policy_license"
+        style="@style/ButtonStyle_bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/policy_button_license"/>
+
+    <include layout="@layout/layout_divider"/>
+
+    <Button
+        android:id="@+id/policy_privacy"
+        style="@style/ButtonStyle_bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/policy_button_privacy_policy"/>
+
+</LinearLayout>

@@ -1,6 +1,5 @@
 package io.stanc.pogotool
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,7 +7,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.android.material.navigation.NavigationView
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
@@ -16,7 +14,7 @@ import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.screen.AccountInfoFragment
 import io.stanc.pogotool.screen.AccountLoginRequestFragment
-import io.stanc.pogotool.screen.ImprintFragment
+import io.stanc.pogotool.screen.PolicyFragment
 import io.stanc.pogotool.screen.MapInteractionFragment
 import io.stanc.pogotool.subscreen.AppInfoLabelController
 import io.stanc.pogotool.utils.SystemUtils
@@ -151,13 +149,13 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
-    private fun showImprintFragment() {
+    private fun showPolicyFragment() {
 
-        val fragmentTag = ImprintFragment::class.java.name
+        val fragmentTag = PolicyFragment::class.java.name
         var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = ImprintFragment()
+            fragment = PolicyFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
@@ -211,9 +209,8 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             R.id.nav_map -> {
                 showMapFragment()
             }
-            R.id.nav_imprint -> {
-//                showImprintFragment()
-                startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+            R.id.nav_policy -> {
+                showPolicyFragment()
             }
         }
 

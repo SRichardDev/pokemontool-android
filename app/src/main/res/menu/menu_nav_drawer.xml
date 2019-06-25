@@ -24,6 +24,14 @@
             android:title="@string/nav_menu_item_map"/>
     </group>
 
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_policy"
+            android:icon="@drawable/icon_imprint_30dp"
+            android:title="@string/nav_menu_item_policy"/>
+    </group>
+
+
     <!-- TODO: for later -->
     <!--<item android:title="Communicate">-->
         <!--<menu>-->

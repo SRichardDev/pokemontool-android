@@ -7,7 +7,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
@@ -15,6 +14,9 @@ buildscript {
 
         // cloud firestore
         classpath 'com.google.gms:google-services:4.2.0'
+
+        // license report
+        classpath 'com.google.android.gms:oss-licenses-plugin:0.9.5'
     }
 }
 
@@ -22,7 +24,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
     }
 }
 
