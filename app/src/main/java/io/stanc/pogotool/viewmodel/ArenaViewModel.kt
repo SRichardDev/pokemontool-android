@@ -1,7 +1,7 @@
 package io.stanc.pogotool.viewmodel
 
-import android.arch.lifecycle.ViewModel
-import android.databinding.ObservableField
+import androidx.lifecycle.ViewModel
+import androidx.databinding.ObservableField
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.AppSettings
 

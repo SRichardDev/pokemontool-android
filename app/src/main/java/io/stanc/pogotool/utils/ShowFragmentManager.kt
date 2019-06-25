@@ -1,9 +1,9 @@
 package io.stanc.pogotool.utils
 
-import android.support.annotation.IdRes
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
 import android.util.Log
+import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 object ShowFragmentManager {
     private val TAG = javaClass.name

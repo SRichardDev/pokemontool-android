@@ -1,15 +1,15 @@
 package io.stanc.pogotool.screen
 
-import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import io.stanc.pogotool.AppSettings
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentMapSettingsBinding
-import io.stanc.pogotool.AppSettings
 
 class MapSettingsFragment: Fragment() {
 

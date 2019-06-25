@@ -2,7 +2,6 @@ package io.stanc.pogotool.screen
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,23 +9,24 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import io.stanc.pogotool.firebase.FirebaseDefinitions
-import io.stanc.pogotool.subscreen.MapFragment
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE
 import io.stanc.pogotool.firebase.DatabaseKeys.LONGITUDE
 import io.stanc.pogotool.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogotool.firebase.FirebaseDatabase
+import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
+import io.stanc.pogotool.subscreen.MapFragment
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner

@@ -1,9 +1,7 @@
 package io.stanc.pogotool.screen
 
 import android.content.Context
-import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,14 +10,16 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.R
-import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
-import io.stanc.pogotool.firebase.node.FirebaseArena
-import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
+import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin.safeLet
 import io.stanc.pogotool.utils.ShowFragmentManager

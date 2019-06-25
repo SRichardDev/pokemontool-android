@@ -1,20 +1,20 @@
 package io.stanc.pogotool.screen
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.Fragment
 import io.stanc.pogotool.Popup
 import io.stanc.pogotool.R
-import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseRaid
 import io.stanc.pogotool.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogotool.geohash.GeoHash
+import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*

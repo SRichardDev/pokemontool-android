@@ -2,21 +2,19 @@ package io.stanc.pogotool.utils
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.databinding.BindingAdapter
-import android.graphics.PorterDuff
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.StateListDrawable
 import android.graphics.drawable.shapes.RoundRectShape
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.util.StateSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import androidx.databinding.BindingAdapter
 import io.stanc.pogotool.R
 import java.lang.ref.WeakReference
-import android.graphics.drawable.ColorDrawable
-import android.util.StateSet
 
 
 @BindingAdapter("onSelectionChangeListener")

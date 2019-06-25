@@ -1,9 +1,9 @@
 package io.stanc.pogotool.screen
 
-import android.databinding.Observable
-import android.support.v4.app.FragmentPagerAdapter
 import android.util.Log
 import android.widget.Toast
+import androidx.databinding.Observable
+import androidx.fragment.app.FragmentPagerAdapter
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
@@ -17,7 +17,6 @@ import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 import io.stanc.pogotool.viewmodel.MapItemViewModel.Type
 import io.stanc.pogotool.viewpager.ViewPagerFragment
-import java.lang.Exception
 
 
 class MapItemCreationFragment: ViewPagerFragment() {

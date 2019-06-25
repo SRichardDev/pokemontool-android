@@ -5,7 +5,7 @@
      android:layout_width="wrap_content"
      android:layout_height="wrap_content">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@color/white"
@@ -59,6 +59,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:text="@string/map_info_window_pokestop_button_info"/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

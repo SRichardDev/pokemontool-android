@@ -1,7 +1,7 @@
 package io.stanc.pogotool.utils
 
-import android.databinding.Observable
-import android.databinding.ObservableField
+import androidx.databinding.Observable
+import androidx.databinding.ObservableField
 
 object Observables {
 

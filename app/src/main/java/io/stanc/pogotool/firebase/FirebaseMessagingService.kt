@@ -1,16 +1,16 @@
 package io.stanc.pogotool.firebase
 
 import android.app.Notification
-import android.util.Log
-import com.google.firebase.messaging.FirebaseMessagingService
-import com.google.firebase.messaging.RemoteMessage
-import android.app.NotificationManager
 import android.app.NotificationChannel
-import android.os.Build
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.support.v4.app.NotificationCompat
+import android.os.Build
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
 import io.stanc.pogotool.NavDrawerActivity
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.DatabaseKeys.LATITUDE

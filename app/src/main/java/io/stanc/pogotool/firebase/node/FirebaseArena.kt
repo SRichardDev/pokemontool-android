@@ -3,8 +3,8 @@ package io.stanc.pogotool.firebase.node
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.support.v4.content.ContextCompat
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.R

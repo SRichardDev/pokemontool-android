@@ -1,23 +1,23 @@
 package io.stanc.pogotool.screen
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogotool.subscreen.MapItemCreationFragment1
 import io.stanc.pogotool.subscreen.MapItemCreationFragment2
 import io.stanc.pogotool.subscreen.MapItemCreationFragment3
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 
-class MapItemCreationFragmentPagerAdapter(fragmentManager: FragmentManager, private val mapItemViewModel: MapItemViewModel): FragmentPagerAdapter(fragmentManager) {
+class MapItemCreationFragmentPagerAdapter(fragmentManager: FragmentManager, private val mapItemViewModel: MapItemViewModel): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     private val NUM_PAGES = 3
 
-    override fun getItem(position: Int): Fragment? {
+    override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> MapItemCreationFragment1.newInstance(mapItemViewModel)
             1 -> MapItemCreationFragment2.newInstance(mapItemViewModel)
             2 -> MapItemCreationFragment3.newInstance(mapItemViewModel)
-            else -> null
+            else -> throw Exception("unsupported position ($position) in MapItemCreationFragmentPagerAdapter!")
         }
     }
 

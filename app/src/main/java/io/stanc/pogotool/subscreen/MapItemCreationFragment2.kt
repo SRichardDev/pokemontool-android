@@ -1,20 +1,12 @@
 package io.stanc.pogotool.subscreen
 
-import android.databinding.DataBindingUtil
-import android.databinding.Observable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.Marker
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import io.stanc.pogotool.R
-import io.stanc.pogotool.map.ClusterArenaRenderer
-import io.stanc.pogotool.map.ClusterPokestopRenderer
-import io.stanc.pogotool.utils.Kotlin
-import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.viewmodel.MapItemViewModel
 
 class MapItemCreationFragment2: Fragment() {

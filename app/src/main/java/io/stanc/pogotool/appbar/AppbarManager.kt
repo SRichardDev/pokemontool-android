@@ -1,6 +1,6 @@
 package io.stanc.pogotool.appbar
 
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import java.lang.ref.WeakReference
 
 

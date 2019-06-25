@@ -1,9 +1,9 @@
 package io.stanc.pogotool
 
+import android.app.AlertDialog
 import android.content.Context
-import android.support.annotation.StringRes
-import android.support.v7.app.AlertDialog
 import android.util.Log
+import androidx.annotation.StringRes
 
 object Popup {
     private val TAG = javaClass.name

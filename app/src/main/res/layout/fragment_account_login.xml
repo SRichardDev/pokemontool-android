@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:orientation="vertical">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/image_size_big">
 
@@ -39,7 +39,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:src="@drawable/mystic"/>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             style="@style/TextStyle_default"

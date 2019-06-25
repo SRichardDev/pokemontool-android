@@ -3,9 +3,8 @@ package io.stanc.pogotool.utils
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.support.annotation.DrawableRes
-import android.support.v4.content.ContextCompat
-import android.util.Log
+import androidx.annotation.DrawableRes
+import androidx.core.content.ContextCompat
 
 object IconFactory {
     private val TAG = javaClass.name

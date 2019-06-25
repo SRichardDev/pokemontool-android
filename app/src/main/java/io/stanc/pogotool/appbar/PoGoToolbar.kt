@@ -1,18 +1,13 @@
 package io.stanc.pogotool.appbar
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.support.annotation.StringRes
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.ImageViewCompat
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.StringRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import io.stanc.pogotool.R
 
 class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : ConstraintLayout(context, attrs, defStyleAttr), Toolbar {

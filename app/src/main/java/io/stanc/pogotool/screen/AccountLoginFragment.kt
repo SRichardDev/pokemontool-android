@@ -1,9 +1,9 @@
 package io.stanc.pogotool.screen
 
 import android.os.Bundle
-import android.support.v4.app.FragmentPagerAdapter
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager

@@ -1,8 +1,8 @@
 package io.stanc.pogotool.viewmodel
 
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import android.content.Context
-import android.databinding.ObservableField
+import androidx.databinding.ObservableField
 import android.graphics.drawable.Drawable
 import android.util.Log
 import io.stanc.pogotool.App

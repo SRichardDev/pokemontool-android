@@ -1,12 +1,14 @@
 package io.stanc.pogotool.screen
 
 import android.content.Context
-import android.databinding.adapters.SearchViewBindingAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
-import io.stanc.pogotool.recyclerviewadapter.QuestAdapter
+import androidx.appcompat.app.AlertDialog
+import androidx.databinding.adapters.SearchViewBindingAdapter
+import io.stanc.pogotool.App
+import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseDefinitions
@@ -16,9 +18,7 @@ import io.stanc.pogotool.firebase.node.FirebaseQuest
 import io.stanc.pogotool.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogotool.recyclerview.RecyclerViewAdapter
 import io.stanc.pogotool.recyclerview.RecyclerViewFragment
-import android.support.v7.app.AlertDialog
-import io.stanc.pogotool.App
-import io.stanc.pogotool.FirebaseImageMapper
+import io.stanc.pogotool.recyclerviewadapter.QuestAdapter
 
 
 class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {

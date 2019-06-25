@@ -1,13 +1,11 @@
 package io.stanc.pogotool.subscreen
 
-import android.databinding.DataBindingUtil
-import android.databinding.Observable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogotool.R

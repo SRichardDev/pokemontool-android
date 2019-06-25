@@ -1,13 +1,13 @@
 package io.stanc.pogotool.subscreen
 
 import android.content.Context
-import android.databinding.BindingAdapter
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.BindingAdapter
 import io.stanc.pogotool.R
 
 

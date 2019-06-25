@@ -1,24 +1,26 @@
 package io.stanc.pogotool
 
+import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.android.material.navigation.NavigationView
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.screen.AccountInfoFragment
 import io.stanc.pogotool.screen.AccountLoginRequestFragment
+import io.stanc.pogotool.screen.ImprintFragment
 import io.stanc.pogotool.screen.MapInteractionFragment
 import io.stanc.pogotool.subscreen.AppInfoLabelController
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
-import kotlinx.android.synthetic.main.activity_drawer.*
-import kotlinx.android.synthetic.main.layout_drawer_navigationview.*
 import kotlinx.android.synthetic.main.layout_navigation_header.*
 import kotlinx.android.synthetic.main.layout_progress.*
 import java.lang.ref.WeakReference
@@ -26,6 +28,7 @@ import java.lang.ref.WeakReference
 
 class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private var drawerLayout: DrawerLayout? = null
     private var appInfoLabelController: AppInfoLabelController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +74,10 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         (findViewById(R.id.activity_toolbar) as? PoGoToolbar)?.let { toolbar ->
 
             AppbarManager.setup(toolbar, defaultOnNavigationIconClicked = {
-                drawer_layout?.openDrawer(nav_view)
+
+                findViewById<View>(R.id.nav_view)?.let { navView ->
+                    drawerLayout?.openDrawer(navView)
+                }
             })
         }
     }
@@ -84,20 +90,25 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun setupDrawer() {
 
-        val weakActivity = WeakReference(this)
-        val toggle = object : ActionBarDrawerToggle(this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+        drawerLayout = findViewById(R.id.drawer_layout)
 
-            override fun onDrawerOpened(drawerView: View) {
-                super.onDrawerOpened(drawerView)
-                weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
-                updateNavText()
+        drawerLayout?.let { drawerLayout ->
+
+            val weakActivity = WeakReference(this)
+            val toggle = object : ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+                override fun onDrawerOpened(drawerView: View) {
+                    super.onDrawerOpened(drawerView)
+                    weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
+                    updateNavText()
+                }
             }
+
+            drawerLayout.addDrawerListener(toggle)
+            findViewById<NavigationView>(R.id.nav_view)?.setNavigationItemSelectedListener(this)
+
+            toggle.syncState()
         }
-
-        drawer_layout?.addDrawerListener(toggle)
-        nav_view?.setNavigationItemSelectedListener(this)
-
-        toggle.syncState()
     }
 
     /**
@@ -107,7 +118,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showMapFragment() {
 
         val fragmentTag = MapInteractionFragment::class.java.name
-        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
             fragment = MapInteractionFragment()
@@ -119,7 +130,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showAccountInfoFragment() {
 
         val fragmentTag = AccountInfoFragment::class.java.name
-        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
             fragment = AccountInfoFragment()
@@ -131,10 +142,22 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     private fun showAccountLoginFragment() {
 
         val fragmentTag = AccountLoginRequestFragment::class.java.name
-        var fragment = supportFragmentManager?.findFragmentByTag(fragmentTag)
+        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
             fragment = AccountLoginRequestFragment()
+        }
+
+        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
+    }
+
+    private fun showImprintFragment() {
+
+        val fragmentTag = ImprintFragment::class.java.name
+        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
+
+        if (fragment == null) {
+            fragment = ImprintFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
@@ -145,10 +168,14 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      */
 
     override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
+
+        drawerLayout?.let { drawerLayout ->
+
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 
@@ -184,9 +211,13 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
             R.id.nav_map -> {
                 showMapFragment()
             }
+            R.id.nav_imprint -> {
+//                showImprintFragment()
+                startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+            }
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
+        drawerLayout?.closeDrawer(GravityCompat.START)
         return true
     }
 

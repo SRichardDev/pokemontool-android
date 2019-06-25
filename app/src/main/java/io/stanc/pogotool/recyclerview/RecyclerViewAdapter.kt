@@ -1,13 +1,12 @@
 package io.stanc.pogotool.recyclerview
 
 import android.content.Context
-import android.support.annotation.IdRes
-import android.support.annotation.LayoutRes
-import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
+import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.RecyclerView
 
 
 abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Context,

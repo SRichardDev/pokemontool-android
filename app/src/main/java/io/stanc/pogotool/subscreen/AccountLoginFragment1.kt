@@ -1,8 +1,8 @@
 package io.stanc.pogotool.subscreen
 
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

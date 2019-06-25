@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="@string/raid_raidboss_selection"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/raidbosses_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="@dimen/recycleview_list_item_height"

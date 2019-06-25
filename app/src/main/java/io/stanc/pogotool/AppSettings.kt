@@ -1,8 +1,8 @@
 package io.stanc.pogotool
 
 import android.content.SharedPreferences
-import android.databinding.Observable
-import android.databinding.ObservableField
+import androidx.databinding.Observable
+import androidx.databinding.ObservableField
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import java.lang.ref.WeakReference

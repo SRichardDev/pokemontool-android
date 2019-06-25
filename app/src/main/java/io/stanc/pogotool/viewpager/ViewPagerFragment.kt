@@ -1,15 +1,15 @@
 package io.stanc.pogotool.viewpager
 
-import android.databinding.DataBindingUtil
-import android.databinding.ObservableField
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableField
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.databinding.LayoutViewpagerBinding
@@ -72,7 +72,7 @@ abstract class ViewPagerFragment: Fragment() {
             } else {
                 viewpager.setCurrentItem(viewpager.currentItem + 1, true)
             }
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "on view pager fragment button clicked, but view pager is null!")
         }
 

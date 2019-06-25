@@ -1,9 +1,8 @@
 package io.stanc.pogotool.viewmodel
 
-import android.arch.lifecycle.ViewModel
-import android.databinding.Observable
-import android.databinding.ObservableField
-import android.util.Log
+import androidx.databinding.Observable
+import androidx.databinding.ObservableField
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogotool.utils.SegmentedControlView
 

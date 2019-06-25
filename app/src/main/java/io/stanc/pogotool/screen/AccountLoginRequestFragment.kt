@@ -1,7 +1,6 @@
 package io.stanc.pogotool.screen
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
