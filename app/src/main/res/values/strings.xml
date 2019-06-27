@@ -192,6 +192,6 @@
 
     <!-- Policy -->
     <string name="policy_button_privacy_policy">Datenschutzerklärung</string>
-    <string name="policy_button_license">Lizensen</string>
+    <string name="policy_button_license">Lizenzen</string>
 
 </resources>

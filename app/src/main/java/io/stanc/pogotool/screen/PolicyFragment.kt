@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import io.stanc.pogotool.PrivacyPolicyActivity
 import io.stanc.pogotool.R
 
 class PolicyFragment: Fragment() {
@@ -20,7 +21,7 @@ class PolicyFragment: Fragment() {
         }
 
         rootLayout.findViewById<Button>(R.id.policy_privacy)?.setOnClickListener {
-
+            startActivity(Intent(context, PrivacyPolicyActivity::class.java))
         }
 
         return rootLayout
