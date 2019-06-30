@@ -30,27 +30,22 @@ class AccountInfoFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.authentication_app_title))
-        FirebaseUser.addAuthStateObserver(authStateObserver)
+        AppbarManager.setMenuButton(R.string.authentication_button_sign_out, onMenuIconClicked = {
+            FirebaseUser.signOut()
+        })
         FirebaseUser.addUserDataObserver(userDataObserver)
     }
 
     override fun onPause() {
-        FirebaseUser.removeAuthStateObserver(authStateObserver)
         FirebaseUser.removeUserDataObserver(userDataObserver)
         AppbarManager.setTitle(getString(R.string.default_app_title))
+        AppbarManager.resetMenu()
         super.onPause()
     }
 
     /**
      * firebase observer
      */
-
-    private val authStateObserver = object: FirebaseUser.AuthStateObserver {
-        override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
-            // TODO: on authStateChanged?
-            Log.i(TAG, "Debug:: authStateChanged(${newAuthState.name})")
-        }
-    }
 
     private val userDataObserver = object: FirebaseUser.UserDataObserver {
         override fun userDataChanged(user: FirebaseUserNode?) {

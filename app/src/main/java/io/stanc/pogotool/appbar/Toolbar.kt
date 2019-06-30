@@ -5,6 +5,11 @@ import androidx.annotation.StringRes
 
 interface Toolbar {
 
+    enum class MenuType {
+        Icon,
+        Button
+    }
+
     fun setVisibility(visible: Boolean)
 
     fun setNavigationIcon(@DrawableRes navigationIconResID: Int)
@@ -16,9 +21,9 @@ interface Toolbar {
     fun setTitle(@StringRes stringResID: Int)
     fun setTitleLongClickListener(onTitleLongClicked: () -> Unit)
 
-    fun showMenu()
-    fun hideMenu()
+    fun showMenu(type: MenuType)
+    fun hideMenu(type: MenuType)
 
-    fun setMenuItemIcon(@DrawableRes menuIconResID: Int)
-    fun setMenuItemClickListener(onMenuItemClicked: () -> Unit)
+    fun setMenuItemIcon(@DrawableRes menuIconResID: Int, onMenuItemClicked: () -> Unit)
+    fun setMenuItemButton(@StringRes stringResID: Int, onMenuItemClicked: () -> Unit)
 }

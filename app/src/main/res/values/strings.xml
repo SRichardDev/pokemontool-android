@@ -23,10 +23,7 @@
 
     <!-- Navigation Drawer -->
     <string name="nav_header_account_state">Account Status:</string>
-    <string name="nav_menu_item_account_create">Login</string>
-    <string name="nav_menu_item_account">Account</string>
     <string name="nav_menu_item_map">Karte</string>
-    <string name="nav_menu_item_policy">Terms &amp; Conditions</string>
 
     <!-- Authentication -->
     <string name="authentication_app_title">Account</string>

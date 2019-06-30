@@ -9,7 +9,7 @@ import io.stanc.pogotool.subscreen.*
 import io.stanc.pogotool.viewmodel.LoginViewModel
 import io.stanc.pogotool.viewmodel.LoginViewModel.SignType
 
-class AccountLoginFragmentPagerAdapter(fragmentManager: FragmentManager, private val loginViewModel: LoginViewModel): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class AccountLoginProcessFragmentPagerAdapter(fragmentManager: FragmentManager, private val loginViewModel: LoginViewModel): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
@@ -18,7 +18,7 @@ class AccountLoginFragmentPagerAdapter(fragmentManager: FragmentManager, private
             2 -> AccountLoginFragment3.newInstance(loginViewModel)
             3 -> AccountLoginFragment4.newInstance(loginViewModel)
             4 -> AccountLoginFragment5.newInstance(loginViewModel)
-            else -> throw Exception("unsupported position ($position) in AccountLoginFragmentPagerAdapter!")
+            else -> throw Exception("unsupported position ($position) in AccountLoginProcessFragmentPagerAdapter!")
         }
     }
 

@@ -17,6 +17,7 @@ class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
     private val navigationIcon: ImageView
     private val title: TextView
     private val menuIcon: ImageView
+    private val menuButton: TextView
 
     init {
         View.inflate(context, R.layout.layout_toolbar, this)
@@ -24,6 +25,7 @@ class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
         navigationIcon = findViewById(R.id.toolbar_icon_navigation)
         title = findViewById(R.id.toolbar_title)
         menuIcon = findViewById(R.id.toolbar_icon_menu)
+        menuButton = findViewById(R.id.toolbar_button_menu)
     }
 
     /**
@@ -74,19 +76,28 @@ class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
      * Menu
      */
 
-    override fun showMenu() {
-        menuIcon.visibility = View.VISIBLE
+    override fun showMenu(type: Toolbar.MenuType) {
+        when(type) {
+            Toolbar.MenuType.Icon -> menuIcon.visibility = View.VISIBLE
+            Toolbar.MenuType.Button -> menuButton.visibility = View.VISIBLE
+        }
     }
 
-    override fun hideMenu() {
-        menuIcon.visibility = View.GONE
+    override fun hideMenu(type: Toolbar.MenuType) {
+        when(type) {
+            Toolbar.MenuType.Icon -> menuIcon.visibility = View.GONE
+            Toolbar.MenuType.Button -> menuButton.visibility = View.GONE
+        }
+
     }
 
-    override fun setMenuItemIcon(menuIconResID: Int) {
+    override fun setMenuItemIcon(menuIconResID: Int, onMenuItemClicked: () -> Unit) {
         menuIcon.setImageResource(menuIconResID)
+        menuIcon.setOnClickListener { onMenuItemClicked() }
     }
 
-    override fun setMenuItemClickListener(onMenuItemClicked: () -> Unit) {
-        menuIcon.setOnClickListener { onMenuItemClicked() }
+    override fun setMenuItemButton(stringResID: Int, onMenuItemClicked: () -> Unit) {
+        (resources.getText(stringResID) as String?)?.let { menuButton.text = it }
+        menuButton.setOnClickListener { onMenuItemClicked() }
     }
 }

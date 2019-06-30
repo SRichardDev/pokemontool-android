@@ -1,6 +1,7 @@
 package io.stanc.pogotool.appbar
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import java.lang.ref.WeakReference
 
 
@@ -61,17 +62,21 @@ class AppbarManager {
          * Menu Icon
          */
 
-        fun showMenu() {
-            toolbar?.get()?.showMenu()
-        }
-
-        fun hideMenuItem() {
-            toolbar?.get()?.hideMenu()
+        fun resetMenu() {
+            toolbar?.get()?.hideMenu(Toolbar.MenuType.Button)
+            toolbar?.get()?.hideMenu(Toolbar.MenuType.Icon)
         }
 
         fun setMenuIcon(@DrawableRes menuIconResID: Int, onMenuIconClicked: () -> Unit) {
-            toolbar?.get()?.setMenuItemIcon(menuIconResID)
-            toolbar?.get()?.setMenuItemClickListener(onMenuIconClicked)
+            toolbar?.get()?.setMenuItemIcon(menuIconResID, onMenuIconClicked)
+            toolbar?.get()?.showMenu(Toolbar.MenuType.Icon)
+            toolbar?.get()?.hideMenu(Toolbar.MenuType.Button)
+        }
+
+        fun setMenuButton(@StringRes menuButtonStringResID: Int, onMenuIconClicked: () -> Unit) {
+            toolbar?.get()?.setMenuItemButton(menuButtonStringResID, onMenuIconClicked)
+            toolbar?.get()?.showMenu(Toolbar.MenuType.Button)
+            toolbar?.get()?.hideMenu(Toolbar.MenuType.Icon)
         }
     }
 }

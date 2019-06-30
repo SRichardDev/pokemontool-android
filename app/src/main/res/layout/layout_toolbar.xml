@@ -23,8 +23,8 @@
         android:textColor="@android:color/white"
         android:textIsSelectable="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/toolbar_icon_navigation"
-        app:layout_constraintEnd_toStartOf="@id/toolbar_icon_menu"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
@@ -36,6 +36,19 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"
         android:src="@drawable/icon_menu"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/toolbar_button_menu"
+        style="@style/ButtonStyle_bold"
+        android:layout_height="0dp"
+        android:layout_width="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:visibility="gone"
+        tools:text="debug button text"
+        tools:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

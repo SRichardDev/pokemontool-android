@@ -5,16 +5,9 @@
 
     <group android:checkableBehavior="none">
         <item
-            android:id="@+id/nav_account_create"
-            android:icon="@drawable/icon_account_create_30dp"
-            android:title="@string/nav_menu_item_account_create"/>
-    </group>
-
-    <group android:checkableBehavior="none">
-        <item
             android:id="@+id/nav_account"
             android:icon="@drawable/icon_account_30dp"
-            android:title="@string/nav_menu_item_account"/>
+            android:title="@string/authentication_app_title"/>
     </group>
 
     <group android:checkableBehavior="none">
@@ -28,7 +21,7 @@
         <item
             android:id="@+id/nav_policy"
             android:icon="@drawable/icon_imprint_30dp"
-            android:title="@string/nav_menu_item_policy"/>
+            android:title="@string/policy_app_title"/>
     </group>
 
 

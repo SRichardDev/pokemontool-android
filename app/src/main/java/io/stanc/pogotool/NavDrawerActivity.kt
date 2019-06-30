@@ -12,10 +12,9 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.appbar.PoGoToolbar
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
-import io.stanc.pogotool.screen.AccountInfoFragment
-import io.stanc.pogotool.screen.AccountLoginRequestFragment
-import io.stanc.pogotool.screen.PolicyFragment
+import io.stanc.pogotool.screen.AccountFragment
 import io.stanc.pogotool.screen.MapInteractionFragment
+import io.stanc.pogotool.screen.PolicyFragment
 import io.stanc.pogotool.subscreen.AppInfoLabelController
 import io.stanc.pogotool.utils.SystemUtils
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -125,25 +124,13 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
-    private fun showAccountInfoFragment() {
+    private fun showAccountFragment() {
 
-        val fragmentTag = AccountInfoFragment::class.java.name
+        val fragmentTag = AccountFragment::class.java.name
         var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (fragment == null) {
-            fragment = AccountInfoFragment()
-        }
-
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
-    }
-
-    private fun showAccountLoginFragment() {
-
-        val fragmentTag = AccountLoginRequestFragment::class.java.name
-        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
-
-        if (fragment == null) {
-            fragment = AccountLoginRequestFragment()
+            fragment = AccountFragment()
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
@@ -200,11 +187,8 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_account_create -> {
-                showAccountLoginFragment()
-            }
             R.id.nav_account -> {
-                showAccountInfoFragment()
+                showAccountFragment()
             }
             R.id.nav_map -> {
                 showMapFragment()
