@@ -32,11 +32,11 @@ object FirebaseImageMapper {
 
                 RaidState.EGG_HATCHES -> {
                     return when(raid.level) {
-                        "1" -> context.getDrawable(R.drawable.icon_level_1_30dp)
-                        "2" -> context.getDrawable(R.drawable.icon_level_2_30dp)
-                        "3" -> context.getDrawable(R.drawable.icon_level_3_30dp)
-                        "4" -> context.getDrawable(R.drawable.icon_level_4_30dp)
-                        "5" -> context.getDrawable(R.drawable.icon_level_5_30dp)
+                        1 -> context.getDrawable(R.drawable.icon_level_1_30dp)
+                        2 -> context.getDrawable(R.drawable.icon_level_2_30dp)
+                        3 -> context.getDrawable(R.drawable.icon_level_3_30dp)
+                        4 -> context.getDrawable(R.drawable.icon_level_4_30dp)
+                        5 -> context.getDrawable(R.drawable.icon_level_5_30dp)
                         else -> null
                     }
                 }

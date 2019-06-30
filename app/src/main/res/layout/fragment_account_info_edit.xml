@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
+        <variable
+            name="settings"
+            type="io.stanc.pogotool.AppSettings"/>
+        <import type="android.view.View"/>
+        <import type="io.stanc.pogotool.firebase.node.Team"/>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/layout_padding_screen">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:src="@drawable/icon_medal_none_96dp"
+                android:visibility="@{viewModel.team == null ? View.VISIBLE : View.GONE}"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:src="@drawable/mystic"
+                android:visibility="@{viewModel.team == Team.MYSTIC ? View.VISIBLE : View.GONE}"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:src="@drawable/icon_valor_512dp"
+                android:visibility="@{viewModel.team == Team.VALOR ? View.VISIBLE : View.GONE}"/>
+
+            <ImageView
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:src="@drawable/icon_instinct_512dp"
+                android:visibility="@{viewModel.team == Team.INSTINCT ? View.VISIBLE : View.GONE}"/>
+
+            <TextView
+                style="@style/TextStyle_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@{viewModel.level}"/>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@{viewModel.name}"/>
+
+            <Button
+                android:id="@+id/account_info_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_default"
+                android:text="@string/authentication_button_edit_infos"/>
+
+            <include layout="@layout/layout_divider"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/authentication_button_enable_push_notifications"/>
+
+                <Switch
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:checked="@={settings.enableSubscriptions}"/>
+
+            </LinearLayout>
+
+            <include layout="@layout/layout_divider"/>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/authentication_button_medal"/>
+
+            <include layout="@layout/layout_table_medals"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_gravity="center"
+                     app:viewModel="@{viewModel}"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

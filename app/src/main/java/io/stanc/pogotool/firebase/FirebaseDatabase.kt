@@ -135,7 +135,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun pushRaidMeetupParticipation(raidMeetupId: String) {
 
         FirebaseUser.userData?.id?.let {
-            FirebaseServer.setDataKey("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it)
+            FirebaseServer.addDataKey("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it)
         } ?: kotlin.run {
             Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }

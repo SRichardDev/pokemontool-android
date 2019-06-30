@@ -17,7 +17,7 @@ import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
 
 data class FirebaseRaid private constructor(override val id: String,
-                                            val level: String,
+                                            val level: Number,
                                             val timeEggHatches: String?,
                                             val timeEnd: String,
                                             val timestamp: Any,
@@ -55,7 +55,7 @@ data class FirebaseRaid private constructor(override val id: String,
 //            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
-            val level = dataSnapshot.child(RAID_LEVEL).value as? String
+            val level = dataSnapshot.child(RAID_LEVEL).value as? Number
             val timeEggHatches = dataSnapshot.child(RAID_TIME_EGG_HATCHES).value as? String
             val timeEnd = dataSnapshot.child(RAID_TIME_END).value as? String
             val timestamp = dataSnapshot.child(TIMESTAMP).value as? Long
@@ -80,13 +80,13 @@ data class FirebaseRaid private constructor(override val id: String,
             } ?: kotlin.run { "00:00" }
 
 //            Log.w(TAG, "Debug:: new Raid() formattedTimeEggHatches: $formattedTimeEggHatches, formattedTimeRaidEnds: $formattedTimeRaidEnds")
-            return FirebaseRaid("", raidLevel.toString(), formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId)
+            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId)
         }
 
         fun new(raidLevel: Int, timeRaidEndsHour: Int, timeRaidEndsMinutes: Int, geoHash: GeoHash, arenaId: String, raidBossId: String?): FirebaseRaid {
             val formattedTimeRaidEnds = TimeCalculator.format(timeRaidEndsHour, timeRaidEndsMinutes)
 
-            return FirebaseRaid("", raidLevel.toString(), null, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId, raidBossId)
+            return FirebaseRaid("", raidLevel, null, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId, raidBossId)
         }
     }
 }

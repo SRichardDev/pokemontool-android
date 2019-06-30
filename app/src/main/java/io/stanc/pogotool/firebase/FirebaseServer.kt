@@ -201,10 +201,8 @@ object FirebaseServer {
         return newNode.key
     }
 
-    fun setDataKey(databasePath: String, key: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        val data = HashMap<String, String>()
-        data[key] = ""
-        databaseRef.child(databasePath).setValue(data).addOnCompleteListener { task ->
+    fun addDataKey(databasePath: String, key: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        databaseRef.child(databasePath).child(key).setValue("").addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
@@ -214,12 +212,6 @@ object FirebaseServer {
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
-
-//    fun removeData(firebaseData: FirebaseData, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-//        databaseRef.child(firebaseData.databasePath()).removeData().addOnCompleteListener { task ->
-//            onCompletionCallback?.let { callback<Void, Void>(task, it) }
-//        }
-//    }
 
     fun removeData(databasePath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         databaseRef.child(databasePath).removeValue().addOnCompleteListener { task ->
