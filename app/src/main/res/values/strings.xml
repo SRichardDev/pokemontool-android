@@ -76,6 +76,7 @@
     <string name="authentication_login_details_name">Trainer Name:</string>
     <string name="authentication_login_details_team">Team:</string>
     <string name="authentication_login_details_level">Level:</string>
+    <string name="authentication_login_details_code">Trainer Code:</string>
 
 
     <string name="authentication_hint_email">Gebe deine Emailadresse hier ein.</string>

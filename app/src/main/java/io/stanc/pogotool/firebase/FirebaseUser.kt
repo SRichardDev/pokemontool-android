@@ -2,7 +2,6 @@ package io.stanc.pogotool.firebase
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogotool.App
@@ -13,8 +12,11 @@ import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_RAIDS
 import io.stanc.pogotool.firebase.DatabaseKeys.USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_CODE
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_LEVEL
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_NAME
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_PUBLIC_DATA
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.firebase.node.Team
 import io.stanc.pogotool.geohash.GeoHash
@@ -41,23 +43,6 @@ object FirebaseUser {
     /**
      * user
      */
-
-    fun changeUserName(newUserName: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        userData?.let { userNode ->
-
-            FirebaseServer.setData("$USERS/${userNode.id}/$USER_PUBLIC_DATA/$USER_NAME", newUserName, object: FirebaseServer.OnCompleteCallback<Void> {
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "User profile update failed. Error: $message")
-                    onCompletionCallback(false)
-                }
-            })
-        } ?: kotlin.run { Log.e(TAG, "cannot change username: $newUserName, because: userData: $userData") }
-    }
 
     fun changePushNotifications(isPushAktive: Boolean, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
@@ -124,9 +109,7 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            val data = HashMap<String, String>()
-            data[id] = DatabaseKeys.firebaseGeoHash(geoHash)
-            FirebaseServer.setData("$USERS/${userNode.id}/$submissionFirebaseKey", data, object: FirebaseServer.OnCompleteCallback<Void> {
+            FirebaseServer.addData("$USERS/${userNode.id}/$submissionFirebaseKey", id, DatabaseKeys.firebaseGeoHash(geoHash), object: FirebaseServer.OnCompleteCallback<Void> {
                 override fun onSuccess(data: Void?) {
                     onCompletionCallback(true)
                 }
@@ -140,13 +123,13 @@ object FirebaseUser {
         } ?: kotlin.run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
     }
 
-    private fun requestNotificationTokenToCreateUser(userConfig: UserConfig) {
+    private fun requestNotificationTokenToCreateUser(userLoginConfig: UserLoginConfig) {
 
         FirebaseServer.requestNotificationToken(object: FirebaseServer.OnCompleteCallback<String> {
 
             override fun onSuccess(data: String?) {
                 data?.let { token ->
-                    createUser(userConfig, token)
+                    createUser(userLoginConfig, token)
                 } ?: kotlin.run { Log.w(TAG, "User profile creation failed. Error: token is $data") }
             }
 
@@ -156,16 +139,16 @@ object FirebaseUser {
         })
     }
 
-    private fun createUser(userConfig: UserConfig, userNotificationToken: String) {
+    private fun createUser(userLoginConfig: UserLoginConfig, userNotificationToken: String) {
 
         auth.currentUser?.let { firebaseUser ->
 
             val userData = FirebaseUserNode.new (
                 firebaseUser.uid,
-                userConfig.email,
-                userConfig.name,
-                userConfig.team,
-                userConfig.level,
+                userLoginConfig.email,
+                userLoginConfig.name,
+                userLoginConfig.team,
+                userLoginConfig.level,
                 userNotificationToken
             )
 
@@ -183,10 +166,27 @@ object FirebaseUser {
             })
 
         } ?: kotlin.run {
-            Log.e(TAG, "could not create user for config: $userConfig and notificationToken: $userNotificationToken, because auth.currentUser: ${auth.currentUser}")
+            Log.e(TAG, "could not create user for config: $userLoginConfig and notificationToken: $userNotificationToken, because auth.currentUser: ${auth.currentUser}")
             FirebaseUser.userData = null
         }
     }
+
+    data class UserProfileConfig(val name: String,
+                                 val code: String,
+                                 val team: Number,
+                                 val level: Number)
+
+    fun updateUserProfile(userProfileConfig: UserProfileConfig) {
+
+        auth.currentUser?.let { firebaseUser ->
+
+            FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_NAME", userProfileConfig.name)
+            FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_CODE", userProfileConfig.code)
+            FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_TEAM", userProfileConfig.team)
+            FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_LEVEL", userProfileConfig.level)
+        }
+    }
+
 
     /**
      * authentication
@@ -236,35 +236,35 @@ object FirebaseUser {
      * login
      */
 
-    data class UserConfig(val email: String,
-                          val password: String,
-                          val name: String,
-                          val team: Team,
-                          val level: Int)
+    data class UserLoginConfig(val email: String,
+                               val password: String,
+                               val name: String,
+                               val team: Team,
+                               val level: Int)
 
-    fun signUp(userConfig: UserConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
+    fun signUp(userLoginConfig: UserLoginConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 
-        if (userConfig.password.length < MIN_PASSWORD_LENGTH) {
+        if (userLoginConfig.password.length < MIN_PASSWORD_LENGTH) {
             onCompletionCallback(false, App.geString(R.string.exceptions_signup_password))
             return
         }
 
-        if (!isEmailValid(userConfig.email)) {
+        if (!isEmailValid(userLoginConfig.email)) {
             onCompletionCallback(false, App.geString(R.string.exceptions_signup_email))
             return
         }
 
-        if (userConfig.name.isEmpty()) {
+        if (userLoginConfig.name.isEmpty()) {
             onCompletionCallback(false, App.geString(R.string.exceptions_signup_name))
             return
         }
 
         WaitingSpinner.showProgress(R.string.spinner_title_sign_up)
 
-        auth.createUserWithEmailAndPassword(userConfig.email, userConfig.password).addOnCompleteListener { task ->
+        auth.createUserWithEmailAndPassword(userLoginConfig.email, userLoginConfig.password).addOnCompleteListener { task ->
 
             if (task.isSuccessful) {
-                requestNotificationTokenToCreateUser(userConfig)
+                requestNotificationTokenToCreateUser(userLoginConfig)
             } else {
                 Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
             }

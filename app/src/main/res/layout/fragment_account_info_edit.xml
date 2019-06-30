@@ -12,11 +12,13 @@
             type="io.stanc.pogotool.AppSettings"/>
         <import type="android.view.View"/>
         <import type="io.stanc.pogotool.firebase.node.Team"/>
+        <import type="io.stanc.pogotool.utils.SegmentedControlView.Selection"/>
     </data>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         android:padding="@dimen/layout_padding_screen">
 
         <LinearLayout
@@ -24,96 +26,75 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="@dimen/image_size_big"
-                android:layout_height="@dimen/image_size_big"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:src="@drawable/icon_medal_none_96dp"
-                android:visibility="@{viewModel.team == null ? View.VISIBLE : View.GONE}"/>
-
-            <ImageView
-                android:layout_width="@dimen/image_size_big"
-                android:layout_height="@dimen/image_size_big"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:src="@drawable/mystic"
-                android:visibility="@{viewModel.team == Team.MYSTIC ? View.VISIBLE : View.GONE}"/>
-
-            <ImageView
-                android:layout_width="@dimen/image_size_big"
-                android:layout_height="@dimen/image_size_big"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:src="@drawable/icon_valor_512dp"
-                android:visibility="@{viewModel.team == Team.VALOR ? View.VISIBLE : View.GONE}"/>
-
-            <ImageView
-                android:layout_width="@dimen/image_size_big"
-                android:layout_height="@dimen/image_size_big"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:src="@drawable/icon_instinct_512dp"
-                android:visibility="@{viewModel.team == Team.INSTINCT ? View.VISIBLE : View.GONE}"/>
-
             <TextView
-                style="@style/TextStyle_header"
+                style="@style/TextStyle_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:text="@string/authentication_login_details_name"/>
+
+            <EditText
+                style="@style/TextStyle_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@{viewModel.level}"/>
+                android:text="@={viewModel.name}"/>
 
             <TextView
                 style="@style/TextStyle_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:text="@string/authentication_login_details_code"
+                android:layout_marginTop="@dimen/layout_margin_default"/>
+
+            <EditText
+                style="@style/TextStyle_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="2"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@{viewModel.name}"/>
+                android:text="@={viewModel.code}"/>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/authentication_login_details_team"
+                android:layout_marginTop="@dimen/layout_margin_default"/>
+
+            <io.stanc.pogotool.utils.SegmentedControlView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textLeft="@{viewModel.teamOrder[0].name}"
+                app:textMiddle="@{viewModel.teamOrder[1].name}"
+                app:textRight="@{viewModel.teamOrder[2].name}"
+                app:startSelection="@{viewModel.team.name}"
+                app:selectionColor="@{viewModel.teamColor}"
+                app:onSelectionChangeListener="@{viewModel.onSelectedStateDidChange}"
+                android:layout_marginTop="@dimen/layout_margin_small"/>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/authentication_login_details_level"
+                android:layout_marginTop="@dimen/layout_margin_default"/>
+
+            <NumberPicker
+                android:id="@+id/account_info_edit_numberpicker_level"
+                android:layout_height="@dimen/raid_picker_height"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:layout_gravity="center"/>
+
+            <include layout="@layout/layout_divider"/>
 
             <Button
-                android:id="@+id/account_info_button"
+                android:id="@+id/account_info_edit_button"
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_default"
-                android:text="@string/authentication_button_edit_infos"/>
-
-            <include layout="@layout/layout_divider"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/TextStyle_bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/authentication_button_enable_push_notifications"/>
-
-                <Switch
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:checked="@={settings.enableSubscriptions}"/>
-
-            </LinearLayout>
-
-            <include layout="@layout/layout_divider"/>
-
-            <TextView
-                style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/authentication_button_medal"/>
-
-            <include layout="@layout/layout_table_medals"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_gravity="center"
-                     app:viewModel="@{viewModel}"/>
+                android:text="@string/map_map_item_button_send"/>
 
         </LinearLayout>
 

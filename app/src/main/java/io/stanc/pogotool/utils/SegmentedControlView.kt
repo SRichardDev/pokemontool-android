@@ -27,6 +27,11 @@ fun setStartSelection(view: SegmentedControlView, selection: SegmentedControlVie
     selection?.let { view.selection = selection }
 }
 
+@BindingAdapter("startSelection")
+fun setStartSelection(view: SegmentedControlView, text: String?) {
+    text?.let { view.setSelectionWithText(it) }
+}
+
 @BindingAdapter("textLeft")
 fun setTextLeft(view: SegmentedControlView, text: String?) {
     text?.let { view.setSegment(text, SegmentedControlView.Selection.LEFT) }
@@ -104,8 +109,15 @@ class SegmentedControlView: LinearLayout {
             Selection.MIDDLE -> buttonMiddle.text = text
             Selection.RIGHT -> buttonRight.text = text
         }
-
         changeVisibility()
+    }
+
+    fun setSelectionWithText(text: String) {
+        when(text) {
+            buttonLeft.text -> selection = Selection.LEFT
+            buttonMiddle.text -> selection = Selection.MIDDLE
+            buttonRight.text -> selection = Selection.RIGHT
+        }
     }
 
     fun setSelectionColor(@ColorRes color: Int) {

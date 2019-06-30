@@ -38,7 +38,7 @@
         android:src="@drawable/icon_menu"
         android:visibility="gone"/>
 
-    <TextView
+    <Button
         android:id="@+id/toolbar_button_menu"
         style="@style/ButtonStyle_bold"
         android:layout_height="0dp"

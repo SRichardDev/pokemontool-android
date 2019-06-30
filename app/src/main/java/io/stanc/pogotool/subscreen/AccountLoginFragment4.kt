@@ -20,8 +20,6 @@ class AccountLoginFragment4: Fragment() {
         val binding = DataBindingUtil.inflate<FragmentAccountLogin4Binding>(inflater, R.layout.fragment_account_login_4, container, false)
         binding.viewModel = viewModel
 
-        Log.i(TAG, "Debug:: onCreateView() viewModel.teamOrder: ${viewModel?.teamOrder}")
-
         binding.root.findViewById<NumberPicker>(R.id.account_numberpicker_level)?.let { numberPicker ->
             numberPicker.minValue = 1
             numberPicker.maxValue = 40

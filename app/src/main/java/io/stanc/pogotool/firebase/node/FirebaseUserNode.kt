@@ -76,7 +76,7 @@ data class FirebaseUserNode private constructor(override var id: String,
 
         fun new(dataSnapshot: DataSnapshot): FirebaseUserNode? {
 
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val email = dataSnapshot.child(EMAIL).value as? String
@@ -84,9 +84,9 @@ data class FirebaseUserNode private constructor(override var id: String,
             val notificationActive = dataSnapshot.child(NOTIFICATION_ACTIVE).value as? Boolean
 
             val submittedArenas =
-                (dataSnapshot.child(SUBMITTED_ARENAS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_ARENAS) as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
             val submittedPokestops =
-                (dataSnapshot.child(SUBMITTED_POKESTOPS).value as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_POKESTOPS) as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
             val submittedQuests = dataSnapshot.child(SUBMITTED_QUESTS).value as? Number
             val submittedRaids = dataSnapshot.child(SUBMITTED_RAIDS).value as? Number
 
@@ -98,7 +98,7 @@ data class FirebaseUserNode private constructor(override var id: String,
             val code = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_CODE).value as? String
             val level = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_LEVEL).value as? Number
 
-            Log.v(TAG, "id: $id, name: $name, email: $email, team: $team, level: $level, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops")
+//            Log.v(TAG, "id: $id, name: $name, email: $email, team: $team, level: $level, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops")
 
             if (id != null && name != null && email != null && team != null && level != null && notificationToken != null) {
                 val user = FirebaseUserNode.new(id, email, name, team, level, notificationToken)
@@ -108,7 +108,7 @@ data class FirebaseUserNode private constructor(override var id: String,
                 notificationActive?.let { user.isNotificationActive = it }
 
                 submittedArenas?.let { user.submittedArenas = it }
-                submittedPokestops?.let { user.submittedArenas = it }
+                submittedPokestops?.let { user.submittedPokestops = it }
                 submittedQuests?.let { user.submittedQuests = it }
                 submittedRaids?.let { user.submittedRaids = it }
 

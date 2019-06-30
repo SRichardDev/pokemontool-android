@@ -12,6 +12,7 @@ import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
@@ -135,7 +136,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun pushRaidMeetupParticipation(raidMeetupId: String) {
 
         FirebaseUser.userData?.id?.let {
-            FirebaseServer.addDataKey("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it)
+            FirebaseServer.addData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it, "")
         } ?: kotlin.run {
             Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import io.stanc.pogotool.AppSettings
@@ -13,7 +14,9 @@ import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentAccountInfoBinding
 import io.stanc.pogotool.firebase.FirebaseUser
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
+import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.viewmodel.LoginViewModel
+
 
 class AccountInfoFragment: Fragment() {
 
@@ -23,6 +26,10 @@ class AccountInfoFragment: Fragment() {
         val binding = DataBindingUtil.inflate<FragmentAccountInfoBinding>(inflater, R.layout.fragment_account_info, container, false)
         binding.viewModel = viewModel
         binding.settings = AppSettings
+
+        binding.root.findViewById<Button>(R.id.account_info_button)?.setOnClickListener {
+            ShowFragmentManager.showFragment(AccountInfoEditFragment.newInstance(viewModel), fragmentManager, R.id.account_layout)
+        }
 
         return binding.root
     }

@@ -21,6 +21,7 @@ class LoginViewModel: ViewModel() {
     val name = ObservableField<String>()
     val email = ObservableField<String>()
     val password = ObservableField<String>()
+    val code = ObservableField<String>("0000 0000 0000")
     val level = ObservableField<String>("0")
     val team = ObservableField<Team>()
     val teamOrder = ObservableField<List<Team>>()
@@ -38,6 +39,7 @@ class LoginViewModel: ViewModel() {
         val shuffledTeamOrder = Team.values().toList().shuffled()
 
         teamOrder.set(shuffledTeamOrder)
+
         team.set(shuffledTeamOrder[0])
         teamColor.set(teamColorMap[shuffledTeamOrder[0]])
     }
@@ -46,14 +48,15 @@ class LoginViewModel: ViewModel() {
 
         name.set(user.name)
         email.set(user.email)
+        user.code?.let { code.set(it) }
         level.set(user.level.toString())
         team.set(user.team)
+        teamColor.set(teamColorMap[user.team])
         numberPokestops.set(user.submittedPokestops.toInt())
         numberArenas.set(user.submittedArenas.toInt())
         numberRaids.set(user.submittedRaids.toInt())
         numberQuests.set(user.submittedQuests.toInt())
 
-        Log.i(TAG, "Debug:: update($user), team: ${team.get()?.name}")
     }
 
     fun onSelectedStateDidChange(selection: SegmentedControlView.Selection) {

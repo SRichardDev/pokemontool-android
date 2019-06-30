@@ -66,6 +66,18 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         super.onPause()
     }
 
+    override fun onBackPressed() {
+
+        drawerLayout?.let { drawerLayout ->
+
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                super.onBackPressed()
+            }
+        }
+    }
+
     private fun setupToolbar() {
 
         (findViewById(R.id.activity_toolbar) as? PoGoToolbar)?.let { toolbar ->
@@ -146,22 +158,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         }
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
-    }
-
-    /**
-     * backpress, options, menu
-     */
-
-    override fun onBackPressed() {
-
-        drawerLayout?.let { drawerLayout ->
-
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            } else {
-                super.onBackPressed()
-            }
-        }
     }
 
     /**

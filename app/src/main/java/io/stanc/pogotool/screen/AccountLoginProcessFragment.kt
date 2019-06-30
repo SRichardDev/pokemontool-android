@@ -57,7 +57,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
 
                     SignType.SIGN_UP -> {
 
-                        val userConfig = FirebaseUser.UserConfig(viewModel.email.get()!!,
+                        val userConfig = FirebaseUser.UserLoginConfig(viewModel.email.get()!!,
                             viewModel.password.get()!!,
                             viewModel.name.get()!!,
                             viewModel.team.get()!!,
