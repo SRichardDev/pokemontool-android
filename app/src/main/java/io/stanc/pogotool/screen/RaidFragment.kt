@@ -75,6 +75,10 @@ class RaidFragment: Fragment() {
         meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
 
+    override fun onPause() {
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onPause()
+    }
     /**
      * setup
      */

@@ -31,8 +31,6 @@ class AccountLoginRequestFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_account_login, container, false)
 
-        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
-
         setupTeamImages(rootLayout)
 
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
@@ -73,11 +71,13 @@ class AccountLoginRequestFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
 
     override fun onPause() {
         FirebaseUser.removeAuthStateObserver(authStateObserver)
+        AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
     }
 

@@ -10,6 +10,7 @@ import androidx.databinding.adapters.SearchViewBindingAdapter
 import io.stanc.pogotool.App
 import io.stanc.pogotool.FirebaseImageMapper
 import io.stanc.pogotool.R
+import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.FirebaseUser
@@ -57,6 +58,16 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupQueryTextView(view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        pokestop?.let { AppbarManager.setTitle(it.name) }
+    }
+
+    override fun onPause() {
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onPause()
     }
 
     private fun setupQueryTextView(rootLayout: View) {

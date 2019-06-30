@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogotool.App
 import io.stanc.pogotool.R
 import io.stanc.pogotool.appbar.AppbarManager
 import io.stanc.pogotool.databinding.FragmentPokestopBinding
@@ -66,6 +67,18 @@ class PokestopFragment: Fragment() {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        pokestop?.let { AppbarManager.setTitle(it.name) }
+        pokestop?.let { firebase.addObserver(pokestopObserver, it) }
+    }
+
+    override fun onPause() {
+        pokestop?.let { firebase.removeObserver(pokestopObserver, it) }
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onPause()
+    }
+
     private fun updateViewModel(pokestop: FirebasePokestop?) {
         pokestop?.let {
             viewModel?.updateData(it) ?: kotlin.run {
@@ -105,17 +118,6 @@ class PokestopFragment: Fragment() {
                 }
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        pokestop?.let { AppbarManager.setTitle(it.name) }
-        pokestop?.let { firebase.addObserver(pokestopObserver, it) }
-    }
-
-    override fun onPause() {
-        pokestop?.let { firebase.removeObserver(pokestopObserver, it) }
-        super.onPause()
     }
 
     private fun setupMapFragment() {

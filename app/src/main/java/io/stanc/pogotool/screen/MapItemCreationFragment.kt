@@ -40,11 +40,13 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.type.get()?.let { updateTitle(it) }
         viewModel.type.addOnPropertyChangedCallback(onTypeChangeCallback)
     }
 
     override fun onPause() {
         viewModel.type.removeOnPropertyChangedCallback(onTypeChangeCallback)
+        AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
     }
 
@@ -68,10 +70,10 @@ class MapItemCreationFragment: ViewPagerFragment() {
         activity?.let { SystemUtils.hideKeyboard(it) }
     }
 
-    private fun updateTitle(type: MapItemViewModel.Type) {
+    private fun updateTitle(type: Type) {
         when (type) {
-            MapItemViewModel.Type.Arena -> AppbarManager.setTitle(getString(R.string.map_title_arena))
-            MapItemViewModel.Type.Pokestop -> AppbarManager.setTitle(getString(R.string.map_title_pokestop))
+            Type.Arena -> AppbarManager.setTitle(getString(R.string.map_title_arena))
+            Type.Pokestop -> AppbarManager.setTitle(getString(R.string.map_title_pokestop))
         }
     }
 

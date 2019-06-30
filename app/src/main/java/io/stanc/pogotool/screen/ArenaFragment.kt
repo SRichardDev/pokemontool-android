@@ -78,6 +78,7 @@ class ArenaFragment: Fragment() {
 
     override fun onPause() {
         arena?.let { firebase.removeObserver(arenaObserver, it) }
+        AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
     }
 

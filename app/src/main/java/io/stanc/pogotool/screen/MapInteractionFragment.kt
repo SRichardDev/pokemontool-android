@@ -88,7 +88,7 @@ class MapInteractionFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        AppbarManager.setTitle(getString(R.string.app_name))
+        AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
     }
 

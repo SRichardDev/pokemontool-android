@@ -37,6 +37,7 @@ class AccountInfoFragment: Fragment() {
     override fun onPause() {
         FirebaseUser.removeAuthStateObserver(authStateObserver)
         FirebaseUser.removeUserDataObserver(userDataObserver)
+        AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
     }
 

@@ -11,6 +11,7 @@
     <!-- app -->
     <string name="app_name">PoGo Radar</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="default_app_title">PoGo Radar</string>
 
     <!-- progress spinner -->
     <string name="spinner_title_sign_up">Registriere Account…</string>
@@ -25,7 +26,7 @@
     <string name="nav_menu_item_account_create">Login</string>
     <string name="nav_menu_item_account">Account</string>
     <string name="nav_menu_item_map">Karte</string>
-    <string name="nav_menu_item_policy">Lizenzen &amp; Privacy Policy</string>
+    <string name="nav_menu_item_policy">Terms &amp; Conditions</string>
 
     <!-- Authentication -->
     <string name="authentication_app_title">Account</string>
@@ -191,8 +192,9 @@
     <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
 
     <!-- Policy -->
+    <string name="policy_app_title">Terms &amp; Conditions</string>
+    <string name="policy_button_terms_conditions">Terms &amp; Conditions</string>
     <string name="policy_button_privacy_policy">Datenschutzerklärung</string>
     <string name="policy_button_license">Open-Source-Lizenzen</string>
-    <string name="policy_button_terms_conditions">Terms &amp; Conditions</string>
 
 </resources>

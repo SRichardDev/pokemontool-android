@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import io.stanc.pogotool.App
 import io.stanc.pogotool.PrivacyPolicyActivity
 import io.stanc.pogotool.R
+import io.stanc.pogotool.appbar.AppbarManager
 
 class PolicyFragment: Fragment() {
 
@@ -29,5 +31,15 @@ class PolicyFragment: Fragment() {
         }
 
         return rootLayout
+    }
+
+    override fun onResume() {
+        super.onResume()
+        AppbarManager.setTitle(App.geString(R.string.policy_app_title))
+    }
+
+    override fun onPause() {
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onPause()
     }
 }

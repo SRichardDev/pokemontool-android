@@ -1,6 +1,5 @@
 package io.stanc.pogotool.screen
 
-import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentPagerAdapter
@@ -17,9 +16,14 @@ class AccountLoginFragment: ViewPagerFragment() {
 
     var viewModel: LoginViewModel? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onResume() {
+        super.onResume()
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
-        super.onCreate(savedInstanceState)
+    }
+
+    override fun onPause() {
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onPause()
     }
 
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
