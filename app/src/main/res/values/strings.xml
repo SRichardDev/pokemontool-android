@@ -9,7 +9,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- app -->
-    <string name="app_name">Pokemon Go Tool</string>
+    <string name="app_name">PoGo Radar</string>
     <string name="action_settings">Einstellungen</string>
 
     <!-- progress spinner -->
@@ -51,7 +51,7 @@
     <string name="authentication_button_edit_infos">Infos bearbeiten</string>
     <string name="authentication_button_enable_push_notifications">Push Nachrichten</string>
     <string name="authentication_button_medal">Medaillien:</string>
-    <string name="authentication_medal_text_pokestops">Eingereichte Pokestops</string>
+    <string name="authentication_medal_text_pokestops">Eingereichte Pok&#233;stops</string>
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
     <string name="authentication_medal_text_raids">Eingereichte Raids</string>
     <string name="authentication_medal_text_quests">Eingereichte Quests</string>
@@ -94,14 +94,14 @@
 
     <!-- Map -->
     <string name="map_title_arena">Neue Arena</string>
-    <string name="map_title_pokestop">Neuer Pokestop</string>
+    <string name="map_title_pokestop">Neuer Pok&#233;stop</string>
     <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
     <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
     <string name="map_map_item_which_item_to_add">Was möchtest du einrichten?</string>
     <string name="map_map_item_position_correct">Stimmt die Position?</string>
     <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest und schiebe es bis die Position passt.</string>
-    <string name="map_map_item_name_of_item">Wie heißt der Pokestop/die Arena?</string>
+    <string name="map_map_item_name_of_item">Wie heißt der Pok&#233;stop/die Arena?</string>
     <string name="map_map_item_name_of_item_subtext">Bitte gebe genau den Namen ein, den du auch im Spiel findest.</string>
     <string name="map_map_item_isex_arena">EX-Arena?</string>
     <string name="map_map_item_check_data">Sind deine Eingaben korrekt?</string>
@@ -113,7 +113,7 @@
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
     <string name="map_info_window_arena_button_info">Details / Neuer Raid</string>
 
-    <string name="map_info_window_pokestop_subheader">Pokestop</string>
+    <string name="map_info_window_pokestop_subheader">Pok&#233;stop</string>
     <string name="map_info_window_pokestop_button_info">Details &amp; Quest</string>
 
     <!-- Map Settings -->
@@ -121,7 +121,7 @@
     <string name="map_setting_arena">Arenen anzeigen</string>
     <string name="map_setting_arena_raid">nur mit Raid</string>
     <string name="map_setting_arena_ex">nur EX</string>
-    <string name="map_setting_pokestop">Pokestops anzeigen</string>
+    <string name="map_setting_pokestop">Pok&#233;stops anzeigen</string>
     <string name="map_setting_pokestop_quest">nur mit Quest</string>
 
     <!-- Raid -->
@@ -172,7 +172,7 @@
     <string name="exceptions_send_map_item_missing_position">Fehler! Fehlende position.</string>
     <string name="exceptions_send_map_item_missing_user_id">Fehler! Fehlende User Id.</string>
     <string name="exceptions_send_map_item_missing_arena_name">Fehler! Fehlender Arena Name.</string>
-    <string name="exceptions_send_map_item_missing_pokestop_name">Fehler! Fehlender Pokestop Name.</string>
+    <string name="exceptions_send_map_item_missing_pokestop_name">Fehler! Fehlender Pok&#233;stop Name.</string>
     <string name="exceptions_signup_password">Fehler! Passwort ist zu kurz.</string>
     <string name="exceptions_signup_email">Fehler! Email scheint falsches Format zu haben.</string>
     <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
@@ -187,11 +187,12 @@
     <!-- App Info Label -->
     <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell sein.</string>
     <string name="info_label_arena_filter">Achtung: Arena filter ist aktiviert!</string>
-    <string name="info_label_pokestop_filter">Achtung: Pokestop filter ist aktiviert!</string>
+    <string name="info_label_pokestop_filter">Achtung: Pok&#233;stop filter ist aktiviert!</string>
     <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
 
     <!-- Policy -->
     <string name="policy_button_privacy_policy">Datenschutzerklärung</string>
-    <string name="policy_button_license">Lizenzen</string>
+    <string name="policy_button_license">Open-Source-Lizenzen</string>
+    <string name="policy_button_terms_conditions">Terms &amp; Conditions</string>
 
 </resources>
