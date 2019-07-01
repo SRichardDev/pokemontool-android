@@ -31,15 +31,13 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
     private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
-
-    private val context = WeakReference(context)
-    private val map = WeakReference(googleMap)
     
     private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
-    private val arenaCircles = HashMap<Any, Circle>()
+//    private val context = WeakReference(context)
+//    private val map = WeakReference(googleMap)
 
     private val arenaInfoWindowAdapter = ClusterArenaRenderer.Companion.InfoWindowAdapter(context)
     private val pokestopInfoWindowAdapter = ClusterPokestopRenderer.Companion.InfoWindowAdapter(context)
@@ -258,20 +256,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     private fun startAnimation(arena: FirebaseArena) {
-        map.get()?.let {
-
-            stopAnimation(arena)
-
-            val circleOptions = CircleOptions().apply {
-                center(arena.geoHash.toLatLng())
-                radius(100.0)
-                strokeColor(Color.TRANSPARENT)
-                fillColor(R.color.redTransparent)
-            }
-
-            arenaCircles[arena.id] = it.addCircle(circleOptions)
-        }
-
         // TODO: search for performant googlemap pulse animation
 //        Kotlin.safeLet(map.get(), context.get()) { map, context ->
 //
@@ -287,7 +271,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     private fun stopAnimation(arena: FirebaseArena) {
-        arenaCircles.remove(arena.id)?.remove()
 //        arenaRippleAnimations.remove(arena.id)?.get()?.stopRippleMapAnimation()
     }
 
