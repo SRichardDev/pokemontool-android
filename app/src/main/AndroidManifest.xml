@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <!-- TODO: enable google search your app! (GoogleAppIndex) -->
     <!-- see: https://stackoverflow.com/questions/34173545/missing-support-for-firebase-app-indexing-android-lint -->
     <application
@@ -28,7 +30,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".PrivacyPolicyActivity"/>
+
+        <activity android:name=".PrivacyPolicyActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".NavDrawerActivity" />
+        </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_map_api_key"/>

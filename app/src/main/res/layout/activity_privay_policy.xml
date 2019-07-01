@@ -4,6 +4,11 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <io.stanc.pogotool.appbar.PoGoToolbar
+        android:id="@+id/activity_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/appbar_height"/>
+
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
