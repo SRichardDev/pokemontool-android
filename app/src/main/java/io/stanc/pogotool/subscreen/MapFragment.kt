@@ -163,7 +163,7 @@ open class MapFragment : Fragment() {
                 updateCameraPosition(it, onFinished = {
                     delegate?.onCameraStartAnimationFinished()
                 })
-            } ?: kotlin.run {
+            } ?: run {
                 latestLocation()?.let {
                     updateCameraPosition(it, onFinished = {
                         delegate?.onCameraStartAnimationFinished()

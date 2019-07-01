@@ -29,7 +29,7 @@ class App: Application() {
         fun geString(@StringRes stringResId: Int, formatArg1: String? = null): String? {
             formatArg1?.let {
                 return appContext?.resources?.getString(stringResId, formatArg1)
-            } ?: kotlin.run {
+            } ?: run {
                 return appContext?.resources?.getString(stringResId)
             }
         }

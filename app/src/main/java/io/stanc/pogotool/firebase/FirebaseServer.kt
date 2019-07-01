@@ -123,7 +123,7 @@ object FirebaseServer {
             if (p0.value == null) {
                 p0.key?.let {
                     callback.get()?.nodeRemoved(it)
-                } ?: kotlin.run {
+                } ?: run {
                     Log.e(TAG, "onDataChange($p0) - value and key are null.")
                 }
             } else {

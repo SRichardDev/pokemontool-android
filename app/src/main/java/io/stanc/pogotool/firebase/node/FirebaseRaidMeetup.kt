@@ -32,7 +32,7 @@ data class FirebaseRaidMeetup(
         fun new(dataSnapshot: DataSnapshot): FirebaseRaidMeetup? {
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
-            val id = dataSnapshot.key ?: kotlin.run { return null }
+            val id = dataSnapshot.key ?: run { return null }
 
             val meetupTime = dataSnapshot.child(MEETUP_TIME).value as? String
 

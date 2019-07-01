@@ -22,7 +22,7 @@ object Popup {
 
             builder.show()
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not show popup with title: $title, because context is null!")
         }
     }

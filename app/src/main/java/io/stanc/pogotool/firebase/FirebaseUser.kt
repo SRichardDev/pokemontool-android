@@ -58,7 +58,7 @@ object FirebaseUser {
                     onCompletionCallback(false)
                 }
             })
-        } ?: kotlin.run { Log.e(TAG, "cannot change push notifications: $isPushAktive, because: userData: $userData") }
+        } ?: run { Log.e(TAG, "cannot change push notifications: $isPushAktive, because: userData: $userData") }
     }
 
     fun saveSubmittedArena(arenaId: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
@@ -72,7 +72,7 @@ object FirebaseUser {
     fun saveSubmittedRaids(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         userData?.submittedRaids?.let { numSubmittedRaids ->
             saveIncreasedSubmission(numSubmittedRaids.toInt()+1, SUBMITTED_RAIDS, onCompletionCallback)
-        } ?: kotlin.run {
+        } ?: run {
             onCompletionCallback(false)
         }
     }
@@ -80,7 +80,7 @@ object FirebaseUser {
     fun saveSubmittedQuests(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         userData?.submittedQuests?.let { numSubmittedQuests ->
             saveIncreasedSubmission(numSubmittedQuests.toInt()+1, SUBMITTED_QUESTS, onCompletionCallback)
-        } ?: kotlin.run {
+        } ?: run {
             onCompletionCallback(false)
         }
     }
@@ -100,7 +100,7 @@ object FirebaseUser {
                 }
             })
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "cannot send $submissionFirebaseKey of $value, because: userData: $userData")
         }
     }
@@ -120,7 +120,7 @@ object FirebaseUser {
                 }
             })
 
-        } ?: kotlin.run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
+        } ?: run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
     }
 
     private fun requestNotificationTokenToCreateUser(userLoginConfig: UserLoginConfig) {
@@ -130,7 +130,7 @@ object FirebaseUser {
             override fun onSuccess(data: String?) {
                 data?.let { token ->
                     createUser(userLoginConfig, token)
-                } ?: kotlin.run { Log.w(TAG, "User profile creation failed. Error: token is $data") }
+                } ?: run { Log.w(TAG, "User profile creation failed. Error: token is $data") }
             }
 
             override fun onFailed(message: String?) {
@@ -165,7 +165,7 @@ object FirebaseUser {
                 }
             })
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not create user for config: $userLoginConfig and notificationToken: $userNotificationToken, because auth.currentUser: ${auth.currentUser}")
             FirebaseUser.userData = null
         }
@@ -208,7 +208,7 @@ object FirebaseUser {
                 AuthState.UserLoggedInButUnverified
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             return AuthState.UserLoggedOut
         }
     }

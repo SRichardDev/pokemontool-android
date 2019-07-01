@@ -271,7 +271,7 @@ class RaidFragment: Fragment() {
 
                 raidBossesFragment?.selectedItem()?.id?.let {  raidbossId ->
                     sendRaid(geoHash, arenaId, raidbossId)
-                } ?: kotlin.run {
+                } ?: run {
                     Popup.showInfo(context, R.string.popup_info_missing_raidboss_id_title)
                 }
 
@@ -279,7 +279,7 @@ class RaidFragment: Fragment() {
                 sendEgg(geoHash, arenaId)
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "tryToSendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!")
         }
     }

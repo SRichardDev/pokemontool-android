@@ -84,9 +84,9 @@ data class FirebaseUserNode private constructor(override var id: String,
             val notificationActive = dataSnapshot.child(NOTIFICATION_ACTIVE).value as? Boolean
 
             val submittedArenas =
-                (dataSnapshot.child(SUBMITTED_ARENAS) as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_ARENAS) as? DataSnapshot)?.childrenCount ?: run { null }
             val submittedPokestops =
-                (dataSnapshot.child(SUBMITTED_POKESTOPS) as? DataSnapshot)?.childrenCount ?: kotlin.run { null }
+                (dataSnapshot.child(SUBMITTED_POKESTOPS) as? DataSnapshot)?.childrenCount ?: run { null }
             val submittedQuests = dataSnapshot.child(SUBMITTED_QUESTS).value as? Number
             val submittedRaids = dataSnapshot.child(SUBMITTED_RAIDS).value as? Number
 

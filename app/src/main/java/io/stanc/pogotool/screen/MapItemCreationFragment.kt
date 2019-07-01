@@ -95,14 +95,14 @@ class MapItemCreationFragment: ViewPagerFragment() {
                     }
                 }
 
-            } ?: kotlin.run {
+            } ?: run {
 
                 val text = App.geString(R.string.exceptions_send_map_item_missing_position)
                 Log.e(TAG, "$text viewModel.position.get(): ${viewModel.position.get()}")
                 throw Exception(text)
             }
 
-        } ?: kotlin.run {
+        } ?: run {
 
             val text = App.geString(R.string.exceptions_send_map_item_missing_user_id)
             Log.e(TAG, "$text FirebaseUser.userData: ${FirebaseUser.userData}")
@@ -115,11 +115,11 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
         viewModel.name.get()?.let { name ->
 
-            val isEX = viewModel.isEx.get() ?: kotlin.run { false }
+            val isEX = viewModel.isEx.get() ?: run { false }
             val arena = FirebaseArena.new(name, geoHash, user, isEX)
             firebase.pushArena(arena)
 
-        } ?: kotlin.run {
+        } ?: run {
 
             val text = App.geString(R.string.exceptions_send_map_item_missing_arena_name)
             Log.e(TAG, "$text viewModel.name.get(): ${viewModel.name.get()}")
@@ -135,7 +135,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
             val pokestop = FirebasePokestop.new(name, geoHash, user)
             firebase.pushPokestop(pokestop)
 
-        } ?: kotlin.run {
+        } ?: run {
 
             val text = App.geString(R.string.exceptions_send_map_item_missing_pokestop_name)
             Log.e(TAG, "$text viewModel.name.get(): ${viewModel.name.get()}")

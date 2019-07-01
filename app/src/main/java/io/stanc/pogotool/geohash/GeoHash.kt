@@ -403,7 +403,7 @@ open class GeoHash : Parcelable {
                         finished = true
                     }
 
-                } ?: kotlin.run {
+                } ?: run {
                     // for performance reasons
                     return null
                 }

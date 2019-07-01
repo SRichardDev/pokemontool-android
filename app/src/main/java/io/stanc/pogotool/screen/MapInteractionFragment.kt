@@ -168,7 +168,7 @@ class MapInteractionFragment: Fragment() {
                     lastGeoHashMatrix = newGeoHashMatrix
                 }
 
-            } ?: kotlin.run {
+            } ?: run {
                 Log.w(TAG, "Max zooming level reached!")
             }
         }

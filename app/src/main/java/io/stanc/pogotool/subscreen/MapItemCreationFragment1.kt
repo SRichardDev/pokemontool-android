@@ -83,7 +83,7 @@ class MapItemCreationFragment1: Fragment() {
 
             when(mapItemType) {
                 MapItemViewModel.Type.Arena ->  {
-                    val isArenaEx = viewModel?.isEx?.get()?: kotlin.run { false }
+                    val isArenaEx = viewModel?.isEx?.get()?: run { false }
                     ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG)
                 }
                 MapItemViewModel.Type.Pokestop ->  {
@@ -91,7 +91,7 @@ class MapItemCreationFragment1: Fragment() {
                 }
             }
 
-        } ?: kotlin.run { null }
+        } ?: run { null }
 
 
         return markerOptions?.let { _markerOptions ->
@@ -100,7 +100,7 @@ class MapItemCreationFragment1: Fragment() {
             _markerOptions.draggable(true)
             map?.addMarker(_markerOptions)
 
-        } ?: kotlin.run {
+        } ?: run {
             null
         }
     }

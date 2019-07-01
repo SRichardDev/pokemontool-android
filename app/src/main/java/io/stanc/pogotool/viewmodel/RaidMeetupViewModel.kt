@@ -29,7 +29,7 @@ class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
 
         raidMeetup?.let {
             changeMeetupData(raidMeetup)
-        } ?: kotlin.run {
+        } ?: run {
             resetMeetupData()
         }
 //        Log.d(TAG, "Debug:: updateData(), isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.get()}, meetupTime: ${meetupTime.get()}, isUserParticipate: ${isUserParticipate.get()}")

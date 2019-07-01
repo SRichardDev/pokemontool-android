@@ -137,7 +137,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
         FirebaseUser.userData?.id?.let {
             FirebaseServer.addData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it, "")
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
     }
@@ -145,7 +145,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun cancelRaidMeetupParticipation(raidMeetupId: String) {
         FirebaseUser.userData?.id?.let {
             FirebaseServer.removeData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS/$it")
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not cancel raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
     }
@@ -324,7 +324,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
             })
 
-        } ?: kotlin.run {
+        } ?: run {
             val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.userData}, and notificationToken: ${FirebaseUser.userData?.notificationToken}")
             onResponse.onException(exception)
         }

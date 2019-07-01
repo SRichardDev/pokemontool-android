@@ -53,13 +53,13 @@ data class FirebaseArena private constructor(
 
             val id = dataSnapshot.key
             val name = dataSnapshot.child(NAME).value as? String
-            val isEX = (dataSnapshot.child(IS_EX).value as? Boolean) ?: kotlin.run {
+            val isEX = (dataSnapshot.child(IS_EX).value as? Boolean) ?: run {
                 (dataSnapshot.child(IS_EX).value as? String)?.toBoolean()
             }
-            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
             }
             val submitter = dataSnapshot.child(SUBMITTER).value as? String

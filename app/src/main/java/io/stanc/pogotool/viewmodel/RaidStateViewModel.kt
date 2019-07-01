@@ -24,7 +24,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
         raid?.let {
             changeRaidData()
-        } ?: kotlin.run {
+        } ?: run {
             resetRaidData()
         }
 
@@ -65,11 +65,11 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
             TimeCalculator.timeExpired(timestamp, timeEggHatches)?.let { alreadyHatched ->
                 !alreadyHatched
-            } ?: kotlin.run {
+            } ?: run {
                 false
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             false
         }
     }
@@ -80,10 +80,10 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
 
             TimeCalculator.timeExpired(timestamp, timeEnd)?.let {
                 it
-            } ?: kotlin.run {
+            } ?: run {
                 true
             }
-        } ?: kotlin.run {
+        } ?: run {
             true
         }
     }

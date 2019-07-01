@@ -81,11 +81,11 @@ class PokestopFragment: Fragment() {
 
     private fun updateViewModel(pokestop: FirebasePokestop?) {
         pokestop?.let {
-            viewModel?.updateData(it) ?: kotlin.run {
+            viewModel?.updateData(it) ?: run {
                 viewModel = QuestViewModel(it)
             }
             position = LatLng(it.geoHash.toLocation().latitude, it.geoHash.toLocation().longitude)
-        } ?: kotlin.run {
+        } ?: run {
             viewModel = null
         }
     }
@@ -142,7 +142,7 @@ class PokestopFragment: Fragment() {
 
         return Kotlin.safeLet(context, position) { _context, _position->
             map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(_context).position(_position))
-        } ?: kotlin.run { null }
+        } ?: run { null }
     }
 
     private fun showQuestFragment(pokestop: FirebasePokestop) {

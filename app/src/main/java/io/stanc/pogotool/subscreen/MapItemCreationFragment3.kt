@@ -66,13 +66,13 @@ class MapItemCreationFragment3: Fragment() {
 
             when(mapItemType) {
                 MapItemViewModel.Type.Arena ->  {
-                    val isArenaEx = viewModel?.isEx?.get()?: kotlin.run { false }
+                    val isArenaEx = viewModel?.isEx?.get()?: run { false }
                     map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG).position(position))
                 }
                 MapItemViewModel.Type.Pokestop ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG).position(position))
             }
 
-        } ?: kotlin.run { null }
+        } ?: run { null }
     }
 
     companion object {

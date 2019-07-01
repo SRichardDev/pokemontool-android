@@ -56,7 +56,7 @@ object PermissionManager {
                 LOCATION_PERMISSIONS,
                 REQUEST_CODE_LOCATION
             )
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "tried to request location permission, but activity is null!")
         }
     }

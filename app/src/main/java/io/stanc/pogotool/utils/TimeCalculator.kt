@@ -35,7 +35,7 @@ object TimeCalculator {
 
             nextClockDate(clockDate, currentDate())
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not nextDate clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
             null
         }
@@ -81,7 +81,7 @@ object TimeCalculator {
             val diffTime = date.time - currentDate().time
             LongMath.divide(diffTime, 1000 * 60, RoundingMode.CEILING)
 
-        } ?: kotlin.run {
+        } ?: run {
             null
         }
     }
@@ -93,7 +93,7 @@ object TimeCalculator {
     fun timeExpired(timestamp: Long, time: String): Boolean? {
         return nextDateAfterTimestamp(timestamp, time)?.let {
             timeExpired(it)
-        } ?: kotlin.run {
+        } ?: run {
             null
         }
     }
@@ -130,7 +130,7 @@ object TimeCalculator {
 
             nextClockDate(clockDate, Date(timestamp))
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not get next date clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
             null
         }

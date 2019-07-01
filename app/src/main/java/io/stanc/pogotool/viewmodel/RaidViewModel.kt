@@ -91,7 +91,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
             isRaidBossMissing.set(isRaidAnnounced.get() == true && raidState.get() == RaidState.RAID_RUNNING && raid.raidBossId == null)
 
-        } ?: kotlin.run {
+        } ?: run {
 
             isRaidBossMissing.set(false)
         }
@@ -111,7 +111,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
                 firebase.cancelRaidMeetupParticipation(it)
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not changed participation($participate), because: raidMeetup?.id: ${raidMeetupViewModel.raidMeetup?.id}")
         }
     }
@@ -122,7 +122,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
             val raidMeetup = FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
             firebase.pushRaidMeetup(raid.databasePath(), raidMeetup)
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "Could not push raid meetup, because raid is null of arena: $arena")
         }
     }
@@ -148,7 +148,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
             val raidMeetup = FirebaseRaidMeetup(id, "", emptyList(), emptyList())
             firebase.addObserver(raidMeetupObserver, raidMeetup)
 
-        } ?: kotlin.run {
+        } ?: run {
             raidMeetupViewModel.updateData(null)
         }
     }

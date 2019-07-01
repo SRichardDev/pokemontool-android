@@ -221,7 +221,7 @@ class ArenaFragment: Fragment() {
 
     private fun updateViewModel(arena: FirebaseArena?) {
         arena?.let {
-            viewModel?.updateData(arena) ?: kotlin.run {
+            viewModel?.updateData(arena) ?: run {
                 viewModel = RaidViewModel(it)
             }
         }

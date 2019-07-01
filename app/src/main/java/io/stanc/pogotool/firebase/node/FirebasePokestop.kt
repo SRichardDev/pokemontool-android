@@ -47,10 +47,10 @@ data class FirebasePokestop private constructor(
 
             val id = id(dataSnapshot)
             val name = dataSnapshot.child(NAME).value as? String
-            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: kotlin.run {
+            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
             }
             val submitter = dataSnapshot.child(SUBMITTER).value as? String

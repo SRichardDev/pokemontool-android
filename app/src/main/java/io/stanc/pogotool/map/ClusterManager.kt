@@ -229,7 +229,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
                     startRefreshTimer(arena, raidTime, timestamp)
 
-                } ?: kotlin.run {
+                } ?: run {
                     Log.e(TAG,"Debug:: viewModel.raidTime: ${viewModel.raidTime.get()}, raid.timestamp: ${raid.timestamp} for $raid")
                 }
             }
@@ -265,7 +265,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 //            arenaRippleAnimations[arena.id] = WeakReference(mapRipple)
 //            mapRipple.startRippleMapAnimation()
 //
-//        } ?: kotlin.run {
+//        } ?: run {
 //            Log.e(TAG, "could not start map animation, because map.get(): ${map.get()} or context.get(): ${context.get()}")
 //        }
     }

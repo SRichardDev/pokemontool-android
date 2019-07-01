@@ -45,7 +45,7 @@ abstract class ViewPagerFragment: Fragment() {
 
             this.viewPager = viewpager
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not find viewPager, therefore could not create viewPagerFragment")
         }
 
