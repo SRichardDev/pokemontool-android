@@ -99,17 +99,28 @@ object IconFactory {
         val marginBottom = if (iconConfig.footerText.isNullOrEmpty()) 0 else textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
 
         val backgroundDrawable = iconConfig.backgroundDrawable
-        backgroundDrawable.setBounds(marginHorizontal, marginTop,  scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod) + marginHorizontal, canvas.height - marginBottom)
+
+        val left = marginHorizontal
+        val top = marginTop
+        val right = scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod) + marginHorizontal
+        val bottom = canvas.height - marginBottom
+
+        backgroundDrawable.setBounds(left, top,  right, bottom)
         backgroundDrawable.draw(canvas)
 
         return backgroundDrawable
     }
 
     private fun drawForeground(canvas: Canvas, foregroundDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
-        val marginHorizontal = (scaledLength(backgroundDrawable.intrinsicWidth, sizeMod) - scaledLength(foregroundDrawable.intrinsicWidth, sizeMod)) / 2
-        val marginVertically = (scaledLength(backgroundDrawable.intrinsicHeight, sizeMod) - scaledLength(foregroundDrawable.intrinsicHeight, sizeMod)) / 2
+        val marginHorizontal = scaledLength(backgroundDrawable.intrinsicWidth, sizeMod) / 4
+        val marginVertically = scaledLength(backgroundDrawable.intrinsicHeight, sizeMod) / 4
 
-        foregroundDrawable.setBounds(backgroundDrawable.bounds.left + marginHorizontal, backgroundDrawable.bounds.top + marginVertically, backgroundDrawable.bounds.right - marginHorizontal, backgroundDrawable.bounds.bottom - marginVertically)
+        val left = backgroundDrawable.bounds.left + marginHorizontal
+        val top = backgroundDrawable.bounds.top + marginVertically
+        val right = backgroundDrawable.bounds.right - marginHorizontal
+        val bottom = backgroundDrawable.bounds.bottom - marginVertically
+
+        foregroundDrawable.setBounds(left, top, right, bottom)
         foregroundDrawable.draw(canvas)
     }
 
