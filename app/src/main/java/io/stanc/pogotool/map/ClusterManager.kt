@@ -1,25 +1,19 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
-import android.graphics.Color
 import android.util.Log
 import android.view.View
 //import com.arsy.maps_library.MapRipple
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogotool.AppSettings
-import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
-import io.stanc.pogotool.utils.DelayedTrigger
+import io.stanc.pogotool.subscreen.MapFragment.Companion.ZOOM_LEVEL_STREET
+import io.stanc.pogotool.utils.*
 import java.lang.ref.WeakReference
-import io.stanc.pogotool.utils.Kotlin
-import io.stanc.pogotool.utils.RefreshTimer
-import io.stanc.pogotool.utils.TimeCalculator
 import io.stanc.pogotool.viewmodel.ArenaViewModel
 import io.stanc.pogotool.viewmodel.PokestopViewModel
 import io.stanc.pogotool.viewmodel.RaidStateViewModel
@@ -31,13 +25,15 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
     private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
-    
+    val arenaItems: HashMap<String, WeakReference<ClusterArena>> = HashMap()
+
+
     private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
 //    private val context = WeakReference(context)
-//    private val map = WeakReference(googleMap)
+    private val map = WeakReference(googleMap)
 
     private val arenaInfoWindowAdapter = ClusterArenaRenderer.Companion.InfoWindowAdapter(context)
     private val pokestopInfoWindowAdapter = ClusterPokestopRenderer.Companion.InfoWindowAdapter(context)
@@ -95,7 +91,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         googleMap.setOnMarkerClickListener { this.onMarkerClicked(it) }
         googleMap.setOnInfoWindowClickListener {this.onInfoWindowClicked(it)}
-
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
 
         AppSettings.addObserver(mapSettingsObserver)
@@ -147,12 +142,51 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     fun onCameraIdle() {
+        map.get()?.cameraPosition?.zoom?.let { zoomLevel ->
+
+            Log.i(TAG, "Debug:: onCameraIdle(zoomLevel: $zoomLevel) - zoomLevel > ZOOM_LEVEL_STREET: ${(zoomLevel > ZOOM_LEVEL_STREET)}")
+
+            if (zoomLevel > ZOOM_LEVEL_STREET) {
+                (arenaClusterManager.renderer as? ClusterArenaRenderer)?.let { renderer ->
+
+                    if (renderer.sizeMod != IconFactory.SizeMod.BIG) {
+                        Log.i(TAG, "Debug:: onCameraIdle sizeMode: DEFAULT -> BIG")
+                        renderer.sizeMod = IconFactory.SizeMod.BIG
+
+                        map.get()?.clear()
+                        val items : List<ClusterArena> = arenaItems.values.mapNotNull { it.get() }
+                        arenaClusterManager.clearItems()
+                        arenaClusterManager.addItems(items)
+                        arenaClustering.trigger()
+                        arenaClusterManager.cluster()
+                    }
+
+
+                }
+            } else {
+                (arenaClusterManager.renderer as? ClusterArenaRenderer)?.let { renderer ->
+
+                    if (renderer.sizeMod != IconFactory.SizeMod.DEFAULT) {
+                        Log.i(TAG, "Debug:: onCameraIdle sizeMode: BIG -> DEFAULT")
+                        renderer.sizeMod = IconFactory.SizeMod.DEFAULT
+
+                        map.get()?.clear()
+                        val items : List<ClusterArena> = arenaItems.values.mapNotNull { it.get() }
+                        arenaClusterManager.clearItems()
+                        arenaClusterManager.addItems(items)
+                        arenaClustering.trigger()
+                        arenaClusterManager.cluster()
+                    }
+                }
+            }
+        }
+
         pokestopClusterManager.onCameraIdle()
         arenaClusterManager.onCameraIdle()
     }
 
     /**
-     * firebase items
+     * firebase arenaItems
      */
 
     val pokestopDelegate = object : FirebaseDatabase.Delegate<FirebasePokestop> {
@@ -186,10 +220,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         override fun onItemAdded(item: FirebaseArena) {
 
-            if (!items.containsKey(item.id)) {
+            if (!arenaItems.containsKey(item.id)) {
                 val clusterItem = ClusterArena.new(item)
                 arenaClusterManager.addItem(clusterItem)
-                items[clusterItem.arena.id] = WeakReference(clusterItem)
+                arenaItems[clusterItem.arena.id] = WeakReference(clusterItem)
 
                 startArenaRefreshTimerIfRaidAnnounced(item)
             }
@@ -203,14 +237,12 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         override fun onItemRemoved(itemId: String) {
 
-            items[itemId]?.get()?.let {
+            arenaItems[itemId]?.get()?.let {
                 arenaClusterManager.removeItem(it)
                 stopRefreshTimer(it.arena)
             }
-            items.remove(itemId)
+            arenaItems.remove(itemId)
         }
-
-        private val items: HashMap<String, WeakReference<ClusterArena>> = HashMap()
     }
 
     /**

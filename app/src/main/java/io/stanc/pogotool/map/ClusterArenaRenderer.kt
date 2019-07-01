@@ -1,6 +1,7 @@
 package io.stanc.pogotool.map
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
@@ -23,13 +24,16 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
                            clusterManager: ClusterManager<ClusterArena>
 ) : DefaultClusterRenderer<ClusterArena>(context, map, clusterManager) {
 
+    var sizeMod = IconFactory.SizeMod.DEFAULT
+
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterArena>): Boolean {
         return cluster.items.filter { ArenaViewModel(it.arena).isArenaVisibleOnMap.get() == true }.size > 5
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
         Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
-            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena, IconFactory.SizeMod.DEFAULT)).anchor(ANCHOR_X, ANCHOR_Y)
+            Log.d(TAG, "Debug:: onBeforeClusterItemRendered(mode: ${sizeMod.name}): item: $item")
+            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena, sizeMod)).anchor(ANCHOR_X, ANCHOR_Y)
         }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
@@ -68,8 +72,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
             private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_arena, null, false)
 
-            private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_header) as TextView
-            private val subheader = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_subheader) as TextView
+            private val header = infoWindowView.findViewById(R.id.info_window_arena_textview_header) as TextView
+            private val subheader = infoWindowView.findViewById(R.id.info_window_arena_textview_subheader) as TextView
 
             private val subheaderTextDefault = context.getText(R.string.map_info_window_arena_subheader_default)
             private val subheaderTextEx = context.getText(R.string.map_info_window_arena_subheader_ex)

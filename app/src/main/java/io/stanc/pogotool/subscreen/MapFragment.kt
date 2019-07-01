@@ -328,11 +328,11 @@ open class MapFragment : Fragment() {
         companion object {
 
         // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
-        private const val ZOOM_LEVEL_WORLD: Float = 1.0f
-        private const val ZOOM_LEVEL_LANDMASS: Float = 5.0f
-        private const val ZOOM_LEVEL_CITY: Float = 10.0f
-        private const val ZOOM_LEVEL_STREET: Float = 15.0f
-        private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
+        const val ZOOM_LEVEL_WORLD: Float = 1.0f
+        const val ZOOM_LEVEL_LANDMASS: Float = 5.0f
+        const val ZOOM_LEVEL_CITY: Float = 10.0f
+        const val ZOOM_LEVEL_STREET: Float = 15.0f
+        const val ZOOM_LEVEL_BUILDING: Float = 20.0f
 
         private const val LOCATION_UPDATE_MIN_TIME_MILLISECONDS: Long = 1000
         private const val LOCATION_UPDATE_MIN_DISTANCE_METER: Float = 2.0f
