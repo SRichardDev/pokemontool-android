@@ -66,8 +66,8 @@ data class FirebasePokestop private constructor(
             return null
         }
 
-        fun new(name: String, geoHash: GeoHash, userId: String): FirebasePokestop {
-            return FirebasePokestop("", name, geoHash, userId)
+        fun new(name: String, geoHash: GeoHash, user: String): FirebasePokestop {
+            return FirebasePokestop("", name, geoHash, user)
         }
     }
 }

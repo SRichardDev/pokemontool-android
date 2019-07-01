@@ -17,7 +17,7 @@ import io.stanc.pogotool.utils.TimeCalculator
 import java.util.*
 
 data class FirebaseRaid private constructor(override val id: String,
-                                            val level: Number,
+                                            val level: Int,
                                             val timeEggHatches: String?,
                                             val timeEnd: String,
                                             val timestamp: Any,
@@ -65,7 +65,7 @@ data class FirebaseRaid private constructor(override val id: String,
 
 //            Log.v(TAG, "id: $id, level: $level, timeEggHatches: $timeEggHatches, timeEnd: $timeEnd, timestamp: $timestamp, raidMeetupId: $raidMeetupId, raidBossId: $raidBossId")
             if (id != null && level != null && timeEnd != null && timestamp != null) {
-                return FirebaseRaid(id, level, timeEggHatches, timeEnd, timestamp, geoHash, arenaId, raidBossId, raidMeetupId)
+                return FirebaseRaid(id, level.toInt(), timeEggHatches, timeEnd, timestamp, geoHash, arenaId, raidBossId, raidMeetupId)
             }
 
             return null
@@ -77,7 +77,7 @@ data class FirebaseRaid private constructor(override val id: String,
             val formattedTimeRaidEnds = TimeCalculator.nextDate(formattedTimeEggHatches)?.let { dateEggHatches ->
                 val date = TimeCalculator.addTime(dateEggHatches, RAID_DURATION)
                 TimeCalculator.format(date)
-            } ?: kotlin.run { "00:00" }
+            } ?: run { "00:00" }
 
 //            Log.w(TAG, "Debug:: new Raid() formattedTimeEggHatches: $formattedTimeEggHatches, formattedTimeRaidEnds: $formattedTimeRaidEnds")
             return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId)

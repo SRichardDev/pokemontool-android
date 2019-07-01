@@ -27,7 +27,7 @@ object IconFactory {
     private const val HEADER_TEXT_RAW_SIZE: Float = 10.0f
     private const val FOOTER_TEXT_RAW_SIZE: Float = 10.0f
     private const val TEXT_COLOR = Color.BLACK
-    private const val TEXT_BACKGROUND_COLOR = Color.BLACK
+    private const val TEXT_BACKGROUND_COLOR = Color.WHITE
 
     fun bitmap(context: Context, @DrawableRes id: Int, sizeMode: SizeMod = IconFactory.SizeMod.DEFAULT): Bitmap? {
 
@@ -63,7 +63,7 @@ object IconFactory {
         }
 
         iconConfig.headerDrawable?.let { headerDrawable ->
-            drawHeaderImage(canvas, headerDrawable, backgroundDrawable, iconConfig.sizeMod)
+            drawHeaderImage(canvas, headerDrawable, backgroundDrawable)
         }
 
         iconConfig.headerText?.let { headerText ->
@@ -140,7 +140,7 @@ object IconFactory {
         foregroundDrawable.draw(canvas)
     }
 
-    private fun drawHeaderImage(canvas: Canvas, headerDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
+    private fun drawHeaderImage(canvas: Canvas, headerDrawable: Drawable, backgroundDrawable: Drawable) {
 
         val left = 0
         val top = 0

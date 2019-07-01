@@ -75,8 +75,8 @@ data class FirebaseArena private constructor(
             return null
         }
 
-        fun new(name: String, geoHash: GeoHash, userId: String, isEX: Boolean): FirebaseArena {
-            return FirebaseArena("", name, geoHash, userId, isEX)
+        fun new(name: String, geoHash: GeoHash, user: String, isEX: Boolean): FirebaseArena {
+            return FirebaseArena("", name, geoHash, user, isEX)
         }
     }
 }

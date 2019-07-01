@@ -80,14 +80,14 @@ class MapItemCreationFragment: ViewPagerFragment() {
     @Throws(Exception::class)
     private fun tryToSendMapItem() {
 
-        FirebaseUser.userData?.id?.let { userId ->
+        FirebaseUser.userData?.name?.let { userName ->
 
             viewModel.position.get()?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
                 when(viewModel.type.get()) {
-                    Type.Arena -> tryToSendArena(geoHash, userId)
-                    Type.Pokestop -> tryToSendPokestop(geoHash, userId)
+                    Type.Arena -> tryToSendArena(geoHash, userName)
+                    Type.Pokestop -> tryToSendPokestop(geoHash, userName)
                     else -> {
                         val text = App.geString(R.string.exceptions_send_map_item_invalid_type)
                         Log.e(TAG, "$text viewModel.type.get(): ${viewModel.type.get()}")
@@ -111,12 +111,12 @@ class MapItemCreationFragment: ViewPagerFragment() {
     }
 
     @Throws(Exception::class)
-    private fun tryToSendArena(geoHash: GeoHash, userId: String) {
+    private fun tryToSendArena(geoHash: GeoHash, user: String) {
 
         viewModel.name.get()?.let { name ->
 
             val isEX = viewModel.isEx.get() ?: kotlin.run { false }
-            val arena = FirebaseArena.new(name, geoHash, userId, isEX)
+            val arena = FirebaseArena.new(name, geoHash, user, isEX)
             firebase.pushArena(arena)
 
         } ?: kotlin.run {
@@ -128,11 +128,11 @@ class MapItemCreationFragment: ViewPagerFragment() {
     }
 
     @Throws(Exception::class)
-    private fun tryToSendPokestop(geoHash: GeoHash, userId: String) {
+    private fun tryToSendPokestop(geoHash: GeoHash, user: String) {
 
         viewModel.name.get()?.let { name ->
 
-            val pokestop = FirebasePokestop.new(name, geoHash, userId)
+            val pokestop = FirebasePokestop.new(name, geoHash, user)
             firebase.pushPokestop(pokestop)
 
         } ?: kotlin.run {
