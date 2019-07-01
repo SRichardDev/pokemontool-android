@@ -33,7 +33,7 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
 
         return imageName?.let {
             FirebaseImageMapper.questDrawable(context, it)
-        } ?: kotlin.run {
+        } ?: run {
             null
         }
     }
@@ -46,19 +46,19 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
 
                 val validQuest = (firebaseQuest.timestamp as? Long)?.let { timestamp ->
                     currentDay(timestamp)
-                } ?: kotlin.run { false }
+                } ?: run { false }
 
                 questExists.set(validQuest)
                 quest.set(questDefinition.questDescription)
                 reward.set(questDefinition.reward)
                 imageName = questDefinition.imageName
 
-            } ?: kotlin.run {
+            } ?: run {
                 Log.w(TAG, "Quest data exists but definitionsId ${firebaseQuest.definitionId} not found in local quests: ${FirebaseDefinitions.quests}")
                 resetData()
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             resetData()
         }
 

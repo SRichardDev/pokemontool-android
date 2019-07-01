@@ -83,7 +83,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
                 return false
             }
 
-        }) ?: kotlin.run { Log.e(TAG, "no quest_searchview found in view: $view") }
+        }) ?: run { Log.e(TAG, "no quest_searchview found in view: $view") }
     }
 
     @Throws(Exception::class)
@@ -95,11 +95,11 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
 
                 sendNewQuest(pokestop, questDefinition, userId)
 
-            } ?: kotlin.run {
+            } ?: run {
                 throw Exception("could not send quest because user is not logged in. FirebaseUser.userData?: ${FirebaseUser.userData}")
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             throw Exception("could not send quest, because pokestop: $pokestop!")
         }
     }
@@ -143,7 +143,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
                 alertDialogBuilder.show()
             }
 
-        } ?: kotlin.run {
+        } ?: run {
             Log.e(TAG, "could not find quest definition with id: $id in list: $list!")
         }
     }

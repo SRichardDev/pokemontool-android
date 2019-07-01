@@ -19,6 +19,7 @@ import io.stanc.pogotool.databinding.FragmentArenaBinding
 import io.stanc.pogotool.firebase.FirebaseDatabase
 import io.stanc.pogotool.firebase.FirebaseNodeObserverManager
 import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.map.MapIconFactory
 import io.stanc.pogotool.subscreen.RaidBossFragment
 import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin.safeLet
@@ -95,7 +96,7 @@ class ArenaFragment: Fragment() {
     }
 
     private fun setIconArena(imageView: ImageView, context: Context, arena: FirebaseArena) {
-        val arenaIcon = arena.icon(context, IconFactory.SizeMod.LARGE)
+        val arenaIcon = MapIconFactory.arenaIcon(context, arena, IconFactory.SizeMod.LARGE)
         imageView.setImageBitmap(arenaIcon)
     }
 

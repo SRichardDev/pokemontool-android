@@ -43,35 +43,6 @@ data class FirebaseArena private constructor(
         return data
     }
 
-    fun icon(context: Context, sizeMod: IconFactory.SizeMod): Bitmap? {
-
-        return backgroundDrawable(context, isEX)?.let { backgroundDrawable ->
-
-            val iconConfig = IconFactory.IconConfig(
-                backgroundDrawable
-            )
-
-            FirebaseImageMapper.raidDrawable(context, this)?.let { foregroundDrawable ->
-                iconConfig.foregroundDrawable = foregroundDrawable
-            }
-
-            raid?.let {
-                val viewModel = RaidStateViewModel(it)
-                if (viewModel.isRaidAnnounced.get() == true) {
-                    iconConfig.headerText = "[${viewModel.raidTime.get()}]"
-                }
-            }
-
-            iconConfig.footerText = name
-            iconConfig.sizeMod = sizeMod
-
-            return IconFactory.bitmap(context, iconConfig)
-
-        } ?: kotlin.run {
-            null
-        }
-    }
-
     companion object {
 
         private val TAG = javaClass.name
@@ -106,27 +77,6 @@ data class FirebaseArena private constructor(
 
         fun new(name: String, geoHash: GeoHash, userId: String, isEX: Boolean): FirebaseArena {
             return FirebaseArena("", name, geoHash, userId, isEX)
-        }
-
-        fun baseIcon(context: Context, isEX: Boolean, sizeMod: IconFactory.SizeMod): Bitmap? {
-
-            backgroundDrawable(context, isEX)?.let { drawable ->
-
-                val iconConfig = IconFactory.IconConfig(drawable, null, sizeMod)
-                return IconFactory.bitmap(context, iconConfig)
-
-            } ?: kotlin.run {
-                Log.e(TAG, "could not create baseIcon, because backgroundDrawable is null.")
-                return null
-            }
-        }
-
-        private fun backgroundDrawable(context: Context, isEX: Boolean): Drawable? {
-            return if (isEX) {
-                ContextCompat.getDrawable(context, R.drawable.icon_arena_ex_30dp)
-            } else {
-                ContextCompat.getDrawable(context, R.drawable.icon_arena_30dp)
-            }
         }
     }
 }

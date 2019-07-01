@@ -46,17 +46,17 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
         private val TAG = javaClass.name
 
-        // TODO: calculate anchor, depending on header & footer text, the bottom of arena icon should be the map location position !
+        // TODO: calculate anchor, depending on header & footer text, the bottom of arena arenaIcon should be the map location position !
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
         private fun getBitmapDescriptor(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
-            val arenaIconBitmap = arena.icon(context, sizeMod)
+            val arenaIconBitmap = MapIconFactory.arenaIcon(context, arena, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
         private fun getBitmapDescriptor(context: Context, isEx: Boolean = false, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
-            val arenaIconBitmap = FirebaseArena.baseIcon(context, isEx, sizeMod)
+            val arenaIconBitmap = MapIconFactory.arenaIconBase(context, isEx, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 
@@ -68,8 +68,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
             private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_arena, null, false)
 
-            private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_header) as TextView
-            private val subheader = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_arena_textview_subheader) as TextView
+            private val header = infoWindowView.findViewById(R.id.info_window_arena_textview_header) as TextView
+            private val subheader = infoWindowView.findViewById(R.id.info_window_arena_textview_subheader) as TextView
 
             private val subheaderTextDefault = context.getText(R.string.map_info_window_arena_subheader_default)
             private val subheaderTextEx = context.getText(R.string.map_info_window_arena_subheader_ex)

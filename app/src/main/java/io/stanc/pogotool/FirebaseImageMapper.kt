@@ -3,8 +3,10 @@ package io.stanc.pogotool
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
+import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.FirebaseDefinitions.raidBosses
 import io.stanc.pogotool.firebase.node.FirebaseArena
+import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.viewmodel.RaidStateViewModel
 import io.stanc.pogotool.viewmodel.RaidStateViewModel.RaidState
 import java.io.IOException
@@ -56,6 +58,15 @@ object FirebaseImageMapper {
 
         } catch (ex: IOException) {
             Log.e(TAG, ex.toString())
+            null
+        }
+    }
+
+    fun questDrawable(context: Context, pokestop: FirebasePokestop): Drawable? {
+
+        return FirebaseDefinitions.quests.find { it.id == pokestop.quest?.definitionId }?.let { questDefinition ->
+            questDrawable(context, questDefinition.imageName)
+        } ?: run {
             null
         }
     }

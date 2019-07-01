@@ -13,6 +13,7 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import io.stanc.pogotool.R
+import io.stanc.pogotool.firebase.node.FirebasePokestop
 import io.stanc.pogotool.utils.IconFactory
 import io.stanc.pogotool.utils.Kotlin
 import io.stanc.pogotool.viewmodel.PokestopViewModel
@@ -28,7 +29,9 @@ class ClusterPokestopRenderer(
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
-        markerOptions?.title(item?.title)?.icon(getBitmapDescriptor(context, IconFactory.SizeMod.DEFAULT))?.anchor(ANCHOR_X, ANCHOR_Y)
+        Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
+            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.pokestop, IconFactory.SizeMod.DEFAULT)).anchor(ANCHOR_X, ANCHOR_Y)
+        }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
 
@@ -47,8 +50,13 @@ class ClusterPokestopRenderer(
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
+        private fun getBitmapDescriptor(context: Context, pokestop: FirebasePokestop, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
+            val bm = MapIconFactory.pokestopIcon(context, pokestop, sizeMod)
+            return BitmapDescriptorFactory.fromBitmap(bm)
+        }
+
         private fun getBitmapDescriptor(context: Context, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
-            val bm = IconFactory.bitmap(context, R.drawable.icon_pstop_30dp, sizeMod)
+            val bm = MapIconFactory.pokestopIconBase(context, sizeMod)
             return BitmapDescriptorFactory.fromBitmap(bm)
         }
 
@@ -60,7 +68,7 @@ class ClusterPokestopRenderer(
 
             private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_pokestop, null, false)
 
-            private val header = infoWindowView.findViewById(io.stanc.pogotool.R.id.info_window_pokestop_textview_header) as TextView
+            private val header = infoWindowView.findViewById(R.id.info_window_pokestop_textview_header) as TextView
 
             override fun getInfoContents(p0: Marker?): View? {
                 return null

@@ -18,6 +18,7 @@ object IconFactory {
     data class IconConfig (
         val backgroundDrawable: Drawable,
         var foregroundDrawable: Drawable? = null,
+        var headerDrawable: Drawable? = null,
         var sizeMod: SizeMod = IconFactory.SizeMod.DEFAULT,
         var headerText: String? = null,
         var footerText: String? = null
@@ -26,6 +27,7 @@ object IconFactory {
     private const val HEADER_TEXT_RAW_SIZE: Float = 10.0f
     private const val FOOTER_TEXT_RAW_SIZE: Float = 10.0f
     private const val TEXT_COLOR = Color.BLACK
+    private const val TEXT_BACKGROUND_COLOR = Color.BLACK
 
     fun bitmap(context: Context, @DrawableRes id: Int, sizeMode: SizeMod = IconFactory.SizeMod.DEFAULT): Bitmap? {
 
@@ -41,7 +43,7 @@ object IconFactory {
 
             return bm
 
-        } ?: kotlin.run {
+        } ?: run {
             return null
         }
     }
@@ -54,10 +56,14 @@ object IconFactory {
         // TODO: for debugging only
 //        canvas.drawColor(Color.YELLOW)
 
-        val backgroundDrawable = drawBackground(canvas, iconConfig, context)
+        val backgroundDrawable = drawBackgroundImage(canvas, iconConfig, context)
 
         iconConfig.foregroundDrawable?.let { foregroundDrawable ->
-            drawForeground(canvas, foregroundDrawable, backgroundDrawable, iconConfig.sizeMod)
+            drawForegroundImage(canvas, foregroundDrawable, backgroundDrawable, iconConfig.sizeMod)
+        }
+
+        iconConfig.headerDrawable?.let { headerDrawable ->
+            drawHeaderImage(canvas, headerDrawable, backgroundDrawable, iconConfig.sizeMod)
         }
 
         iconConfig.headerText?.let { headerText ->
@@ -86,16 +92,26 @@ object IconFactory {
             iconHeight += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         }
         iconConfig.footerText?.let {
-            iconHeight += textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
+            iconHeight += (textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize * 1.1).toInt()
+        }
+        iconConfig.headerDrawable?.let {
+            iconHeight += iconWidth
         }
 
         return Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
     }
 
-    private fun drawBackground(canvas: Canvas, iconConfig: IconConfig, context: Context): Drawable {
+    private fun drawBackgroundImage(canvas: Canvas, iconConfig: IconConfig, context: Context): Drawable {
         val marginHorizontal = (canvas.width - scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod)) / 2
 
-        val marginTop = if (iconConfig.headerText.isNullOrEmpty()) 0 else textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
+        var marginTop = 0
+        iconConfig.headerText?.let {
+            marginTop += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
+        }
+        iconConfig.headerDrawable?.let {
+            marginTop += canvas.width
+        }
+
         val marginBottom = if (iconConfig.footerText.isNullOrEmpty()) 0 else textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
 
         val backgroundDrawable = iconConfig.backgroundDrawable
@@ -111,7 +127,7 @@ object IconFactory {
         return backgroundDrawable
     }
 
-    private fun drawForeground(canvas: Canvas, foregroundDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
+    private fun drawForegroundImage(canvas: Canvas, foregroundDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
         val marginHorizontal = scaledLength(backgroundDrawable.intrinsicWidth, sizeMod) / 4
         val marginVertically = scaledLength(backgroundDrawable.intrinsicHeight, sizeMod) / 4
 
@@ -122,6 +138,17 @@ object IconFactory {
 
         foregroundDrawable.setBounds(left, top, right, bottom)
         foregroundDrawable.draw(canvas)
+    }
+
+    private fun drawHeaderImage(canvas: Canvas, headerDrawable: Drawable, backgroundDrawable: Drawable, sizeMod: SizeMod) {
+
+        val left = 0
+        val top = 0
+        val right = canvas.width
+        val bottom = backgroundDrawable.bounds.top
+
+        headerDrawable.setBounds(left, top, right, bottom)
+        headerDrawable.draw(canvas)
     }
 
     private fun drawHeaderText(canvas: Canvas, headerText: String, context: Context) {
@@ -137,7 +164,11 @@ object IconFactory {
         val paint = textPaint(context, FOOTER_TEXT_RAW_SIZE)
 
         val x = canvas.width / 2.0f
-        val y = canvas.height - paint.textSize / 4.0
+        val y = canvas.height - paint.textSize / 6.0
+
+        val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        fillPaint.color = TEXT_BACKGROUND_COLOR
+        canvas.drawRect(0.0f, canvas.height - paint.textSize, canvas.width.toFloat(), canvas.height.toFloat(), fillPaint)
 
         canvas.drawText(subText, x, y.toFloat(), paint)
     }
