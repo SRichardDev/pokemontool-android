@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ImageView
 import android.widget.TextView
 import io.stanc.pogotool.FirebaseImageMapper
+import io.stanc.pogotool.FirebaseImageMapper.ASSETS_DIR_RAIDBOSSES
 import io.stanc.pogotool.R
 import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
 import io.stanc.pogotool.recyclerview.RecyclerViewAdapter
@@ -24,7 +25,7 @@ class RaidBossAdapter(private val context: Context,
 
         raidBosses.find { it.id == id }?.let { raidBossDefinition ->
 
-            val drawable = FirebaseImageMapper.raidBossDrawable(context, raidBossDefinition.imageName)
+            val drawable = FirebaseImageMapper.assetDrawable(context, ASSETS_DIR_RAIDBOSSES, raidBossDefinition.imageName)
             holder.itemView.findViewById<ImageView>(R.id.list_item_raidboss_image).setImageDrawable(drawable)
 
             holder.itemView.findViewById<TextView>(R.id.list_item_raidboss_name).text = raidBossDefinition.name

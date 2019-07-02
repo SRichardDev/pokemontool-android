@@ -15,6 +15,9 @@ object FirebaseImageMapper {
 
     private val TAG = javaClass.name
 
+    const val ASSETS_DIR_RAIDBOSSES = "raidbosses"
+    const val ASSETS_DIR_REWARDS = "rewards"
+
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
 
         arena?.raid?.let { raid ->
@@ -25,9 +28,10 @@ object FirebaseImageMapper {
                 RaidState.RAID_RUNNING -> {
                     raid.raidBossId?.let { id ->
                         val imageName = raidBosses.first { it.id == id }.imageName
-                        return raidBossDrawable(
+                        return assetDrawable(
                             context,
-                            raidBossImageName = imageName
+                            ASSETS_DIR_RAIDBOSSES,
+                            assetImageName = imageName
                         )
                     }
                 }
@@ -50,10 +54,10 @@ object FirebaseImageMapper {
         return null
     }
 
-    fun raidBossDrawable(context: Context, raidBossImageName: String): Drawable? {
+    fun assetDrawable(context: Context, assetDir: String, assetImageName: String): Drawable? {
 
         return try {
-            val inputStream = context.assets.open("raidbosses/$raidBossImageName.png")
+            val inputStream = context.assets.open("$assetDir/$assetImageName.png")
             Drawable.createFromStream(inputStream, null)
 
         } catch (ex: IOException) {
@@ -74,9 +78,9 @@ object FirebaseImageMapper {
     fun questDrawable(context: Context, imageName: String): Drawable? {
 
         return when (imageName) {
-            "candy" -> context.getDrawable(R.drawable.icon_candy_96dp)
-            "stardust" -> context.getDrawable(R.drawable.icon_candy_96dp)
-            else -> raidBossDrawable(context,raidBossImageName = imageName)
+            "candy" -> assetDrawable(context, ASSETS_DIR_REWARDS, assetImageName = imageName)
+            "stardust" -> assetDrawable(context, ASSETS_DIR_REWARDS, assetImageName = imageName)
+            else -> assetDrawable(context, ASSETS_DIR_RAIDBOSSES, assetImageName = imageName)
         }
     }
 }
