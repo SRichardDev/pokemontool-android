@@ -3,6 +3,7 @@ package io.stanc.pogotool.utils
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 
@@ -63,7 +64,7 @@ object IconFactory {
         }
 
         iconConfig.headerDrawable?.let { headerDrawable ->
-            drawHeaderImage(canvas, headerDrawable, backgroundDrawable)
+            drawHeaderImage(canvas, headerDrawable, iconConfig)
         }
 
         iconConfig.headerText?.let { headerText ->
@@ -79,26 +80,50 @@ object IconFactory {
 
     private fun createBitmap(context: Context, iconConfig: IconConfig): Bitmap {
 
+        val bitmapWidth = bitmapWidth(context, iconConfig)
+        val bitmapHeight = bitmapHeight(context, iconConfig)
+
+        return Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888)
+    }
+
+    private fun bitmapWidth(context: Context, iconConfig: IconConfig): Int {
+
         var iconWidth = scaledLength(iconConfig.backgroundDrawable.intrinsicWidth, iconConfig.sizeMod)
+
         iconConfig.headerText?.let { headerText ->
             iconWidth = maxOf(iconWidth, textPaint(context, HEADER_TEXT_RAW_SIZE).measureText(headerText).toInt())
         }
+
         iconConfig.footerText?.let { footerText ->
             iconWidth = maxOf(iconWidth, textPaint(context, FOOTER_TEXT_RAW_SIZE).measureText(footerText).toInt())
         }
 
+        iconConfig.headerDrawable?.let { _ ->
+            val headerDrawableSize = headerDrawableSize(iconConfig.backgroundDrawable, iconConfig.sizeMod)
+            iconWidth = maxOf(iconWidth, headerDrawableSize)
+        }
+
+        return iconWidth
+    }
+
+    private fun bitmapHeight(context: Context, iconConfig: IconConfig): Int {
+
         var iconHeight = scaledLength(iconConfig.backgroundDrawable.intrinsicHeight, iconConfig.sizeMod)
+
         iconConfig.headerText?.let {
             iconHeight += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         }
+
         iconConfig.footerText?.let {
             iconHeight += (textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize * 1.1).toInt()
         }
+
         iconConfig.headerDrawable?.let {
-            iconHeight += iconWidth
+            val headerDrawableSize = headerDrawableSize(iconConfig.backgroundDrawable, iconConfig.sizeMod)
+            iconHeight += headerDrawableSize
         }
 
-        return Bitmap.createBitmap(iconWidth, iconHeight, Bitmap.Config.ARGB_8888)
+        return iconHeight
     }
 
     private fun drawBackgroundImage(canvas: Canvas, iconConfig: IconConfig, context: Context): Drawable {
@@ -109,7 +134,7 @@ object IconFactory {
             marginTop += textPaint(context, HEADER_TEXT_RAW_SIZE).textSize.toInt()
         }
         iconConfig.headerDrawable?.let {
-            marginTop += canvas.width
+            marginTop += headerDrawableSize(iconConfig.backgroundDrawable, iconConfig.sizeMod)
         }
 
         val marginBottom = if (iconConfig.footerText.isNullOrEmpty()) 0 else textPaint(context, FOOTER_TEXT_RAW_SIZE).textSize.toInt()
@@ -140,12 +165,14 @@ object IconFactory {
         foregroundDrawable.draw(canvas)
     }
 
-    private fun drawHeaderImage(canvas: Canvas, headerDrawable: Drawable, backgroundDrawable: Drawable) {
+    private fun drawHeaderImage(canvas: Canvas, headerDrawable: Drawable, iconConfig: IconConfig) {
 
-        val left = 0
+        val headerSize = headerDrawableSize(iconConfig.backgroundDrawable, iconConfig.sizeMod)
+
+        val left = (canvas.width - headerSize) / 2
         val top = 0
-        val right = canvas.width
-        val bottom = backgroundDrawable.bounds.top
+        val right = headerSize + (canvas.width - headerSize) / 2
+        val bottom = headerSize
 
         headerDrawable.setBounds(left, top, right, bottom)
         headerDrawable.draw(canvas)
@@ -190,5 +217,9 @@ object IconFactory {
             IconFactory.SizeMod.LARGE -> 3.0f
         }
         return (length * scaleFactor).toInt()
+    }
+
+    private fun headerDrawableSize(backgroundDrawable: Drawable, sizeMod: SizeMod): Int {
+        return scaledLength(backgroundDrawable.intrinsicHeight, sizeMod)
     }
 }
