@@ -1,9 +1,8 @@
 package io.stanc.pogotool.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
-import android.util.Log
-import io.stanc.pogotool.R
+import androidx.lifecycle.ViewModel
+import io.stanc.pogotool.FirebaseImageMapper.TEAM_COLOR
 import io.stanc.pogotool.firebase.node.FirebaseUserNode
 import io.stanc.pogotool.firebase.node.Team
 import io.stanc.pogotool.utils.SegmentedControlView
@@ -32,8 +31,6 @@ class LoginViewModel: ViewModel() {
     val numberRaids = ObservableField<Int>(0)
     val numberQuests = ObservableField<Int>(0)
 
-    private val teamColorMap = mapOf(Team.MYSTIC to R.color.teamMystic, Team.VALOR to R.color.teamValor, Team.INSTINCT to R.color.teamInstinct)
-
     init {
 
         val shuffledTeamOrder = Team.values().toList().shuffled()
@@ -41,7 +38,7 @@ class LoginViewModel: ViewModel() {
         teamOrder.set(shuffledTeamOrder)
 
         team.set(shuffledTeamOrder[0])
-        teamColor.set(teamColorMap[shuffledTeamOrder[0]])
+        teamColor.set(TEAM_COLOR[shuffledTeamOrder[0]])
     }
 
     fun update(user: FirebaseUserNode) {
@@ -51,7 +48,7 @@ class LoginViewModel: ViewModel() {
         user.code?.let { code.set(it) }
         level.set(user.level.toString())
         team.set(user.team)
-        teamColor.set(teamColorMap[user.team])
+        teamColor.set(TEAM_COLOR[user.team])
         numberPokestops.set(user.submittedPokestops.toInt())
         numberArenas.set(user.submittedArenas.toInt())
         numberRaids.set(user.submittedRaids.toInt())
@@ -65,19 +62,19 @@ class LoginViewModel: ViewModel() {
             SegmentedControlView.Selection.LEFT -> {
                 teamOrder.get()?.get(0)?.let {
                     team.set(it)
-                    teamColor.set(teamColorMap[it])
+                    teamColor.set(TEAM_COLOR[it])
                 }
             }
             SegmentedControlView.Selection.MIDDLE -> {
                 teamOrder.get()?.get(1)?.let {
                     team.set(it)
-                    teamColor.set(teamColorMap[it])
+                    teamColor.set(TEAM_COLOR[it])
                 }
             }
             SegmentedControlView.Selection.RIGHT -> {
                 teamOrder.get()?.get(2)?.let {
                     team.set(it)
-                    teamColor.set(teamColorMap[it])
+                    teamColor.set(TEAM_COLOR[it])
                 }
             }
         }

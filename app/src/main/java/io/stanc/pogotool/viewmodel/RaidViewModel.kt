@@ -18,8 +18,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
     private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel(arena.raid)
-    private var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel(null)
-//    private var publicUser: List<FirebasePublicUser>? = null
+    var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel(null)
 
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 
@@ -81,7 +80,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
      */
 
     fun updateData(arena: FirebaseArena) {
-        Log.i(TAG, "Debug:: updateData($arena)")
+//        Log.i(TAG, "Debug:: updateData($arena)")
 
         requestRaidMeetupData(arena)
 
@@ -98,7 +97,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
         this.arena = arena
 
-        Log.i(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.get()}, isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
+//        Log.i(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.get()}, isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
     }
 
     fun changeParticipation(participate: Boolean) {
@@ -141,7 +140,6 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     private fun requestRaidMeetupData(arena: FirebaseArena) {
 
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
-        Log.d(TAG, "Debug:: requestRaidMeetupData(arena: $arena), arena.raid?.raidMeetupId?: ${arena.raid?.raidMeetupId}")
 
         arena.raid?.raidMeetupId?.let { id ->
 
@@ -152,28 +150,4 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
             raidMeetupViewModel.updateData(null)
         }
     }
-
-
-
-    private fun requestParticipants() {
-//        raidMeetup?.numParticipants.... => this.publicUser
-    }
-
-    /**
-     * observer
-     */
-
-//    interface RaidViewModelObserver {
-//        fun raidChanged(raid: FirebaseRaid?)
-//    }
-//
-//    fun addObserver(observer: RaidViewModelObserver) {
-//        observerManager.addObserver(observer)
-//        observer.raidChanged(arena.raid)
-//        Log.d(TAG, "Debug:: addObserver($observer) observers: ${observerManager.observers()}")
-//    }
-//
-//    fun removeObserver(observer: RaidViewModelObserver) {
-//        observerManager.removeObserver(observer)
-//    }
 }

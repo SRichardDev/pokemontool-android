@@ -305,7 +305,7 @@ open class MapFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         context?.let {
             PermissionManager.onRequestPermissionsResult(requestCode, it, onLocationPermissionGranted = {
-                Log.i(TAG, "location permission granted! startAuthentication init camera animation...")
+                updateMyLocationEnabledPOI()
                 updateCameraStartPosition()
             })
         }

@@ -7,6 +7,7 @@ import io.stanc.pogotool.firebase.FirebaseDefinitions
 import io.stanc.pogotool.firebase.FirebaseDefinitions.raidBosses
 import io.stanc.pogotool.firebase.node.FirebaseArena
 import io.stanc.pogotool.firebase.node.FirebasePokestop
+import io.stanc.pogotool.firebase.node.Team
 import io.stanc.pogotool.viewmodel.RaidStateViewModel
 import io.stanc.pogotool.viewmodel.RaidStateViewModel.RaidState
 import java.io.IOException
@@ -17,6 +18,8 @@ object FirebaseImageMapper {
 
     const val ASSETS_DIR_RAIDBOSSES = "raidbosses"
     const val ASSETS_DIR_REWARDS = "rewards"
+
+    val TEAM_COLOR = mapOf(Team.MYSTIC to R.color.teamMystic, Team.VALOR to R.color.teamValor, Team.INSTINCT to R.color.teamInstinct)
 
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
 

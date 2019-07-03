@@ -221,7 +221,6 @@ class ArenaFragment: Fragment() {
     }
 
     private fun showParticipantsFragment(viewModel: RaidViewModel) {
-        Log.d(TAG, "Debug:: showParticipantsFragment() viewModel: ${viewModel.numParticipants.get()}: ${viewModel.participants.get()}")
         val fragment = ParticipantsFragment.newInstance(viewModel)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }

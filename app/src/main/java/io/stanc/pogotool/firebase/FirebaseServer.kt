@@ -136,6 +136,21 @@ object FirebaseServer {
      * interface for request, add, change & remove data
      */
 
+    fun requestNode(databaseNodePath: String, onCompletionCallback: OnCompleteCallback<DataSnapshot>? = null) {
+        FirebaseServer.databaseRef.child(databaseNodePath).addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onCancelled(p0: DatabaseError) {
+                Log.e(TAG, "onCancelled(error: ${p0.code}, message: ${p0.message}) for databaseRef path: $databaseNodePath")
+                onCompletionCallback?.onFailed(p0.message)
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                Log.v(TAG, "onDataChange(p0: $p0) for databaseRef path: $databaseNodePath")
+                onCompletionCallback?.onSuccess(p0)
+            }
+        })
+    }
+
     fun requestDataValue(databaseDataPath: String, onCompletionCallback: OnCompleteCallback<Any?>? = null) {
         FirebaseServer.databaseRef.child(databaseDataPath).addListenerForSingleValueEvent(object : ValueEventListener {
 

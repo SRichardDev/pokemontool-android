@@ -13,7 +13,11 @@ import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
+import io.stanc.pogotool.firebase.DatabaseKeys.USERS
+import io.stanc.pogotool.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
+import io.stanc.pogotool.firebase.FirebaseServer.OnCompleteCallback
+import io.stanc.pogotool.firebase.FirebaseServer.requestNode
 import io.stanc.pogotool.firebase.node.*
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.Async
@@ -150,6 +154,24 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
+    fun loadPublicUser(userId: String, onCompletionCallback: (publicUser: FirebasePublicUser) -> Unit) {
+
+        requestNode("$USERS/$userId/$USER_PUBLIC_DATA", object: OnCompleteCallback<DataSnapshot> {
+
+            override fun onSuccess(data: DataSnapshot?) {
+
+                data?.let {
+                    FirebasePublicUser.new(userId, data)?.let { onCompletionCallback(it) }
+                }
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "loadPublicUser($userId) failed. Error: $message")
+            }
+
+        })
+    }
+
     /**
      * pokestops
      */
@@ -178,7 +200,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidbossDefinition>?) -> Unit) {
 
-        FirebaseServer.requestDataChilds(RAID_BOSSES, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+        FirebaseServer.requestDataChilds(RAID_BOSSES, object : OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
                 val raidBosses = mutableListOf<FirebaseRaidbossDefinition>()
@@ -200,7 +222,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun loadQuests(onCompletionCallback: (quests: List<FirebaseQuestDefinition>?) -> Unit) {
 
-        FirebaseServer.requestDataChilds(QUESTS, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+        FirebaseServer.requestDataChilds(QUESTS, object : OnCompleteCallback<List<DataSnapshot>> {
 
             override fun onSuccess(data: List<DataSnapshot>?) {
                 val quests = mutableListOf<FirebaseQuestDefinition>()
@@ -292,7 +314,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * private implementations
      */
 
-    private fun callbackForVoid(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) = object : FirebaseServer.OnCompleteCallback<Void> {
+    private fun callbackForVoid(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) = object : OnCompleteCallback<Void> {
         override fun onSuccess(data: Void?) {
             onCompletionCallback(true)
         }
@@ -307,7 +329,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
         FirebaseUser.userData?.notificationToken?.let { userToken ->
 
-            FirebaseServer.requestDataChilds(databasePath, object : FirebaseServer.OnCompleteCallback<List<DataSnapshot>> {
+            FirebaseServer.requestDataChilds(databasePath, object : OnCompleteCallback<List<DataSnapshot>> {
 
                 override fun onSuccess(data: List<DataSnapshot>?) {
                     Log.d(TAG, "Debug:: loadSubscriptions onSuccess($data)")

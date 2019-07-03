@@ -1,23 +1,13 @@
 package io.stanc.pogotool.screen
 
 import android.content.Context
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ListView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
 import io.stanc.pogotool.R
-import io.stanc.pogotool.firebase.FirebaseDefinitions
-import io.stanc.pogotool.firebase.node.FirebaseParticipant
-import io.stanc.pogotool.firebase.node.FirebaseRaidbossDefinition
+import io.stanc.pogotool.firebase.node.FirebasePublicUser
 import io.stanc.pogotool.recyclerview.RecyclerViewFragment
-import io.stanc.pogotool.recyclerviewadapter.RaidBossAdapter
+import io.stanc.pogotool.recyclerviewadapter.ParticipantAdapter
 import io.stanc.pogotool.viewmodel.RaidViewModel
 
-class ParticipantsFragment: RecyclerViewFragment<FirebaseParticipant>() {
+class ParticipantsFragment: RecyclerViewFragment<FirebasePublicUser>() {
     private val TAG = javaClass.name
 
     private var viewModel: RaidViewModel? = null
@@ -31,15 +21,10 @@ class ParticipantsFragment: RecyclerViewFragment<FirebaseParticipant>() {
     override val orientation: Orientation
         get() = Orientation.VERTICAL
 
-    override val initItemList: List<FirebaseParticipant>
-        get() = FirebaseDefinitions.raidBosses.filter { it.level.toInt() == initRaidLevel }
+    override val initItemList: List<FirebasePublicUser>
+        get() = viewModel?.participants?.get() ?: emptyList()
 
-    override fun onCreateListAdapter(context: Context, list: List<FirebaseRaidbossDefinition>) = RaidBossAdapter(context, list)
-
-    fun showList(raidLevel: Int) {
-        val newList = FirebaseDefinitions.raidBosses.filter { it.level.toInt() == raidLevel }
-        showList(newList)
-    }
+    override fun onCreateListAdapter(context: Context, list: List<FirebasePublicUser>) = ParticipantAdapter(context, list)
 
     companion object {
 
