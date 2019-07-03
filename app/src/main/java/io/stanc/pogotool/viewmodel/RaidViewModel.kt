@@ -81,7 +81,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
      */
 
     fun updateData(arena: FirebaseArena) {
-//        Log.i(TAG, "Debug:: updateData($arena)")
+        Log.i(TAG, "Debug:: updateData($arena)")
 
         requestRaidMeetupData(arena)
 
@@ -98,7 +98,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
         this.arena = arena
 
-//        Log.i(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
+        Log.i(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.get()}, isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
     }
 
     fun changeParticipation(participate: Boolean) {

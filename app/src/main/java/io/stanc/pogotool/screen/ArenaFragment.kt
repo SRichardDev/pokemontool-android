@@ -143,7 +143,8 @@ class ArenaFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.let {
                 it.setOnClickListener {
-                    // TODO...
+                    Log.d(TAG, "Debug:: onclick: viewModel: $viewModel")
+                    viewModel?.let { showParticipantsFragment(it) }
                 }
             }
 
@@ -155,6 +156,7 @@ class ArenaFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let { button ->
                 button.setOnClickListener {
+                    Log.i(TAG, "Debug:: setOnClickListener() activated: (${button.isActivated} -> ${!button.isActivated})")
                     button.isActivated = !button.isActivated
                     Log.d(TAG, "Debug:: button participant pressed, now: isActivated: ${button.isActivated}, raidAnnounced: ${viewModel?.isRaidMeetupAnnounced?.get()}")
 
@@ -169,7 +171,10 @@ class ArenaFragment: Fragment() {
                         }
                     }
                 }
-                viewModel?.isUserParticipate?.get()?.let { button.isActivated = it }
+                viewModel?.isUserParticipate?.get()?.let {
+                    button.isActivated = it
+                    Log.i(TAG, "Debug:: setup() activated: ${button.isActivated})")
+                }
             }
 
         }
@@ -201,8 +206,13 @@ class ArenaFragment: Fragment() {
         arena?.raid?.level?.let { raidBossesFragment?.showList(it.toInt()) }
     }
 
+    private fun setIconRaid(imageView: ImageView, context: Context, arena: FirebaseArena) {
+        val raidDrawable = FirebaseImageMapper.raidDrawable(context, arena)
+        imageView.setImageDrawable(raidDrawable)
+    }
+
     /**
-     * Raid
+     * Further screens
      */
 
     private fun showRaidFragment(arena: FirebaseArena) {
@@ -210,9 +220,10 @@ class ArenaFragment: Fragment() {
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
-    private fun setIconRaid(imageView: ImageView, context: Context, arena: FirebaseArena) {
-        val raidDrawable = FirebaseImageMapper.raidDrawable(context, arena)
-        imageView.setImageDrawable(raidDrawable)
+    private fun showParticipantsFragment(viewModel: RaidViewModel) {
+        Log.d(TAG, "Debug:: showParticipantsFragment() viewModel: ${viewModel.numParticipants.get()}: ${viewModel.participants.get()}")
+        val fragment = ParticipantsFragment.newInstance(viewModel)
+        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     /**
