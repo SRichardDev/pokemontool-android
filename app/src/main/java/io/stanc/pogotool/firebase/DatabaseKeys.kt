@@ -6,6 +6,7 @@ object DatabaseKeys {
 
     // Arenas
     const val ARENAS = "arenas"
+//    const val ARENAS = "test_arenas"
     const val IS_EX = "isEX"
     const val RAID = "raid"
     const val RAID_LEVEL = "level"
@@ -16,8 +17,8 @@ object DatabaseKeys {
     const val RAID_DURATION = 45
 
     // Pokestops
-    //    const val POKESTOPS = "pokestops"
-    const val POKESTOPS = "test_pokestops"
+    const val POKESTOPS = "pokestops"
+//    const val POKESTOPS = "test_pokestops"
     const val POKESTOP_QUEST_ID = "questId"
 
     // Raid Meetup

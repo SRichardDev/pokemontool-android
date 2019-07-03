@@ -57,7 +57,7 @@
             android:id="@+id/fragment_map_button_negative"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:tint="@color/colorRed"
+            android:tint="@color/redCancel"
             android:src="@drawable/icon_cancel_24dp"
             android:background="@color/transparent"/>
 
@@ -66,6 +66,7 @@
             android:id="@+id/fragment_map_button_positive"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:tint="@color/greenConfirm"
             android:layout_marginStart="@dimen/layout_margin_large"
             android:src="@drawable/icon_check_24dp"
             android:background="@color/transparent"/>

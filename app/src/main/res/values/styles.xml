@@ -73,7 +73,7 @@
     <style name="TextStyle_sub">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/colorRedDarkPoke</item>
+        <item name="android:textColor">@color/redCancel</item>
     </style>
 
     <style name="TextStyle_error">

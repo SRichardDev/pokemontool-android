@@ -6,6 +6,7 @@
         <variable
             name="viewModel"
             type="io.stanc.pogotool.viewmodel.MapItemViewModel" />
+        <import type="io.stanc.pogotool.viewmodel.MapItemViewModel.Type"/>
     </data>
 
     <ScrollView
@@ -23,7 +24,7 @@
                 style="@style/TextStyle_bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/map_map_item_name_of_item"/>
+                android:text="@{viewModel.type == Type.Pokestop ? @string/map_map_item_name_of_pokestop : @string/map_map_item_name_of_arena}"/>
 
             <TextView
                 style="@style/TextStyle_sub"

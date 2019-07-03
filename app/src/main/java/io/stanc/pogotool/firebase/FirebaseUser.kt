@@ -167,7 +167,7 @@ object FirebaseUser {
 
         } ?: run {
             Log.e(TAG, "could not create user for config: $userLoginConfig and notificationToken: $userNotificationToken, because auth.currentUser: ${auth.currentUser}")
-            FirebaseUser.userData = null
+            userData = null
         }
     }
 
@@ -348,7 +348,7 @@ object FirebaseUser {
         when (authState()) {
             AuthState.UserLoggedOut -> {
                 stopListenForUserDataChanges()
-                FirebaseUser.userData = null
+                userData = null
             }
             AuthState.UserLoggedInButUnverified,
             AuthState.UserLoggedIn -> {
@@ -367,7 +367,6 @@ object FirebaseUser {
 
     fun addUserDataObserver(observer: UserDataObserver) {
         userDataObserverManager.addObserver(observer)
-        Log.i(TAG, "Debug:: addUserDataObserver() userData: $userData")
         observer.userDataChanged(userData)
     }
 
@@ -376,7 +375,6 @@ object FirebaseUser {
     }
 
     private fun startListenForUserDataChanges() {
-        Log.i(TAG, "Debug:: startListenForUserDataChanges() auth.currentUser?.uid: ${auth.currentUser?.uid}, path: ${"$USERS/${auth.currentUser?.uid}"}")
         auth.currentUser?.uid?.let { uid ->
             FirebaseServer.removeNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
             FirebaseServer.addNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
@@ -391,13 +389,11 @@ object FirebaseUser {
 
     private val userNodeDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot)")
             FirebaseUserNode.new(dataSnapshot)?.let {
-                Log.i(TAG, "Debug:: nodeChanged(dataSnapshot: $dataSnapshot) done.")
-                FirebaseUser.userData = it }
+                userData = it }
         }
         override fun nodeRemoved(key: String) {
-            FirebaseUser.userData = null
+            userData = null
         }
     }
 

@@ -88,12 +88,15 @@
 
                 </LinearLayout>
 
-                <include
-                    layout="@layout/fragment_raidbosses"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/layout_margin_small"
-                    android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+                    android:visibility="@{viewmodel.isRaidBossMissing ? View.VISIBLE : View.GONE}">
+
+                    <include layout="@layout/fragment_raidbosses"/>
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/arena_raid_button_raidboss"

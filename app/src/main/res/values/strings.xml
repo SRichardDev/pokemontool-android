@@ -100,7 +100,8 @@
     <string name="map_map_item_which_item_to_add">Was möchtest du einrichten?</string>
     <string name="map_map_item_position_correct">Stimmt die Position?</string>
     <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest und schiebe es bis die Position passt.</string>
-    <string name="map_map_item_name_of_item">Wie heißt der Pok&#233;stop/die Arena?</string>
+    <string name="map_map_item_name_of_pokestop">Wie heißt der Pok&#233;stop?</string>
+    <string name="map_map_item_name_of_arena">Wie heißt die Arena?</string>
     <string name="map_map_item_name_of_item_subtext">Bitte gebe genau den Namen ein, den du auch im Spiel findest.</string>
     <string name="map_map_item_isex_arena">EX-Arena?</string>
     <string name="map_map_item_check_data">Sind deine Eingaben korrekt?</string>

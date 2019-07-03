@@ -16,20 +16,29 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import io.stanc.pogotool.R
 import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.utils.PermissionManager
+import io.stanc.pogotool.subscreen.ZoomLevel.BUILDING
+import io.stanc.pogotool.subscreen.ZoomLevel.STREETS
 
+
+// google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
+enum class ZoomLevel(val value: Float) {
+    WORLD(1.0f),
+    LANDMASS(5.0f),
+    CITY(10.0f),
+    STREETS(15.0f),
+    STREET(18.0f),
+    BUILDING(20.0f)
+}
 
 open class MapFragment : Fragment() {
 
     private val TAG = javaClass.name
 
     var map: GoogleMap? = null
-
     var mapView: MapView? = null
         private set
     private var delegate: MapDelegate? = null
@@ -64,8 +73,8 @@ open class MapFragment : Fragment() {
         map?.isBuildingsEnabled = true
 
         updateMyLocationEnabledPOI()
-
         updateCameraStartPosition()
+
         map?.let { delegate?.onMapReady(it) }
     }
 
@@ -118,6 +127,10 @@ open class MapFragment : Fragment() {
     /**
      * Location
      */
+
+    fun addMarker(markerOptions: MarkerOptions): Marker? {
+        return map?.addMarker(markerOptions)
+    }
 
     fun centeredPosition(): LatLng? {
         return map?.cameraPosition?.target
@@ -195,10 +208,19 @@ open class MapFragment : Fragment() {
     fun updateCameraPosition(latLng: LatLng, onFinished: () -> Unit = {}) {
 
         map?.let { googleMap ->
-            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(ZOOM_LEVEL_STREET).build()
+            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(STREETS.value).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
         }
     }
+
+    fun zoomTo(targetZoomLevel: ZoomLevel, smoothZooming: Boolean = false) {
+        if (smoothZooming) {
+            map?.animateCamera(CameraUpdateFactory.newLatLngZoom(centeredPosition(), targetZoomLevel.value), 750, null)
+        } else {
+            map?.moveCamera(CameraUpdateFactory.zoomTo(targetZoomLevel.value))
+        }
+    }
+
 
     private fun animationCallback(onFinished: () -> Unit): GoogleMap.CancelableCallback {
 
@@ -221,8 +243,10 @@ open class MapFragment : Fragment() {
     private val defaultDurationInMilliSec = 6000
 
     fun startAnimation(latLng: LatLng) {
-        animationRunning = true
-        animate(latLng)
+        if (!animationRunning) {
+            animate(latLng)
+            animationRunning = true
+        }
     }
 
     fun stopAnimation() {
@@ -248,14 +272,14 @@ open class MapFragment : Fragment() {
             val camPosition1 = CameraPosition.builder()
                 .target(latLng)
                 .bearing(bearing1)
-                .zoom(ZOOM_LEVEL_BUILDING)
+                .zoom(BUILDING.value)
                 .tilt(googleMap.cameraPosition.tilt) // 30f
                 .build()
 
             val camPosition2 = CameraPosition.builder()
                 .target(latLng)
                 .bearing(bearing2)
-                .zoom(ZOOM_LEVEL_STREET)
+                .zoom(STREETS.value)
                 .tilt(75f)
                 .build()
 
@@ -323,18 +347,5 @@ open class MapFragment : Fragment() {
     fun setDelegate(delegate: MapDelegate) {
         map?.let { delegate.onMapReady(it) }
         this.delegate = delegate
-    }
-
-        companion object {
-
-        // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
-        private const val ZOOM_LEVEL_WORLD: Float = 1.0f
-        private const val ZOOM_LEVEL_LANDMASS: Float = 5.0f
-        private const val ZOOM_LEVEL_CITY: Float = 10.0f
-        private const val ZOOM_LEVEL_STREET: Float = 15.0f
-        private const val ZOOM_LEVEL_BUILDING: Float = 20.0f
-
-        private const val LOCATION_UPDATE_MIN_TIME_MILLISECONDS: Long = 1000
-        private const val LOCATION_UPDATE_MIN_DISTANCE_METER: Float = 2.0f
     }
 }

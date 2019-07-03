@@ -27,6 +27,7 @@ import io.stanc.pogotool.geohash.GeoHash
 import io.stanc.pogotool.map.ClusterManager
 import io.stanc.pogotool.map.MapGridProvider
 import io.stanc.pogotool.subscreen.MapFragment
+import io.stanc.pogotool.subscreen.ZoomLevel
 import io.stanc.pogotool.utils.PermissionManager
 import io.stanc.pogotool.utils.ShowFragmentManager
 import io.stanc.pogotool.utils.WaitingSpinner
@@ -267,17 +268,17 @@ class MapInteractionFragment: Fragment() {
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
 
             WaitingSpinner.showProgress(R.string.spinner_title_map_data)
-            firebase?.loadSubscriptions { geoHashes ->
-                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
-
-                geoHashes?.let {
-                    for (geoHash in geoHashes) {
-                        mapGridProvider?.showGeoHashGrid(geoHash)
-                    }
-                }
-
-                WaitingSpinner.hideProgress()
-            }
+//            firebase?.loadSubscriptions { geoHashes ->
+//                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
+//
+//                geoHashes?.let {
+//                    for (geoHash in geoHashes) {
+//                        mapGridProvider?.showGeoHashGrid(geoHash)
+//                    }
+//                }
+//
+//                WaitingSpinner.hideProgress()
+//            }
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
@@ -288,6 +289,7 @@ class MapInteractionFragment: Fragment() {
             resetInteractionMap()
             showNewPoiIcon()
             currentMode = MapMode.SET_NEW_POI
+            mapFragment?.zoomTo(ZoomLevel.STREET, true)
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {

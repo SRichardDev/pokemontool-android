@@ -1,6 +1,7 @@
 package io.stanc.pogotool.subscreen
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,6 @@ class MapItemCreationFragment3: Fragment() {
 
     private var viewModel: MapItemViewModel? = null
     private var mapFragment: MapFragment? = null
-    private var map: GoogleMap? = null
     private var mapItemMarker: Marker? = null
         set(value) {
             field?.remove()
@@ -38,6 +38,11 @@ class MapItemCreationFragment3: Fragment() {
         setupMapFragment()
     }
 
+    override fun onPause() {
+        mapFragment?.stopAnimation()
+        super.onPause()
+    }
+
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
@@ -45,19 +50,14 @@ class MapItemCreationFragment3: Fragment() {
         mapFragment?.enableMyLocationPOI(enabled = false)
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
+            override fun onMapReady(googleMap: GoogleMap) {
+                mapItemMarker = addMarker()
+            }
+
             override fun onCameraStartAnimationFinished() {
                 viewModel?.position?.get()?.let { mapFragment?.startAnimation(it) }
             }
-
-            override fun onMapReady(googleMap: GoogleMap) {
-                map = googleMap
-                updateMarker()
-            }
         })
-    }
-
-    private fun updateMarker() {
-        mapItemMarker = addMarker()
     }
 
     private fun addMarker(): Marker? {
@@ -67,9 +67,9 @@ class MapItemCreationFragment3: Fragment() {
             when(mapItemType) {
                 MapItemViewModel.Type.Arena ->  {
                     val isArenaEx = viewModel?.isEx?.get()?: run { false }
-                    map?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG).position(position))
+                    mapFragment?.addMarker(ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG).position(position))
                 }
-                MapItemViewModel.Type.Pokestop ->  map?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG).position(position))
+                MapItemViewModel.Type.Pokestop ->  mapFragment?.addMarker(ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG).position(position))
             }
 
         } ?: run { null }

@@ -30,7 +30,8 @@
     <color name="teamValor">#EC1709</color>
     <color name="teamInstinct">#FBD233</color>
 
-    <color name="colorRedDarkPoke">#CC0000</color>
+    <color name="redCancel">#CC0000</color>
+    <color name="greenConfirm">#00CC00</color>
     <color name="colorRedLightPoke">#FF0000</color>
     <color name="colorYellowPoke">#FFDE00</color>
     <color name="colorGoldPoke">#B3A125</color>

@@ -160,7 +160,7 @@ class ArenaFragment: Fragment() {
 
                     viewModel?.let { viewModel ->
 
-                        if (viewModel.isRaidMeetupAnnounced.get()!!) {
+                        if (viewModel.isRaidMeetupAnnounced.get() == true) {
                             viewModel.changeParticipation(button.isActivated)
                         } else {
                             val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)

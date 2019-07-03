@@ -1,6 +1,7 @@
 package io.stanc.pogotool.subscreen
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,7 +41,7 @@ class MapItemCreationFragment1: Fragment() {
         binding.viewModel = viewModel
 
         scrollview = binding.root.findViewById(R.id.scrollview)
-            viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
+        viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
         viewModel?.isEx?.addOnPropertyChangedCallback(onTypeChangeCallback)
         setupMapFragment()
 
@@ -62,7 +63,7 @@ class MapItemCreationFragment1: Fragment() {
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onCameraStartAnimationFinished() {
-                viewModel?.position?.get()?.let { mapFragment?.startAnimation(it) }
+                // stop animation
             }
 
             override fun onMapReady(googleMap: GoogleMap) {
@@ -75,6 +76,21 @@ class MapItemCreationFragment1: Fragment() {
 
     private fun updateMarker() {
         mapItemMarker = addMarker()
+
+        map?.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
+            override fun onMarkerDragStart(p0: Marker) {}
+            override fun onMarkerDrag(p0: Marker) {}
+            override fun onMarkerDragEnd(p0: Marker) {
+                if (p0 == mapItemMarker) {
+                    updatePosition(p0)
+                }
+            }
+        })
+    }
+
+    private fun updatePosition(newMarker: Marker) {
+        mapItemMarker?.position = newMarker.position
+        viewModel?.position?.set(newMarker.position)
     }
 
     private fun addMarker(): Marker? {
