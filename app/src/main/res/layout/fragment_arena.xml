@@ -7,10 +7,10 @@
 
         <variable
             name="viewmodel"
-            type="io.stanc.pogotool.viewmodel.RaidViewModel"/>
+            type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
 
         <import type="android.view.View"/>
-        <import type="io.stanc.pogotool.viewmodel.RaidStateViewModel.RaidState"/>
+        <import type="io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState"/>
     </data>
 
     <ScrollView

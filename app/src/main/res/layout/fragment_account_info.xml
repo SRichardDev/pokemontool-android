@@ -7,12 +7,12 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
+            type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
         <variable
             name="settings"
-            type="io.stanc.pogotool.AppSettings"/>
+            type="io.stanc.pogoradar.AppSettings"/>
         <import type="android.view.View"/>
-        <import type="io.stanc.pogotool.firebase.node.Team"/>
+        <import type="io.stanc.pogoradar.firebase.node.Team"/>
     </data>
 
     <ScrollView

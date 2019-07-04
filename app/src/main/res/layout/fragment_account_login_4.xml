@@ -6,9 +6,9 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
-        <import type="io.stanc.pogotool.firebase.node.Team"/>
-        <import type="io.stanc.pogotool.utils.SegmentedControlView.Selection"/>
+            type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
+        <import type="io.stanc.pogoradar.firebase.node.Team"/>
+        <import type="io.stanc.pogoradar.utils.SegmentedControlView.Selection"/>
     </data>
 
     <LinearLayout
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:text="@string/authentication_login_details_team"/>
 
-        <io.stanc.pogotool.utils.SegmentedControlView
+        <io.stanc.pogoradar.utils.SegmentedControlView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:textLeft="@{viewModel.teamOrder[0].name}"

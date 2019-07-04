@@ -5,8 +5,8 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.MapItemViewModel" />
-        <import type="io.stanc.pogotool.viewmodel.MapItemViewModel.Type"/>
+            type="io.stanc.pogoradar.viewmodel.MapItemViewModel" />
+        <import type="io.stanc.pogoradar.viewmodel.MapItemViewModel.Type"/>
     </data>
 
     <ScrollView

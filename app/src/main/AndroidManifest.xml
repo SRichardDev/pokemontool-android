@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.stanc.pogotool">
+          package="io.stanc.pogoradar">
 
     <!-- needed for MapFragment -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -17,10 +17,10 @@
         android:roundIcon="@mipmap/icon_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".App">
+        android:name="io.stanc.pogoradar.App">
 
         <activity
-            android:name=".NavDrawerActivity"
+            android:name="io.stanc.pogoradar.NavDrawerActivity"
             android:launchMode="singleInstance"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -31,10 +31,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PrivacyPolicyActivity">
+        <activity android:name="io.stanc.pogoradar.PrivacyPolicyActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavDrawerActivity" />
+                android:value="io.stanc.pogoradar.NavDrawerActivity" />
         </activity>
 
         <meta-data
@@ -45,7 +45,7 @@
             android:value="@integer/google_play_services_version"/>
 
         <!-- Firebase -->
-        <service android:name="io.stanc.pogotool.firebase.FirebaseMessagingService">
+        <service android:name="io.stanc.pogoradar.firebase.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

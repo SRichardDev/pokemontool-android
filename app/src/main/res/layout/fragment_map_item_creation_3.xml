@@ -6,8 +6,8 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.MapItemViewModel" />
-        <import type="io.stanc.pogotool.viewmodel.MapItemViewModel.Type"/>
+            type="io.stanc.pogoradar.viewmodel.MapItemViewModel" />
+        <import type="io.stanc.pogoradar.viewmodel.MapItemViewModel.Type"/>
     </data>
 
     <ScrollView
@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/map_map_item_check_data"/>
 
-            <fragment android:name="io.stanc.pogotool.subscreen.MapFragment"
+            <fragment android:name="io.stanc.pogoradar.subscreen.MapFragment"
                       android:id="@+id/map_item_mapview"
                       android:layout_width="match_parent"
                       android:layout_height="300dp"

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewpager.ViewPagerFragment" />
+            type="io.stanc.pogoradar.viewpager.ViewPagerFragment" />
 
     </data>
 

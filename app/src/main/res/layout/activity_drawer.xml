@@ -15,7 +15,7 @@
         android:fitsSystemWindows="true"
         tools:context=".NavDrawerActivity">
 
-        <io.stanc.pogotool.appbar.PoGoToolbar
+        <io.stanc.pogoradar.appbar.PoGoToolbar
             android:id="@+id/activity_toolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/appbar_height"

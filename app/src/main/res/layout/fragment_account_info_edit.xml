@@ -6,13 +6,13 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
+            type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
         <variable
             name="settings"
-            type="io.stanc.pogotool.AppSettings"/>
+            type="io.stanc.pogoradar.AppSettings"/>
         <import type="android.view.View"/>
-        <import type="io.stanc.pogotool.firebase.node.Team"/>
-        <import type="io.stanc.pogotool.utils.SegmentedControlView.Selection"/>
+        <import type="io.stanc.pogoradar.firebase.node.Team"/>
+        <import type="io.stanc.pogoradar.utils.SegmentedControlView.Selection"/>
     </data>
 
     <ScrollView
@@ -62,7 +62,7 @@
                 android:text="@string/authentication_login_details_team"
                 android:layout_marginTop="@dimen/layout_margin_default"/>
 
-            <io.stanc.pogotool.utils.SegmentedControlView
+            <io.stanc.pogoradar.utils.SegmentedControlView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:textLeft="@{viewModel.teamOrder[0].name}"

@@ -6,7 +6,7 @@
 
         <variable
             name="settings"
-            type="io.stanc.pogotool.AppSettings"/>
+            type="io.stanc.pogoradar.AppSettings"/>
     </data>
 
     <LinearLayout

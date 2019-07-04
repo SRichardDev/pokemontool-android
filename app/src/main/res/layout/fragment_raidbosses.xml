@@ -5,7 +5,7 @@
               android:layout_height="wrap_content">
 
     <fragment
-        android:name="io.stanc.pogotool.subscreen.RaidBossFragment"
+        android:name="io.stanc.pogoradar.subscreen.RaidBossFragment"
         android:id="@+id/fragment_raidbosses"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

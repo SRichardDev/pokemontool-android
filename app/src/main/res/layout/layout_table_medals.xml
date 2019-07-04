@@ -5,7 +5,7 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogotool.viewmodel.LoginViewModel" />
+            type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
         <import type="android.view.View"/>
     </data>
 
@@ -14,22 +14,22 @@
         android:layout_height="wrap_content">
 
         <TableRow>
-            <io.stanc.pogotool.subscreen.MedalView
+            <io.stanc.pogoradar.subscreen.MedalView
                 number="@{viewModel.numberPokestops}"
                 medalDescription="@{@string/authentication_medal_text_pokestops}"
                 android:layout_margin="@dimen/layout_padding_screen"/>
-            <io.stanc.pogotool.subscreen.MedalView
+            <io.stanc.pogoradar.subscreen.MedalView
                 number="@{viewModel.numberArenas}"
                 medalDescription="@{@string/authentication_medal_text_arenas}"
                 android:layout_margin="@dimen/layout_padding_screen"/>
         </TableRow>
 
         <TableRow>
-            <io.stanc.pogotool.subscreen.MedalView
+            <io.stanc.pogoradar.subscreen.MedalView
                 number="@{viewModel.numberRaids}"
                 medalDescription="@{@string/authentication_medal_text_raids}"
                 android:layout_margin="@dimen/layout_padding_screen"/>
-            <io.stanc.pogotool.subscreen.MedalView
+            <io.stanc.pogoradar.subscreen.MedalView
                 number="@{viewModel.numberQuests}"
                 medalDescription="@{@string/authentication_medal_text_quests}"
                 android:layout_margin="@dimen/layout_padding_screen"/>
