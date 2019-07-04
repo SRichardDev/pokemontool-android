@@ -7,11 +7,11 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "io.stanc.pogotool"
+        applicationId "io.stanc.pogoradar"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 100
-        versionName "0.1.0"
+        versionCode 101
+        versionName "0.1.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
