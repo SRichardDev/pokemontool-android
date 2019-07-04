@@ -13,6 +13,7 @@
 
 
     <color name="white">#ffffff</color>
+    <color name="whiteTransparent">#99ffffff</color>
     <color name="aliceBlue">#F0F8FF</color>
     <color name="black">#000000</color>
     <color name="transparent">#00000000</color>

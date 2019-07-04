@@ -118,6 +118,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     fun createMeetup(meetupTime: String) {
 
         arena.raid?.let { raid ->
+
             val raidMeetup = FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
             firebase.pushRaidMeetup(raid.databasePath(), raidMeetup)
 

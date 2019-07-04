@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import io.stanc.pogotool.R
 
 object IconFactory {
     private val TAG = javaClass.name
@@ -27,8 +28,6 @@ object IconFactory {
 
     private const val HEADER_TEXT_RAW_SIZE: Float = 10.0f
     private const val FOOTER_TEXT_RAW_SIZE: Float = 10.0f
-    private const val TEXT_COLOR = Color.BLACK
-    private const val TEXT_BACKGROUND_COLOR = Color.WHITE
 
     fun bitmap(context: Context, @DrawableRes id: Int, sizeMode: SizeMod = IconFactory.SizeMod.DEFAULT): Bitmap? {
 
@@ -194,7 +193,7 @@ object IconFactory {
         val y = canvas.height - paint.textSize / 6.0
 
         val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        fillPaint.color = TEXT_BACKGROUND_COLOR
+        fillPaint.color = ContextCompat.getColor(context, R.color.whiteTransparent)
         canvas.drawRect(0.0f, canvas.height - paint.textSize, canvas.width.toFloat(), canvas.height.toFloat(), fillPaint)
 
         canvas.drawText(subText, x, y.toFloat(), paint)
@@ -205,7 +204,7 @@ object IconFactory {
         textPaint.textAlign = Paint.Align.CENTER
         textPaint.style = Paint.Style.FILL_AND_STROKE
         textPaint.typeface = Typeface.DEFAULT_BOLD
-        textPaint.color = TEXT_COLOR
+        textPaint.color = ContextCompat.getColor(context, R.color.black)
         textPaint.textSize = textRawSize * context.resources.displayMetrics.density
         return textPaint
     }

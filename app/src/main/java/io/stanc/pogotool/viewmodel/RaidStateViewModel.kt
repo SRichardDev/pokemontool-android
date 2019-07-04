@@ -1,5 +1,6 @@
 package io.stanc.pogotool.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
 import io.stanc.pogotool.firebase.node.FirebaseRaid
@@ -49,9 +50,7 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
         RAID_RUNNING
     }
 
-    // TODO: add timer for raidState and "raidIsExpired" + "eggIsHatching"
     fun currentRaidState(): RaidState {
-//        Log.d(TAG, "Debug:: raidIsExpired: ${raidIsExpired()}, eggIsHatching: ${eggIsHatching()}")
         return when {
             raidIsExpired() -> RaidState.NONE
             eggIsHatching() -> RaidState.EGG_HATCHES

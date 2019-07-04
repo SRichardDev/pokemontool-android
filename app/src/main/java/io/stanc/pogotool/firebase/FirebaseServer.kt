@@ -71,12 +71,18 @@ object FirebaseServer {
         fun onFailed(message: String?)
     }
 
+    // TODO: remove OnCompleteCallback and use another way to handle multiple methods with same callback structure
     private fun <TResult, TData>callback(task: Task<TResult>, callback: OnCompleteCallback<TData>) {
 
         if (task.isSuccessful) {
 
             (task.result as? InstanceIdResult)?.let { callback.onSuccess(it.token as TData) }
             (task.result as? Void)?.let { callback.onSuccess(null) }
+
+            // e.g. if no value exists for removing
+            if (task.result == null) {
+                callback.onSuccess(null)
+            }
 
         } else {
             callback.onFailed(task.exception?.message)
@@ -160,7 +166,6 @@ object FirebaseServer {
             }
 
             override fun onDataChange(p0: DataSnapshot) {
-//                Log.v(TAG, "onDataChange(key: ${p0.key}, value: ${p0.value}) for databaseRef path: $databaseDataPath")
                 onCompletionCallback?.onSuccess(p0.value)
             }
         })
@@ -223,7 +228,11 @@ object FirebaseServer {
     }
 
     fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        databaseRef.child(firebaseNode.databasePath()).child(firebaseNode.id).removeValue().addOnCompleteListener { task ->
+        removeNode(firebaseNode.databasePath(), firebaseNode.id, onCompletionCallback)
+    }
+
+    fun removeNode(noteDatabasePath: String, nodeId: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        databaseRef.child(noteDatabasePath).child(nodeId).removeValue().addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

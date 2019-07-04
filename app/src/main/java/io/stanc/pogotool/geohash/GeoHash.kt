@@ -455,7 +455,7 @@ open class GeoHash : Parcelable {
         }
 
         private val TAG = this::class.java.name
-        private const val DEFAULT_MAX_GEO_HASH_MATRIX_SIZE = 64
+        private const val DEFAULT_MAX_GEO_HASH_MATRIX_SIZE = 32
         private const val DEFAULT_CHARACTER_PRECISION = 6
 
         const val base32 = "0123456789bcdefghjkmnpqrstuvwxyz"

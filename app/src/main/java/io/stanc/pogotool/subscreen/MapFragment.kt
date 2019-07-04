@@ -96,6 +96,8 @@ open class MapFragment : Fragment() {
                 showAlertMessageNoGPS()
             }
         }
+        updateMyLocationEnabledPOI()
+        updateCameraStartPosition()
     }
 
     override fun onPause() {
@@ -303,6 +305,7 @@ open class MapFragment : Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
         context?.let {
             PermissionManager.onRequestPermissionsResult(requestCode, it, onLocationPermissionGranted = {
                 updateMyLocationEnabledPOI()

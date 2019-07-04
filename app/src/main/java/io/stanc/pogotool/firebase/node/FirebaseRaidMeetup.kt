@@ -43,7 +43,7 @@ data class FirebaseRaidMeetup(
                 FirebaseChat.new(id, childSnapshot)?.let { chats.add(it) }
             }
 
-            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds")
+//            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds")
 
             return if (meetupTime != null) {
                 FirebaseRaidMeetup(id, meetupTime, participantUserIds, chats)

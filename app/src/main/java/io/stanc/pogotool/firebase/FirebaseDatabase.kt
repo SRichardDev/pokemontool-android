@@ -12,7 +12,6 @@ import io.stanc.pogotool.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.QUESTS
 import io.stanc.pogotool.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogotool.firebase.DatabaseKeys.REGISTERED_USERS
-import io.stanc.pogotool.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogotool.firebase.DatabaseKeys.USERS
 import io.stanc.pogotool.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogotool.firebase.DatabaseKeys.firebaseGeoHash
@@ -107,11 +106,16 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * raids & meetups
      */
 
-    fun pushRaid(raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup? = null) {
-        FirebaseServer.setNode(raid)
-        raidMeetup?.let {
-            pushRaidMeetup(raid.databasePath(), it)
+    fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup? = null) {
+
+        removeRaidMeetupIfExists(raid.databasePath()) {
+
+            FirebaseServer.setNode(raid)
+            newRaidMeetup?.let {
+                pushRaidMeetup(raid.databasePath(), newRaidMeetup)
+            }
         }
+
         FirebaseUser.saveSubmittedRaids()
     }
 
@@ -122,7 +126,39 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
             pushRaidMeetupParticipation(id)
         }
+
         return raidMeetupId
+    }
+
+    private fun removeRaidMeetupIfExists(raidDatabasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseServer.requestDataValue("$raidDatabasePath/$RAID_MEETUP_ID", object: OnCompleteCallback<Any?> {
+            override fun onSuccess(data: Any?) {
+
+                (data as? String)?.let { nodeId ->
+
+                    FirebaseServer.removeNode(RAID_MEETUPS, nodeId, object: OnCompleteCallback<Void> {
+                        override fun onSuccess(data: Void?) {
+                            onCompletionCallback(true)
+                        }
+
+                        override fun onFailed(message: String?) {
+                            onCompletionCallback(false)
+                        }
+                    })
+
+                } ?: run {
+                    onCompletionCallback(false)
+                }
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "requestDataValue($raidDatabasePath/$RAID_MEETUP_ID) onFailed. message: $message")
+                onCompletionCallback(false)
+            }
+        })
+
+
     }
 
     fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidbossDefinition) {

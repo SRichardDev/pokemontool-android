@@ -156,6 +156,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     val pokestopDelegate = object : FirebaseDatabase.Delegate<FirebasePokestop> {
+
         override fun onItemAdded(item: FirebasePokestop) {
 
             if (!items.containsKey(item.id)) {

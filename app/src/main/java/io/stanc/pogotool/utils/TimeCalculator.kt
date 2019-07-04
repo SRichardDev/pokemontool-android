@@ -29,18 +29,6 @@ object TimeCalculator {
         calendar.set(Calendar.MINUTE, minutes)
         return format(calendar.time)
     }
-    fun nextDate(clock: String): Date? {
-
-        return date(clock)?.let { clockDate ->
-
-            nextClockDate(clockDate, currentDate())
-
-        } ?: run {
-            Log.e(TAG, "could not nextDate clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
-            null
-        }
-    }
-
 
     /**
      * calculate time
@@ -76,7 +64,7 @@ object TimeCalculator {
 
     fun minutesUntil(timestamp: Long, time: String): Long? {
 
-        return nextDateAfterTimestamp(timestamp, time)?.let { date ->
+        return dateOfToday(time)?.let { date ->
 
             val diffTime = date.time - currentDate().time
             LongMath.divide(diffTime, 1000 * 60, RoundingMode.CEILING)
@@ -91,7 +79,7 @@ object TimeCalculator {
      */
 
     fun timeExpired(timestamp: Long, time: String): Boolean? {
-        return nextDateAfterTimestamp(timestamp, time)?.let {
+        return dateOfToday(time)?.let {
             timeExpired(it)
         } ?: run {
             null
@@ -112,47 +100,58 @@ object TimeCalculator {
                 now.get(YEAR) == timestampCalender.get(YEAR)
     }
 
-    /**
-     * private
-     */
+    fun dateOfToday(time: String): Date? {
 
-    private fun date(time: String): Date? {
         return try {
-            clock.parse(time)
+
+            val temp = Calendar.getInstance()
+            temp.time = clock.parse(time)
+
+            val clockCalendar = Calendar.getInstance()
+            clockCalendar.time = currentDate()
+            clockCalendar.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY))
+            clockCalendar.set(Calendar.MINUTE, temp.get(Calendar.MINUTE))
+
+            clockCalendar.time
+
         } catch (e: ParseException) {
             e.printStackTrace()
             null
         }
     }
 
-    private fun nextDateAfterTimestamp(timestamp: Long, clock: String): Date? {
-        return date(clock)?.let { clockDate ->
+    /**
+     * private
+     */
 
-            nextClockDate(clockDate, Date(timestamp))
-
-        } ?: run {
-            Log.e(TAG, "could not get next date clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
-            null
-        }
-    }
-
-    private fun nextClockDate(clockDate: Date, compareDate: Date): Date {
-
-        val compareCalendar = Calendar.getInstance()
-        compareCalendar.time = compareDate
-
-        val temp = Calendar.getInstance()
-        temp.time = clockDate
-
-        val clockCalendar = Calendar.getInstance()
-        clockCalendar.time = compareDate
-        clockCalendar.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY))
-        clockCalendar.set(Calendar.MINUTE, temp.get(Calendar.MINUTE))
-
-        if (clockCalendar.time.before(compareCalendar.time)) {
-            clockCalendar.set(DAY_OF_YEAR, clockCalendar.get(DAY_OF_YEAR)+1)
-        }
-
-        return clockCalendar.time
-    }
+//    private fun nextDateAfterTimestamp(timestamp: Long, clock: String): Date? {
+//        return dateOfToday(clock)?.let { clockDate ->
+//
+//            nextClockDate(clockDate, Date(timestamp))
+//
+//        } ?: run {
+//            Log.e(TAG, "could not get next dateOfToday clock $clock w.r.t. expected clock nextDate ${this.clock.toLocalizedPattern()}")
+//            null
+//        }
+//    }
+//
+//    private fun nextClockDate(clockDate: Date, compareDate: Date): Date {
+//
+//        val compareCalendar = Calendar.getInstance()
+//        compareCalendar.time = compareDate
+//
+//        val temp = Calendar.getInstance()
+//        temp.time = clockDate
+//
+//        val clockCalendar = Calendar.getInstance()
+//        clockCalendar.time = compareDate
+//        clockCalendar.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY))
+//        clockCalendar.set(Calendar.MINUTE, temp.get(Calendar.MINUTE))
+//
+//        if (clockCalendar.time.before(compareCalendar.time)) {
+//            clockCalendar.set(DAY_OF_YEAR, clockCalendar.get(DAY_OF_YEAR)+1)
+//        }
+//
+//        return clockCalendar.time
+//    }
 }

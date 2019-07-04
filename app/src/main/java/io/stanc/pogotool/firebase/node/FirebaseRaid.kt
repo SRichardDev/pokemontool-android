@@ -74,7 +74,7 @@ data class FirebaseRaid private constructor(override val id: String,
         fun new(raidLevel: Int, timeEggHatchesHour: Int, timeEggHatchesMinutes: Int, geoHash: GeoHash, arenaId: String): FirebaseRaid {
 //            Log.i(TAG, "Debug:: new Raid() timeEggHatchesHour: $timeEggHatchesHour, timeEggHatchesMinutes: $timeEggHatchesMinutes")
             val formattedTimeEggHatches = TimeCalculator.format(timeEggHatchesHour, timeEggHatchesMinutes)
-            val formattedTimeRaidEnds = TimeCalculator.nextDate(formattedTimeEggHatches)?.let { dateEggHatches ->
+            val formattedTimeRaidEnds = TimeCalculator.dateOfToday(formattedTimeEggHatches)?.let { dateEggHatches ->
                 val date = TimeCalculator.addTime(dateEggHatches, RAID_DURATION)
                 TimeCalculator.format(date)
             } ?: run { "00:00" }
