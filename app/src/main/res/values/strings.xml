@@ -178,6 +178,7 @@
     <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
     <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
     <string name="exceptions_login_missing_data">Fehler! Anmeldedaten sind unvollständig.</string>
+    <string name="exceptions_subscription_sending_failed">Fehler! Gebiet wurde nicht erfolgreich gespeichert.</string>
 
     <!-- Popups -->
     <string name="popup_info_button_neutral">OK</string>

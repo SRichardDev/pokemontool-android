@@ -56,9 +56,13 @@ object DatabaseKeys {
     const val SUBMITTED_POKESTOPS = "submittedPokestops"
     const val SUBMITTED_QUESTS = "submittedQuests"
     const val SUBMITTED_RAIDS = "submittedRaids"
+    const val SUBSCRIBED_GEOHASH_POKESTOPS = "subscribedGeohashPokestops"
+    const val SUBSCRIBED_GEOHASH_ARENAS = "subscribedGeohashArenas"
 
     // common
     const val REGISTERED_USERS = "registeredUsers"
+    const val REGISTERED_USERS_ARENAS = "registeredUsersArenas"
+    const val REGISTERED_USERS_POKESTOPS = "registeredUsersPokestops"
     const val NAME = "name"
     const val SUBMITTER = "submitter"
     const val LATITUDE = "latitude"
@@ -66,8 +70,12 @@ object DatabaseKeys {
     const val TIMESTAMP = "timestamp"
     const val GEO_HASH_AREA_PRECISION: Int = 6
 
-    const val MAX_SUBSCRIPTIONS = 16
+    const val MAX_SUBSCRIPTIONS = 100
 
     fun firebaseGeoHash(geoHash: GeoHash): String = geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)
 
+    enum class SubscriptionType(val userDataKey: String, val subscriptionDatabaseKey: String) {
+        Arena(SUBSCRIBED_GEOHASH_ARENAS, REGISTERED_USERS_ARENAS),
+        Pokestop(SUBSCRIBED_GEOHASH_POKESTOPS, REGISTERED_USERS_POKESTOPS)
+    }
 }

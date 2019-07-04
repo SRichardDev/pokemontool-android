@@ -205,11 +205,14 @@ class MapInteractionFragment: Fragment() {
 
             } else {
 
-                Log.i(TAG, "Debug:: add subscription and geoHashGrid for $geoHash...")
                 if (it.geoHashes().size < MAX_SUBSCRIPTIONS) {
                     firebase?.subscribeForPush(geoHash) { successful ->
-                        Log.i(TAG, "Debug:: subscribeForPush($geoHash), successful: $successful")
-                        it.showGeoHashGrid(geoHash)
+                        if (successful) {
+                            it.showGeoHashGrid(geoHash)
+                        } else {
+                            Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
+                        }
+
                     }
                 } else {
                     Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()
@@ -268,17 +271,17 @@ class MapInteractionFragment: Fragment() {
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
 
             WaitingSpinner.showProgress(R.string.spinner_title_map_data)
-//            firebase?.loadSubscriptions { geoHashes ->
-//                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
-//
-//                geoHashes?.let {
-//                    for (geoHash in geoHashes) {
-//                        mapGridProvider?.showGeoHashGrid(geoHash)
-//                    }
-//                }
-//
-//                WaitingSpinner.hideProgress()
-//            }
+            firebase?.loadSubscriptions { geoHashes ->
+                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
+
+                geoHashes?.let {
+                    for (geoHash in geoHashes) {
+                        mapGridProvider?.showGeoHashGrid(geoHash)
+                    }
+                }
+
+                WaitingSpinner.hideProgress()
+            }
         }
 
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
