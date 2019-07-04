@@ -209,6 +209,24 @@ object FirebaseUser {
         }
     }
 
+    fun removeUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        auth.currentUser?.let { firebaseUser ->
+            FirebaseServer.removeData("$USERS/${firebaseUser.uid}/${type.userDataKey}/${firebaseGeoHash(geoHash)}", object : FirebaseServer.OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    Log.i(TAG, "successfully removed subscription ${type.name} for geoHash: $geoHash")
+                    onCompletionCallback(true)
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "failed to remove subscription for ${type.name}! Error: $message")
+                    onCompletionCallback(false)
+                }
+            })
+        }
+    }
+
 
     /**
      * authentication

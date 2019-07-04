@@ -349,13 +349,34 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
-    // TODO: remove subscriptions in user data on firebase server
-    // TODO: for arena
-    // TODO: for pokestops
-    fun removeSubscription(geoHash: GeoHash) {
-        FirebaseUser.userData?.notificationToken?.let { userToken ->
-            Log.e(TAG, "NOT implemented yet: removeSubscription($geoHash) !")
-//            FirebaseServer.removeData()
+    fun removeSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        unsubscribeFor(SubscriptionType.Arena, geoHash, onCompletionCallback)
+        unsubscribeFor(SubscriptionType.Pokestop, geoHash, onCompletionCallback)
+    }
+
+    private fun unsubscribeFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseUser.userData?.let { user ->
+
+            Log.d(TAG, "Debug:: unsubscribeFor(${type.name}), uid: ${user.id}, geoHash: $geoHash")
+
+            FirebaseServer.removeData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}/${user.id}", object : OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    FirebaseUser.removeUserSubscription(type, geoHash) { taskSuccessful ->
+                        onCompletionCallback(taskSuccessful)
+                    }
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "unsubscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: run {
+            Log.e(TAG, "unsubscribeFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
+            onCompletionCallback(false)
         }
     }
 

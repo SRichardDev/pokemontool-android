@@ -197,26 +197,36 @@ class MapInteractionFragment: Fragment() {
 
         mapGridProvider?.let {
             if (it.geoHashExists(geoHash)) {
-
-                // TODO: add onCompletionCallBack for removing ...
-                Log.i(TAG, "Debug:: remove subscription and geoHashGrid for $geoHash...")
-                firebase?.removeSubscription(geoHash)
-                it.removeGeoHashGrid(geoHash)
-
+                removeSubscription(it, geoHash)
             } else {
+                addSubscription(it, geoHash)
+            }
+        }
+    }
 
-                if (it.geoHashes().size < MAX_SUBSCRIPTIONS) {
-                    firebase?.subscribeForPush(geoHash) { successful ->
-                        if (successful) {
-                            it.showGeoHashGrid(geoHash)
-                        } else {
-                            Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
-                        }
+    private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
-                    }
+        if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
+            firebase?.subscribeForPush(geoHash) { successful ->
+                if (successful) {
+                    mapGridProvider.showGeoHashGrid(geoHash)
                 } else {
-                    Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
                 }
+
+            }
+        } else {
+            Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun removeSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
+
+        firebase?.removeSubscription(geoHash) { successful ->
+            if (successful) {
+                mapGridProvider.removeGeoHashGrid(geoHash)
+            } else {
+                Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
             }
         }
     }
