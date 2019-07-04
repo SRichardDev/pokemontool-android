@@ -148,11 +148,11 @@ class ArenaFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.let {
-                it.setOnClickListener {
-                    // TODO...
-                }
-            }
+//            rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.let {
+//                it.setOnClickListener {
+//                    // TODO...
+//                }
+//            }
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let { button ->
                 button.setOnClickListener {

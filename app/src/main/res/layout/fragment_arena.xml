@@ -160,14 +160,14 @@
                     android:layout_marginTop="@dimen/layout_margin_small"
                     android:text="@string/arena_raid_participants_list"/>
 
-                <Button
-                    android:id="@+id/arena_raid_button_chat"
-                    style="@style/ButtonStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/layout_margin_small"
-                    android:text="@string/arena_raid_chat"/>
+                <!--<Button-->
+                    <!--android:id="@+id/arena_raid_button_chat"-->
+                    <!--style="@style/ButtonStyle"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center"-->
+                    <!--android:layout_marginTop="@dimen/layout_margin_small"-->
+                    <!--android:text="@string/arena_raid_chat"/>-->
 
                 <include
                     layout="@layout/layout_raid_meetup_time"

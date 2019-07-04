@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("io.stanc.pogotool", appContext.packageName)
+        assertEquals("io.stanc.pogoradar", appContext.packageName)
     }
 }
