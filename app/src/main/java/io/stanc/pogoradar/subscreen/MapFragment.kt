@@ -22,7 +22,7 @@ import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.subscreen.ZoomLevel.BUILDING
 import io.stanc.pogoradar.subscreen.ZoomLevel.STREETS
-
+import com.google.android.gms.maps.model.CameraPosition
 
 // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
 enum class ZoomLevel(val value: Float) {
@@ -73,9 +73,14 @@ open class MapFragment : Fragment() {
         map?.isBuildingsEnabled = true
 
         updateMyLocationEnabledPOI()
-        updateCameraStartPosition()
+        Log.v(TAG, "Debug:: setupMap()")
+        moveCameraToStartPosition()
 
         map?.let { delegate?.onMapReady(it) }
+
+        if (!PermissionManager.isLocationPermissionGranted(activity)) {
+            PermissionManager.requestLocationPermission(activity)
+        }
     }
 
     /**
@@ -97,7 +102,6 @@ open class MapFragment : Fragment() {
             }
         }
         updateMyLocationEnabledPOI()
-        updateCameraStartPosition()
     }
 
     override fun onPause() {
@@ -151,10 +155,6 @@ open class MapFragment : Fragment() {
         }
     }
 
-    fun setNextStartPosition(latitude: Double, longitude: Double) {
-        geoHashStartPosition = GeoHash(latitude, longitude)
-    }
-
     fun enableMyLocationPOI(enabled: Boolean) {
         isMyLocationEnabled = enabled
         updateMyLocationEnabledPOI()
@@ -170,26 +170,41 @@ open class MapFragment : Fragment() {
         }
     }
 
-    private fun updateCameraStartPosition() {
+    private fun moveCameraToStartPosition() {
+        Log.d(TAG, "Debug:: moveCameraToStartPosition(), geoHashStartPosition: $geoHashStartPosition, map: $map")
 
-        if (PermissionManager.isLocationPermissionGranted(activity)) {
+        map?.let { map ->
 
             geoHashStartPosition?.let {
-                updateCameraPosition(it, onFinished = {
-                    delegate?.onCameraStartAnimationFinished()
-                })
+
+                val cameraPosition = CameraPosition.Builder()
+                    .target(it.toLatLng()).zoom(ZoomLevel.STREETS.value).build()
+                map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                delegate?.onCameraStartAnimationFinished()
+
+//                val startPosition = CameraUpdateFactory.newLatLng(it.toLatLng())
+//                map.moveCamera(startPosition)
+//                delegate?.onCameraStartAnimationFinished()
+
             } ?: run {
                 latestLocation()?.let {
-                    updateCameraPosition(it, onFinished = {
-                        delegate?.onCameraStartAnimationFinished()
-                    })
+
+//                    val startPosition = CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude))
+//                    map.moveCamera(startPosition)
+//                    delegate?.onCameraStartAnimationFinished()
+
+                    val cameraPosition = CameraPosition.Builder()
+                        .target(LatLng(it.latitude, it.longitude)).zoom(ZoomLevel.STREETS.value).build()
+                    map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                    delegate?.onCameraStartAnimationFinished()
                 }
             }
 
+            Log.d(TAG, "Debug:: reset geoHashStartPosition")
             geoHashStartPosition = null
 
-        } else {
-            PermissionManager.requestLocationPermission(activity)
+        } ?: run {
+            Log.w(TAG, "moveCameraToStartPosition not working, map is not ready!")
         }
     }
 
@@ -208,10 +223,14 @@ open class MapFragment : Fragment() {
     }
 
     fun updateCameraPosition(latLng: LatLng, onFinished: () -> Unit = {}) {
+        Log.d(TAG, "Debug:: updateCameraPosition($latLng)")
 
         map?.let { googleMap ->
             val cameraPosition = CameraPosition.Builder().target(latLng).zoom(STREETS.value).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
+        } ?: run {
+            geoHashStartPosition = GeoHash(latLng)
+            Log.w(TAG, "Debug:: updateCameraPosition($latLng), map not ready, store geoHashStartPosition: $geoHashStartPosition")
         }
     }
 
@@ -308,8 +327,9 @@ open class MapFragment : Fragment() {
 
         context?.let {
             PermissionManager.onRequestPermissionsResult(requestCode, it, onLocationPermissionGranted = {
+                Log.v(TAG, "Debug:: onRequestPermissionsResult()")
                 updateMyLocationEnabledPOI()
-                updateCameraStartPosition()
+                moveCameraToStartPosition()
             })
         }
     }

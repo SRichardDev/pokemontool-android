@@ -2,14 +2,15 @@
 
     <!-- keys & ids -->
     <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
-    <string name="default_notification_channel_id">firebasenotificationchannelid</string>
+    <string name="firebase_notification_channel_id">3131830000</string>
+    <string name="firebase_notification_channel_name">firebasenotificationchannelname</string>
 
     <!-- internal -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- app -->
-    <string name="app_name">PoGo Radar</string>
+    <string name="app_name">PoGO Radar</string>
     <string name="action_settings">Einstellungen</string>
     <string name="default_app_title">PoGo Radar</string>
 

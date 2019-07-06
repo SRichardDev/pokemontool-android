@@ -156,9 +156,8 @@ class ArenaFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_register)?.let { button ->
                 button.setOnClickListener {
-                    Log.i(TAG, "Debug:: setOnClickListener() activated: (${button.isActivated} -> ${!button.isActivated})")
+
                     button.isActivated = !button.isActivated
-                    Log.d(TAG, "Debug:: button participant pressed, now: isActivated: ${button.isActivated}, raidAnnounced: ${viewModel?.isRaidMeetupAnnounced?.get()}")
 
                     viewModel?.let { viewModel ->
 
@@ -173,7 +172,6 @@ class ArenaFragment: Fragment() {
                 }
                 viewModel?.isUserParticipate?.get()?.let {
                     button.isActivated = it
-                    Log.i(TAG, "Debug:: setup() activated: ${button.isActivated})")
                 }
             }
 

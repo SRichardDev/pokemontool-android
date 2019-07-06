@@ -7,6 +7,7 @@ import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
+import io.stanc.pogoradar.firebase.DatabaseKeys.PLATFORM_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
@@ -230,7 +231,7 @@ object FirebaseUser {
     }
 
     fun updateNotificationToken(token: String) {
-        userData?.copy(notificationToken = token)?.let { userDataCopy ->
+        userData?.copy(notificationToken = token, platform = PLATFORM_ANDROID)?.let { userDataCopy ->
             updateServerData(userDataCopy)
         }
     }

@@ -1,6 +1,8 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
 
+    <integer name="firebase_notification_id">8973871</integer>
+
     <dimen name="appbar_padding">12dp</dimen>
     <dimen name="appbar_height">56dp</dimen>
     <dimen name="appbar_icon_size">24dp</dimen>

@@ -122,8 +122,8 @@ class PokestopFragment: Fragment() {
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
-        position?.let { mapFragment?.setNextStartPosition(it.latitude, it.longitude) }
         mapFragment?.enableMyLocationPOI(enabled = false)
+        position?.let { mapFragment?.updateCameraPosition(it) }
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onCameraStartAnimationFinished() {

@@ -31,7 +31,6 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
-        Log.i(TAG, "Debug:: navigationButtonClickedOnTheLastPage() email: ${viewModel?.email?.get()}, password: ${viewModel?.password?.get()}")
         try {
             tryToSendLoginData()
 

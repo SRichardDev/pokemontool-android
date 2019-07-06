@@ -57,8 +57,8 @@ class MapItemCreationFragment1: Fragment() {
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
-        viewModel?.position?.get()?.let { mapFragment?.setNextStartPosition(it.latitude, it.longitude) }
         mapFragment?.enableMyLocationPOI(enabled = false)
+        viewModel?.position?.get()?.let { mapFragment?.updateCameraPosition(it) }
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onCameraStartAnimationFinished() {

@@ -21,6 +21,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
+import io.stanc.pogoradar.firebase.NotificationService
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
@@ -31,6 +32,7 @@ import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.utils.WaitingSpinner
+
 
 
 class MapInteractionFragment: Fragment() {
@@ -46,33 +48,10 @@ class MapInteractionFragment: Fragment() {
     private var mapFragment: MapFragment? = null
     private var famButton: FloatingActionsMenu? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        activity?.intent?.extras?.let { bundle ->
-
-            Log.d(
-                TAG, "Debug:: Intent has extras [bundle.containsKey(\"$LONGITUDE\"): ${bundle.containsKey(
-                LONGITUDE
-            )}, bundle.containsKey(\"$LATITUDE\"): ${bundle.containsKey(
-                LATITUDE
-            )}]")
-
-            if (bundle.containsKey(LATITUDE) && bundle.containsKey(LONGITUDE)) {
-
-                val latitude = (bundle.get(LATITUDE) as String).toDouble()
-                val longitude = (bundle.get(LONGITUDE) as String).toDouble()
-
-                Log.i(TAG, "Debug:: onCreate() NOTIFICATION: latitude: $latitude, longitude: $longitude")
-                mapFragment?.setNextStartPosition(latitude, longitude)
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_map_grid, container, false)
-
+        Log.d(TAG, "Debug:: onCreateView()")
         setupMapFragment()
 
         // floating action buttons
@@ -87,15 +66,27 @@ class MapInteractionFragment: Fragment() {
         return rootLayout
     }
 
-    override fun onResume() {
-        super.onResume()
-        AppbarManager.setTitle(getString(R.string.default_app_title))
-        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "Debug:: onStart()")
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "Debug:: onResume()")
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
+        NotificationService.consumeNotification()?.let { notification ->
+            Log.d(TAG, "Debug:: onResume(), consumeNotification: $notification")
+            val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
+            Log.d(TAG, "Debug:: onResume(), try to update: ${geoHashStartPosition.toLatLng()}")
+            mapFragment?.updateCameraPosition(geoHashStartPosition)
+        }
+    }
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as MapFragment
+        Log.d(TAG, "Debug:: setupMapFragment...")
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onMapReady(googleMap: GoogleMap) {
@@ -213,7 +204,6 @@ class MapInteractionFragment: Fragment() {
                 } else {
                     Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
                 }
-
             }
         } else {
             Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()

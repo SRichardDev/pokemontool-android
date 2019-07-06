@@ -17,6 +17,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_NAME
+import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PLATFORM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogoradar.geohash.GeoHash
@@ -38,7 +39,8 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var name: String,
                                                 var team: Team,
                                                 var level: Number,
-                                                var notificationToken: String?,
+                                                var notificationToken: String? = null,
+                                                var platform: String? = null,
                                                 var code: String? = null,
                                                 var isNotificationActive: Boolean = true,
                                                 var isVerified: Boolean = false,
@@ -61,6 +63,7 @@ data class FirebaseUserNode private constructor(override var id: String,
         data[EMAIL] = email
         data[NOTIFICATION_ACTIVE] = isNotificationActive
         notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
+        platform?.let { data[USER_PLATFORM] = it }
 
         val publicData = HashMap<String, Any>()
         publicData[USER_NAME] = name
@@ -86,6 +89,7 @@ data class FirebaseUserNode private constructor(override var id: String,
             val id = dataSnapshot.key
             val email = dataSnapshot.child(EMAIL).value as? String
             val notificationToken = dataSnapshot.child(NOTIFICATION_TOKEN).value as? String
+            val platform = dataSnapshot.child(USER_PLATFORM).value as? String
             val notificationActive = dataSnapshot.child(NOTIFICATION_ACTIVE).value as? Boolean
 
             val submittedArenas =
@@ -108,11 +112,14 @@ data class FirebaseUserNode private constructor(override var id: String,
 
 //            Log.v(TAG, "id: $id, name: $name, email: $email, team: $team, level: $level, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops")
 
-            if (id != null && name != null && email != null && team != null && level != null && notificationToken != null) {
-                val user = new(id, email, name, team, level, notificationToken)
+            if (id != null && name != null && email != null && team != null && level != null) {
+                val user = new(id, email, name, team, level)
 
                 // optionals
                 code?.let { user.code = it }
+
+                notificationToken?.let { user.notificationToken = it }
+                platform?.let { user.platform = it }
                 notificationActive?.let { user.isNotificationActive = it }
 
                 submittedArenas?.let { user.submittedArenas = it }
@@ -129,8 +136,8 @@ data class FirebaseUserNode private constructor(override var id: String,
             return null
         }
 
-        fun new(uid: String, email: String, name: String, team: Team, level: Number, notificationToken: String? = null): FirebaseUserNode {
-            return FirebaseUserNode(uid, email, name, team, level, notificationToken)
+        fun new(uid: String, email: String, name: String, team: Team, level: Number): FirebaseUserNode {
+            return FirebaseUserNode(uid, email, name, team, level)
         }
     }
 }

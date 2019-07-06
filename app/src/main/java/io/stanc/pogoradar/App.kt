@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import androidx.annotation.DimenRes
+import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
 
 class App: Application() {
@@ -32,6 +34,11 @@ class App: Application() {
             } ?: run {
                 return appContext?.resources?.getString(stringResId)
             }
+        }
+
+        fun getInteger(@IntegerRes dimenResId: Int): Int? {
+            return appContext?.resources?.getInteger(dimenResId)
+//            return appContext?.resources?.getDimension(dimenResId)?.toInt()
         }
     }
 }
