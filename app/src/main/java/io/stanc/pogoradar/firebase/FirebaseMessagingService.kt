@@ -22,8 +22,9 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     // Notification in Background/Foreground:
     // https://medium.com/@Miqubel/mastering-firebase-notifications-36a3ffe57c41
 
+
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.i(TAG, "onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+        Log.i(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
         val intent = Intent(this, NavDrawerActivity::class.java)
         intent.putExtra(LATITUDE, message.data[LATITUDE])
@@ -34,23 +35,24 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     }
 
     override fun onDeletedMessages() {
-        Log.i(TAG, "onDeletedMessages()")
+        Log.i(TAG, "Debug:: onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
-        Log.i(TAG, "onMessageSent(var1: $var1)")
+        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
-        Log.i(TAG, "onSendError(var1: $var1, var2: ${var2.message})")
+        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
     }
 
-    override fun onNewToken(var1: String) {
-        Log.i(TAG, "onNewToken(var1: $var1)")
+    override fun onNewToken(token: String) {
+        Log.i(TAG, "Debug:: onNewToken(token: $token), FirebaseUser: ${FirebaseUser.userData}")
+        FirebaseUser.updateNotificationToken(token)
     }
 
     private fun postNotification(notification: Notification) {
-        Log.d(TAG, "postNotification(notification: $notification)")
+        Log.d(TAG, "Debug:: postNotification(notification: $notification)")
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -73,7 +75,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             .setContentText(text).setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
-        Log.d(TAG, "buildNotification(title: $title, text: $title)")
+        Log.d(TAG, "Debug:: buildNotification(title: $title, text: $title)")
         return builder.build()
     }
 

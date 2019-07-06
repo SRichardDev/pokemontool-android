@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:757954584873:android:3504b8138e0820dc",
+        "mobilesdk_app_id": "1:757954584873:android:d3980f66fcff4050",
         "android_client_info": {
           "package_name": "io.stanc.pogoradar"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "757954584873-penhbrva6aue2s11bjba4m4ulvl49hbt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.stanc.pogoradar",
+            "certificate_hash": "decc3c0cf36641bdf5b5f38e67d772faba18f93e"
+          }
+        },
         {
           "client_id": "757954584873-0lg7465cvkdpcoe1ipprrflu3pboq9fk.apps.googleusercontent.com",
           "client_type": 3
@@ -25,15 +33,20 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "757954584873-0lg7465cvkdpcoe1ipprrflu3pboq9fk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "757954584873-eb47j3b9gj27a63sbbr99hh958plr9nc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.stanc.PokemonGoTool"
+              }
+            }
+          ]
         }
       }
     }

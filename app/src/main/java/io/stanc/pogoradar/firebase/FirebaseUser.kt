@@ -42,6 +42,18 @@ object FirebaseUser {
             userDataObserverManager.observers().filterNotNull().forEach { it.userDataChanged(userData) }
         }
 
+    private val authStateObserver = object : AuthStateObserver {
+        override fun authStateChanged(newAuthState: AuthState) {
+            if (newAuthState == FirebaseUser.AuthState.UserLoggedIn) {
+                requestNotificationToken()
+            }
+        }
+    }
+
+    init {
+        addAuthStateObserver(authStateObserver)
+    }
+
     /**
      * user
      */
@@ -125,23 +137,25 @@ object FirebaseUser {
         } ?: run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
     }
 
-    private fun requestNotificationTokenToCreateUser(userLoginConfig: UserLoginConfig) {
+    fun requestNotificationToken() {
 
         FirebaseServer.requestNotificationToken(object: FirebaseServer.OnCompleteCallback<String> {
 
             override fun onSuccess(data: String?) {
                 data?.let { token ->
-                    createUser(userLoginConfig, token)
-                } ?: run { Log.w(TAG, "User profile creation failed. Error: token is $data") }
+                    updateNotificationToken(token)
+                } ?: run {
+                    Log.w(TAG, "request notification token failed. Error: token data: $data")
+                }
             }
 
             override fun onFailed(message: String?) {
-                Log.w(TAG, "User profile creation failed. Error: $message")
+                Log.w(TAG, "request notification token failed. Error: $message")
             }
         })
     }
 
-    private fun createUser(userLoginConfig: UserLoginConfig, userNotificationToken: String) {
+    private fun createUser(userLoginConfig: UserLoginConfig) {
 
         auth.currentUser?.let { firebaseUser ->
 
@@ -150,25 +164,13 @@ object FirebaseUser {
                 userLoginConfig.email,
                 userLoginConfig.name,
                 userLoginConfig.team,
-                userLoginConfig.level,
-                userNotificationToken
+                userLoginConfig.level
             )
 
-            FirebaseServer.updateNode(userData, object : FirebaseServer.OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    Log.i(TAG, "successfully created user: [$userData]")
-                    FirebaseUser.userData = userData
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "failed to create user! Error: $message")
-                    FirebaseUser.userData = null
-                }
-            })
+            updateServerData(userData)
 
         } ?: run {
-            Log.e(TAG, "could not create user for config: $userLoginConfig and notificationToken: $userNotificationToken, because auth.currentUser: ${auth.currentUser}")
+            Log.e(TAG, "could not create user for config: $userLoginConfig, because auth.currentUser: ${auth.currentUser}")
             userData = null
         }
     }
@@ -225,6 +227,26 @@ object FirebaseUser {
                 }
             })
         }
+    }
+
+    fun updateNotificationToken(token: String) {
+        userData?.copy(notificationToken = token)?.let { userDataCopy ->
+            updateServerData(userDataCopy)
+        }
+    }
+
+    private fun updateServerData(localUserData: FirebaseUserNode) {
+
+        FirebaseServer.updateNode(localUserData, object : FirebaseServer.OnCompleteCallback<Void> {
+
+            override fun onSuccess(data: Void?) {
+                Log.v(TAG, "successfully updated user...")
+            }
+
+            override fun onFailed(message: String?) {
+                Log.w(TAG, "failed to update user! Error: $message")
+            }
+        })
     }
 
 
@@ -304,7 +326,7 @@ object FirebaseUser {
         auth.createUserWithEmailAndPassword(userLoginConfig.email, userLoginConfig.password).addOnCompleteListener { task ->
 
             if (task.isSuccessful) {
-                requestNotificationTokenToCreateUser(userLoginConfig)
+                createUser(userLoginConfig)
             } else {
                 Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
             }
@@ -430,9 +452,11 @@ object FirebaseUser {
     private val userNodeDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
             FirebaseUserNode.new(dataSnapshot)?.let {
-                userData = it }
+                userData = it
+            }
         }
         override fun nodeRemoved(key: String) {
+            Log.w(TAG, "user (key: $key) removed!")
             userData = null
         }
     }

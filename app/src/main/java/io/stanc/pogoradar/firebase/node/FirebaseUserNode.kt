@@ -38,7 +38,7 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var name: String,
                                                 var team: Team,
                                                 var level: Number,
-                                                var notificationToken: String,
+                                                var notificationToken: String?,
                                                 var code: String? = null,
                                                 var isNotificationActive: Boolean = true,
                                                 var isVerified: Boolean = false,
@@ -60,7 +60,7 @@ data class FirebaseUserNode private constructor(override var id: String,
         data[USER_ID] = id
         data[EMAIL] = email
         data[NOTIFICATION_ACTIVE] = isNotificationActive
-        data[NOTIFICATION_TOKEN] = notificationToken
+        notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
 
         val publicData = HashMap<String, Any>()
         publicData[USER_NAME] = name
@@ -129,7 +129,7 @@ data class FirebaseUserNode private constructor(override var id: String,
             return null
         }
 
-        fun new(uid: String, email: String, name: String, team: Team, level: Number, notificationToken: String): FirebaseUserNode {
+        fun new(uid: String, email: String, name: String, team: Team, level: Number, notificationToken: String? = null): FirebaseUserNode {
             return FirebaseUserNode(uid, email, name, team, level, notificationToken)
         }
     }
