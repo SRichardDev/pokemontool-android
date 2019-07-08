@@ -17,34 +17,32 @@ object FirebaseDefinitions {
 
     fun loadDefinitions(firebase: FirebaseDatabase) {
 
+        WaitingSpinner.showProgress(R.string.spinner_title_loading_data)
+
         loadRaidBosses(firebase, onCompletionCallback = {
-            loadQuests(firebase)
+            loadQuests(firebase, onCompletionCallback = {
+                WaitingSpinner.hideProgress()
+            })
         })
     }
 
     // TODO: load optional sprites from: https://github.com/PokeAPI/sprites
     private fun loadRaidBosses(firebase: FirebaseDatabase, onCompletionCallback: () -> Unit = {}) {
 
-        WaitingSpinner.showProgress(R.string.spinner_title_loading_data_1)
         firebase.loadRaidBosses { firebaseRaidBosses ->
 
             Log.i(TAG, "Debug:: firebaseRaidBosses: ${firebaseRaidBosses?.size}")
             firebaseRaidBosses?.let { raidBosses = it }
-            WaitingSpinner.hideProgress()
-
             onCompletionCallback()
         }
     }
 
     private fun loadQuests(firebase: FirebaseDatabase, onCompletionCallback: () -> Unit = {}) {
 
-        WaitingSpinner.showProgress(R.string.spinner_title_loading_data_2)
         firebase.loadQuests { firebaseQuests ->
 
             Log.i(TAG, "Debug:: firebaseQuests: ${firebaseQuests?.size}")
             firebaseQuests?.let { quests = it }
-            WaitingSpinner.hideProgress()
-
             onCompletionCallback()
         }
     }
