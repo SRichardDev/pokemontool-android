@@ -3,8 +3,8 @@ package io.stanc.pogoradar.firebase.node
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.IS_EX
-import io.stanc.pogoradar.firebase.DatabaseKeys.LATITUDE
-import io.stanc.pogoradar.firebase.DatabaseKeys.LONGITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
@@ -27,8 +27,8 @@ data class FirebaseArena private constructor(
 
         data[NAME] = name
         data[IS_EX] = isEX
-        data[LATITUDE] = geoHash.toLocation().latitude
-        data[LONGITUDE] = geoHash.toLocation().longitude
+        data[NOTIFICATION_LATITUDE] = geoHash.toLocation().latitude
+        data[NOTIFICATION_LONGITUDE] = geoHash.toLocation().longitude
         data[SUBMITTER] = submitter
 
         return data
@@ -47,11 +47,11 @@ data class FirebaseArena private constructor(
             val isEX = (dataSnapshot.child(IS_EX).value as? Boolean) ?: run {
                 (dataSnapshot.child(IS_EX).value as? String)?.toBoolean()
             }
-            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: run {
-                (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
+            val latitude = (dataSnapshot.child(NOTIFICATION_LATITUDE).value as? Number)?.toDouble() ?: run {
+                (dataSnapshot.child(NOTIFICATION_LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: run {
-                (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
+            val longitude = (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? Number)?.toDouble() ?: run {
+                (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? String)?.toDouble()
             }
             val submitter = dataSnapshot.child(SUBMITTER).value as? String
 

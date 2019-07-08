@@ -1,8 +1,8 @@
 package io.stanc.pogoradar.firebase.node
 
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogoradar.firebase.DatabaseKeys.LATITUDE
-import io.stanc.pogoradar.firebase.DatabaseKeys.LONGITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST
@@ -26,8 +26,8 @@ data class FirebasePokestop private constructor(
         val data = HashMap<String, Any>()
 
         data[NAME] = name
-        data[LATITUDE] = geoHash.toLocation().latitude
-        data[LONGITUDE] = geoHash.toLocation().longitude
+        data[NOTIFICATION_LATITUDE] = geoHash.toLocation().latitude
+        data[NOTIFICATION_LONGITUDE] = geoHash.toLocation().longitude
         data[SUBMITTER] = submitter
 
         return data
@@ -47,11 +47,11 @@ data class FirebasePokestop private constructor(
 
             val id = id(dataSnapshot)
             val name = dataSnapshot.child(NAME).value as? String
-            val latitude = (dataSnapshot.child(LATITUDE).value as? Number)?.toDouble() ?: run {
-                (dataSnapshot.child(LATITUDE).value as? String)?.toDouble()
+            val latitude = (dataSnapshot.child(NOTIFICATION_LATITUDE).value as? Number)?.toDouble() ?: run {
+                (dataSnapshot.child(NOTIFICATION_LATITUDE).value as? String)?.toDouble()
             }
-            val longitude = (dataSnapshot.child(LONGITUDE).value as? Number)?.toDouble() ?: run {
-                (dataSnapshot.child(LONGITUDE).value as? String)?.toDouble()
+            val longitude = (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? Number)?.toDouble() ?: run {
+                (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? String)?.toDouble()
             }
             val submitter = dataSnapshot.child(SUBMITTER).value as? String
 

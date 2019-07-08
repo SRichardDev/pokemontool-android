@@ -1,7 +1,9 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogoradar.firebase.DatabaseKeys.DATA_UNDEFINED
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_DURATION
@@ -77,16 +79,25 @@ data class FirebaseRaid private constructor(override val id: String,
             val formattedTimeRaidEnds = TimeCalculator.dateOfToday(formattedTimeEggHatches)?.let { dateEggHatches ->
                 val date = TimeCalculator.addTime(dateEggHatches, RAID_DURATION)
                 TimeCalculator.format(date)
-            } ?: run { "00:00" }
+            } ?: run {
+                DATA_UNDEFINED
+            }
 
-//            Log.w(TAG, "Debug:: new Raid() formattedTimeEggHatches: $formattedTimeEggHatches, formattedTimeRaidEnds: $formattedTimeRaidEnds")
+//            Log.d(TAG, "Debug:: new raid: formattedTimeRaidEnds: $formattedTimeRaidEnds, formattedTimeEggHatches: $formattedTimeEggHatches")
             return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId)
         }
 
         fun new(raidLevel: Int, timeRaidEndsHour: Int, timeRaidEndsMinutes: Int, geoHash: GeoHash, arenaId: String, raidBossId: String?): FirebaseRaid {
-            val formattedTimeRaidEnds = TimeCalculator.format(timeRaidEndsHour, timeRaidEndsMinutes)
 
-            return FirebaseRaid("", raidLevel, null, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId, raidBossId)
+            val formattedTimeRaidEnds = TimeCalculator.format(timeRaidEndsHour, timeRaidEndsMinutes)
+            val formattedTimeEggHatches = TimeCalculator.dateOfToday(formattedTimeRaidEnds)?.let {
+                TimeCalculator.format(TimeCalculator.addTime(it, -RAID_DURATION))
+            } ?: run {
+                DATA_UNDEFINED
+            }
+//            Log.d(TAG, "Debug:: new raid: formattedTimeRaidEnds: $formattedTimeRaidEnds, formattedTimeEggHatches: $formattedTimeEggHatches")
+
+            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId, raidBossId)
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.stanc.pogoradar
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -10,7 +11,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_FLAG
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.FirebaseUser
+import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.screen.AccountFragment
 import io.stanc.pogoradar.screen.MapInteractionFragment
@@ -48,6 +55,29 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         // first screen
         showMapFragment()
+
+        // notification check
+        onNotification(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        onNotification(intent)
+    }
+
+    private fun onNotification(intent: Intent) {
+        intent.extras?.let { extras ->
+
+            if (extras.containsKey(NOTIFICATION_FLAG)) {
+
+                NotificationContent.new(extras.getString(NOTIFICATION_TITLE),
+                                        extras.getString(NOTIFICATION_BODY),
+                                        extras.getDouble(NOTIFICATION_LATITUDE),
+                                        extras.getDouble(NOTIFICATION_LONGITUDE))?.let { notification ->
+                    showMapFragment(notification)
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -124,15 +154,16 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Screens
      */
 
-    private fun showMapFragment() {
+    private fun showMapFragment(notificationContent: NotificationContent? = null) {
 
         val fragmentTag = MapInteractionFragment::class.java.name
-        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
+        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as? MapInteractionFragment
 
         if (fragment == null) {
             fragment = MapInteractionFragment()
         }
 
+        notificationContent?.let { fragment.onNotificationReceived(it) }
         supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 

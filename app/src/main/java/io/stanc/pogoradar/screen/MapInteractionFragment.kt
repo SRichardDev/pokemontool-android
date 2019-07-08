@@ -16,12 +16,10 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
-import io.stanc.pogoradar.firebase.DatabaseKeys.LATITUDE
-import io.stanc.pogoradar.firebase.DatabaseKeys.LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
-import io.stanc.pogoradar.firebase.NotificationService
+import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
@@ -47,6 +45,7 @@ class MapInteractionFragment: Fragment() {
 
     private var mapFragment: MapFragment? = null
     private var famButton: FloatingActionsMenu? = null
+    private var pendingNotification: NotificationContent? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -76,19 +75,32 @@ class MapInteractionFragment: Fragment() {
         Log.d(TAG, "Debug:: onResume()")
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
-        NotificationService.consumeNotification()?.let { showNotificationArea(it) }
     }
 
-    private fun showNotificationArea(notification: NotificationService.Notification) {
-        val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
-        Log.d(TAG, "Debug:: showNotificationArea(), consumeNotification: $notification, try to update: ${geoHashStartPosition.toLatLng()}")
-        mapFragment?.updateCameraPosition(geoHashStartPosition, ZoomLevel.STREET)
+    fun onNotificationReceived(notification: NotificationContent) {
+        Log.d(TAG, "Debug:: onNotificationReceived(), notification: $notification")
+        pendingNotification =  notification
+        tryToConsumeNotification()
+    }
+
+    private fun tryToConsumeNotification() {
+        Log.d(TAG, "Debug:: tryToConsumeNotification(), pendingNotification: $pendingNotification")
+        mapFragment?.let {
+
+            pendingNotification?.let { notification ->
+                val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
+                Log.d(TAG, "Debug:: tryToConsumeNotification(), geoHashStartPosition: $geoHashStartPosition")
+                it.updateCameraPosition(geoHashStartPosition, ZoomLevel.STREET)
+            }
+            pendingNotification = null
+        }
     }
 
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as MapFragment
         Log.d(TAG, "Debug:: setupMapFragment...")
+        tryToConsumeNotification()
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onMapReady(googleMap: GoogleMap) {

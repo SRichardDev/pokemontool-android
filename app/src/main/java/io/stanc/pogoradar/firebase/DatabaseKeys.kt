@@ -68,13 +68,14 @@ object DatabaseKeys {
     const val SUBMITTER = "submitter"
     const val TIMESTAMP = "timestamp"
     const val GEO_HASH_AREA_PRECISION: Int = 6
+    const val DATA_UNDEFINED = "---"
 
     // notifications
-    const val TITLE = "title"
-    const val BODY = "body"
-    const val SOUND = "sound"
-    const val LATITUDE = "latitude"
-    const val LONGITUDE = "longitude"
+    const val NOTIFICATION_FLAG = "notification"
+    const val NOTIFICATION_TITLE = "title"
+    const val NOTIFICATION_BODY = "body"
+    const val NOTIFICATION_LATITUDE = "latitude"
+    const val NOTIFICATION_LONGITUDE = "longitude"
 
     const val MAX_SUBSCRIPTIONS = 100
     const val PLATFORM_ANDROID = "android"
