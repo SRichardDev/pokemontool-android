@@ -76,13 +76,15 @@ class MapInteractionFragment: Fragment() {
         Log.d(TAG, "Debug:: onResume()")
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
-        NotificationService.consumeNotification()?.let { notification ->
-            Log.d(TAG, "Debug:: onResume(), consumeNotification: $notification")
-            val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
-            Log.d(TAG, "Debug:: onResume(), try to update: ${geoHashStartPosition.toLatLng()}")
-            mapFragment?.updateCameraPosition(geoHashStartPosition)
-        }
+        NotificationService.consumeNotification()?.let { showNotificationArea(it) }
     }
+
+    private fun showNotificationArea(notification: NotificationService.Notification) {
+        val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
+        Log.d(TAG, "Debug:: showNotificationArea(), consumeNotification: $notification, try to update: ${geoHashStartPosition.toLatLng()}")
+        mapFragment?.updateCameraPosition(geoHashStartPosition, ZoomLevel.STREET)
+    }
+
     private fun setupMapFragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as MapFragment
@@ -161,7 +163,7 @@ class MapInteractionFragment: Fragment() {
                 }
 
             } ?: run {
-                Log.w(TAG, "Max zooming level reached!")
+                Log.v(TAG, "Max zooming level reached!")
             }
         }
 

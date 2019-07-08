@@ -22,6 +22,7 @@ import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.subscreen.ZoomLevel.BUILDING
 import io.stanc.pogoradar.subscreen.ZoomLevel.STREETS
+import io.stanc.pogoradar.subscreen.ZoomLevel.STREET
 import com.google.android.gms.maps.model.CameraPosition
 
 // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
@@ -45,6 +46,8 @@ open class MapFragment : Fragment() {
     private var locationManager: LocationManager? = null
 
     private var geoHashStartPosition: GeoHash? = null
+    private var zoomLevelStart: ZoomLevel? = null
+    private val zoomLevelDefault: ZoomLevel = STREETS
     private var isMyLocationEnabled: Boolean = true
 
     override fun onAttach(context: Context) {
@@ -175,10 +178,12 @@ open class MapFragment : Fragment() {
 
         map?.let { map ->
 
+            val zoomLevel: ZoomLevel = zoomLevelStart ?: zoomLevelDefault
+
             geoHashStartPosition?.let {
 
                 val cameraPosition = CameraPosition.Builder()
-                    .target(it.toLatLng()).zoom(ZoomLevel.STREETS.value).build()
+                    .target(it.toLatLng()).zoom(zoomLevel.value).build()
                 map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
                 delegate?.onCameraStartAnimationFinished()
 
@@ -194,7 +199,7 @@ open class MapFragment : Fragment() {
 //                    delegate?.onCameraStartAnimationFinished()
 
                     val cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(it.latitude, it.longitude)).zoom(ZoomLevel.STREETS.value).build()
+                        .target(LatLng(it.latitude, it.longitude)).zoom(zoomLevel.value).build()
                     map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
                     delegate?.onCameraStartAnimationFinished()
                 }
@@ -202,6 +207,7 @@ open class MapFragment : Fragment() {
 
             Log.d(TAG, "Debug:: reset geoHashStartPosition")
             geoHashStartPosition = null
+            zoomLevelStart = null
 
         } ?: run {
             Log.w(TAG, "moveCameraToStartPosition not working, map is not ready!")
@@ -212,21 +218,21 @@ open class MapFragment : Fragment() {
      * camera position
      */
 
-    fun updateCameraPosition(geoHash: GeoHash, onFinished: () -> Unit = {}) {
+    fun updateCameraPosition(geoHash: GeoHash, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
         val latlng = LatLng(geoHash.toLocation().latitude, geoHash.toLocation().longitude)
-        updateCameraPosition(latlng, onFinished)
+        updateCameraPosition(latlng, zoomLevel, onFinished)
     }
 
-    fun updateCameraPosition(location: Location, onFinished: () -> Unit = {}) {
+    fun updateCameraPosition(location: Location, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
         val latlng = LatLng(location.latitude, location.longitude)
-        updateCameraPosition(latlng, onFinished)
+        updateCameraPosition(latlng, zoomLevel, onFinished)
     }
 
-    fun updateCameraPosition(latLng: LatLng, onFinished: () -> Unit = {}) {
-        Log.d(TAG, "Debug:: updateCameraPosition($latLng)")
+    fun updateCameraPosition(latLng: LatLng, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
+        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name})")
 
         map?.let { googleMap ->
-            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(STREETS.value).build()
+            val cameraPosition = CameraPosition.Builder().target(latLng).zoom(zoomLevel.value).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
         } ?: run {
             geoHashStartPosition = GeoHash(latLng)
@@ -282,7 +288,7 @@ open class MapFragment : Fragment() {
         })
     }
 
-    fun rotateCamera(latLng: LatLng, onFinished:() -> Unit = {}, durationInMilliSec: Int = defaultDurationInMilliSec) {
+    private fun rotateCamera(latLng: LatLng, onFinished:() -> Unit = {}, durationInMilliSec: Int = defaultDurationInMilliSec) {
 
         map?.let { googleMap ->
 
@@ -300,7 +306,7 @@ open class MapFragment : Fragment() {
             val camPosition2 = CameraPosition.builder()
                 .target(latLng)
                 .bearing(bearing2)
-                .zoom(STREETS.value)
+                .zoom(STREET.value)
                 .tilt(75f)
                 .build()
 

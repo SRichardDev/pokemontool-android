@@ -21,6 +21,7 @@ import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
 import io.stanc.pogoradar.subscreen.MapFragment
+import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.QuestViewModel
@@ -123,7 +124,7 @@ class PokestopFragment: Fragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
         mapFragment?.enableMyLocationPOI(enabled = false)
-        position?.let { mapFragment?.updateCameraPosition(it) }
+        position?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
         mapFragment?.setDelegate(object : MapFragment.MapDelegate {
 
             override fun onCameraStartAnimationFinished() {

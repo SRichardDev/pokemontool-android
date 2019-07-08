@@ -12,7 +12,7 @@
     <!-- app -->
     <string name="app_name">PoGO Radar</string>
     <string name="action_settings">Einstellungen</string>
-    <string name="default_app_title">PoGo Radar</string>
+    <string name="default_app_title">PoGO Radar</string>
 
     <!-- progress spinner -->
     <string name="spinner_title_sign_up">Registriere Account…</string>
