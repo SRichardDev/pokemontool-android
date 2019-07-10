@@ -89,9 +89,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         pokestopClusterManager.renderer = ClusterPokestopRenderer(context, googleMap, pokestopClusterManager)
         arenaClusterManager.renderer = ClusterArenaRenderer(context, googleMap, arenaClusterManager)
 
-        googleMap.setOnMarkerClickListener { this.onMarkerClicked(it) }
-        googleMap.setOnInfoWindowClickListener {this.onInfoWindowClicked(it)}
-
+        googleMap.setOnInfoWindowClickListener { this.onInfoWindowClicked(it) }
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
 
         AppSettings.addObserver(mapSettingsObserver)
@@ -118,28 +116,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
     }
 
-    private fun onMarkerClicked(marker: Marker): Boolean {
-        var handled = false
-
-        pokestopClusterManager.let {
-            if (it.onMarkerClick(marker)) {
-                handled = true
-            }
-        }
-
-        if (!handled) {
-            arenaClusterManager.let {
-                if (it.onMarkerClick(marker)) {
-                    handled = true
-                }
-            }
-        }
-
-        return handled
-    }
-
     /**
-     *
+     * map callbacks
      */
 
     fun onCameraIdle() {

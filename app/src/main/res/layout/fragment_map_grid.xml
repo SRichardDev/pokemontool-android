@@ -6,7 +6,7 @@
                                              android:layout_height="match_parent"
                                              android:id="@+id/fragment_map_layout">
 
-    <fragment android:name="io.stanc.pogoradar.subscreen.MapFragment"
+    <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
               android:id="@+id/map_mapview"
               android:layout_width="match_parent"
               android:layout_height="match_parent"/>
@@ -20,7 +20,7 @@
              app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/vertical_center_guideline"
+        android:id="@+id/horizontal_center_guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -35,42 +35,59 @@
         app:layout_constraintWidth_percent=".05"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/vertical_center_guideline"
-        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_center_guideline"
+        android:visibility="invisible"
         tools:visibility="visible"
         tools:ignore="ContentDescription"/>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_map_layout_buttons"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="@dimen/layout_margin_default"
-        android:orientation="horizontal"
-        android:visibility="gone"
+        android:layout_margin="@dimen/layout_padding_screen"
+        android:visibility="invisible"
         tools:visibility="visible">
+
+        <ImageButton
+            style="@style/ImageButton"
+            android:id="@+id/fragment_map_button_neutral"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fragment_map_button_negative"
+            android:layout_marginEnd="@dimen/layout_margin_large"
+            android:tint="@color/redCancel"
+            android:src="@drawable/icon_cancel_24dp"
+            tools:ignore="contentDescription"/>
 
         <ImageButton
             style="@style/ImageButton"
             android:id="@+id/fragment_map_button_negative"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:tint="@color/redCancel"
-            android:src="@drawable/icon_cancel_24dp"
-            android:background="@color/transparent"/>
+            android:src="@drawable/icon_delete_24dp"
+            tools:ignore="contentDescription"/>
 
         <ImageButton
             style="@style/ImageButton"
             android:id="@+id/fragment_map_button_positive"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:tint="@color/greenConfirm"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fragment_map_button_negative"
             android:layout_marginStart="@dimen/layout_margin_large"
+            android:tint="@color/greenConfirm"
             android:src="@drawable/icon_check_24dp"
-            android:background="@color/transparent"/>
+            tools:ignore="contentDescription"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,7 +18,7 @@
     <string name="spinner_title_sign_up">Registriere Account…</string>
     <string name="spinner_title_sign_in">Einloggen…</string>
     <string name="spinner_title_email_verification">Daten werden gesendet…</string>
-    <string name="spinner_title_map_data">Kartenelemente werden geladen…</string>
+    <string name="spinner_title_loading_map_data">Kartenelemente werden aktualisiert…</string>
     <string name="spinner_title_loading_data">Durchsuche hohes Gras in der Umgebung…</string>
 
     <!-- Navigation Drawer -->
@@ -178,7 +178,8 @@
     <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
     <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
     <string name="exceptions_login_missing_data">Fehler! Anmeldedaten sind unvollständig.</string>
-    <string name="exceptions_subscription_sending_failed">Fehler! Gebiet konnte nicht aktualisiert werden.</string>
+    <string name="exceptions_subscription_sending_failed">Fehler! Gebiete konnten nicht aktualisiert werden.</string>
+    <string name="exceptions_location_permission_denied">Bitte aktiviere die Location Berechtigung, um die App im vollen Umfang benutzen zu können.</string>
 
     <!-- Popups -->
     <string name="popup_info_button_neutral">OK</string>

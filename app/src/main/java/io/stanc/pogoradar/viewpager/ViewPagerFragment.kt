@@ -5,14 +5,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.databinding.LayoutViewpagerBinding
+import io.stanc.pogoradar.databinding.LayoutViewpagerFlowBinding
 
 abstract class ViewPagerFragment: Fragment() {
 
@@ -24,8 +23,7 @@ abstract class ViewPagerFragment: Fragment() {
     protected abstract fun onPageChanged(position: Int)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<LayoutViewpagerBinding>(inflater, R.layout.layout_viewpager, container, false)
-
+        val binding = LayoutViewpagerFlowBinding.inflate(inflater, container, false)
         binding.viewModel = this
 
         binding.root.findViewById<ViewPager>(R.id.viewpager)?.let { viewpager ->

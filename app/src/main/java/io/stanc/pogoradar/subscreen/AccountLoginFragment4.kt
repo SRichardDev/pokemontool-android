@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.subscreen
 
 import android.os.Bundle
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,7 @@ class AccountLoginFragment4: Fragment() {
     private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentAccountLogin4Binding>(inflater, R.layout.fragment_account_login_4, container, false)
+        val binding = FragmentAccountLogin4Binding.inflate(inflater, container, false)
         binding.viewModel = viewModel
 
         binding.root.findViewById<NumberPicker>(R.id.account_numberpicker_level)?.let { numberPicker ->

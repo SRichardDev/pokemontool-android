@@ -23,6 +23,7 @@ import io.stanc.pogoradar.screen.AccountFragment
 import io.stanc.pogoradar.screen.MapInteractionFragment
 import io.stanc.pogoradar.screen.PolicyFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
+import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_navigation_header.*
@@ -106,6 +107,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 super.onBackPressed()
             }
         }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        PermissionManager.onRequestPermissionsResult(requestCode, this)
     }
 
     private fun setupToolbar() {

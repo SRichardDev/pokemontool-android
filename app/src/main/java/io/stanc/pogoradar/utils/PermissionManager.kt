@@ -15,18 +15,23 @@ object PermissionManager {
     private val LOCATION_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     private const val REQUEST_CODE_LOCATION = 12349
 
-    fun checkLocationPermission(activity: Activity?) {
-
-        if (!isLocationPermissionGranted(activity)) {
-            requestLocationPermission(activity)
-        }
+    interface LocationPermissionObserver {
+        fun onLocationPermissionGranted()
+        fun onLocationPermissionDenied()
     }
 
-    fun onRequestPermissionsResult(requestCode: Int, context: Context, onLocationPermissionGranted: () -> Unit) {
+    private val observerManager = ObserverManager<LocationPermissionObserver>()
+
+    fun onRequestPermissionsResult(requestCode: Int, context: Context) {
 
         when(requestCode) {
             REQUEST_CODE_LOCATION -> {
-                if (isLocationPermissionGranted(context)) { onLocationPermissionGranted() }
+                if (isLocationPermissionGranted(context)) {
+                    observerManager.observers().forEach { it?.onLocationPermissionGranted() }
+                } else {
+                    observerManager.observers().forEach { it?.onLocationPermissionDenied() }
+                }
+                observerManager.clear()
             }
         }
     }
@@ -48,14 +53,21 @@ object PermissionManager {
         return false
     }
 
-    fun requestLocationPermission(activity: Activity?) {
+    fun requestLocationPermissionIfNeeded(activity: Activity?, callback: LocationPermissionObserver? = null) {
 
         activity?.let {
 
-            requestPermissions(it,
-                LOCATION_PERMISSIONS,
-                REQUEST_CODE_LOCATION
-            )
+            if (!isLocationPermissionGranted(activity)) {
+
+                callback?.let { observerManager.addObserver(it) }
+
+                requestPermissions(activity,
+                    LOCATION_PERMISSIONS,
+                    REQUEST_CODE_LOCATION
+                )
+            } else {
+                callback?.onLocationPermissionGranted()
+            }
         } ?: run {
             Log.e(TAG, "tried to request location permission, but activity is null!")
         }

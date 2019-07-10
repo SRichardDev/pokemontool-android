@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.databinding.FragmentMapItemCreation3Binding
 import io.stanc.pogoradar.map.ClusterArenaRenderer
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
 import io.stanc.pogoradar.utils.IconFactory
@@ -18,7 +18,7 @@ import io.stanc.pogoradar.viewmodel.MapItemViewModel
 class MapItemCreationFragment3: Fragment() {
 
     private var viewModel: MapItemViewModel? = null
-    private var mapFragment: MapFragment? = null
+    private var mapFragment: BaseMapFragment? = null
     private var mapItemMarker: Marker? = null
         set(value) {
             field?.remove()
@@ -26,7 +26,7 @@ class MapItemCreationFragment3: Fragment() {
         }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<io.stanc.pogoradar.databinding.FragmentMapItemCreation3Binding>(inflater, R.layout.fragment_map_item_creation_3, container, false)
+        val binding = FragmentMapItemCreation3Binding.inflate(inflater, container, false)
         binding.viewModel = viewModel
 
         return binding.root
@@ -44,10 +44,10 @@ class MapItemCreationFragment3: Fragment() {
 
     private fun setupMapFragment() {
 
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
+        mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as BaseMapFragment
         mapFragment?.enableMyLocationPOI(enabled = false)
         viewModel?.position?.get()?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
-        mapFragment?.setDelegate(object : MapFragment.MapDelegate {
+        mapFragment?.setDelegate(object : BaseMapFragment.MapDelegate {
 
             override fun onMapReady(googleMap: GoogleMap) {
                 mapItemMarker = addMarker()

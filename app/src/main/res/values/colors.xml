@@ -5,7 +5,7 @@
     <color name="colorAccent">#CC0000</color>
 
     <color name="colorRed">#800000</color>
-    <color name="colorGeoHashArea">#80800000</color>
+    <color name="colorGeoHashArea">#8000CC00</color>
 
     <color name="colorLayoutBackground">#ffffff</color>
     <color name="colorText">#800000</color>

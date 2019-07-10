@@ -10,8 +10,8 @@ android {
         applicationId "io.stanc.pogoradar"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 101
-        versionName "0.1.1"
+        versionCode 200
+        versionName "0.2.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +43,7 @@ dependencies {
     // gmaps
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 //    implementation 'com.github.aarsy.googlemapsanimations:googlemapsanimations:1.0.5'
 
     // firebase and cloud firestore

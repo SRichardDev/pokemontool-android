@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.utils
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.google.common.math.LongMath
 import java.math.RoundingMode
 import java.text.ParseException
@@ -78,8 +79,15 @@ object TimeCalculator {
      */
 
     fun timeExpired(timestamp: Long, time: String): Boolean? {
-        return dateOfToday(time)?.let {
+        return date(timestamp, time)?.let {
             timeExpired(it)
+//
+//            if (expired) {
+//                Log.v(TAG, "Debug:: date(timestamp: $timestamp, time: $time) => $it after? currentDate: ${currentDate()} => isExpired: $expired")
+//            } else {
+//                Log.w(TAG, "Debug:: date(timestamp: $timestamp, time: $time) => $it after? currentDate: ${currentDate()} => isExpired: $expired")
+//            }
+//            expired
         } ?: run {
             null
         }
@@ -89,7 +97,7 @@ object TimeCalculator {
 
     fun currentDate(): Date = Calendar.getInstance().time
 
-    fun currentDay(timestamp: Long): Boolean {
+    fun isCurrentDay(timestamp: Long): Boolean {
         val now = Calendar.getInstance()
 
         val timestampCalender = Calendar.getInstance()
@@ -108,6 +116,26 @@ object TimeCalculator {
 
             val clockCalendar = Calendar.getInstance()
             clockCalendar.time = currentDate()
+            clockCalendar.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY))
+            clockCalendar.set(Calendar.MINUTE, temp.get(Calendar.MINUTE))
+
+            clockCalendar.time
+
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun date(timestamp: Long, time: String): Date? {
+
+        return try {
+
+            val temp = Calendar.getInstance()
+            temp.time = clock.parse(time)
+
+            val clockCalendar = Calendar.getInstance()
+            clockCalendar.time = Date(timestamp)
             clockCalendar.set(Calendar.HOUR_OF_DAY, temp.get(Calendar.HOUR_OF_DAY))
             clockCalendar.set(Calendar.MINUTE, temp.get(Calendar.MINUTE))
 

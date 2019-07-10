@@ -77,7 +77,7 @@
                 android:text="@string/map_map_item_position_correct_subtext"
                 android:layout_marginTop="@dimen/layout_margin_small"/>
 
-            <fragment android:name="io.stanc.pogoradar.subscreen.MapFragment"
+            <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
                       android:id="@+id/map_item_mapview"
                       android:layout_width="match_parent"
                       android:layout_height="300dp"

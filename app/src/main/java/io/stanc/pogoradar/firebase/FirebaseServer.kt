@@ -221,6 +221,12 @@ object FirebaseServer {
         return newNode.key
     }
 
+    fun addData(databasePath: String, data: HashMap<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        databaseRef.child(databasePath).updateChildren(data).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
+
     fun addData(databasePath: String, key: String, value: Any, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         databaseRef.child(databasePath).child(key).setValue(value).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }

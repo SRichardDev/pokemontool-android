@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.firebase
 
 import android.util.Log
+import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.database.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
@@ -20,12 +21,10 @@ import io.stanc.pogoradar.firebase.FirebaseServer.OnCompleteCallback
 import io.stanc.pogoradar.firebase.FirebaseServer.requestNode
 import io.stanc.pogoradar.firebase.node.*
 import io.stanc.pogoradar.geohash.GeoHash
-import io.stanc.pogoradar.utils.Async
-import io.stanc.pogoradar.utils.Async.awaitResponse
-import io.stanc.pogoradar.utils.Kotlin
 import kotlinx.coroutines.*
-import java.lang.Exception
 import java.lang.ref.WeakReference
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
                        arenaDelegate: Delegate<FirebaseArena>? = null) {
@@ -281,22 +280,168 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     /**
-     * location subscriptions
+     * location subscriptions - interface
      */
 
     fun loadSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
 
         FirebaseUser.userData?.let { user ->
 
-            val pokestopsGeoHashes = user.subscribedGeohashPokestops
-            val arenaGeoHashes = user.subscribedGeohashArenas
-            notifyCompletionCallback(pokestopsGeoHashes, arenaGeoHashes, onCompletionCallback)
+            notifyCompletionCallback(user.subscribedGeohashPokestops, user.subscribedGeohashArenas, onCompletionCallback)
 
         } ?: run {
             Log.e(TAG, "geohash subscription loading failed. FirebaseUser.userData: ${FirebaseUser.userData}")
             onCompletionCallback(null)
         }
     }
+
+    fun addSubscriptionForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        addSubscriptionFor(SubscriptionType.Arena, geoHash, onCompletionCallback)
+        addSubscriptionFor(SubscriptionType.Pokestop, geoHash, onCompletionCallback)
+    }
+
+//    fun setSubscriptionsForPush(geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        val oldArenaGeoHashes = FirebaseUser.userData?.subscribedGeohashArenas ?: emptyList()
+//        val oldPokestopGeoHashes = FirebaseUser.userData?.subscribedGeohashPokestops ?: emptyList()
+//
+//        Log.d(TAG, "Debug:: setSubscriptionsForPush($geoHashes) oldArenaGeoHashes: $oldArenaGeoHashes, oldPokestopGeoHashes: $oldPokestopGeoHashes")
+//        setSubscriptionsFor(SubscriptionType.Arena, geoHashes, oldArenaGeoHashes, onCompletionCallback)
+//        setSubscriptionsFor(SubscriptionType.Pokestop, geoHashes, oldPokestopGeoHashes, onCompletionCallback)
+//    }
+
+    fun removePushSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        removeSubscriptionFor(SubscriptionType.Arena, geoHash, onCompletionCallback)
+        removeSubscriptionFor(SubscriptionType.Pokestop, geoHash, onCompletionCallback)
+    }
+
+    fun removeAllPushSubscriptions(onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        FirebaseUser.userData?.let { user ->
+
+            removeSubscriptionsFor(SubscriptionType.Arena, user.subscribedGeohashArenas, onCompletionCallback = {
+                removeSubscriptionsFor(SubscriptionType.Pokestop, user.subscribedGeohashPokestops, onCompletionCallback)
+            })
+        }
+    }
+
+    /**
+     * location subscriptions - implementation
+     */
+
+    private fun addSubscriptionFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseUser.userData?.let { user ->
+
+            FirebaseServer.addData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}", user.id, "", object : OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    FirebaseUser.addUserSubscription(type, geoHash) { taskSuccessful ->
+                        onCompletionCallback(taskSuccessful)
+                    }
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "subscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: run {
+            Log.e(TAG, "addSubscriptionFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
+            onCompletionCallback(false)
+        }
+    }
+
+//    private fun setSubscriptionsFor(type: SubscriptionType, newGeoHashes: List<GeoHash>, oldGeoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        val geoHashesToAdd = newGeoHashes.minus(oldGeoHashes)
+//        val geoHashesToRemove = oldGeoHashes.minus(newGeoHashes)
+//        Log.i(TAG, "Debug:: setSubscriptionsFor(${type.name}) \ngeoHashesToAdd: $geoHashesToAdd\ngeoHashesToRemove: $geoHashesToRemove")
+//
+//        onCompletionCallback(false)
+//        addSubscriptionsFor(type, geoHashesToAdd, onCompletionCallback = { firstTaskSuccessful ->
+//            removeSubscriptionsFor(type, geoHashesToRemove, onCompletionCallback = { secondTaskSuccessful ->
+//                onCompletionCallback(firstTaskSuccessful && secondTaskSuccessful)
+//            })
+//        })
+//    }
+
+    private fun addSubscriptionsFor(type: SubscriptionType, geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseUser.userData?.let { user ->
+
+            val data = HashMap<String, Any>()
+            geoHashes.forEach { data[firebaseGeoHash(it)] = "" }
+
+            FirebaseServer.addData(type.subscriptionDatabaseKey, data, object : OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    FirebaseUser.addUserSubscriptions(type, geoHashes) { taskSuccessful ->
+                        onCompletionCallback(taskSuccessful)
+                    }
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "addSubscriptions failed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHashes: $geoHashes: [$message]")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: run {
+            Log.e(TAG, "addSubscriptions ${type.subscriptionDatabaseKey} in $geoHashes failed. FirebaseUser.userData: ${FirebaseUser.userData}")
+            onCompletionCallback(false)
+        }
+    }
+
+    private fun removeSubscriptionFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseUser.userData?.let { user ->
+
+            FirebaseServer.removeData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}/${user.id}", object : OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    FirebaseUser.removeUserSubscription(type, geoHash) { taskSuccessful ->
+                        onCompletionCallback(taskSuccessful)
+                    }
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "unsubscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: run {
+            Log.e(TAG, "removeSubscriptionFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
+            onCompletionCallback(false)
+        }
+    }
+
+    private fun removeSubscriptionsFor(type: SubscriptionType, geoHashes: List<GeoHash>?, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        var successful = true
+
+        CoroutineScope(Dispatchers.Main).launch {
+
+            geoHashes?.forEach { geoHash ->
+
+                val result = async{ waitForRemoveSubscription(type, geoHash) }.await()
+                successful = successful && result
+            }
+
+            onCompletionCallback(successful)
+        }
+    }
+
+    suspend fun waitForRemoveSubscription(type: SubscriptionType, geoHash: GeoHash): Boolean =
+        suspendCoroutine { result ->
+            val callback = object : (Boolean) -> Unit {
+                override fun invoke(taskSuccessful: Boolean) {
+                    result.resume(taskSuccessful)
+                }
+            }
+            removeSubscriptionFor(type, geoHash, callback)
+        }
 
     private fun notifyCompletionCallback(geoHashList1: List<GeoHash>?, geoHashList2: List<GeoHash>?, onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
 
@@ -318,68 +463,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
-    fun subscribeForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        subscribeFor(SubscriptionType.Arena, geoHash, onCompletionCallback)
-        subscribeFor(SubscriptionType.Pokestop, geoHash, onCompletionCallback)
-    }
-
-    private fun subscribeFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        FirebaseUser.userData?.let { user ->
-
-            Log.d(TAG, "Debug:: subscribeFor(${type.name}), uid: ${user.id}, geoHash: $geoHash")
-
-            FirebaseServer.addData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}", user.id, "", object : OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    FirebaseUser.updateUserSubscription(type, geoHash) { taskSuccessful ->
-                        onCompletionCallback(taskSuccessful)
-                    }
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "subscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
-                    onCompletionCallback(false)
-                }
-            })
-
-        } ?: run {
-            Log.e(TAG, "subscribeFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
-            onCompletionCallback(false)
-        }
-    }
-
-    fun removeSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        unsubscribeFor(SubscriptionType.Arena, geoHash, onCompletionCallback)
-        unsubscribeFor(SubscriptionType.Pokestop, geoHash, onCompletionCallback)
-    }
-
-    private fun unsubscribeFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        FirebaseUser.userData?.let { user ->
-
-            Log.d(TAG, "Debug:: unsubscribeFor(${type.name}), uid: ${user.id}, geoHash: $geoHash")
-
-            FirebaseServer.removeData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}/${user.id}", object : OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    FirebaseUser.removeUserSubscription(type, geoHash) { taskSuccessful ->
-                        onCompletionCallback(taskSuccessful)
-                    }
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "unsubscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
-                    onCompletionCallback(false)
-                }
-            })
-
-        } ?: run {
-            Log.e(TAG, "unsubscribeFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
-            onCompletionCallback(false)
-        }
-    }
-
     /**
      * private implementations
      */
@@ -393,34 +476,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             Log.e(TAG, "Data request failed. Error: $message")
             onCompletionCallback(false)
         }
-    }
-
-    private fun loadSubscriptionsFromDatabase(databasePath: String, onResponse: Async.Response<List<GeoHash>>) {
-
-        FirebaseUser.userData?.notificationToken?.let { userToken ->
-
-            FirebaseServer.requestDataChilds(databasePath, object : OnCompleteCallback<List<DataSnapshot>> {
-
-                override fun onSuccess(data: List<DataSnapshot>?) {
-                    Log.d(TAG, "Debug:: loadSubscriptions onSuccess($data)")
-                    data?.let {
-                        val geoHashes = registeredGeoHashes(it, userToken)
-                        onResponse.onCompletion(geoHashes)
-                    }
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.d(TAG, "loadSubscriptions failed. Error: $message")
-                    onResponse.onException(Exception(message))
-                }
-
-            })
-
-        } ?: run {
-            val exception = Exception("tried to load subscriptions from database, but user: ${FirebaseUser.userData}, and notificationToken: ${FirebaseUser.userData?.notificationToken}")
-            onResponse.onException(exception)
-        }
-
     }
 
     fun formattedFirebaseGeoHash(geoHash: GeoHash): GeoHash? {

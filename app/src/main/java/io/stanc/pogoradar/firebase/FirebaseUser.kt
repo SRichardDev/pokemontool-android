@@ -192,15 +192,33 @@ object FirebaseUser {
         }
     }
 
-
-
-    fun updateUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun addUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         auth.currentUser?.let { firebaseUser ->
             FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", firebaseGeoHash(geoHash), "", object : FirebaseServer.OnCompleteCallback<Void> {
 
                 override fun onSuccess(data: Void?) {
-                    Log.i(TAG, "successfully subscribed ${type.name} for geoHash: $geoHash")
+                    onCompletionCallback(true)
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
+                    onCompletionCallback(false)
+                }
+            })
+        }
+    }
+
+    fun addUserSubscriptions(type: SubscriptionType, geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        auth.currentUser?.let { firebaseUser ->
+
+            val data = HashMap<String, Any>()
+            geoHashes.forEach { data[firebaseGeoHash(it)] = "" }
+
+            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", data, object : FirebaseServer.OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
                     onCompletionCallback(true)
                 }
 
@@ -218,7 +236,6 @@ object FirebaseUser {
             FirebaseServer.removeData("$USERS/${firebaseUser.uid}/${type.userDataKey}/${firebaseGeoHash(geoHash)}", object : FirebaseServer.OnCompleteCallback<Void> {
 
                 override fun onSuccess(data: Void?) {
-                    Log.i(TAG, "successfully removed subscription ${type.name} for geoHash: $geoHash")
                     onCompletionCallback(true)
                 }
 

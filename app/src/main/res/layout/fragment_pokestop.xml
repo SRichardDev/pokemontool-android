@@ -21,7 +21,7 @@
             android:orientation="vertical"
             android:padding="@dimen/layout_padding_screen">
 
-            <fragment android:name="io.stanc.pogoradar.subscreen.MapFragment"
+            <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
                       android:id="@+id/map_item_mapview"
                       android:layout_width="match_parent"
                       android:layout_height="250dp"

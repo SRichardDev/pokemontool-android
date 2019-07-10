@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -20,7 +19,7 @@ import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
-import io.stanc.pogoradar.subscreen.MapFragment
+import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
@@ -31,7 +30,7 @@ class PokestopFragment: Fragment() {
     private val TAG = javaClass.name
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
-    private var mapFragment: MapFragment? = null
+    private var mapFragment: BaseMapFragment? = null
     private var map: GoogleMap? = null
     private var position: LatLng? = null
     private var viewModel: QuestViewModel? = null
@@ -57,7 +56,7 @@ class PokestopFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentPokestopBinding>(inflater, R.layout.fragment_pokestop, container, false)
+        val binding = FragmentPokestopBinding.inflate(inflater, container, false)
         binding.viewmodel = viewModel
         viewBinding = binding
 
@@ -122,10 +121,10 @@ class PokestopFragment: Fragment() {
 
     private fun setupMapFragment() {
 
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as MapFragment
+        mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as BaseMapFragment
         mapFragment?.enableMyLocationPOI(enabled = false)
         position?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
-        mapFragment?.setDelegate(object : MapFragment.MapDelegate {
+        mapFragment?.setDelegate(object : BaseMapFragment.MapDelegate {
 
             override fun onCameraStartAnimationFinished() {
                 position?.let { mapFragment?.startAnimation(it) }

@@ -17,4 +17,8 @@ class ObserverManager<Observer> {
     }
 
     fun observers(subId: Any? = null): List<Observer?> = observerMap.entries.filter { it.key.second == subId }.associate { it.key to it.value.get() }.values.toList()
+
+    fun clear() {
+        observerMap.clear()
+    }
 }

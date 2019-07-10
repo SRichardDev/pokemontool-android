@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.R
@@ -60,7 +59,7 @@ class ArenaFragment: Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentArenaBinding>(inflater, R.layout.fragment_arena, container, false)
+        val binding = FragmentArenaBinding.inflate(inflater, container, false)
         binding.viewmodel = viewModel
         viewBinding = binding
 

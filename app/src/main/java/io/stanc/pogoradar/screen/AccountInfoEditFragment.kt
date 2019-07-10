@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.NumberPicker
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentAccountInfoEditBinding
@@ -21,7 +20,7 @@ class AccountInfoEditFragment: Fragment() {
     private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentAccountInfoEditBinding>(inflater, R.layout.fragment_account_info_edit, container, false)
+        val binding = FragmentAccountInfoEditBinding.inflate(inflater, container, false)
 
         binding.viewModel = viewModel
 

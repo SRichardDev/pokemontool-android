@@ -10,7 +10,7 @@ import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
-import io.stanc.pogoradar.utils.TimeCalculator.currentDay
+import io.stanc.pogoradar.utils.TimeCalculator.isCurrentDay
 
 class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
 
@@ -45,7 +45,7 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
                 val validQuest = (firebaseQuest.timestamp as? Long)?.let { timestamp ->
-                    currentDay(timestamp)
+                    isCurrentDay(timestamp)
                 } ?: run { false }
 
                 questExists.set(validQuest)

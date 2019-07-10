@@ -6,14 +6,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
@@ -25,12 +24,10 @@ import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider
-import io.stanc.pogoradar.subscreen.MapFragment
+import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
-import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.utils.WaitingSpinner
-
 
 
 class MapInteractionFragment: Fragment() {
@@ -42,54 +39,45 @@ class MapInteractionFragment: Fragment() {
     private var map: GoogleMap? = null
     private var poiImage: ImageView? = null
     private var actionButtonLayout: View? = null
+    private var negativeButton: ImageView? = null
 
-    private var mapFragment: MapFragment? = null
+    private var mapFragment: BaseMapFragment? = null
     private var famButton: FloatingActionsMenu? = null
     private var pendingNotification: NotificationContent? = null
+    private var lastMarkerClicked: Marker? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_map_grid, container, false)
-        Log.d(TAG, "Debug:: onCreateView()")
         setupMapFragment()
 
         // floating action buttons
         setupFAB(rootLayout)
 
-        // poi
-        poiImage = rootLayout.findViewById(R.id.fragment_map_imageview_poi)
-
-        // button layout
-        setupNewPoiViews(rootLayout)
+        // poi & subscriptions
+        setupButtons(rootLayout)
 
         return rootLayout
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "Debug:: onStart()")
-    }
-
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "Debug:: onResume()")
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
     }
 
     fun onNotificationReceived(notification: NotificationContent) {
-        Log.d(TAG, "Debug:: onNotificationReceived(), notification: $notification")
+        Log.i(TAG, "onNotificationReceived: $notification")
         pendingNotification =  notification
         tryToConsumeNotification()
     }
 
     private fun tryToConsumeNotification() {
-        Log.d(TAG, "Debug:: tryToConsumeNotification(), pendingNotification: $pendingNotification")
         mapFragment?.let {
 
             pendingNotification?.let { notification ->
                 val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
-                Log.d(TAG, "Debug:: tryToConsumeNotification(), geoHashStartPosition: $geoHashStartPosition")
+                Log.d(TAG, "consume notification: $pendingNotification with position: $geoHashStartPosition")
                 it.updateCameraPosition(geoHashStartPosition, ZoomLevel.STREET)
             }
             pendingNotification = null
@@ -98,14 +86,14 @@ class MapInteractionFragment: Fragment() {
 
     private fun setupMapFragment() {
 
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as MapFragment
-        Log.d(TAG, "Debug:: setupMapFragment...")
+        mapFragment = childFragmentManager.findFragmentById(R.id.map_mapview) as BaseMapFragment
         tryToConsumeNotification()
-        mapFragment?.setDelegate(object : MapFragment.MapDelegate {
+        mapFragment?.setDelegate(object : BaseMapFragment.MapDelegate {
 
             override fun onMapReady(googleMap: GoogleMap) {
 
-                googleMap.setOnMapLongClickListener(onMapLongClickListener)
+                googleMap.setOnMapClickListener(onMapClickListener)
+                googleMap.setOnMarkerClickListener(onMarkersClickListener)
                 googleMap.setOnCameraIdleListener(onCameraIdleListener)
                 googleMap.uiSettings.isCompassEnabled = true
                 googleMap.uiSettings.setAllGesturesEnabled(true)
@@ -125,10 +113,10 @@ class MapInteractionFragment: Fragment() {
                         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
                         clusterManager = manager
                     }
-                }
 
-                mapGridProvider = MapGridProvider(googleMap)
-                mapGridProvider?.showGeoHashGridList()
+                    mapGridProvider = MapGridProvider(googleMap, it)
+                    mapGridProvider?.showGeoHashGridList()
+                }
 
                 map = googleMap
             }
@@ -143,17 +131,22 @@ class MapInteractionFragment: Fragment() {
      * map listener
      */
 
-    private val onMapLongClickListener = GoogleMap.OnMapLongClickListener {
+    private val onMapClickListener = GoogleMap.OnMapClickListener {
 
-        if (PermissionManager.isLocationPermissionGranted(context)) {
-            if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
+        if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
+            toggleSubscriptions(GeoHash(it))
+        }
+    }
 
-                firebase?.formattedFirebaseGeoHash(GeoHash(it))?.let { geoHash ->
-                    toggleSubscriptions(geoHash)
-                }
-            }
+    private val onMarkersClickListener = GoogleMap.OnMarkerClickListener {
+
+        lastMarkerClicked = it
+
+        if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
+            toggleSubscriptions(GeoHash(it.position))
+            true
         } else {
-            Toast.makeText(context, R.string.dialog_location_disabled_message, Toast.LENGTH_LONG).show()
+            false
         }
     }
 
@@ -200,25 +193,27 @@ class MapInteractionFragment: Fragment() {
 
     private fun toggleSubscriptions(geoHash: GeoHash) {
 
-        mapGridProvider?.let {
-            if (it.geoHashExists(geoHash)) {
-                removeSubscription(it, geoHash)
-            } else {
-                addSubscription(it, geoHash)
+        firebase?.formattedFirebaseGeoHash(geoHash)?.let { geoHash ->
+            mapGridProvider?.let {
+                if (it.geoHashExists(geoHash)) {
+                    removeSubscription(it, geoHash)
+                } else {
+                    addSubscription(it, geoHash)
+                }
             }
         }
     }
 
+    // TODO: ??? not sending each subscription one by one, but send all new and removed at once, after edit mode is over ???
     private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
-            firebase?.subscribeForPush(geoHash) { successful ->
-                if (successful) {
-                    mapGridProvider.showGeoHashGrid(geoHash)
-                } else {
+            firebase?.addSubscriptionForPush(geoHash) { successful ->
+                if (!successful) {
                     Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
                 }
             }
+            mapGridProvider.showGeoHashGrid(geoHash)
         } else {
             Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()
         }
@@ -226,13 +221,12 @@ class MapInteractionFragment: Fragment() {
 
     private fun removeSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
-        firebase?.removeSubscription(geoHash) { successful ->
-            if (successful) {
-                mapGridProvider.removeGeoHashGrid(geoHash)
-            } else {
+        firebase?.removePushSubscription(geoHash) { successful ->
+            if (!successful) {
                 Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
             }
         }
+        mapGridProvider.removeGeoHashGrid(geoHash)
     }
 
     /**
@@ -240,31 +234,31 @@ class MapInteractionFragment: Fragment() {
      */
 
     private fun showArenaFragment(arena: FirebaseArena) {
-        resetInteractionMap()
+        resetModes()
         val fragment = ArenaFragment.newInstance(arena)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     private fun showPokestopFragment(pokestop: FirebasePokestop) {
-        resetInteractionMap()
+        resetModes()
         val fragment = PokestopFragment.newInstance(pokestop)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     private fun showMapItemCreationFragment(latLng: LatLng) {
-        resetInteractionMap()
+        resetModes()
         val fragment = MapItemCreationFragment.newInstance(latLng)
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     private fun showMapSettingsFragment() {
-        resetInteractionMap()
+        resetModes()
         val fragment = MapSettingsFragment()
         ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
     }
 
     /**
-     * FABs
+     * view setup
      */
 
     private fun setupFAB(rootLayout: View) {
@@ -272,21 +266,101 @@ class MapInteractionFragment: Fragment() {
         famButton = rootLayout.findViewById(R.id.fab_menu)
         famButton?.setOnFloatingActionsMenuUpdateListener(object: FloatingActionsMenu.OnFloatingActionsMenuUpdateListener{
             override fun onMenuCollapsed() {
-                resetInteractionMap()
+                resetModes()
             }
 
             override fun onMenuExpanded() {}
         })
 
-        // TODO: refactor subscriptions !
         rootLayout.findViewById<FloatingActionButton>(R.id.fab_push_registration)?.setOnClickListener {
+            startModePushRegistration()
+        }
 
-            mapGridProvider?.clearGeoHashGridList()
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
+            map?.mapType = nextMapType()
+        }
+
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
+            startModeNewPoi()
+        }
+
+        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
+            showMapSettingsFragment()
+        }
+    }
+
+    private fun setupButtons(rootLayout: View) {
+
+        poiImage = rootLayout.findViewById(R.id.fragment_map_imageview_poi)
+
+        actionButtonLayout = rootLayout.findViewById(R.id.fragment_map_layout_buttons)
+
+        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_positive)?.setOnClickListener {
+            when(currentMode) {
+
+                MapMode.SET_NEW_POI -> {
+                    mapFragment?.centeredPosition()?.let { latlng ->
+                        showMapItemCreationFragment(latlng)
+                    }
+                }
+
+                MapMode.EDIT_PUSH_REGISTRATION -> {
+                    resetModes()
+                }
+
+                else -> {}
+            }
+        }
+
+        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_neutral)?.setOnClickListener {
+
+            when(currentMode) {
+
+                MapMode.SET_NEW_POI, MapMode.EDIT_PUSH_REGISTRATION  -> {
+                    resetModes()
+                }
+
+                else -> {}
+            }
+        }
+
+        negativeButton = actionButtonLayout?.findViewById(R.id.fragment_map_button_negative)
+        negativeButton?.setOnClickListener {
+
+            when(currentMode) {
+
+                MapMode.EDIT_PUSH_REGISTRATION -> {
+
+                    WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
+                    firebase?.removeAllPushSubscriptions(onCompletionCallback = { successful ->
+                        WaitingSpinner.hideProgress()
+                        if (successful) {
+                            mapGridProvider?.clearGeoHashGridList()
+                        } else {
+                            Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
+                        }
+                    })
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    /**
+     * map modes
+     */
+
+    private fun startModePushRegistration() {
+        if (currentMode != MapMode.EDIT_PUSH_REGISTRATION) {
+            resetModes()
+            actionButtonLayout?.visibility = View.VISIBLE
+            negativeButton?.visibility = View.VISIBLE
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
+            lastMarkerClicked?.hideInfoWindow()
 
-            WaitingSpinner.showProgress(R.string.spinner_title_map_data)
+            WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
             firebase?.loadSubscriptions { geoHashes ->
-                Log.i(TAG, "loading subscriptions for geoHashes: $geoHashes")
 
                 geoHashes?.let {
                     for (geoHash in geoHashes) {
@@ -297,44 +371,38 @@ class MapInteractionFragment: Fragment() {
                 WaitingSpinner.hideProgress()
             }
         }
+    }
 
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_type)?.setOnClickListener {
-            map?.mapType = nextMapType()
-        }
-
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_new_poi)?.setOnClickListener {
-            resetInteractionMap()
-            showNewPoiIcon()
+    private fun startModeNewPoi() {
+        if (currentMode != MapMode.SET_NEW_POI) {
+            resetModes()
+            poiImage?.visibility = View.VISIBLE
+            actionButtonLayout?.visibility = View.VISIBLE
             currentMode = MapMode.SET_NEW_POI
             mapFragment?.zoomTo(ZoomLevel.STREET, true)
         }
-
-        rootLayout.findViewById<FloatingActionButton>(R.id.fab_map_filter)?.setOnClickListener {
-            showMapSettingsFragment()
-        }
     }
 
-    private fun setupNewPoiViews(rootLayout: View) {
-        actionButtonLayout = rootLayout.findViewById(R.id.fragment_map_layout_buttons)
-        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_positive)?.setOnClickListener {
-            when(currentMode) {
+    private fun resetModes() {
+        poiImage?.visibility = View.INVISIBLE
+        actionButtonLayout?.visibility = View.INVISIBLE
+        negativeButton?.visibility = View.INVISIBLE
 
-                MapMode.SET_NEW_POI -> {
-                    mapFragment?.centeredPosition()?.let { latlng ->
-                        showMapItemCreationFragment(latlng)
-                    }
-                }
-
-                else -> {}
-            }
-        }
-        actionButtonLayout?.findViewById<ImageButton>(R.id.fragment_map_button_negative)?.setOnClickListener {
-            resetInteractionMap()
-        }
-    }
-
-    private fun resetInteractionMap() {
-        dismissNewPoiIcon()
+//        if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
+//
+//            mapGridProvider?.let {
+//
+//                Log.i(TAG, "Debug:: resetModes ...")
+//                WaitingSpinner.showProgress(R.string.spinner_title_map_data)
+//
+//                firebase?.setSubscriptionsForPush(it.geoHashes()) { taskSuccessful ->
+//                    Log.i(TAG, "Debug:: setSubscriptionsForPush finished, taskSuccessful: $taskSuccessful")
+//
+//                    mapGridProvider?.clearGeoHashGridList()
+//                    WaitingSpinner.hideProgress()
+//                }
+//            }
+//        }
         mapGridProvider?.clearGeoHashGridList()
         currentMode = MapMode.DEFAULT
         famButton?.collapse()
@@ -347,20 +415,6 @@ class MapInteractionFragment: Fragment() {
             GoogleMap.MAP_TYPE_HYBRID -> GoogleMap.MAP_TYPE_NORMAL
             else -> GoogleMap.MAP_TYPE_NORMAL
         }
-    }
-
-    /**
-     * poi
-     */
-
-    private fun showNewPoiIcon() {
-        poiImage?.visibility = View.VISIBLE
-        actionButtonLayout?.visibility = View.VISIBLE
-    }
-
-    private fun dismissNewPoiIcon() {
-        poiImage?.visibility = View.GONE
-        actionButtonLayout?.visibility = View.GONE
     }
 
     companion object {

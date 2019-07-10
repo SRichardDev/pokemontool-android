@@ -19,23 +19,27 @@ import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.geohash.GeoHash
+import io.stanc.pogoradar.subscreen.ZoomLevel.*
 import io.stanc.pogoradar.utils.PermissionManager
-import io.stanc.pogoradar.subscreen.ZoomLevel.BUILDING
-import io.stanc.pogoradar.subscreen.ZoomLevel.STREETS
-import io.stanc.pogoradar.subscreen.ZoomLevel.STREET
-import com.google.android.gms.maps.model.CameraPosition
+import android.content.Context.LOCATION_SERVICE
+import android.widget.Toast
+import io.stanc.pogoradar.App
+import com.google.android.gms.maps.model.MapStyleOptions
+import android.content.res.Resources
+
 
 // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
 enum class ZoomLevel(val value: Float) {
     WORLD(1.0f),
     LANDMASS(5.0f),
     CITY(10.0f),
-    STREETS(15.0f),
-    STREET(18.0f),
+    DISTRICT(15.0f),
+    NEIGHBORHOOD(17.0f),
+    STREET(18.5f),
     BUILDING(20.0f)
 }
 
-open class MapFragment : Fragment() {
+open class BaseMapFragment : Fragment() {
 
     private val TAG = javaClass.name
 
@@ -47,12 +51,26 @@ open class MapFragment : Fragment() {
 
     private var geoHashStartPosition: GeoHash? = null
     private var zoomLevelStart: ZoomLevel? = null
-    private val zoomLevelDefault: ZoomLevel = STREETS
+    private val zoomLevelDefault: ZoomLevel = DISTRICT
     private var isMyLocationEnabled: Boolean = true
+
+    private val locationPermissionCallback = object : PermissionManager.LocationPermissionObserver {
+
+        override fun onLocationPermissionGranted() {
+            Log.i(TAG, "Debug:: onLocationPermissionGranted")
+            updateMyLocationEnabledPOI()
+            moveCameraToStartPosition()
+        }
+
+        override fun onLocationPermissionDenied() {
+            Log.i(TAG, "Debug:: onLocationPermissionDenied")
+            Toast.makeText(context, App.geString(R.string.exceptions_location_permission_denied), Toast.LENGTH_LONG).show()
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager = context.getSystemService(LOCATION_SERVICE) as LocationManager
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,7 +78,6 @@ open class MapFragment : Fragment() {
 
         mapView = rootLayout.findViewById(R.id.map_mapview) as MapView
         mapView?.onCreate(savedInstanceState)
-        mapView?.onResume() // needed to get the map to display immediately
 
         activity?.let { MapsInitializer.initialize(it.applicationContext) }
 
@@ -72,17 +89,29 @@ open class MapFragment : Fragment() {
     private fun setupMap(googleMap: GoogleMap) {
         map = googleMap
 
+        setupCustomMapStyle(googleMap)
+
         // 3D buildings
         map?.isBuildingsEnabled = true
 
         updateMyLocationEnabledPOI()
-        Log.v(TAG, "Debug:: setupMap()")
         moveCameraToStartPosition()
 
         map?.let { delegate?.onMapReady(it) }
+    }
 
-        if (!PermissionManager.isLocationPermissionGranted(activity)) {
-            PermissionManager.requestLocationPermission(activity)
+    private fun setupCustomMapStyle(googleMap: GoogleMap) {
+
+        // https://stackoverflow.com/questions/22660778/is-it-possible-to-remove-the-default-points-of-interest-from-android-google-map
+        try {
+            val mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style)
+            val success = googleMap.setMapStyle(mapStyleOptions)
+
+            if (!success) {
+                Log.e(TAG, "Google map style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "Can't find map style. NotFoundException: ", e)
         }
     }
 
@@ -98,13 +127,10 @@ open class MapFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
-        activity?.let { PermissionManager.checkLocationPermission(it) }
-        isGPSEnabled()?.let { enabled ->
-            if (!enabled) {
-                showAlertMessageNoGPS()
-            }
+
+        if (!PermissionManager.isLocationPermissionGranted(context)) {
+            PermissionManager.requestLocationPermissionIfNeeded(activity, locationPermissionCallback)
         }
-        updateMyLocationEnabledPOI()
     }
 
     override fun onPause() {
@@ -134,7 +160,7 @@ open class MapFragment : Fragment() {
     }
 
     /**
-     * Location
+     * map positions
      */
 
     fun addMarker(markerOptions: MarkerOptions): Marker? {
@@ -148,16 +174,6 @@ open class MapFragment : Fragment() {
     fun visibleRegionBounds(): LatLngBounds? {
         return map?.projection?.visibleRegion?.latLngBounds
     }
-
-    @SuppressLint("MissingPermission") // permission check exists
-    fun latestLocation(): Location? {
-        return if (PermissionManager.isLocationPermissionGranted(context)) {
-            locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        } else {
-            null
-        }
-    }
-
     fun enableMyLocationPOI(enabled: Boolean) {
         isMyLocationEnabled = enabled
         updateMyLocationEnabledPOI()
@@ -170,6 +186,15 @@ open class MapFragment : Fragment() {
         if (PermissionManager.isLocationPermissionGranted(context)) {
             map?.isMyLocationEnabled = isMyLocationEnabled
             map?.uiSettings?.isMyLocationButtonEnabled = isMyLocationEnabled
+            map?.setOnMyLocationButtonClickListener {
+
+                if (!isGPSEnabled()) {
+                    showAlertMessageNoGPS()
+                } else {
+                    moveToMyLocation()
+                }
+                true
+            }
         }
     }
 
@@ -192,7 +217,7 @@ open class MapFragment : Fragment() {
 //                delegate?.onCameraStartAnimationFinished()
 
             } ?: run {
-                latestLocation()?.let {
+                lastKnownLocation()?.let {
 
 //                    val startPosition = CameraUpdateFactory.newLatLng(LatLng(it.latitude, it.longitude))
 //                    map.moveCamera(startPosition)
@@ -218,6 +243,12 @@ open class MapFragment : Fragment() {
      * camera position
      */
 
+    private fun moveToMyLocation() {
+        lastKnownLocation()?.let { location ->
+            updateCameraPosition(LatLng(location.latitude, location.longitude), NEIGHBORHOOD)
+        }
+    }
+
     fun updateCameraPosition(geoHash: GeoHash, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
         val latlng = LatLng(geoHash.toLocation().latitude, geoHash.toLocation().longitude)
         updateCameraPosition(latlng, zoomLevel, onFinished)
@@ -229,7 +260,7 @@ open class MapFragment : Fragment() {
     }
 
     fun updateCameraPosition(latLng: LatLng, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
-        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name})")
+        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name}), map: $map")
 
         map?.let { googleMap ->
             val cameraPosition = CameraPosition.Builder().target(latLng).zoom(zoomLevel.value).build()
@@ -299,14 +330,14 @@ open class MapFragment : Fragment() {
             val camPosition1 = CameraPosition.builder()
                 .target(latLng)
                 .bearing(bearing1)
-                .zoom(BUILDING.value)
+                .zoom(STREET.value)
                 .tilt(googleMap.cameraPosition.tilt) // 30f
                 .build()
 
             val camPosition2 = CameraPosition.builder()
                 .target(latLng)
                 .bearing(bearing2)
-                .zoom(STREET.value)
+                .zoom(DISTRICT.value)
                 .tilt(75f)
                 .build()
 
@@ -325,26 +356,43 @@ open class MapFragment : Fragment() {
     }
 
     /**
-     * Permissions
+     * Location
      */
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    private fun lastKnownLocation(): Location? {
 
-        context?.let {
-            PermissionManager.onRequestPermissionsResult(requestCode, it, onLocationPermissionGranted = {
-                Log.v(TAG, "Debug:: onRequestPermissionsResult()")
-                updateMyLocationEnabledPOI()
-                moveCameraToStartPosition()
-            })
+        var location: Location? = null
+
+        try {
+
+            val gpsIsEnabled = isGPSEnabled()
+            val networkIsEnabled = isNetworkEnabled()
+
+            if (!gpsIsEnabled && !networkIsEnabled) {
+                Log.w(TAG, "GPS and Network is disabled! No location found.")
+            }
+
+            if (gpsIsEnabled) {
+                location = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                Log.v(TAG, "lastKnownLocation(${LocationManager.GPS_PROVIDER}): $location")
+            }
+
+            if (networkIsEnabled && location == null) {
+                location = locationManager?.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                Log.v(TAG, "lastKnownLocation(${LocationManager.NETWORK_PROVIDER}): $location")
+            }
+
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException => No location found.")
+            e.printStackTrace()
         }
+
+        return location
     }
 
-    /**
-     * GPS
-     */
 
-    private fun isGPSEnabled(): Boolean? = locationManager?.isProviderEnabled( LocationManager.GPS_PROVIDER )
+    private fun isGPSEnabled(): Boolean = locationManager?.isProviderEnabled( LocationManager.GPS_PROVIDER ) ?: false
+    private fun isNetworkEnabled(): Boolean = locationManager?.isProviderEnabled( LocationManager.NETWORK_PROVIDER ) ?: false
 
     private fun showAlertMessageNoGPS() {
 

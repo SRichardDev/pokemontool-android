@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.R
@@ -22,7 +21,7 @@ class AccountInfoFragment: Fragment() {
     private val viewModel = LoginViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = DataBindingUtil.inflate<FragmentAccountInfoBinding>(inflater, R.layout.fragment_account_info, container, false)
+        val binding = FragmentAccountInfoBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.settings = AppSettings
 
