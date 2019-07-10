@@ -7,17 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogoradar.App
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
@@ -64,6 +68,13 @@ class MapInteractionFragment: Fragment() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
+        showPopupIfUserIsLoggedOut()
+    }
+
+    private fun showPopupIfUserIsLoggedOut() {
+        if(FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedOut) {
+            Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
+        }
     }
 
     fun onNotificationReceived(notification: NotificationContent) {
@@ -77,7 +88,7 @@ class MapInteractionFragment: Fragment() {
 
             pendingNotification?.let { notification ->
                 val geoHashStartPosition = GeoHash(notification.latitude, notification.longitude)
-                Log.d(TAG, "consume notification: $pendingNotification with position: $geoHashStartPosition")
+//                Log.d(TAG, "consume notification: $pendingNotification with position: $geoHashStartPosition")
                 it.updateCameraPosition(geoHashStartPosition, ZoomLevel.STREET)
             }
             pendingNotification = null
@@ -369,6 +380,7 @@ class MapInteractionFragment: Fragment() {
                 }
 
                 WaitingSpinner.hideProgress()
+                Popup.showInfo(context, title = R.string.popup_info_push_registration_title, description = R.string.popup_info_push_registration_message)
             }
         }
     }
@@ -379,6 +391,7 @@ class MapInteractionFragment: Fragment() {
             poiImage?.visibility = View.VISIBLE
             actionButtonLayout?.visibility = View.VISIBLE
             currentMode = MapMode.SET_NEW_POI
+            lastMarkerClicked?.hideInfoWindow()
             mapFragment?.zoomTo(ZoomLevel.STREET, true)
         }
     }

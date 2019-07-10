@@ -26,7 +26,6 @@ class AppInfoLabelController(layout: View) {
         AppSettings.removeObserver(mapSettingsObserver)
     }
 
-
     private val connectionListener = object : (Boolean) -> Unit {
         override fun invoke(connected: Boolean) {
             if (connected) {

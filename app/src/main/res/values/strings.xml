@@ -85,12 +85,6 @@
     <string name="authentication_edittext_email_error">Benötigt!</string>
     <string name="authentication_edittext_password_error">Benötigt!</string>
 
-    <!-- Dialog -->
-    <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?</string>
-    <string name="dialog_gps_disabled_button_positive">Ja</string>
-    <string name="dialog_gps_disabled_button_negative">Nein</string>
-    <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.</string>
-
     <!-- Map -->
     <string name="map_title_arena">Neue Arena</string>
     <string name="map_title_pokestop">Neuer Pok&#233;stop</string>
@@ -181,10 +175,16 @@
     <string name="exceptions_subscription_sending_failed">Fehler! Gebiete konnten nicht aktualisiert werden.</string>
     <string name="exceptions_location_permission_denied">Bitte aktiviere die Location Berechtigung, um die App im vollen Umfang benutzen zu können.</string>
 
-    <!-- Popups -->
+    <!-- Popups / Dialogs -->
     <string name="popup_info_button_neutral">OK</string>
-
     <string name="popup_info_missing_raidboss_id_title">Bitte wähle den korrekten Raidboss aus.</string>
+    <string name="popup_info_push_registration_title">Push Nachrichten registrieren</string>
+    <string name="popup_info_push_registration_message">Bitte klicke auf die Gebiete für die du über Raids &amp; Quests benachrichtigt werden möchtest.</string>
+    <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?</string>
+    <string name="dialog_gps_disabled_button_positive">Ja</string>
+    <string name="dialog_gps_disabled_button_negative">Nein</string>
+    <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.</string>
+    <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nZiehe dazu den Drawer vom linken Rand in den Screen und klicke auf \"Account\".</string>
 
     <!-- App Info Label -->
     <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell sein.</string>

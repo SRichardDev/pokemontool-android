@@ -8,7 +8,7 @@ import androidx.annotation.StringRes
 object Popup {
     private val TAG = javaClass.name
 
-    fun showInfo(context: Context?, @StringRes title: Int, description: Int? = null) {
+    fun showInfo(context: Context?, @StringRes title: Int, @StringRes description: Int? = null) {
 
         context?.let {
 
