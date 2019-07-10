@@ -56,7 +56,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
-        Log.w(TAG, "Debug:: navigationButtonClickedOnTheLastPage()")
+//        Log.w(TAG, "Debug:: navigationButtonClickedOnTheLastPage()")
         try {
             tryToSendMapItem()
             close()
@@ -80,7 +80,6 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
     @Throws(Exception::class)
     private fun tryToSendMapItem() {
-        Log.w(TAG, "Debug:: tryToSendMapItem()")
 
         FirebaseUser.userData?.name?.let { userName ->
 
@@ -146,7 +145,6 @@ class MapItemCreationFragment: ViewPagerFragment() {
     }
 
     private fun close() {
-        Log.w(TAG, "Debug:: close() fragmentManager: ${fragmentManager?.fragments}, childFragmentManager: ${childFragmentManager.fragments}")
         fragmentManager?.popBackStack()
     }
 

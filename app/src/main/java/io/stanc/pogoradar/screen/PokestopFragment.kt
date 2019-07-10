@@ -90,7 +90,7 @@ class PokestopFragment: Fragment() {
     }
 
     private fun updateLayout() {
-        Log.d(TAG, "Debug:: updateLayout(), pokestop: $pokestop, viewBinding?.root: ${viewBinding?.root}")
+//        Log.d(TAG, "Debug:: updateLayout(), pokestop: $pokestop, viewBinding?.root: ${viewBinding?.root}")
 
         pokestop?.let { pokestop ->
 

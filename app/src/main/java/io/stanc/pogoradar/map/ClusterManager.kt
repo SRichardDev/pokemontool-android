@@ -203,9 +203,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
                 Kotlin.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
 
                     startRefreshTimer(arena, raidTime, timestamp)
-
-                } ?: run {
-                    Log.e(TAG,"Debug:: viewModel.raidTime: ${viewModel.raidTime.get()}, raid.timestamp: ${raid.timestamp} for $raid")
                 }
             }
         }

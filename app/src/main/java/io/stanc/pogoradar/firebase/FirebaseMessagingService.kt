@@ -39,7 +39,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
                         message.data[NOTIFICATION_LATITUDE]?.toDoubleOrNull(),
                         message.data[NOTIFICATION_LONGITUDE]?.toDoubleOrNull()) { title, body, lat, lng ->
 
-            Log.d(TAG, "Debug:: onMessageReceived(title: $title): geoHash: ${GeoHash(lat, lng)}")
+//            Log.d(TAG, "Debug:: onMessageReceived(title: $title): geoHash: ${GeoHash(lat, lng)}")
 
             val intent = Intent(this, NavDrawerActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -59,22 +59,22 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onDeletedMessages() {
         super.onDeletedMessages()
-        Log.i(TAG, "Debug:: onDeletedMessages()")
+//        Log.i(TAG, "Debug:: onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
         super.onMessageSent(var1)
-        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
+//        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
         super.onSendError(var1, var2)
-        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
+//        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.i(TAG, "onNewToken(token: $token) for user: ${FirebaseUser.userData}")
+//        Log.i(TAG, "onNewToken(token: $token) for user: ${FirebaseUser.userData}")
         FirebaseUser.updateNotificationToken(token)
     }
 

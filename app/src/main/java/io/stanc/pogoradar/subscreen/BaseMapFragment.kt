@@ -57,13 +57,11 @@ open class BaseMapFragment : Fragment() {
     private val locationPermissionCallback = object : PermissionManager.LocationPermissionObserver {
 
         override fun onLocationPermissionGranted() {
-            Log.i(TAG, "Debug:: onLocationPermissionGranted")
             updateMyLocationEnabledPOI()
             moveCameraToStartPosition()
         }
 
         override fun onLocationPermissionDenied() {
-            Log.i(TAG, "Debug:: onLocationPermissionDenied")
             Toast.makeText(context, App.geString(R.string.exceptions_location_permission_denied), Toast.LENGTH_LONG).show()
         }
     }
@@ -199,7 +197,6 @@ open class BaseMapFragment : Fragment() {
     }
 
     private fun moveCameraToStartPosition() {
-        Log.d(TAG, "Debug:: moveCameraToStartPosition(), geoHashStartPosition: $geoHashStartPosition, map: $map")
 
         map?.let { map ->
 
@@ -230,7 +227,6 @@ open class BaseMapFragment : Fragment() {
                 }
             }
 
-            Log.d(TAG, "Debug:: reset geoHashStartPosition")
             geoHashStartPosition = null
             zoomLevelStart = null
 
@@ -260,14 +256,14 @@ open class BaseMapFragment : Fragment() {
     }
 
     fun updateCameraPosition(latLng: LatLng, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
-        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name}), map: $map")
+//        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name}), map: $map")
 
         map?.let { googleMap ->
             val cameraPosition = CameraPosition.Builder().target(latLng).zoom(zoomLevel.value).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
         } ?: run {
             geoHashStartPosition = GeoHash(latLng)
-            Log.w(TAG, "Debug:: updateCameraPosition($latLng), map not ready, store geoHashStartPosition: $geoHashStartPosition")
+//            Log.w(TAG, "Debug:: updateCameraPosition($latLng), map not ready, store geoHashStartPosition: $geoHashStartPosition")
         }
     }
 

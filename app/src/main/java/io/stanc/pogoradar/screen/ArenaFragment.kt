@@ -142,7 +142,6 @@ class ArenaFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.let {
                 it.setOnClickListener {
-                    Log.d(TAG, "Debug:: onclick: viewModel: $viewModel")
                     viewModel?.let { showParticipantsFragment(it) }
                 }
             }
@@ -164,7 +163,6 @@ class ArenaFragment: Fragment() {
                             viewModel.changeParticipation(button.isActivated)
                         } else {
                             val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
-                            Log.d(TAG, "Debug:: arena_raid_button_register: meetupTime: $meetupTime <= (meetupTimeHour: $meetupTimeHour, meetupTimeMinutes: $meetupTimeMinutes)")
                             viewModel.createMeetup(meetupTime)
                         }
                     }

@@ -31,7 +31,7 @@ object FirebaseDefinitions {
 
         firebase.loadRaidBosses { firebaseRaidBosses ->
 
-            Log.i(TAG, "Debug:: firebaseRaidBosses: ${firebaseRaidBosses?.size}")
+//            Log.i(TAG, "Debug:: firebaseRaidBosses: ${firebaseRaidBosses?.size}")
             firebaseRaidBosses?.let { raidBosses = it }
             onCompletionCallback()
         }
@@ -41,7 +41,7 @@ object FirebaseDefinitions {
 
         firebase.loadQuests { firebaseQuests ->
 
-            Log.i(TAG, "Debug:: firebaseQuests: ${firebaseQuests?.size}")
+//            Log.i(TAG, "Debug:: firebaseQuests: ${firebaseQuests?.size}")
             firebaseQuests?.let { quests = it }
             onCompletionCallback()
         }
