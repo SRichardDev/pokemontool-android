@@ -171,6 +171,10 @@ object FirebaseServer {
         })
     }
 
+    fun keepSyncDatabaseChilds(databasePath: String, keepSynced: Boolean = true) {
+        FirebaseServer.databaseRef.child(databasePath).ref.keepSynced(keepSynced)
+    }
+
     fun requestDataChilds(databaseChildPath: String, onCompletionCallback: OnCompleteCallback<List<DataSnapshot>>? = null) {
         FirebaseServer.databaseRef.child(databaseChildPath).addListenerForSingleValueEvent(object : ValueEventListener {
 

@@ -3,8 +3,8 @@ package io.stanc.pogoradar
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.Log
-import io.stanc.pogoradar.firebase.FirebaseDefinitions
 import io.stanc.pogoradar.firebase.FirebaseDefinitions.raidBosses
+import io.stanc.pogoradar.firebase.FirebaseDefinitions.quests
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.firebase.node.Team
@@ -24,13 +24,11 @@ object FirebaseImageMapper {
     fun raidDrawable(context: Context, arena: FirebaseArena?): Drawable? {
 
         arena?.raid?.let { raid ->
-//            Log.v(TAG, "Debug:: raidDrawable for raid: $raid, currentRaidState: ${RaidStateViewModel(raid).currentRaidState().name}, raidBossId: ${raid.raidBossId}, level: ${raid.level}")
 
             when(RaidStateViewModel(raid).currentRaidState()) {
 
                 RaidState.RAID_RUNNING -> {
-                    raid.raidBossId?.let { id ->
-                        val imageName = raidBosses.first { it.id == id }.imageName
+                    raidBosses.find { it.id == raid.raidBossId }?.imageName?.let { imageName ->
                         return assetDrawable(
                             context,
                             ASSETS_DIR_RAIDBOSSES,
@@ -71,7 +69,7 @@ object FirebaseImageMapper {
 
     fun questDrawable(context: Context, pokestop: FirebasePokestop): Drawable? {
 
-        return FirebaseDefinitions.quests.find { it.id == pokestop.quest?.definitionId }?.let { questDefinition ->
+        return quests.find { it.id == pokestop.quest?.definitionId }?.let { questDefinition ->
             questDrawable(context, questDefinition.imageName)
         } ?: run {
             null
