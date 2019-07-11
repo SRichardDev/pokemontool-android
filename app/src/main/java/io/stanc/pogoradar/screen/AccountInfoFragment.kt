@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -26,7 +27,7 @@ class AccountInfoFragment: Fragment() {
         binding.settings = AppSettings
 
         binding.root.findViewById<Button>(R.id.account_info_button)?.setOnClickListener {
-            ShowFragmentManager.showFragment(AccountInfoEditFragment.newInstance(viewModel), fragmentManager, R.id.account_layout)
+            findNavController().navigate(R.id.action_accountInfoFragment_to_accountInfoEditFragment)
         }
 
         return binding.root

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.ShowFragmentManager
@@ -33,18 +34,10 @@ class AccountFragment: Fragment() {
     private val authStateObserver = object: FirebaseUser.AuthStateObserver {
         override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
             when(newAuthState) {
-                FirebaseUser.AuthState.UserLoggedIn -> showAccountInfoFragment()
-                FirebaseUser.AuthState.UserLoggedInButUnverified -> showAccountLoginFragment()
-                FirebaseUser.AuthState.UserLoggedOut -> showAccountLoginFragment()
+                FirebaseUser.AuthState.UserLoggedIn -> findNavController().navigate(R.id.action_accountFragment_to_accountInfoFragment)
+                FirebaseUser.AuthState.UserLoggedInButUnverified -> findNavController().navigate(R.id.action_accountFragment_to_accountLoginFragment)
+                FirebaseUser.AuthState.UserLoggedOut -> findNavController().navigate(R.id.action_accountFragment_to_accountLoginFragment)
             }
         }
-    }
-
-    private fun showAccountInfoFragment() {
-        ShowFragmentManager.replaceFragment(AccountInfoFragment(), childFragmentManager, R.id.account_layout)
-    }
-
-    private fun showAccountLoginFragment() {
-        ShowFragmentManager.replaceFragment(AccountLoginFragment(), childFragmentManager, R.id.account_layout)
     }
 }

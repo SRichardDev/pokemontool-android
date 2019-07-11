@@ -8,6 +8,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.findNavController
 import com.google.android.material.navigation.NavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
@@ -19,9 +20,6 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
-import io.stanc.pogoradar.screen.AccountFragment
-import io.stanc.pogoradar.screen.MapInteractionFragment
-import io.stanc.pogoradar.screen.PolicyFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.SystemUtils
@@ -87,6 +85,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
         appInfoLabelController?.start()
+        showPopupIfUserIsLoggedOut()
     }
 
     override fun onPause() {
@@ -95,6 +94,12 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseUser.removeUserDataObserver(userDataObserver)
         appInfoLabelController?.stop()
         super.onPause()
+    }
+
+    private fun showPopupIfUserIsLoggedOut() {
+        if(FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedOut) {
+            Popup.showInfo(this, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
+        }
     }
 
     override fun onBackPressed() {
@@ -162,39 +167,33 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun showMapFragment(notificationContent: NotificationContent? = null) {
 
-        val fragmentTag = MapInteractionFragment::class.java.name
-        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag) as? MapInteractionFragment
-
-        if (fragment == null) {
-            fragment = MapInteractionFragment()
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.mapInteractionFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
         }
-
-        notificationContent?.let { fragment.onNotificationReceived(it) }
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
     }
 
     private fun showAccountFragment() {
 
-        val fragmentTag = AccountFragment::class.java.name
-        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
-
-        if (fragment == null) {
-            fragment = AccountFragment()
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.policyFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.mapInteractionFragment) {
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
+        }
     }
 
     private fun showPolicyFragment() {
 
-        val fragmentTag = PolicyFragment::class.java.name
-        var fragment = supportFragmentManager.findFragmentByTag(fragmentTag)
-
-        if (fragment == null) {
-            fragment = PolicyFragment()
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.accountFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.activity_content_layout, fragment, fragmentTag).commit()
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.mapInteractionFragment) {
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
+        }
     }
 
     /**
@@ -218,7 +217,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_account -> {
                 showAccountFragment()
@@ -230,7 +228,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
                 showPolicyFragment()
             }
         }
-
         drawerLayout?.closeDrawer(GravityCompat.START)
         return true
     }

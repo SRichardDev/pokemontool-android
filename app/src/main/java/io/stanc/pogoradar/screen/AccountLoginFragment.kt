@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -36,16 +37,14 @@ class AccountLoginFragment: Fragment() {
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
         signInButton?.setOnClickListener {
             viewModel.signType.set(SignType.SIGN_IN)
-            val fragment = AccountLoginProcessFragment.newInstance(viewModel)
-            ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.account_layout)
+            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 
         signUpButton = rootLayout.findViewById(R.id.account_button_signup)
         signUpButton?.setOnClickListener {
             viewModel.signType.set(SignType.SIGN_UP)
-            val fragment = AccountLoginProcessFragment.newInstance(viewModel)
-            ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.account_layout)
+            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 

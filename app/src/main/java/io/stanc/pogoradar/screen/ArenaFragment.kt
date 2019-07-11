@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -211,13 +212,11 @@ class ArenaFragment: Fragment() {
      */
 
     private fun showRaidFragment(arena: FirebaseArena) {
-        val fragment = RaidFragment.newInstance(arena.id, arena.geoHash)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_arenaFragment_to_raidFragment) // TODO: FirebaseArena -> showRaidFragment
     }
 
     private fun showParticipantsFragment(viewModel: RaidViewModel) {
-        val fragment = ParticipantsFragment.newInstance(viewModel)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_arenaFragment_to_participantsFragment) // TODO: RaidViewModel -> ParticipantsFragment
     }
 
     /**

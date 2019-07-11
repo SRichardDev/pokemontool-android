@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -145,8 +146,7 @@ class PokestopFragment: Fragment() {
     }
 
     private fun showQuestFragment(pokestop: FirebasePokestop) {
-        val fragment = QuestFragment.newInstance(pokestop)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_pokestopFragment_to_questFragment)
     }
 
     companion object {

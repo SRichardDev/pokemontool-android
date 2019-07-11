@@ -1,6 +1,8 @@
 package io.stanc.pogoradar.screen
 
+import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogoradar.App
@@ -16,17 +18,30 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
 
     var viewModel: LoginViewModel? = null
 
-    override fun onResume() {
-        super.onResume()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment onViewCreated()")
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment onResume()")
+    }
+
     override fun onPause() {
-        AppbarManager.setTitle(getString(R.string.default_app_title))
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment onPause()")
         super.onPause()
     }
 
+    override fun onDestroy() {
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment onDestroy()")
+        AppbarManager.setTitle(getString(R.string.default_app_title))
+        super.onDestroy()
+    }
+
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment viewPagerAdapter by lazy, viewModel: $viewModel")
         AccountLoginProcessFragmentPagerAdapter(childFragmentManager, viewModel!!)
     }
 
@@ -41,6 +56,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     override fun onPageChanged(position: Int) {
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment onPageChanged($position)")
         activity?.let { SystemUtils.hideKeyboard(it) }
     }
 
@@ -85,6 +101,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     private fun close() {
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment close()")
         activity?.let { SystemUtils.hideKeyboard(it) }
         fragmentManager?.popBackStack()
     }

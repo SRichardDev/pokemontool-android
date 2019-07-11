@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
@@ -68,13 +69,6 @@ class MapInteractionFragment: Fragment() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
-        showPopupIfUserIsLoggedOut()
-    }
-
-    private fun showPopupIfUserIsLoggedOut() {
-        if(FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedOut) {
-            Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
-        }
     }
 
     fun onNotificationReceived(notification: NotificationContent) {
@@ -246,26 +240,22 @@ class MapInteractionFragment: Fragment() {
 
     private fun showArenaFragment(arena: FirebaseArena) {
         resetModes()
-        val fragment = ArenaFragment.newInstance(arena)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_mapInteractionFragment_to_arenaFragment)
     }
 
     private fun showPokestopFragment(pokestop: FirebasePokestop) {
         resetModes()
-        val fragment = PokestopFragment.newInstance(pokestop)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_mapInteractionFragment_to_pokestopFragment)
     }
 
     private fun showMapItemCreationFragment(latLng: LatLng) {
         resetModes()
-        val fragment = MapItemCreationFragment.newInstance(latLng)
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapItemCreationFragment)
     }
 
     private fun showMapSettingsFragment() {
         resetModes()
-        val fragment = MapSettingsFragment()
-        ShowFragmentManager.showFragment(fragment, fragmentManager, R.id.fragment_map_layout)
+        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapSettingsFragment)
     }
 
     /**

@@ -57,6 +57,10 @@ dependencies {
     // exbandable FAB
     implementation 'com.getbase:floatingactionbutton:1.10.1'
 
+    // navigation components
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.0.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.0.0'
+
     // tests
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'

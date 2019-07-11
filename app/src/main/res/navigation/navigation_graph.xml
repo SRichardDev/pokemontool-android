@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/navigation_graph" app:startDestination="@id/mapInteractionFragment">
+
+    <fragment android:id="@+id/mapInteractionFragment" android:name="io.stanc.pogoradar.screen.MapInteractionFragment"
+              android:label="MapInteractionFragment"
+              tools:layout="@layout/fragment_map_grid">
+        <action android:id="@+id/action_mapInteractionFragment_to_pokestopFragment"
+                app:destination="@id/pokestopFragment"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_policyFragment" app:destination="@id/policyFragment"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_arenaFragment" app:destination="@id/arenaFragment"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_mapSettingsFragment"
+                app:destination="@id/mapSettingsFragment"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_mapItemCreationFragment"
+                app:destination="@id/mapItemCreationFragment"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_accountFragment"
+                app:destination="@id/accountFragment"/>
+    </fragment>
+    <fragment android:id="@+id/pokestopFragment" android:name="io.stanc.pogoradar.screen.PokestopFragment"
+              android:label="PokestopFragment"
+              tools:layout="@layout/fragment_pokestop">
+        <action android:id="@+id/action_pokestopFragment_to_questFragment" app:destination="@id/questFragment"/>
+    </fragment>
+    <fragment android:id="@+id/policyFragment" android:name="io.stanc.pogoradar.screen.PolicyFragment"
+              android:label="PolicyFragment"
+              tools:layout="@layout/fragment_policy"/>
+    <fragment android:id="@+id/arenaFragment" android:name="io.stanc.pogoradar.screen.ArenaFragment"
+              android:label="ArenaFragment"
+              tools:layout="@layout/fragment_arena">
+        <action android:id="@+id/action_arenaFragment_to_raidFragment" app:destination="@id/raidFragment"/>
+        <action android:id="@+id/action_arenaFragment_to_participantsFragment"
+                app:destination="@id/participantsFragment"/>
+    </fragment>
+    <fragment android:id="@+id/questFragment" android:name="io.stanc.pogoradar.screen.QuestFragment"
+              android:label="QuestFragment"
+              tools:layout="@layout/fragment_quest"/>
+    <fragment android:id="@+id/raidFragment" android:name="io.stanc.pogoradar.screen.RaidFragment"
+              android:label="RaidFragment"
+              tools:layout="@layout/fragment_raid"/>
+    <fragment android:id="@+id/mapSettingsFragment" android:name="io.stanc.pogoradar.screen.MapSettingsFragment"
+              android:label="MapSettingsFragment"
+              tools:layout="@layout/fragment_map_settings"/>
+    <fragment android:id="@+id/mapItemCreationFragment" android:name="io.stanc.pogoradar.screen.MapItemCreationFragment"
+              android:label="MapItemCreationFragment"
+              tools:layout="@layout/layout_viewpager_flow"/>
+    <fragment android:id="@+id/accountInfoFragment" android:name="io.stanc.pogoradar.screen.AccountInfoFragment"
+              android:label="AccountInfoFragment"
+              tools:layout="@layout/fragment_account_info">
+        <action android:id="@+id/action_accountInfoFragment_to_accountInfoEditFragment"
+                app:destination="@id/accountInfoEditFragment"/>
+    </fragment>
+    <fragment android:id="@+id/accountFragment" android:name="io.stanc.pogoradar.screen.AccountFragment"
+              android:label="AccountFragment"
+              tools:layout="@layout/fragment_account">
+        <action android:id="@+id/action_accountFragment_to_accountInfoFragment"
+                app:destination="@id/accountInfoFragment"/>
+        <action android:id="@+id/action_accountFragment_to_accountLoginFragment"
+                app:destination="@id/accountLoginFragment"/>
+    </fragment>
+    <fragment android:id="@+id/accountLoginProcessFragment"
+              android:name="io.stanc.pogoradar.screen.AccountLoginProcessFragment"
+              android:label="AccountLoginProcessFragment"
+              tools:layout="@layout/layout_viewpager_flow"/>
+    <fragment android:id="@+id/accountLoginFragment" android:name="io.stanc.pogoradar.screen.AccountLoginFragment"
+              android:label="AccountLoginFragment"
+              tools:layout="@layout/fragment_account_login">
+        <action android:id="@+id/action_accountLoginFragment_to_accountLoginProcessFragment"
+                app:destination="@id/accountLoginProcessFragment"/>
+    </fragment>
+    <fragment android:id="@+id/accountInfoEditFragment"
+              android:name="io.stanc.pogoradar.screen.AccountInfoEditFragment"
+              android:label="AccountInfoEditFragment"
+              tools:layout="@layout/fragment_account_info_edit"/>
+    <fragment android:id="@+id/participantsFragment" android:name="io.stanc.pogoradar.screen.ParticipantsFragment"
+              android:label="ParticipantsFragment"
+              tools:layout="@layout/layout_participants"/>
+</navigation>
