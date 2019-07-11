@@ -123,7 +123,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
         (findViewById(R.id.activity_toolbar) as? PoGoToolbar)?.let { toolbar ->
 
-            AppbarManager.setup(toolbar, defaultOnNavigationIconClicked = {
+            AppbarManager.setup(toolbar, resources.getString(R.string.default_app_title), defaultOnNavigationIconClicked = {
 
                 findViewById<View>(R.id.nav_view)?.let { navView ->
                     drawerLayout?.openDrawer(navView)

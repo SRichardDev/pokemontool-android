@@ -2,6 +2,7 @@ package io.stanc.pogoradar.appbar
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.stanc.pogoradar.NavDrawerActivity
 import java.lang.ref.WeakReference
 
 
@@ -10,17 +11,20 @@ class AppbarManager {
     companion object {
         private val TAG = javaClass.name
 
-        internal var toolbar: WeakReference<Toolbar>? = null
-             private set
-        internal val EMPTY_LAMBDA: () -> Unit = {}
-        internal var defaultOnNavigationIconClicked: () -> Unit = EMPTY_LAMBDA
-            private set
+        private var toolbar: WeakReference<Toolbar>? = null
+        private val EMPTY_LAMBDA: () -> Unit = {}
+        private var defaultOnNavigationIconClicked: () -> Unit = EMPTY_LAMBDA
+        private var defaultTitle: String? = null
 
-        fun setup(toolbar: Toolbar, defaultOnNavigationIconClicked: () -> Unit) {
+
+        fun setup(toolbar: Toolbar, defaultTitle: String, defaultOnNavigationIconClicked: () -> Unit) {
             toolbar.setNavigationIconClickListener { defaultOnNavigationIconClicked() }
 
             Companion.toolbar = WeakReference(toolbar)
+            Companion.defaultTitle = defaultTitle
             Companion.defaultOnNavigationIconClicked = defaultOnNavigationIconClicked
+
+            setTitle(defaultTitle)
         }
 
 
@@ -30,6 +34,10 @@ class AppbarManager {
 
         fun hideAppbar() {
             toolbar?.get()?.setVisibility(false)
+        }
+
+        fun reset() {
+            defaultTitle?.let { setTitle(it) }
         }
 
         /**

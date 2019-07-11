@@ -51,19 +51,9 @@ class PrivacyPolicyActivity: Activity() {
 
         (findViewById(R.id.activity_toolbar) as? PoGoToolbar)?.let { toolbar ->
 
-            AppbarManager.setup(toolbar, defaultOnNavigationIconClicked = {
+            AppbarManager.setup(toolbar, resources.getString(R.string.policy_button_privacy_policy), defaultOnNavigationIconClicked = {
                 // TODO...
             })
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        AppbarManager.setTitle(App.geString(R.string.policy_button_privacy_policy))
-    }
-
-    override fun onPause() {
-        AppbarManager.setTitle(getString(R.string.default_app_title))
-        super.onPause()
     }
 }
