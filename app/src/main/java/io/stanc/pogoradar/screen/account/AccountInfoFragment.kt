@@ -1,11 +1,13 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.account
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.R
@@ -15,22 +17,34 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.LoginViewModel
+import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 
 class AccountInfoFragment: Fragment() {
+    private val TAG = this::class.java.name
 
-    private val viewModel = LoginViewModel()
+    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountInfoBinding.inflate(inflater, container, false)
+
+        Log.d(TAG, "Debug:: onCreateView(AccountInfoFragment)")
         binding.viewModel = viewModel
+        Log.d(TAG, "Debug:: onCreateView(AccountInfoFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
+
         binding.settings = AppSettings
 
         binding.root.findViewById<Button>(R.id.account_info_button)?.setOnClickListener {
-            findNavController().navigate(R.id.action_accountInfoFragment_to_accountInfoEditFragment)
+            ShowFragmentManager.replaceFragment(AccountInfoEditFragment(), fragmentManager, R.id.account_layout)
+//            findNavController().navigate(R.id.action_accountInfoFragment_to_accountInfoEditFragment)
         }
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        Log.d(TAG, "Debug:: onDestroyView(AccountInfoFragment)")
+        super.onDestroyView()
     }
 
     override fun onResume() {
@@ -55,12 +69,7 @@ class AccountInfoFragment: Fragment() {
 
     private val userDataObserver = object: FirebaseUser.UserDataObserver {
         override fun userDataChanged(user: FirebaseUserNode?) {
-            user?.let { viewModel.update(it) }
+            user?.let { viewModel?.update(it) }
         }
-    }
-
-    companion object {
-
-        private val TAG = this::class.java.name
     }
 }

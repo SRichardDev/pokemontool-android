@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.account
 
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
@@ -19,11 +20,13 @@ import io.stanc.pogoradar.firebase.node.Team
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewmodel.LoginViewModel.SignType
+import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountLoginFragment: Fragment() {
     private val TAG = javaClass.name
 
-    private val viewModel = LoginViewModel()
+    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+
     private var signInButton: Button? = null
     private var signUpButton: Button? = null
     private var verificationButton: Button? = null
@@ -32,19 +35,24 @@ class AccountLoginFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_account_login, container, false)
 
+        Log.d(TAG, "Debug:: onCreateView(AccountLoginFragment)")
+        Log.d(TAG, "Debug:: onCreateView(AccountLoginFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
+
         setupTeamImages(rootLayout)
 
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
         signInButton?.setOnClickListener {
-            viewModel.signType.set(SignType.SIGN_IN)
-            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
+            viewModel?.signType?.set(SignType.SIGN_IN)
+            ShowFragmentManager.replaceFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
+//            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 
         signUpButton = rootLayout.findViewById(R.id.account_button_signup)
         signUpButton?.setOnClickListener {
-            viewModel.signType.set(SignType.SIGN_UP)
-            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
+            viewModel?.signType?.set(SignType.SIGN_UP)
+            ShowFragmentManager.replaceFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
+//            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 
@@ -68,6 +76,11 @@ class AccountLoginFragment: Fragment() {
         return rootLayout
     }
 
+    override fun onDestroyView() {
+        Log.d(TAG, "Debug:: onDestroyView(AccountLoginFragment)")
+        super.onDestroyView()
+    }
+
     override fun onResume() {
         super.onResume()
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
@@ -86,7 +99,7 @@ class AccountLoginFragment: Fragment() {
                                                 Team.MYSTIC to R.drawable.mystic,
                                                 Team.VALOR to R.drawable.icon_valor_512dp)
 
-        viewModel.teamOrder.get()?.let { teamOrder ->
+        viewModel?.teamOrder?.get()?.let { teamOrder ->
 
             if (teamOrder.size != 3) {
                 Log.e(TAG, "viewModel.teamOrder contains not 3 entries! teamOrder: $teamOrder")

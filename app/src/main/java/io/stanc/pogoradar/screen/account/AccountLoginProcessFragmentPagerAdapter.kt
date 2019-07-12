@@ -1,29 +1,28 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.account
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.subscreen.*
 import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewmodel.LoginViewModel.SignType
 
-class AccountLoginProcessFragmentPagerAdapter(fragmentManager: FragmentManager, private val loginViewModel: LoginViewModel): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+class AccountLoginProcessFragmentPagerAdapter(fragmentManager: FragmentManager, private val signType: SignType): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> AccountLoginFragment1.newInstance(loginViewModel)
-            1 -> AccountLoginFragment2.newInstance(loginViewModel)
-            2 -> AccountLoginFragment3.newInstance(loginViewModel)
-            3 -> AccountLoginFragment4.newInstance(loginViewModel)
-            4 -> AccountLoginFragment5.newInstance(loginViewModel)
+            0 -> AccountLoginProcessPage1Fragment()
+            1 -> AccountLoginProcessPage2Fragment()
+            2 -> AccountLoginProcessPage3Fragment()
+            3 -> AccountLoginProcessPage4Fragment()
+            4 -> AccountLoginProcessPage5Fragment()
             else -> throw Exception("unsupported position ($position) in AccountLoginProcessFragmentPagerAdapter!")
         }
     }
 
     override fun getCount(): Int {
-        return when(loginViewModel.signType.get()) {
+        return when(signType) {
             SignType.SIGN_IN -> 2
             SignType.SIGN_UP -> 5
             else -> 0

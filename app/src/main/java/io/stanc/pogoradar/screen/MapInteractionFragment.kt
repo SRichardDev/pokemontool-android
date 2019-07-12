@@ -6,8 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -15,15 +16,14 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import io.stanc.pogoradar.App
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
-import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
+import io.stanc.pogoradar.firebase.NotificationHolder
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
@@ -31,7 +31,6 @@ import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider
 import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
-import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.utils.WaitingSpinner
 
 
@@ -69,12 +68,12 @@ class MapInteractionFragment: Fragment() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.default_app_title))
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
-    }
 
-    fun onNotificationReceived(notification: NotificationContent) {
-        Log.i(TAG, "onNotificationReceived: $notification")
-        pendingNotification =  notification
-        tryToConsumeNotification()
+        NotificationHolder.consumeNotification()?.let { notification ->
+            Log.i(TAG, "onNotificationReceived: $notification")
+            pendingNotification =  notification
+            tryToConsumeNotification()
+        }
     }
 
     private fun tryToConsumeNotification() {

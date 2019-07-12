@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.account
 
 import android.os.Bundle
 import android.util.Log
@@ -13,11 +13,12 @@ import io.stanc.pogoradar.databinding.FragmentAccountInfoEditBinding
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.viewmodel.LoginViewModel
+import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountInfoEditFragment: Fragment() {
     private val TAG = javaClass.name
 
-    private var viewModel: LoginViewModel? = null
+    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountInfoEditBinding.inflate(inflater, container, false)
@@ -61,14 +62,5 @@ class AccountInfoEditFragment: Fragment() {
         updateUserData()
         activity?.let { SystemUtils.hideKeyboard(it) }
         fragmentManager?.popBackStack()
-    }
-
-    companion object {
-
-        fun newInstance(viewModel: LoginViewModel): AccountInfoEditFragment {
-            val fragment = AccountInfoEditFragment()
-            fragment.viewModel = viewModel
-            return fragment
-        }
     }
 }

@@ -2,6 +2,7 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.navigation.NavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
@@ -21,6 +23,7 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
+import io.stanc.pogoradar.firebase.NotificationHolder
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.utils.WaitingSpinner
@@ -68,12 +71,13 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         intent.extras?.let { extras ->
 
             if (extras.containsKey(NOTIFICATION_FLAG)) {
-
                 NotificationContent.new(extras.getString(NOTIFICATION_TITLE),
                                         extras.getString(NOTIFICATION_BODY),
                                         extras.getDouble(NOTIFICATION_LATITUDE),
                                         extras.getDouble(NOTIFICATION_LONGITUDE))?.let { notification ->
-                    showMapFragment(notification)
+
+                    NotificationHolder.reportNotification(notification)
+                    showMapFragment()
                 }
             }
         }
@@ -165,7 +169,7 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
      * Screens
      */
 
-    private fun showMapFragment(notificationContent: NotificationContent? = null) {
+    private fun showMapFragment() {
 
         if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.mapInteractionFragment) {
             this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
@@ -174,26 +178,14 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
     private fun showAccountFragment() {
 
-        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.policyFragment) {
-            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
-            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
-        }
-
-        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.mapInteractionFragment) {
-            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
-        }
+        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
+        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
     }
 
     private fun showPolicyFragment() {
 
-        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.accountFragment) {
-            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
-            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
-        }
-
-        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.mapInteractionFragment) {
-            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
-        }
+        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
+        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
     }
 
     /**
@@ -217,6 +209,15 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        Log.i(TAG, "Debug:: currentDestination: ${this.findNavController(R.id.nav_host_fragment).currentDestination?.id}")
+        Log.d(TAG, "Debug:: mapInteractionFragment: ${R.id.mapInteractionFragment}")
+        Log.d(TAG, "Debug:: accountFragment: ${R.id.accountFragment}")
+        Log.d(TAG, "Debug:: policyFragment: ${R.id.policyFragment}")
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        val backStackEntryCount = navHostFragment?.childFragmentManager?.backStackEntryCount
+        Log.w(TAG, "Debug:: backStackEntryCount: $backStackEntryCount: ${navHostFragment?.childFragmentManager?.fragments}")
+
         when (item.itemId) {
             R.id.nav_account -> {
                 showAccountFragment()

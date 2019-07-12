@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.subscreen
+package io.stanc.pogoradar.screen.account
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,10 +9,11 @@ import android.widget.NumberPicker
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentAccountLogin4Binding
 import io.stanc.pogoradar.viewmodel.LoginViewModel
+import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
-class AccountLoginFragment4: Fragment() {
+class AccountLoginProcessPage4Fragment: Fragment() {
 
-    private var viewModel: LoginViewModel? = null
+    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountLogin4Binding.inflate(inflater, container, false)
@@ -28,16 +29,5 @@ class AccountLoginFragment4: Fragment() {
         }
 
         return binding.root
-    }
-
-    companion object {
-
-        private val TAG = javaClass.name
-
-        fun newInstance(viewModel: LoginViewModel): AccountLoginFragment4 {
-            val fragment = AccountLoginFragment4()
-            fragment.viewModel = viewModel
-            return fragment
-        }
     }
 }
