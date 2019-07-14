@@ -4,8 +4,7 @@
               android:layout_height="match_parent"
               android:orientation="vertical"
               android:background="@color/white"
-              android:paddingStart="@dimen/layout_padding_screen"
-              android:paddingEnd="@dimen/layout_padding_screen">
+              android:padding="@dimen/layout_padding_screen">
 
     <TextView
         style="@style/TextStyle_bold"
