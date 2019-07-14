@@ -15,7 +15,8 @@
       android:orientation="vertical"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:padding="@dimen/layout_padding_screen">
+      android:paddingStart="@dimen/layout_padding_screen"
+        android:paddingEnd="@dimen/layout_padding_screen">
 
         <TextView
             style="@style/TextStyle_bold"
