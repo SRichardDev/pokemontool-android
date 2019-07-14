@@ -16,8 +16,11 @@ object ShowFragmentManager {
         }
 
         val fragmentTag = fragment::class.java.name
-        removeFragmentIfExists(fragmentTag, fragmentManager)
-        fragmentManager.beginTransaction().add(layoutResId, fragment, fragmentTag).addToBackStack(null).commit()
+
+        if(!fragmentAlreadyExists(fragmentTag, fragmentManager)) {
+            Log.w(TAG, "Debug:: new fragment to add: $fragment")
+            fragmentManager.beginTransaction().add(layoutResId, fragment, fragmentTag).addToBackStack(null).commit()
+        }
     }
 
     fun replaceFragment(fragment: Fragment?, fragmentManager: FragmentManager?, @IdRes layoutResId: Int) {
@@ -28,13 +31,15 @@ object ShowFragmentManager {
         }
 
         val fragmentTag = fragment::class.java.name
-        removeFragmentIfExists(fragmentTag, fragmentManager)
-        fragmentManager.beginTransaction().replace(layoutResId, fragment, fragmentTag).commit()
+
+        if(!fragmentAlreadyExists(fragmentTag, fragmentManager)) {
+            Log.w(TAG, "Debug:: new fragment to replace: $fragment")
+            fragmentManager.beginTransaction().replace(layoutResId, fragment, fragmentTag).commit()
+        }
     }
 
-    private fun removeFragmentIfExists(fragmentTag: String, fragmentManager: FragmentManager) {
-        fragmentManager.findFragmentByTag(fragmentTag)?.let {
-            fragmentManager.beginTransaction().remove(it).commit()
-        }
+    private fun fragmentAlreadyExists(fragmentTag: String, fragmentManager: FragmentManager): Boolean {
+        val fragment = fragmentManager.findFragmentByTag(fragmentTag)
+        return fragment?.isAdded ?: false
     }
 }

@@ -25,7 +25,7 @@ object FirebaseImageMapper {
 
         arena?.raid?.let { raid ->
 
-            when(RaidStateViewModel(raid).currentRaidState()) {
+            when(RaidStateViewModel.new(raid).currentRaidState()) {
 
                 RaidState.RAID_RUNNING -> {
                     raidBosses.find { it.id == raid.raidBossId }?.imageName?.let { imageName ->

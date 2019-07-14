@@ -241,16 +241,4 @@ class ArenaFragment: Fragment() {
             setupRaidbossList()
         }
     }
-
-
-    companion object {
-
-        private val TAG = javaClass.name
-
-        fun newInstance(arena: FirebaseArena): ArenaFragment {
-            val fragment = ArenaFragment()
-            fragment.arena = arena
-            return fragment
-        }
-    }
 }

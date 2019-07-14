@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
@@ -9,14 +10,16 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.geohash.GeoHash
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
+@Parcelize
 data class FirebasePokestop private constructor(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
     val submitter: String,
-    val quest: FirebaseQuest? = null): FirebaseNode {
+    val quest: FirebaseQuest? = null) : FirebaseNode, Parcelable {
 
     override fun databasePath(): String {
         return "$POKESTOPS/${firebaseGeoHash(geoHash)}"
@@ -33,9 +36,7 @@ data class FirebasePokestop private constructor(
         return data
     }
 
-
     companion object {
-
         private val TAG = javaClass.name
 
         fun id(dataSnapshot: DataSnapshot): String? {

@@ -6,6 +6,8 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_MESSAGE
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_SENDER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
+import io.stanc.pogoradar.firebase.FirebaseServer
+import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
 
 class FirebaseChat (
     override val id: String,
@@ -21,7 +23,7 @@ class FirebaseChat (
 
         data[CHAT_MESSAGE] = message
         data[CHAT_SENDER_ID] = senderId
-        data[TIMESTAMP] = timestamp
+        data[TIMESTAMP] = if(timestamp == TIMESTAMP_SERVER) FirebaseServer.timestamp() else timestamp
 
         return data
     }

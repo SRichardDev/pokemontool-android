@@ -6,9 +6,10 @@ import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.TimeCalculator
 
-class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
+class RaidStateViewModel: ViewModel() {
     private val TAG = javaClass.name
 
+    var raid: FirebaseRaid? = null
     val raidState = ObservableField<RaidState>()
     // TODO: update raidTime ? maybe server should change: egg -> raid -> expired
     val raidTime = ObservableField<String?>()
@@ -102,4 +103,13 @@ class RaidStateViewModel(private var raid: FirebaseRaid?): ViewModel() {
     fun timeEggHatches(): String? = raid?.timeEggHatches
 
     fun timeRaidEnds(): String? = raid?.timeEnd
+
+    companion object {
+
+        fun new(raid: FirebaseRaid?): RaidStateViewModel {
+            val viewModel = RaidStateViewModel()
+            viewModel.updateData(raid)
+            return viewModel
+        }
+    }
 }

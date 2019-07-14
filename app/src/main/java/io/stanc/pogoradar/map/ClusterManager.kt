@@ -68,7 +68,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val markers = arenaClusterManager.markerCollection.markers
             for (marker in markers) {
                 (marker.tag as? FirebaseArena)?.let {
-                    marker.isVisible = ArenaViewModel(it).isArenaVisibleOnMap.get() == true
+                    marker.isVisible = ArenaViewModel.new(it).isArenaVisibleOnMap.get() == true
                 }
             }
             arenaClusterManager.cluster()
@@ -78,7 +78,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val markers = pokestopClusterManager.markerCollection.markers
             for (marker in markers) {
                 (marker.tag as? FirebasePokestop)?.let {
-                    marker.isVisible = PokestopViewModel(it).isPokestopVisibleOnMap.get() == true
+                    marker.isVisible = PokestopViewModel.new(it, context).isPokestopVisibleOnMap.get() == true
                 }
             }
             pokestopClusterManager.cluster()
@@ -196,7 +196,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         arena.raid?.let { raid ->
 
-            val viewModel = RaidStateViewModel(raid)
+            val viewModel = RaidStateViewModel.new(raid)
 
             if (viewModel.isRaidAnnounced.get() == true) {
 

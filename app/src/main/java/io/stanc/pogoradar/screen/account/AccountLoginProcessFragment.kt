@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -14,45 +15,29 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewmodel.LoginViewModel.SignType
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 import io.stanc.pogoradar.viewpager.ViewPagerFragment
 
 class AccountLoginProcessFragment: ViewPagerFragment() {
     private val TAG = this::class.java.name
 
-    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d(TAG, "Debug:: onCreateView(AccountLoginProcessFragment)")
-
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+        }
         Log.d(TAG, "Debug:: onCreateView(AccountLoginProcessFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
-
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment onViewCreated()")
+        Log.d(TAG, "Debug:: onViewCreated(AccountLoginProcessFragment)")
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment onResume()")
-    }
-
-    override fun onPause() {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment onPause()")
-        super.onPause()
-    }
-
-    override fun onDestroyView() {
-        Log.d(TAG, "Debug:: onDestroyView(AccountLoginProcessFragment)")
-        super.onDestroyView()
-    }
-
     override fun onDestroy() {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment onDestroy()")
+        Log.d(TAG, "Debug:: onDestroy(AccountLoginProcessFragment)")
         AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onDestroy()
     }
@@ -63,6 +48,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment.navigationButtonClickedOnTheLastPage()")
         try {
             tryToSendLoginData()
 
@@ -73,7 +59,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     override fun onPageChanged(position: Int) {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment onPageChanged($position)")
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment.onPageChanged($position)")
         activity?.let { SystemUtils.hideKeyboard(it) }
     }
 
@@ -108,6 +94,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
 
     private val signInUpCompletionCallback = object: (Boolean, String?) -> Unit {
         override fun invoke(taskSuccessful: Boolean, exception: String?) {
+            Log.d(TAG, "Debug:: AccountLoginProcessFragment.signInUpCompletionCallback(taskSuccessful: $taskSuccessful)")
             if (taskSuccessful) {
                 close()
             } else {
@@ -118,7 +105,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     private fun close() {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment close()")
+        Log.d(TAG, "Debug:: AccountLoginProcessFragment.close()")
         activity?.let { SystemUtils.hideKeyboard(it) }
         fragmentManager?.popBackStack()
     }

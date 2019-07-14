@@ -11,6 +11,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
@@ -62,6 +63,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         onNotification(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        showPopupIfUserIsLoggedOut()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         onNotification(intent)
@@ -89,7 +95,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
         FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
         appInfoLabelController?.start()
-        showPopupIfUserIsLoggedOut()
     }
 
     override fun onPause() {
@@ -160,6 +165,11 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
 
             drawerLayout.addDrawerListener(toggle)
             findViewById<NavigationView>(R.id.nav_view)?.setNavigationItemSelectedListener(this)
+
+//            findViewById<NavigationView>(R.id.nav_view)?.let { navigationView ->
+//                NavigationUI.setupWithNavController(navigationView, this.findNavController(R.id.nav_host_fragment))
+//            }
+
 
             toggle.syncState()
         }

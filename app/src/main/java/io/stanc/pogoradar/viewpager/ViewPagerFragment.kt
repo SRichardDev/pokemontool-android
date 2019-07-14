@@ -25,6 +25,8 @@ abstract class ViewPagerFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = LayoutViewpagerFlowBinding.inflate(inflater, container, false)
         binding.viewModel = this
+        Log.d(TAG, "Debug:: onCreateView(ViewPagerFragment)")
+
 
         binding.root.findViewById<ViewPager>(R.id.viewpager)?.let { viewpager ->
 
@@ -52,7 +54,19 @@ abstract class ViewPagerFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.i(TAG, "Debug:: onResume(ViewPagerFragment), childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
+        Log.d(TAG, "Debug:: onResume(ViewPagerFragment) viewPager?.currentItem: ${viewPager?.currentItem}")
         viewPager?.currentItem?.let { updateViewPagerButtonText(it) }
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "Debug:: onPause(ViewPagerFragment) viewPager?.currentItem: ${viewPager?.currentItem}")
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        Log.d(TAG, "Debug:: onDestroyView(ViewPagerFragment)")
+        super.onDestroyView()
     }
 
     /**
@@ -65,6 +79,7 @@ abstract class ViewPagerFragment: Fragment() {
 
         viewPager?.let { viewpager ->
 
+            Log.d(TAG, "Debug:: onButtonClicked(ViewPagerFragment) viewPager.currentItem: ${viewpager.currentItem}")
             if (viewpager.currentItem == viewpager.adapter?.count?.minus(1)) {
                 navigationButtonClickedOnTheLastPage()
             } else {

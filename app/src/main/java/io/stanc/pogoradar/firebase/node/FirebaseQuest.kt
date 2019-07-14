@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST
@@ -8,15 +9,18 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.FirebaseServer
+import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
 import io.stanc.pogoradar.geohash.GeoHash
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class FirebaseQuest private constructor(
     override val id: String,
     val definitionId: String,
     val submitter: String,
-    val timestamp: Any,
+    val timestamp: Long,
     val geoHash: GeoHash,
-    val pokestopId: String): FirebaseNode {
+    val pokestopId: String): FirebaseNode, Parcelable {
 
     override fun databasePath(): String = "$POKESTOPS/${firebaseGeoHash(geoHash)}/$pokestopId/$QUEST"
 
@@ -25,7 +29,7 @@ data class FirebaseQuest private constructor(
 
         data[QUEST_ID] = definitionId
         data[SUBMITTER] = submitter
-        data[TIMESTAMP] = timestamp
+        data[TIMESTAMP] = if(timestamp == TIMESTAMP_SERVER) FirebaseServer.timestamp() else timestamp
 
         return data
     }
@@ -51,7 +55,7 @@ data class FirebaseQuest private constructor(
         }
 
         fun new(pokestopId: String, geoHash: GeoHash, questDefinitionId: String, userId: String): FirebaseQuest {
-            return FirebaseQuest(QUEST, questDefinitionId, userId, FirebaseServer.timestamp(), geoHash, pokestopId)
+            return FirebaseQuest(QUEST, questDefinitionId, userId, TIMESTAMP_SERVER, geoHash, pokestopId)
         }
     }
 }

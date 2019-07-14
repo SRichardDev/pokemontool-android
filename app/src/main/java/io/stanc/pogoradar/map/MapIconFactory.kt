@@ -33,7 +33,7 @@ object MapIconFactory {
             }
 
             arena.raid?.let {
-                val viewModel = RaidStateViewModel(it)
+                val viewModel = RaidStateViewModel.new(it)
                 if (viewModel.isRaidAnnounced.get() == true) {
                     iconConfig.headerText = "[${viewModel.raidTime.get()}]"
                 }
@@ -82,7 +82,7 @@ object MapIconFactory {
                 backgroundDrawable
             )
 
-            if(QuestViewModel(pokestop).questExists.get() == true) {
+            if(QuestViewModel.new(pokestop, context).questExists.get() == true) {
                 FirebaseImageMapper.questDrawable(context, pokestop)?.let { headerDrawable ->
                     iconConfig.headerDrawable = headerDrawable
                 }

@@ -1,24 +1,26 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.IS_EX
+import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
-import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.geohash.GeoHash
+import kotlinx.android.parcel.Parcelize
 
-
+@Parcelize
 data class FirebaseArena private constructor(
     override val id: String,
     val name: String,
     val geoHash: GeoHash,
     val submitter: String,
     val isEX: Boolean = false,
-    val raid: FirebaseRaid? = null): FirebaseNode {
+    val raid: FirebaseRaid? = null): FirebaseNode, Parcelable {
 
     override fun databasePath() = "$ARENAS/${firebaseGeoHash(geoHash)}"
 

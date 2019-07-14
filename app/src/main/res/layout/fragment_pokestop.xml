@@ -1,107 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
 
-    <data>
-        <variable
-            name="viewmodel"
-            type="io.stanc.pogoradar.viewmodel.QuestViewModel" />
-        <import type="android.view.View"/>
-    </data>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white">
-
-        <LinearLayout
+    <FrameLayout
+            android:id="@+id/pokestop_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/layout_padding_screen">
+            android:layout_height="match_parent"/>
 
-            <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
-                      android:id="@+id/map_item_mapview"
-                      android:layout_width="match_parent"
-                      android:layout_height="250dp"
-                      app:layout_constraintEnd_toEndOf="parent"
-                      app:layout_constraintStart_toStartOf="parent"
-                      app:layout_constraintTop_toTopOf="parent"/>
-
-            <Button
-                android:id="@+id/pokestop_button_new_quest"
-                style="@style/ButtonStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@string/pokestop_quest_button_new_quest"
-                android:visibility="@{viewmodel.questExists ? View.GONE : View.VISIBLE}"
-                tools:visibility="visible"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="@{viewmodel.questExists ? View.VISIBLE : View.GONE}"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@string/pokestop_active_quest"/>
-
-                    <TextView
-                        style="@style/TextStyle_default"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@{viewmodel.quest}"
-                        tools:text="Super cool quest"/>
-
-                    <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@string/pokestop_quest_reward"/>
-
-                    <TextView
-                        style="@style/TextStyle_default"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@{viewmodel.reward}"
-                        tools:text="Super big reward"/>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/pokestop_layout_quest_image"
-                    style="@style/Image"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    tools:src="@drawable/icon_star_gold_30dp"
-                    tools:ignore="contentDescription"/>
-
-            </LinearLayout>
-
-            <include layout="@layout/layout_divider"/>
-
-            <include layout="@layout/layout_map_item_infos"/>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</layout>
+</LinearLayout>

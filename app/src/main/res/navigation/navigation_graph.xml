@@ -21,7 +21,7 @@
         <action android:id="@+id/action_mapInteractionFragment_to_accountFragment"
                 app:destination="@id/accountFragment"/>
     </fragment>
-    <fragment android:id="@+id/pokestopFragment" android:name="io.stanc.pogoradar.screen.PokestopFragment"
+    <fragment android:id="@+id/pokestopFragment" android:name="io.stanc.pogoradar.screen.pokestop.PokestopFragment"
               android:label="PokestopFragment"
               tools:layout="@layout/fragment_pokestop">
         <action android:id="@+id/action_pokestopFragment_to_questFragment" app:destination="@id/questFragment"
@@ -41,7 +41,7 @@
         <action android:id="@+id/action_arenaFragment_to_participantsFragment"
                 app:destination="@id/participantsFragment"/>
     </fragment>
-    <fragment android:id="@+id/questFragment" android:name="io.stanc.pogoradar.screen.QuestFragment"
+    <fragment android:id="@+id/questFragment" android:name="io.stanc.pogoradar.screen.pokestop.QuestFragment"
               android:label="QuestFragment"
               tools:layout="@layout/fragment_quest"/>
     <fragment android:id="@+id/raidFragment" android:name="io.stanc.pogoradar.screen.RaidFragment"

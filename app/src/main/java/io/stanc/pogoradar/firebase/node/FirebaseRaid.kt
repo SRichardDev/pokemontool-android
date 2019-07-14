@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
@@ -14,19 +15,22 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_TIME_END
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.FirebaseServer
+import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.TimeCalculator
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
+@Parcelize
 data class FirebaseRaid private constructor(override val id: String,
                                             val level: Int,
                                             val timeEggHatches: String?,
                                             val timeEnd: String,
-                                            val timestamp: Any,
+                                            val timestamp: Long,
                                             val geoHash: GeoHash,
                                             val arenaId: String,
                                             var raidBossId: String? = null,
-                                            var raidMeetupId: String? = null): FirebaseNode {
+                                            var raidMeetupId: String? = null): FirebaseNode, Parcelable {
 
     override fun databasePath(): String = "$ARENAS/${firebaseGeoHash(geoHash)}/$arenaId/$RAID"
 
@@ -38,7 +42,7 @@ data class FirebaseRaid private constructor(override val id: String,
             data[RAID_TIME_EGG_HATCHES] = it
         }
         data[RAID_TIME_END] = timeEnd
-        data[TIMESTAMP] = timestamp
+        data[TIMESTAMP] = if(timestamp == TIMESTAMP_SERVER) FirebaseServer.timestamp() else timestamp
         raidBossId?.let {
             data[RAID_BOSS_ID] = it
         }
@@ -84,7 +88,7 @@ data class FirebaseRaid private constructor(override val id: String,
             }
 
 //            Log.d(TAG, "Debug:: new raid: formattedTimeRaidEnds: $formattedTimeRaidEnds, formattedTimeEggHatches: $formattedTimeEggHatches")
-            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId)
+            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, TIMESTAMP_SERVER, geoHash, arenaId)
         }
 
         fun new(raidLevel: Int, timeRaidEndsHour: Int, timeRaidEndsMinutes: Int, geoHash: GeoHash, arenaId: String, raidBossId: String?): FirebaseRaid {
@@ -97,7 +101,7 @@ data class FirebaseRaid private constructor(override val id: String,
             }
 //            Log.d(TAG, "Debug:: new raid: formattedTimeRaidEnds: $formattedTimeRaidEnds, formattedTimeEggHatches: $formattedTimeEggHatches")
 
-            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, FirebaseServer.timestamp(), geoHash, arenaId, raidBossId)
+            return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, TIMESTAMP_SERVER, geoHash, arenaId, raidBossId)
         }
     }
 }

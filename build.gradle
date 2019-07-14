@@ -13,7 +13,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // cloud firestore
-        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.gms:google-services:4.3.0'
 
         // license report
         classpath 'com.google.android.gms:oss-licenses-plugin:0.9.5'

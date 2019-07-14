@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -20,12 +19,11 @@ import io.stanc.pogoradar.firebase.node.Team
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewmodel.LoginViewModel.SignType
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountLoginFragment: Fragment() {
     private val TAG = javaClass.name
 
-    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+    private var viewModel: LoginViewModel? = null
 
     private var signInButton: Button? = null
     private var signUpButton: Button? = null
@@ -35,7 +33,10 @@ class AccountLoginFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_account_login, container, false)
 
-        Log.d(TAG, "Debug:: onCreateView(AccountLoginFragment)")
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+        }
+
         Log.d(TAG, "Debug:: onCreateView(AccountLoginFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
 
         setupTeamImages(rootLayout)
@@ -43,7 +44,7 @@ class AccountLoginFragment: Fragment() {
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
         signInButton?.setOnClickListener {
             viewModel?.signType?.set(SignType.SIGN_IN)
-            ShowFragmentManager.replaceFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
+            ShowFragmentManager.showFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
 //            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
@@ -51,7 +52,7 @@ class AccountLoginFragment: Fragment() {
         signUpButton = rootLayout.findViewById(R.id.account_button_signup)
         signUpButton?.setOnClickListener {
             viewModel?.signType?.set(SignType.SIGN_UP)
-            ShowFragmentManager.replaceFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
+            ShowFragmentManager.showFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
 //            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
             // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
@@ -76,13 +77,10 @@ class AccountLoginFragment: Fragment() {
         return rootLayout
     }
 
-    override fun onDestroyView() {
-        Log.d(TAG, "Debug:: onDestroyView(AccountLoginFragment)")
-        super.onDestroyView()
-    }
-
     override fun onResume() {
         super.onResume()
+        Log.i(TAG, "Debug:: onResume(AccountLoginFragment), childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
+
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
@@ -91,6 +89,11 @@ class AccountLoginFragment: Fragment() {
         FirebaseUser.removeAuthStateObserver(authStateObserver)
         AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        Log.d(TAG, "Debug:: onDestroyView(AccountLoginFragment)")
+        super.onDestroyView()
     }
 
     private fun setupTeamImages(rootLayout: View) {
@@ -114,6 +117,7 @@ class AccountLoginFragment: Fragment() {
 
     private val authStateObserver = object : FirebaseUser.AuthStateObserver {
         override fun authStateChanged(newAuthState: AuthState) {
+            Log.i(TAG, "Debug:: authStateChanged(${newAuthState.name})")
             when(newAuthState) {
                 AuthState.UserLoggedIn -> {
                     signInButton?.visibility = View.GONE

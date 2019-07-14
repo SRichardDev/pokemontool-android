@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.annotation.DimenRes
 import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
+import io.stanc.pogoradar.utils.Kotlin
 
 class App: Application() {
     private val TAG = javaClass.name
@@ -43,11 +44,14 @@ class App: Application() {
         var preferences: SharedPreferences? = null
             private set
 
-        fun geString(@StringRes stringResId: Int, formatArg1: String? = null): String? {
-            formatArg1?.let {
-                return appContext?.resources?.getString(stringResId, formatArg1)
-            } ?: run {
-                return appContext?.resources?.getString(stringResId)
+        fun geString(@StringRes stringResId: Int, formatArg1: String? = null, formatArg2: String? = null): String? {
+
+            return if (formatArg1 != null && formatArg2 != null) {
+                appContext?.resources?.getString(stringResId, formatArg1, formatArg2)
+            } else if (formatArg1 != null) {
+                appContext?.resources?.getString(stringResId, formatArg1)
+            } else {
+                appContext?.resources?.getString(stringResId)
             }
         }
 

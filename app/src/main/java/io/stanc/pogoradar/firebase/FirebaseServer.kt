@@ -76,7 +76,7 @@ object FirebaseServer {
 
         if (task.isSuccessful) {
 
-            (task.result as? InstanceIdResult)?.let { callback.onSuccess(it.token as TData) }
+            (task.result as? InstanceIdResult)?.let { callback.onSuccess(it.token as? TData) }
             (task.result as? Void)?.let { callback.onSuccess(null) }
 
             // e.g. if no value exists for removing
@@ -257,6 +257,8 @@ object FirebaseServer {
     /**
      * helper
      */
+
+    const val TIMESTAMP_SERVER: Long = -1
 
     fun timestamp(): Any {
         return ServerValue.TIMESTAMP

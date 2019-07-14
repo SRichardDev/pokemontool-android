@@ -9,6 +9,11 @@ import io.stanc.pogoradar.utils.SegmentedControlView
 class MapItemViewModel: ViewModel() {
     private val TAG = javaClass.name
 
+    enum class Type {
+        Arena,
+        Pokestop
+    }
+
     val position = ObservableField<LatLng>()
     val type = ObservableField<Type>(Type.Pokestop)
     val isEx = ObservableField<Boolean?>()
@@ -39,10 +44,5 @@ class MapItemViewModel: ViewModel() {
 
     private fun updateNameWithType() {
         nameWithType.set("${type.get()?.name}: ${name.get()}")
-    }
-
-    enum class Type {
-        Arena,
-        Pokestop
     }
 }

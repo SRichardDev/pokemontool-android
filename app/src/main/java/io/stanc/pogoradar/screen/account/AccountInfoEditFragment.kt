@@ -8,20 +8,24 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.NumberPicker
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentAccountInfoEditBinding
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.viewmodel.LoginViewModel
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountInfoEditFragment: Fragment() {
     private val TAG = javaClass.name
 
-    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountInfoEditBinding.inflate(inflater, container, false)
+
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+        }
 
         binding.viewModel = viewModel
 

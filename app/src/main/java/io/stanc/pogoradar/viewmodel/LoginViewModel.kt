@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.viewmodel
 
-import android.util.Log
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.FirebaseImageMapper.TEAM_COLOR
@@ -32,34 +31,48 @@ class LoginViewModel: ViewModel() {
     val numberRaids = ObservableField<Int>(0)
     val numberQuests = ObservableField<Int>(0)
 
-    init {
-        Log.i(TAG, "Debug:: LoginViewModel created !!!")
+    fun update(user: FirebaseUserNode?) {
+
+        user?.let {
+
+            shuffleTeam()
+
+            name.set(user.name)
+            email.set(user.email)
+            user.code?.let { code.set(it) }
+            level.set(user.level.toString())
+            team.set(user.team)
+            teamColor.set(TEAM_COLOR[user.team])
+            numberPokestops.set(user.submittedPokestops.toInt())
+            numberArenas.set(user.submittedArenas.toInt())
+            numberRaids.set(user.submittedRaids.toInt())
+            numberQuests.set(user.submittedQuests.toInt())
+
+        } ?: run {
+            reset()
+        }
+    }
+
+    private fun shuffleTeam() {
         val shuffledTeamOrder = Team.values().toList().shuffled()
 
         teamOrder.set(shuffledTeamOrder)
-
         team.set(shuffledTeamOrder[0])
         teamColor.set(TEAM_COLOR[shuffledTeamOrder[0]])
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.i(TAG, "Debug:: LoginViewModel destroyed!")
-    }
+    private fun reset() {
 
-    fun update(user: FirebaseUserNode) {
+        shuffleTeam()
 
-        name.set(user.name)
-        email.set(user.email)
-        user.code?.let { code.set(it) }
-        level.set(user.level.toString())
-        team.set(user.team)
-        teamColor.set(TEAM_COLOR[user.team])
-        numberPokestops.set(user.submittedPokestops.toInt())
-        numberArenas.set(user.submittedArenas.toInt())
-        numberRaids.set(user.submittedRaids.toInt())
-        numberQuests.set(user.submittedQuests.toInt())
-
+        name.set(null)
+        email.set(null)
+        code.set("0000 0000 0000")
+        level.set("0")
+        numberPokestops.set(0)
+        numberArenas.set(0)
+        numberRaids.set(0)
+        numberQuests.set(0)
     }
 
     fun onSelectedStateDidChange(selection: SegmentedControlView.Selection) {

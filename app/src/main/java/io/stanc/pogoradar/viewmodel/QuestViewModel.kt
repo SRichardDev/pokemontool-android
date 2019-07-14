@@ -12,7 +12,7 @@ import io.stanc.pogoradar.firebase.FirebaseDefinitions
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.TimeCalculator.isCurrentDay
 
-class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
+class QuestViewModel : ViewModel() {
 
     private val TAG = javaClass.name
 
@@ -20,38 +20,31 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
      * observable fields
      */
 
+    var pokestop: FirebasePokestop? = null
     val questExists = ObservableField<Boolean>(false)
     val quest = ObservableField<String>(App.geString(R.string.pokestop_quest_none))
     val reward = ObservableField<String>(App.geString(R.string.pokestop_quest_none))
-    private var imageName: String? = null
+    val questImage = ObservableField<Drawable?>()
 
-    init {
-        updateData(pokestop)
-    }
+    fun updateData(pokestop: FirebasePokestop?, context: Context) {
+        this.pokestop = pokestop
 
-    fun imageDrawable(context: Context): Drawable? {
+        pokestop?.quest?.let { firebaseQuest ->
 
-        return imageName?.let {
-            FirebaseImageMapper.questDrawable(context, it)
-        } ?: run {
-            null
-        }
-    }
-
-    fun updateData(pokestop: FirebasePokestop) {
-
-        pokestop.quest?.let { firebaseQuest ->
-
+            Log.w(TAG, "Debug:: updateViewModel(), firebaseQuest.id: ${firebaseQuest.id}, FirebaseDefinitions.quests: ${FirebaseDefinitions.quests}")
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
                 val validQuest = (firebaseQuest.timestamp as? Long)?.let { timestamp ->
                     isCurrentDay(timestamp)
-                } ?: run { false }
+                } ?: run {
+                    false
+                }
 
                 questExists.set(validQuest)
                 quest.set(questDefinition.questDescription)
                 reward.set(questDefinition.reward)
-                imageName = questDefinition.imageName
+                Log.w(TAG, "Debug:: updateViewModel(), imageName: ${questDefinition.imageName}")
+                questImage.set(imageDrawable(questDefinition.imageName, context))
 
             } ?: run {
                 Log.w(TAG, "Quest data exists but definitionsId ${firebaseQuest.definitionId} not found in local quests: ${FirebaseDefinitions.quests}")
@@ -61,14 +54,26 @@ class QuestViewModel(private var pokestop: FirebasePokestop): ViewModel() {
         } ?: run {
             resetData()
         }
-
-        this.pokestop = pokestop
     }
 
     private fun resetData() {
+        Log.w(TAG, "Debug:: resetData()")
         questExists.set(false)
         quest.set(App.geString(R.string.pokestop_quest_none))
         reward.set(App.geString(R.string.pokestop_quest_none))
-        imageName = null
+        questImage.set(null)
+    }
+
+    private fun imageDrawable(imageName: String, context: Context): Drawable? {
+        return FirebaseImageMapper.questDrawable(context, imageName)
+    }
+
+    companion object {
+
+        fun new(pokestop: FirebasePokestop, context: Context): QuestViewModel {
+            val viewModel = QuestViewModel()
+            viewModel.updateData(pokestop, context)
+            return viewModel
+        }
     }
 }

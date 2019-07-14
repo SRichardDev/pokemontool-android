@@ -9,12 +9,12 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 
-class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
+class RaidMeetupViewModel: ViewModel() {
     private val TAG = javaClass.name
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
-    var raidMeetup: FirebaseRaidMeetup? = raidMeetup
+    var raidMeetup: FirebaseRaidMeetup? = null
         private set
 
     val isRaidMeetupAnnounced = ObservableField<Boolean>()
@@ -22,10 +22,6 @@ class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
     val numParticipants = ObservableField<String>()
     val participants = ObservableField<List<FirebasePublicUser>>()
     val isUserParticipate = ObservableField<Boolean>()
-
-    init {
-        updateData(raidMeetup)
-    }
 
     fun updateData(raidMeetup: FirebaseRaidMeetup?) {
         this.raidMeetup = raidMeetup
@@ -103,4 +99,12 @@ class RaidMeetupViewModel(raidMeetup: FirebaseRaidMeetup?): ViewModel() {
         }
     }
 
+    companion object {
+
+        fun new(raidMeetup: FirebaseRaidMeetup?): RaidMeetupViewModel {
+            val viewModel = RaidMeetupViewModel()
+            viewModel.updateData(raidMeetup)
+            return viewModel
+        }
+    }
 }

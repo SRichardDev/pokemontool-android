@@ -6,17 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentAccountLogin4Binding
 import io.stanc.pogoradar.viewmodel.LoginViewModel
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountLoginProcessPage4Fragment: Fragment() {
 
-    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountLogin4Binding.inflate(inflater, container, false)
+
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+        }
+
         binding.viewModel = viewModel
 
         binding.root.findViewById<NumberPicker>(R.id.account_numberpicker_level)?.let { numberPicker ->

@@ -11,26 +11,25 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.LoginViewModel
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 class AccountFragment: Fragment() {
     private val TAG = javaClass.name
 
-//    private lateinit var viewModel: LoginViewModel
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_account, container, false)
-        Log.d(TAG, "Debug:: onCreateView(AccountFragment)")
-        ViewModelFactory.boundNewViewModel(this, LoginViewModel::class.java)
-        val viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
-//        val viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-        Log.d(TAG, "Debug:: onCreateView(AccountFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
+
+        activity?.let {
+            val viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+            viewModel.update(FirebaseUser.userData)
+            Log.d(TAG, "Debug:: onCreateView(AccountFragment) viewModel: $viewModel, signType: ${viewModel.signType.get()?.name}")
+        }
 
         return rootLayout
     }
 
     override fun onResume() {
         super.onResume()
+        Log.i(TAG, "Debug:: onResume(AccountFragment), childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
 
@@ -50,6 +49,7 @@ class AccountFragment: Fragment() {
 
     private val authStateObserver = object: FirebaseUser.AuthStateObserver {
         override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
+            Log.i(TAG, "Debug:: authStateChanged(${newAuthState.name}, childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
             when(newAuthState) {
                 FirebaseUser.AuthState.UserLoggedIn -> ShowFragmentManager.replaceFragment(AccountInfoFragment(), childFragmentManager, R.id.account_layout)
                 FirebaseUser.AuthState.UserLoggedInButUnverified -> ShowFragmentManager.replaceFragment(AccountLoginFragment(), childFragmentManager, R.id.account_layout)

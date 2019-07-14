@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.pokestop
 
 import android.content.Context
 import android.os.Bundle
@@ -7,10 +7,10 @@ import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.adapters.SearchViewBindingAdapter
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseDefinitions
 import io.stanc.pogoradar.firebase.FirebaseUser
@@ -20,14 +20,15 @@ import io.stanc.pogoradar.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogoradar.recyclerview.RecyclerViewAdapter
 import io.stanc.pogoradar.recyclerview.RecyclerViewFragment
 import io.stanc.pogoradar.recyclerviewadapter.QuestAdapter
+import io.stanc.pogoradar.viewmodel.PokestopViewModel
 
 
 class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     private val TAG = javaClass.name
 
-    private var pokestop: FirebasePokestop? = null
     private val firebase = FirebaseDatabase()
     private var adapter: QuestAdapter? = null
+    private var pokestopViewModel: PokestopViewModel? = null
 
     override val fragmentLayoutRes: Int
         get() = R.layout.fragment_quest
@@ -46,7 +47,6 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
 
         adapter.onItemClickListener = object : RecyclerViewAdapter.OnItemClickListener {
             override fun onClick(id: Any) {
-                // TODO: PopupFragment/AlertFragment
                 showPopup(list, id)
             }
         }
@@ -58,16 +58,9 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupQueryTextView(view)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        pokestop?.let { AppbarManager.setTitle(it.name) }
-    }
-
-    override fun onPause() {
-        AppbarManager.setTitle(getString(R.string.default_app_title))
-        super.onPause()
+        activity?.let {
+            pokestopViewModel = ViewModelProviders.of(it).get(PokestopViewModel::class.java)
+        }
     }
 
     private fun setupQueryTextView(rootLayout: View) {
@@ -89,7 +82,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
     @Throws(Exception::class)
     private fun tryToSendNewQuest(questDefinition: FirebaseQuestDefinition) {
 
-        pokestop?.let { pokestop ->
+        pokestopViewModel?.pokestop?.let { pokestop ->
 
             FirebaseUser.userData?.id?.let { userId ->
 
@@ -100,7 +93,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
             }
 
         } ?: run {
-            throw Exception("could not send quest, because pokestop: $pokestop!")
+            throw Exception("could not send quest, because pokestopViewModel?.pokestop: ${pokestopViewModel?.pokestop}!")
         }
     }
 
@@ -115,6 +108,7 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
         }
     }
 
+    // TODO: PopupFragment/AlertFragment
     private fun showPopup(list: List<FirebaseQuestDefinition>, itemId: Any) {
 
         list.find { it.id == itemId }?.let { questDefinition ->
@@ -145,15 +139,6 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
 
         } ?: run {
             Log.e(TAG, "could not find quest definition with id: $id in list: $list!")
-        }
-    }
-
-    companion object {
-
-        fun newInstance(pokestop: FirebasePokestop): QuestFragment {
-            val fragment = QuestFragment()
-            fragment.pokestop = pokestop
-            return fragment
         }
     }
 }

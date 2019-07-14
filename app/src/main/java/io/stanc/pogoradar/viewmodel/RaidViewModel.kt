@@ -17,8 +17,8 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
-    private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel(arena.raid)
-    var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel(null)
+    private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel.new(arena.raid)
+    var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel.new(null)
 
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -17,18 +16,20 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.LoginViewModel
-import io.stanc.pogoradar.viewmodel.ViewModelFactory
 
 
 class AccountInfoFragment: Fragment() {
     private val TAG = this::class.java.name
 
-    private var viewModel = ViewModelFactory.getViewModel(LoginViewModel::class.java)
+    private var viewModel: LoginViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentAccountInfoBinding.inflate(inflater, container, false)
 
-        Log.d(TAG, "Debug:: onCreateView(AccountInfoFragment)")
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
+        }
+
         binding.viewModel = viewModel
         Log.d(TAG, "Debug:: onCreateView(AccountInfoFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
 
@@ -36,7 +37,6 @@ class AccountInfoFragment: Fragment() {
 
         binding.root.findViewById<Button>(R.id.account_info_button)?.setOnClickListener {
             ShowFragmentManager.replaceFragment(AccountInfoEditFragment(), fragmentManager, R.id.account_layout)
-//            findNavController().navigate(R.id.action_accountInfoFragment_to_accountInfoEditFragment)
         }
 
         return binding.root
@@ -58,7 +58,7 @@ class AccountInfoFragment: Fragment() {
 
     override fun onPause() {
         FirebaseUser.removeUserDataObserver(userDataObserver)
-        AppbarManager.setTitle(getString(R.string.default_app_title))
+        AppbarManager.reset()
         AppbarManager.resetMenu()
         super.onPause()
     }
