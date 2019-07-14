@@ -9,6 +9,6 @@
     android:fitsSystemWindows="true"
     app:headerLayout="@layout/layout_navigation_header"
     app:menu="@menu/menu_nav_drawer"
-    tools:context=".NavDrawerActivity">
+    tools:context=".StartActivity">
 
 </com.google.android.material.navigation.NavigationView>

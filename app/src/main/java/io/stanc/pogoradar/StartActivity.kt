@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.layout_progress.*
 import java.lang.ref.WeakReference
 
 
-class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var drawerLayout: DrawerLayout? = null
     private var appInfoLabelController: AppInfoLabelController? = null

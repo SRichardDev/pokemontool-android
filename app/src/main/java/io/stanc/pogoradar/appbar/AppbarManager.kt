@@ -2,7 +2,6 @@ package io.stanc.pogoradar.appbar
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import io.stanc.pogoradar.NavDrawerActivity
 import java.lang.ref.WeakReference
 
 

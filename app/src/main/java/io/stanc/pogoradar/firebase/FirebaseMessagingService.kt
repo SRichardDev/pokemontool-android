@@ -14,14 +14,13 @@ import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.stanc.pogoradar.App
-import io.stanc.pogoradar.NavDrawerActivity
+import io.stanc.pogoradar.StartActivity
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_FLAG
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
-import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.Kotlin
 
 
@@ -41,7 +40,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
 //            Log.d(TAG, "Debug:: onMessageReceived(title: $title): geoHash: ${GeoHash(lat, lng)}")
 
-            val intent = Intent(this, NavDrawerActivity::class.java)
+            val intent = Intent(this, StartActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             intent.putExtra(NOTIFICATION_FLAG, true)
             intent.putExtra(NOTIFICATION_TITLE, title)
