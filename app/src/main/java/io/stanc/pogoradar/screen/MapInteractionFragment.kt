@@ -29,7 +29,7 @@ import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider
-import io.stanc.pogoradar.screen.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
+import io.stanc.pogoradar.utils.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
 import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.WaitingSpinner

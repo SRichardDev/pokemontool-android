@@ -83,7 +83,6 @@ class RaidViewModel: ViewModel() {
      */
 
     fun updateData(arena: FirebaseArena?, context: Context) {
-        Log.i(TAG, "Debug:: updateData($arena)")
         this.arena = arena
 
         arena?.let {

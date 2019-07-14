@@ -18,7 +18,6 @@ object ShowFragmentManager {
         val fragmentTag = fragment::class.java.name
 
         if(!fragmentAlreadyExists(fragmentTag, fragmentManager)) {
-            Log.w(TAG, "Debug:: new fragment to add: $fragment")
             fragmentManager.beginTransaction().add(layoutResId, fragment, fragmentTag).addToBackStack(null).commit()
         }
     }
@@ -33,7 +32,6 @@ object ShowFragmentManager {
         val fragmentTag = fragment::class.java.name
 
         if(!fragmentAlreadyExists(fragmentTag, fragmentManager)) {
-            Log.w(TAG, "Debug:: new fragment to replace: $fragment")
             fragmentManager.beginTransaction().replace(layoutResId, fragment, fragmentTag).commit()
         }
     }

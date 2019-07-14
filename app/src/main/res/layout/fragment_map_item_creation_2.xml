@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -24,24 +25,29 @@
                 style="@style/TextStyle_bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{viewModel.type == Type.Pokestop ? @string/map_map_item_name_of_pokestop : @string/map_map_item_name_of_arena}"/>
+                android:text="@string/map_map_item_check_data"/>
+
+            <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
+                      android:id="@+id/map_item_mapview"
+                      android:layout_width="match_parent"
+                      android:layout_height="300dp"
+                      android:layout_marginTop="@dimen/layout_margin_small"/>
+
+            <TextView
+                style="@style/TextStyle_bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_default"
+                android:layout_gravity="center"
+                android:text="@{viewModel.nameWithType}"
+                tools:text="MapType: Name"/>
 
             <TextView
                 style="@style/TextStyle_sub"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/map_map_item_name_of_item_subtext"
-                android:layout_marginTop="@dimen/layout_margin_small"/>
-
-            <EditText
-                style="@style/TextStyle_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="2"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@={viewModel.name}"/>
+                android:text="@string/map_map_item_check_data_subtext"
+                android:layout_marginTop="@dimen/layout_margin_default"/>
 
         </LinearLayout>
 

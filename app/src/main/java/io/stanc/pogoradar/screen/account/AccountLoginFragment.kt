@@ -37,8 +37,6 @@ class AccountLoginFragment: Fragment() {
             viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
         }
 
-        Log.d(TAG, "Debug:: onCreateView(AccountLoginFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
-
         setupTeamImages(rootLayout)
 
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
@@ -79,8 +77,6 @@ class AccountLoginFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.i(TAG, "Debug:: onResume(AccountLoginFragment), childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
-
         AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
@@ -89,11 +85,6 @@ class AccountLoginFragment: Fragment() {
         FirebaseUser.removeAuthStateObserver(authStateObserver)
         AppbarManager.setTitle(getString(R.string.default_app_title))
         super.onPause()
-    }
-
-    override fun onDestroyView() {
-        Log.d(TAG, "Debug:: onDestroyView(AccountLoginFragment)")
-        super.onDestroyView()
     }
 
     private fun setupTeamImages(rootLayout: View) {
@@ -117,7 +108,7 @@ class AccountLoginFragment: Fragment() {
 
     private val authStateObserver = object : FirebaseUser.AuthStateObserver {
         override fun authStateChanged(newAuthState: AuthState) {
-            Log.i(TAG, "Debug:: authStateChanged(${newAuthState.name})")
+            Log.i(TAG, "authStateChanged(${newAuthState.name})")
             when(newAuthState) {
                 AuthState.UserLoggedIn -> {
                     signInButton?.visibility = View.GONE

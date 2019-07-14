@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.subscreen
+package io.stanc.pogoradar.screen.mapitemcreation
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.databinding.FragmentMapItemCreation3Binding
+import io.stanc.pogoradar.databinding.FragmentMapItemCreation2Binding
 import io.stanc.pogoradar.map.ClusterArenaRenderer
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
-import io.stanc.pogoradar.screen.MapItemCreationFragmentPagerAdapter
+import io.stanc.pogoradar.subscreen.BaseMapFragment
+import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.viewmodel.MapItemViewModel
-import java.lang.ref.WeakReference
 
 class MapItemCreationPageFragment2: Fragment() {
 
@@ -29,7 +29,7 @@ class MapItemCreationPageFragment2: Fragment() {
         }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentMapItemCreation3Binding.inflate(inflater, container, false)
+        val binding = FragmentMapItemCreation2Binding.inflate(inflater, container, false)
 
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
@@ -53,7 +53,9 @@ class MapItemCreationPageFragment2: Fragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as BaseMapFragment
         mapFragment?.enableMyLocationPOI(enabled = false)
-        viewModel?.position?.get()?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
+        viewModel?.position?.get()?.let { mapFragment?.updateCameraPosition(it,
+            ZoomLevel.STREET
+        ) }
         mapFragment?.setDelegate(object : BaseMapFragment.MapDelegate {
 
             override fun onMapReady(googleMap: GoogleMap) {

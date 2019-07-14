@@ -23,39 +23,19 @@
     </fragment>
     <fragment android:id="@+id/pokestopFragment" android:name="io.stanc.pogoradar.screen.pokestop.PokestopFragment"
               android:label="PokestopFragment"
-              tools:layout="@layout/fragment_pokestop">
-        <action android:id="@+id/action_pokestopFragment_to_questFragment" app:destination="@id/questFragment"
-                app:enterAnim="@anim/nav_default_enter_anim"
-                app:exitAnim="@anim/nav_default_exit_anim"
-                app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-                app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
-
-    </fragment>
+              tools:layout="@layout/fragment_pokestop"/>
     <fragment android:id="@+id/policyFragment" android:name="io.stanc.pogoradar.screen.PolicyFragment"
               android:label="PolicyFragment"
               tools:layout="@layout/fragment_policy"/>
     <fragment android:id="@+id/arenaFragment" android:name="io.stanc.pogoradar.screen.arena.ArenaFragment"
               android:label="ArenaFragment"
-              tools:layout="@layout/fragment_arena_info">
-        <action android:id="@+id/action_arenaFragment_to_raidFragment" app:destination="@id/raidFragment"/>
-        <action android:id="@+id/action_arenaFragment_to_participantsFragment"
-                app:destination="@id/participantsFragment"/>
-    </fragment>
-    <fragment android:id="@+id/questFragment" android:name="io.stanc.pogoradar.screen.pokestop.QuestFragment"
-              android:label="QuestFragment"
-              tools:layout="@layout/fragment_quest"/>
-    <fragment android:id="@+id/raidFragment" android:name="io.stanc.pogoradar.screen.arena.RaidFragment"
-              android:label="RaidFragment"
-              tools:layout="@layout/fragment_raid"/>
+              tools:layout="@layout/fragment_arena_info"/>
     <fragment android:id="@+id/mapSettingsFragment" android:name="io.stanc.pogoradar.screen.MapSettingsFragment"
               android:label="MapSettingsFragment"
               tools:layout="@layout/fragment_map_settings"/>
-    <fragment android:id="@+id/mapItemCreationFragment" android:name="io.stanc.pogoradar.screen.MapItemCreationFragment"
+    <fragment android:id="@+id/mapItemCreationFragment" android:name="io.stanc.pogoradar.screen.mapitemcreation.MapItemCreationFragment"
               android:label="MapItemCreationFragment"
               tools:layout="@layout/layout_viewpager_flow"/>
-    <fragment android:id="@+id/participantsFragment" android:name="io.stanc.pogoradar.screen.arena.ParticipantsFragment"
-              android:label="ParticipantsFragment"
-              tools:layout="@layout/layout_participants"/>
     <fragment android:id="@+id/accountFragment" android:name="io.stanc.pogoradar.screen.account.AccountFragment"
               android:label="AccountFragment"/>
 </navigation>

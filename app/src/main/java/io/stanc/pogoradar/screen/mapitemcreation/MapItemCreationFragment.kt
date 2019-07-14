@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.mapitemcreation
 
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +15,7 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
+import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.viewmodel.MapItemViewModel
 import io.stanc.pogoradar.viewmodel.MapItemViewModel.Type

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
             name="viewModel"
             type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
+        <import type="io.stanc.pogoradar.firebase.node.Team"/>
+        <import type="io.stanc.pogoradar.utils.SegmentedControlView.Selection"/>
     </data>
 
     <LinearLayout
@@ -15,19 +18,35 @@
       android:padding="@dimen/layout_padding_screen">
 
         <TextView
-            style="@style/TextStyle_default"
+            style="@style/TextStyle_bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authentication_login_name_description"/>
+            android:text="@string/authentication_login_details_team"/>
 
-        <EditText
-            style="@style/TextStyle_edittext"
+        <io.stanc.pogoradar.utils.SegmentedControlView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            app:textLeft="@{viewModel.teamOrder[0].name}"
+            app:textMiddle="@{viewModel.teamOrder[1].name}"
+            app:textRight="@{viewModel.teamOrder[2].name}"
+            app:startSelection="@{Selection.LEFT}"
+            app:selectionColor="@{viewModel.teamColor}"
+            app:onSelectionChangeListener="@{viewModel.onSelectedStateDidChange}"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/authentication_login_details_level"
+            android:layout_marginTop="@dimen/layout_margin_small"/>
+
+        <NumberPicker
+            android:id="@+id/account_numberpicker_level"
+            android:layout_height="@dimen/raid_picker_height"
+            android:layout_width="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_small"
-            android:hint="@string/authentication_login_name_edit_hint_text"
-            android:text="@={viewModel.name}"/>
+            android:layout_gravity="center"/>
 
     </LinearLayout>
 

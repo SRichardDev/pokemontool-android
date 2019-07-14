@@ -1,13 +1,10 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.mapitemcreation
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.subscreen.MapItemCreationPageFragment0
-import io.stanc.pogoradar.subscreen.MapItemCreationPageFragment1
-import io.stanc.pogoradar.subscreen.MapItemCreationPageFragment2
 
 class MapItemCreationFragmentPagerAdapter(fragmentManager: FragmentManager): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 

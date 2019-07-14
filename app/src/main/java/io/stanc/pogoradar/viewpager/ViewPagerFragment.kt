@@ -81,7 +81,6 @@ abstract class ViewPagerFragment: Fragment() {
         binding.root.findViewById<Button>(R.id.viewpager_button)?.setOnClickListener {
             viewPager?.let { viewpager ->
 
-                Log.d(TAG, "Debug:: onButtonClicked(ViewPagerFragment) viewPager.currentItem: ${viewpager.currentItem}")
                 if (viewpager.currentItem == viewpager.adapter?.count?.minus(1)) {
                     navigationButtonClickedOnTheLastPage()
                 } else {

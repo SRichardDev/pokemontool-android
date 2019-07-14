@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.viewmodel.LoginViewModel
@@ -26,29 +25,14 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
         }
-        Log.d(TAG, "Debug:: onCreateView(AccountLoginProcessFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "Debug:: onViewCreated(AccountLoginProcessFragment)")
-        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
-    }
-
-    override fun onDestroy() {
-        Log.d(TAG, "Debug:: onDestroy(AccountLoginProcessFragment)")
-        AppbarManager.setTitle(getString(R.string.default_app_title))
-        super.onDestroy()
-    }
-
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment viewPagerAdapter by lazy, viewModel: $viewModel")
         AccountLoginProcessFragmentPagerAdapter(childFragmentManager, viewModel?.signType?.get()!!)
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment.navigationButtonClickedOnTheLastPage()")
         try {
             tryToSendLoginData()
 
@@ -59,7 +43,6 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     override fun onPageChanged(position: Int) {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment.onPageChanged($position)")
         activity?.let { SystemUtils.hideKeyboard(it) }
     }
 
@@ -94,7 +77,6 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
 
     private val signInUpCompletionCallback = object: (Boolean, String?) -> Unit {
         override fun invoke(taskSuccessful: Boolean, exception: String?) {
-            Log.d(TAG, "Debug:: AccountLoginProcessFragment.signInUpCompletionCallback(taskSuccessful: $taskSuccessful)")
             if (taskSuccessful) {
                 close()
             } else {
@@ -105,7 +87,6 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
     }
 
     private fun close() {
-        Log.d(TAG, "Debug:: AccountLoginProcessFragment.close()")
         activity?.let { SystemUtils.hideKeyboard(it) }
         fragmentManager?.popBackStack()
     }

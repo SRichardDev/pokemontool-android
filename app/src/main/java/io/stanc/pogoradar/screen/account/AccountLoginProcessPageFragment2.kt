@@ -1,34 +1,29 @@
-package io.stanc.pogoradar.subscreen
+package io.stanc.pogoradar.screen.account
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.Observable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import io.stanc.pogoradar.databinding.FragmentMapItemCreation2Binding
-import io.stanc.pogoradar.screen.MapItemCreationFragmentPagerAdapter
+import io.stanc.pogoradar.databinding.FragmentAccountLogin2Binding
 import io.stanc.pogoradar.utils.addOnPropertyChanged
-import io.stanc.pogoradar.viewmodel.MapItemViewModel
+import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewpager.ViewPagerViewModel
-import java.lang.ref.WeakReference
 
-class MapItemCreationPageFragment1: Fragment() {
+class AccountLoginProcessPageFragment2: Fragment() {
 
-    private val TAG = javaClass.name
-
-    private var viewModel: MapItemViewModel? = null
+    private var viewModel: LoginViewModel? = null
     private var viewPagerViewModel: ViewPagerViewModel? = null
 
     private var onNameChangeCallback: Observable.OnPropertyChangedCallback? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = FragmentMapItemCreation2Binding.inflate(inflater, container, false)
+        val binding = FragmentAccountLogin2Binding.inflate(inflater, container, false)
 
         activity?.let {
-            viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+            viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
             viewPagerViewModel = ViewModelProviders.of(it).get(ViewPagerViewModel::class.java)
 
             onNameChangeCallback = viewModel?.name?.addOnPropertyChanged {
@@ -52,12 +47,10 @@ class MapItemCreationPageFragment1: Fragment() {
     }
 
     private fun validateInput(name: String?) {
-
-        Log.i(TAG, "Debug:: validateInput, name: $name")
-        if (name?.isNotEmpty() == true) {
-            viewPagerViewModel?.onPageValidationChanged(page = 1, isValid = true)
+        if (name?.isNotBlank() == true) {
+            viewPagerViewModel?.onPageValidationChanged(page = 2, isValid = true)
         } else {
-            viewPagerViewModel?.onPageValidationChanged(page = 1, isValid = false)
+            viewPagerViewModel?.onPageValidationChanged(page = 2, isValid = false)
         }
     }
 }

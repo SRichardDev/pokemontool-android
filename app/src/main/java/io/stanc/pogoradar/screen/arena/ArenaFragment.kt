@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
-import io.stanc.pogoradar.screen.ParcelableDataFragment
+import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.RaidViewModel

@@ -21,32 +21,71 @@
             style="@style/TextStyle_bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authentication_login_details_team"/>
+            android:text="@string/authentication_login_details_email"/>
 
-        <io.stanc.pogoradar.utils.SegmentedControlView
+        <TextView
+            style="@style/TextStyle_default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:textLeft="@{viewModel.teamOrder[0].name}"
-            app:textMiddle="@{viewModel.teamOrder[1].name}"
-            app:textRight="@{viewModel.teamOrder[2].name}"
-            app:startSelection="@{Selection.LEFT}"
-            app:selectionColor="@{viewModel.teamColor}"
-            app:onSelectionChangeListener="@{viewModel.onSelectedStateDidChange}"
-            android:layout_marginTop="@dimen/layout_margin_small"/>
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@{viewModel.email}"/>
 
         <TextView
             style="@style/TextStyle_bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authentication_login_details_level"
-            android:layout_marginTop="@dimen/layout_margin_small"/>
-
-        <NumberPicker
-            android:id="@+id/account_numberpicker_level"
-            android:layout_height="@dimen/raid_picker_height"
-            android:layout_width="wrap_content"
             android:layout_marginTop="@dimen/layout_margin_small"
-            android:layout_gravity="center"/>
+            android:text="@string/authentication_login_details_password"/>
+
+        <TextView
+            style="@style/TextStyle_default"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:inputType="textPassword"
+            android:text="@{viewModel.password}"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@string/authentication_login_details_name"/>
+
+        <TextView
+            style="@style/TextStyle_default"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@{viewModel.name}"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@string/authentication_login_details_team"/>
+
+        <TextView
+            style="@style/TextStyle_default"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@{viewModel.team.name}"/>
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@string/authentication_login_details_level"/>
+
+        <TextView
+            style="@style/TextStyle_default"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@{viewModel.level}"/>
 
     </LinearLayout>
 

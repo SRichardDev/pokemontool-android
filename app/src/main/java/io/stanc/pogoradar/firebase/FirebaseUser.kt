@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.core.utilities.Utilities
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
@@ -25,6 +26,7 @@ import io.stanc.pogoradar.firebase.node.Team
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.ObserverManager
 import io.stanc.pogoradar.utils.WaitingSpinner
+import java.util.regex.Pattern
 
 
 object FirebaseUser {
@@ -324,7 +326,7 @@ object FirebaseUser {
 
     fun signUp(userLoginConfig: UserLoginConfig, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
 
-        if (userLoginConfig.password.length < MIN_PASSWORD_LENGTH) {
+        if (!isPasswordValid(userLoginConfig.password)) {
             onCompletionCallback(false, App.geString(R.string.exceptions_signup_password))
             return
         }
@@ -483,7 +485,24 @@ object FirebaseUser {
      * private
      */
 
-    fun isEmailValid(email: CharSequence): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    fun isEmailValid(email: CharSequence?): Boolean {
+        return email?.let {
+            android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        } ?: run {
+            false
+        }
+    }
+
+    fun isPasswordValid(password: CharSequence?): Boolean {
+        return password?.let {
+
+            val containsDigits = Pattern.compile( "[0-9]" ).matcher( password ).find()
+            val containsLetters = Pattern.compile( "[a-zA-Z]" ).matcher( password ).find()
+            val hasMinLength = password.length >= MIN_PASSWORD_LENGTH
+
+            containsDigits && containsLetters && hasMinLength
+        } ?: run {
+            false
+        }
     }
 }

@@ -31,7 +31,6 @@ class AccountInfoFragment: Fragment() {
         }
 
         binding.viewModel = viewModel
-        Log.d(TAG, "Debug:: onCreateView(AccountInfoFragment) viewModel: $viewModel, signType: ${viewModel?.signType?.get()?.name}")
 
         binding.settings = AppSettings
 
@@ -41,12 +40,6 @@ class AccountInfoFragment: Fragment() {
 
         return binding.root
     }
-
-    override fun onDestroyView() {
-        Log.d(TAG, "Debug:: onDestroyView(AccountInfoFragment)")
-        super.onDestroyView()
-    }
-
     override fun onResume() {
         super.onResume()
         AppbarManager.setTitle(getString(R.string.authentication_app_title))

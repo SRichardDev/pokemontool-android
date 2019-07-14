@@ -18,16 +18,17 @@
             style="@style/TextStyle_default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/authentication_login_name_description"/>
+            android:text="@string/authentication_login_email_description"/>
 
         <EditText
             style="@style/TextStyle_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textCapSentences|textMultiLine"
             android:maxLines="2"
             android:layout_marginTop="@dimen/layout_margin_small"
-            android:hint="@string/authentication_login_name_edit_hint_text"
-            android:text="@={viewModel.name}"/>
+            android:hint="@string/authentication_login_email_edit_hint_text"
+            android:text="@={viewModel.email}"/>
 
     </LinearLayout>
 

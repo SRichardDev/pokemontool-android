@@ -219,14 +219,6 @@ class NavDrawerActivity : AppCompatActivity(), NavigationView.OnNavigationItemSe
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        Log.i(TAG, "Debug:: currentDestination: ${this.findNavController(R.id.nav_host_fragment).currentDestination?.id}")
-        Log.d(TAG, "Debug:: mapInteractionFragment: ${R.id.mapInteractionFragment}")
-        Log.d(TAG, "Debug:: accountFragment: ${R.id.accountFragment}")
-        Log.d(TAG, "Debug:: policyFragment: ${R.id.policyFragment}")
-
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-        val backStackEntryCount = navHostFragment?.childFragmentManager?.backStackEntryCount
-        Log.w(TAG, "Debug:: backStackEntryCount: $backStackEntryCount: ${navHostFragment?.childFragmentManager?.fragments}")
 
         when (item.itemId) {
             R.id.nav_account -> {

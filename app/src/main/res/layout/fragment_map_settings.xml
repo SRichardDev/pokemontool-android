@@ -43,7 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginStart="@dimen/layout_margin_small">
+            android:layout_marginTop="@dimen/layout_margin_default"
+            android:layout_marginStart="@dimen/layout_margin_default">
 
             <TextView
                 android:id="@+id/map_settings_textview_filter_arena_raid"
@@ -67,7 +68,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginStart="@dimen/layout_margin_small">
+            android:layout_marginTop="@dimen/layout_margin_default"
+            android:layout_marginStart="@dimen/layout_margin_default"
+            android:layout_marginBottom="@dimen/layout_margin_default">
 
             <TextView
                 android:id="@+id/map_settings_textview_filter_arena_ex"
@@ -93,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="@dimen/layout_margin_small">
+            android:layout_marginTop="@dimen/layout_margin_default">
 
             <TextView
                 android:id="@+id/map_settings_textview_filter_pokestop"
@@ -117,7 +120,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginStart="@dimen/layout_margin_small">
+            android:layout_marginTop="@dimen/layout_margin_default"
+            android:layout_marginStart="@dimen/layout_margin_default">
 
             <TextView
                 android:id="@+id/map_settings_textview_filter_pokestop_quest"

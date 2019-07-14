@@ -5,18 +5,17 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.viewmodel.LoginViewModel
 import io.stanc.pogoradar.viewmodel.LoginViewModel.SignType
 
 class AccountLoginProcessFragmentPagerAdapter(fragmentManager: FragmentManager, private val signType: SignType): FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> AccountLoginProcessPage1Fragment()
-            1 -> AccountLoginProcessPage2Fragment()
-            2 -> AccountLoginProcessPage3Fragment()
-            3 -> AccountLoginProcessPage4Fragment()
-            4 -> AccountLoginProcessPage5Fragment()
+            0 -> AccountLoginProcessPageFragment0()
+            1 -> AccountLoginProcessPageFragment1()
+            2 -> AccountLoginProcessPageFragment2()
+            3 -> AccountLoginProcessPageFragment3()
+            4 -> AccountLoginProcessPageFragment4()
             else -> throw Exception("unsupported position ($position) in AccountLoginProcessFragmentPagerAdapter!")
         }
     }

@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.viewpager
 
-import android.util.Log
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 
@@ -20,15 +19,18 @@ class ViewPagerViewModel: ViewModel() {
     }
 
     fun onPageValidationChanged(page: Int, isValid: Boolean) {
-        Log.d("ViewPagerViewModel", "Debug:: onPageValidationChanged(page: $page, isValid: $isValid), currentPage: $currentPage")
         pagesValid[page] = isValid
-        pagesValid.keys.find { it == currentPage }?.let {
-            viewPagerButtonEnabled.set(pagesValid[it])
-        }
+        checkButtonEnable()
     }
 
     fun onPageChanged(page: Int) {
-        Log.d("ViewPagerViewModel", "Debug:: onPageChanged(page: $page)")
         currentPage = page
+        checkButtonEnable()
+    }
+
+    private fun checkButtonEnable() {
+        pagesValid.keys.find { it == currentPage }?.let {
+            viewPagerButtonEnabled.set(pagesValid[it])
+        }
     }
 }

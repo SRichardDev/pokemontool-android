@@ -21,7 +21,6 @@ class AccountFragment: Fragment() {
         activity?.let {
             val viewModel = ViewModelProviders.of(it).get(LoginViewModel::class.java)
             viewModel.update(FirebaseUser.userData)
-            Log.d(TAG, "Debug:: onCreateView(AccountFragment) viewModel: $viewModel, signType: ${viewModel.signType.get()?.name}")
         }
 
         return rootLayout
@@ -29,7 +28,6 @@ class AccountFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.i(TAG, "Debug:: onResume(AccountFragment), childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
 
@@ -38,18 +36,13 @@ class AccountFragment: Fragment() {
         super.onPause()
     }
 
-    override fun onDestroyView() {
-        Log.d(TAG, "Debug:: onDestroyView(AccountFragment)")
-        super.onDestroyView()
-    }
-
     /**
      * firebase observer
      */
 
     private val authStateObserver = object: FirebaseUser.AuthStateObserver {
         override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
-            Log.i(TAG, "Debug:: authStateChanged(${newAuthState.name}, childFragmentManager(${childFragmentManager.fragments.size}): ${childFragmentManager.fragments}, fragmentManager(${fragmentManager?.fragments?.size}): ${fragmentManager?.fragments})")
+            Log.i(TAG, "authStateChanged(${newAuthState.name})")
             when(newAuthState) {
                 FirebaseUser.AuthState.UserLoggedIn -> ShowFragmentManager.replaceFragment(AccountInfoFragment(), childFragmentManager, R.id.account_layout)
                 FirebaseUser.AuthState.UserLoggedInButUnverified -> ShowFragmentManager.replaceFragment(AccountLoginFragment(), childFragmentManager, R.id.account_layout)

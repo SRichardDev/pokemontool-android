@@ -1,13 +1,10 @@
 package io.stanc.pogoradar.screen.pokestop
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.GoogleMap
@@ -36,7 +33,6 @@ class PokestopInfoFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentPokestopInfoBinding.inflate(inflater, container, false)
-        Log.d(TAG, "onCreateView(), questViewModel: $questViewModel, pokestopViewModel: $pokestopViewModel, mapItemInfoViewModel: ${pokestopViewModel?.mapItemInfoViewModel}")
 
         activity?.let {
             pokestopViewModel = ViewModelProviders.of(it).get(PokestopViewModel::class.java)
@@ -58,7 +54,6 @@ class PokestopInfoFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Log.w(TAG, "Debug:: onResume(), pokestopViewModel: $pokestopViewModel")
         pokestopViewModel?.geoHash?.get()?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
     }
 
@@ -66,7 +61,6 @@ class PokestopInfoFragment: Fragment() {
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_item_mapview) as BaseMapFragment
         mapFragment?.enableMyLocationPOI(enabled = false)
-        Log.w(TAG, "Debug:: setupMapFragment(), pokestopViewModel?.geoHash: ${pokestopViewModel?.geoHash?.get()}")
         pokestopViewModel?.geoHash?.get()?.let { mapFragment?.updateCameraPosition(it, ZoomLevel.STREET) }
         mapFragment?.setDelegate(object : BaseMapFragment.MapDelegate {
 
@@ -75,7 +69,6 @@ class PokestopInfoFragment: Fragment() {
             }
 
             override fun onMapReady(googleMap: GoogleMap) {
-                Log.w(TAG, "Debug:: onMapReady() -> addMarker()")
                 map = googleMap
                 addMarker()
             }
