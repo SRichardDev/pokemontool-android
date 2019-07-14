@@ -68,7 +68,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val markers = arenaClusterManager.markerCollection.markers
             for (marker in markers) {
                 (marker.tag as? FirebaseArena)?.let {
-                    marker.isVisible = ArenaViewModel.new(it).isArenaVisibleOnMap.get() == true
+                    marker.isVisible = ArenaViewModel.new(it, context).isArenaVisibleOnMap.get() == true
                 }
             }
             arenaClusterManager.cluster()

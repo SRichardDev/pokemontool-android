@@ -102,6 +102,9 @@
     <string name="map_map_item_check_data_subtext">Bitte beachte, dass es sich hier um nutzergenerierte Daten handelt. Stelle sicher, dass alles korrekt ist, damit andere Spieler den Pokestop/ die Arena auch finden können.</string>
     <string name="map_map_item_button_further">Weiter</string>
     <string name="map_map_item_button_send">Absenden</string>
+    <string name="map_map_item_creation_page_title_1">Position</string>
+    <string name="map_map_item_creation_page_title_2">Name</string>
+    <string name="map_map_item_creation_page_title_3">Prüfen &amp; Senden</string>
 
     <string name="map_info_window_arena_subheader_default">Arena</string>
     <string name="map_info_window_arena_subheader_ex">EX-Arena</string>
@@ -141,8 +144,7 @@
     <string name="arena_raid_participants">Anzahl der Teilnehmer:</string>
     <string name="arena_raid_participants_list">Teilnehmerliste</string>
     <string name="arena_raid_chat">Chat</string>
-    <string name="arena_raid_register">Anmelden</string>
-    <string name="arena_raid_deregister">Abmelden</string>
+    <string name="arena_raid_register">Anmelden:</string>
     <string name="arena_raid_raidboss">Raidboss melden</string>
 
     <!-- Pokestop -->

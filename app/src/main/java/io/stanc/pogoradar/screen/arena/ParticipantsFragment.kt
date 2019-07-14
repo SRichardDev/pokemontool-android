@@ -1,6 +1,11 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.arena
 
 import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.recyclerview.RecyclerViewFragment
@@ -9,8 +14,6 @@ import io.stanc.pogoradar.viewmodel.RaidViewModel
 
 class ParticipantsFragment: RecyclerViewFragment<FirebasePublicUser>() {
     private val TAG = javaClass.name
-
-    private var viewModel: RaidViewModel? = null
 
     override val fragmentLayoutRes: Int
         get() = R.layout.layout_participants
@@ -22,18 +25,7 @@ class ParticipantsFragment: RecyclerViewFragment<FirebasePublicUser>() {
         get() = Orientation.VERTICAL
 
     override val initItemList: List<FirebasePublicUser>
-        get() = viewModel?.participants?.get() ?: emptyList()
+        get() = activity?.let { ViewModelProviders.of(it).get(RaidViewModel::class.java).participants.get() ?: emptyList() } ?: emptyList()
 
     override fun onCreateListAdapter(context: Context, list: List<FirebasePublicUser>) = ParticipantAdapter(context, list)
-
-    companion object {
-
-        private val TAG = javaClass.name
-
-        fun newInstance(viewModel: RaidViewModel): ParticipantsFragment {
-            val fragment = ParticipantsFragment()
-            fragment.viewModel = viewModel
-            return fragment
-        }
-    }
 }

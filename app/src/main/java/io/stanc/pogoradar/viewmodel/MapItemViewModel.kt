@@ -5,6 +5,7 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogoradar.utils.SegmentedControlView
+import io.stanc.pogoradar.utils.addOnPropertyChanged
 
 class MapItemViewModel: ViewModel() {
     private val TAG = javaClass.name
@@ -13,6 +14,9 @@ class MapItemViewModel: ViewModel() {
         Arena,
         Pokestop
     }
+
+    private var typeChangedCalback: Observable.OnPropertyChangedCallback? = null
+    private var nameChangedCalback: Observable.OnPropertyChangedCallback? = null
 
     val position = ObservableField<LatLng>()
     val type = ObservableField<Type>(Type.Pokestop)
@@ -29,17 +33,27 @@ class MapItemViewModel: ViewModel() {
     }
 
     init {
-        type.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                updateNameWithType()
-            }
-        })
+        typeChangedCalback = type.addOnPropertyChanged {
+            updateNameWithType()
+        }
 
-        name.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                updateNameWithType()
-            }
-        })
+        nameChangedCalback = name.addOnPropertyChanged {
+            updateNameWithType()
+        }
+    }
+
+    override fun onCleared() {
+        typeChangedCalback?.let { type.removeOnPropertyChangedCallback(it) }
+        nameChangedCalback?.let { name.removeOnPropertyChangedCallback(it) }
+        super.onCleared()
+    }
+
+    fun reset() {
+        position.set(null)
+        type.set(Type.Pokestop)
+        isEx.set(false)
+        name.set(null)
+        nameWithType.set(null)
     }
 
     private fun updateNameWithType() {

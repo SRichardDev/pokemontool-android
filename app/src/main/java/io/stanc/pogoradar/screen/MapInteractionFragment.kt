@@ -29,8 +29,7 @@ import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider
-import io.stanc.pogoradar.screen.ParcelableArgumentFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
-import io.stanc.pogoradar.screen.pokestop.PokestopFragment
+import io.stanc.pogoradar.screen.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
 import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.WaitingSpinner
@@ -244,7 +243,6 @@ class MapInteractionFragment: Fragment() {
         val bundle = Bundle().apply {
             this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, arena)
         }
-        Log.d(TAG, "Debug:: showArenaFragment, put Bundle: $bundle")
         findNavController().navigate(R.id.action_mapInteractionFragment_to_arenaFragment, bundle)
     }
 
@@ -253,14 +251,15 @@ class MapInteractionFragment: Fragment() {
         val bundle = Bundle().apply {
             this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, pokestop)
         }
-        Log.d(TAG, "Debug:: showPokestopFragment, put Bundle: $bundle")
         findNavController().navigate(R.id.action_mapInteractionFragment_to_pokestopFragment, bundle)
     }
 
     private fun showMapItemCreationFragment(latLng: LatLng) {
         resetModes()
-        // TODO: parse latLng into bundle for mapItemCreationFragment !
-        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapItemCreationFragment)
+        val bundle = Bundle().apply {
+            this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, latLng)
+        }
+        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapItemCreationFragment, bundle)
     }
 
     private fun showMapSettingsFragment() {

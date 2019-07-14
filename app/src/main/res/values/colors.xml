@@ -25,6 +25,8 @@
     <color name="colorBlueDarkPoke">#3c5aa6</color>
     <color name="colorBlueLightPoke">#2a75bb</color>
 
+    <color name="actionDisabled">#808080</color>
+
     <color name="segmentedControlSelected">#3c5aa6</color>
 
     <color name="teamMystic">#0077E9</color>

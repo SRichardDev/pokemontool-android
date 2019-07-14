@@ -29,7 +29,7 @@ class RaidMeetupViewModel: ViewModel() {
         raidMeetup?.let {
             changeMeetupData(raidMeetup)
         } ?: run {
-            resetMeetupData()
+            reset()
         }
 //        Log.d(TAG, "Debug:: updateData(), numParticipants: ${numParticipants.get()}, participants: ${participants.get()}, isUserParticipate: ${isUserParticipate.get()}")
     }
@@ -43,7 +43,7 @@ class RaidMeetupViewModel: ViewModel() {
         updateParticipantsList(raidMeetup)
     }
 
-    private fun resetMeetupData() {
+    fun reset() {
         isRaidMeetupAnnounced.set(false)
         numParticipants.set("0")
         participants.set(emptyList())

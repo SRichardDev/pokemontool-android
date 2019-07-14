@@ -5,17 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentMapItemCreation3Binding
 import io.stanc.pogoradar.map.ClusterArenaRenderer
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
+import io.stanc.pogoradar.screen.MapItemCreationFragmentPagerAdapter
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.viewmodel.MapItemViewModel
+import java.lang.ref.WeakReference
 
-class MapItemCreationFragment3: Fragment() {
+class MapItemCreationPageFragment2: Fragment() {
 
     private var viewModel: MapItemViewModel? = null
     private var mapFragment: BaseMapFragment? = null
@@ -27,6 +30,10 @@ class MapItemCreationFragment3: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentMapItemCreation3Binding.inflate(inflater, container, false)
+
+        activity?.let {
+            viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+        }
         binding.viewModel = viewModel
 
         return binding.root
@@ -72,16 +79,5 @@ class MapItemCreationFragment3: Fragment() {
             }
 
         } ?: run { null }
-    }
-
-    companion object {
-
-        private val TAG = javaClass.name
-
-        fun newInstance(viewModel: MapItemViewModel): MapItemCreationFragment3 {
-            val fragment = MapItemCreationFragment3()
-            fragment.viewModel = viewModel
-            return fragment
-        }
     }
 }

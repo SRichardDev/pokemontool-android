@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen
+package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -17,13 +18,14 @@ import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.subscreen.RaidBossFragment
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.TimeCalculator
+import io.stanc.pogoradar.viewmodel.ArenaViewModel
 import java.util.*
 
 
 class RaidFragment: Fragment() {
+    private val TAG = javaClass.name
 
-    private var geoHash: GeoHash? = null
-    private var arenaId: String? = null
+    private var arenaViewModel: ArenaViewModel? = null
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
@@ -52,6 +54,10 @@ class RaidFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_raid, container, false)
 
+        activity?.let {
+            arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
+        }
+
         setupEggImages(rootLayout)
         setupSwitches(rootLayout)
         setupTimePicker(rootLayout)
@@ -76,7 +82,7 @@ class RaidFragment: Fragment() {
     }
 
     override fun onPause() {
-        AppbarManager.setTitle(getString(R.string.default_app_title))
+        AppbarManager.reset()
         super.onPause()
     }
     /**
@@ -265,7 +271,7 @@ class RaidFragment: Fragment() {
 
     private fun tryToSendData() {
 
-        Kotlin.safeLet(arenaId, geoHash) { arenaId, geoHash ->
+        Kotlin.safeLet(arenaViewModel?.arena?.id, arenaViewModel?.arena?.geoHash) { arenaId, geoHash ->
 
             if (isEggAlreadyHatched) {
 
@@ -280,7 +286,7 @@ class RaidFragment: Fragment() {
             }
 
         } ?: run {
-            Log.e(TAG, "tryToSendData, but arenaId: $arenaId, geoHash: $geoHash, level: $raidLevel!")
+            Log.e(TAG, "tryToSendData, but arenaViewModel?.arena: ${arenaViewModel?.arena}, level: $raidLevel!")
         }
     }
 
@@ -311,20 +317,6 @@ class RaidFragment: Fragment() {
     private fun closeScreen() {
         fragmentManager?.findFragmentByTag(this::class.java.name)?.let {
             fragmentManager?.beginTransaction()?.remove(it)?.commit()
-        }
-    }
-
-    private fun formattedTime(hours: Int, minutes: Int): String = "$hours:$minutes"
-
-    companion object {
-
-        private val TAG = javaClass.name
-
-        fun newInstance(arenaId: String, geoHash: GeoHash): RaidFragment {
-            val fragment = RaidFragment()
-            fragment.arenaId = arenaId
-            fragment.geoHash = geoHash
-            return fragment
         }
     }
 }

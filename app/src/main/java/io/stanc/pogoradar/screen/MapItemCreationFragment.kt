@@ -1,9 +1,11 @@
 package io.stanc.pogoradar.screen
 
+import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.databinding.Observable
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
@@ -24,39 +26,43 @@ class MapItemCreationFragment: ViewPagerFragment() {
     private val TAG = javaClass.name
 
     private val firebase = FirebaseDatabase()
-    private val viewModel = MapItemViewModel()
-
-    private var position: LatLng? = null
-        set(value) {
-            viewModel.position.set(value)
-            field = value
-        }
+    private var viewModel: MapItemViewModel? = null
 
     private val onTypeChangeCallback = object : Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-            viewModel.type.get()?.let { updateTitle(it) }
+            viewModel?.type?.get()?.let { updateTitle(it) }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getParcelable<LatLng>(ParcelableDataFragment.PARCELABLE_EXTRA_DATA_OBJECT)?.let { position ->
+            activity?.let {
+                viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+                viewModel?.reset()
+                viewModel?.position?.set(position)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.type.get()?.let { updateTitle(it) }
-        viewModel.type.addOnPropertyChangedCallback(onTypeChangeCallback)
+        viewModel?.type?.get()?.let { updateTitle(it) }
+        viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
     }
 
     override fun onPause() {
-        viewModel.type.removeOnPropertyChangedCallback(onTypeChangeCallback)
-        AppbarManager.setTitle(getString(R.string.default_app_title))
+        viewModel?.type?.removeOnPropertyChangedCallback(onTypeChangeCallback)
+        AppbarManager.reset()
         super.onPause()
     }
 
 
     override val viewPagerAdapter: FragmentPagerAdapter by lazy {
-        MapItemCreationFragmentPagerAdapter(childFragmentManager, viewModel)
+        MapItemCreationFragmentPagerAdapter(childFragmentManager)
     }
 
     override fun navigationButtonClickedOnTheLastPage() {
-//        Log.w(TAG, "Debug:: navigationButtonClickedOnTheLastPage()")
         try {
             tryToSendMapItem()
             close()
@@ -83,15 +89,15 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
         FirebaseUser.userData?.name?.let { userName ->
 
-            viewModel.position.get()?.let {
+            viewModel?.position?.get()?.let {
                 val geoHash = GeoHash(it.latitude, it.longitude)
 
-                when(viewModel.type.get()) {
+                when(viewModel?.type?.get()) {
                     Type.Arena -> tryToSendArena(geoHash, userName)
                     Type.Pokestop -> tryToSendPokestop(geoHash, userName)
                     else -> {
                         val text = App.geString(R.string.exceptions_send_map_item_invalid_type)
-                        Log.e(TAG, "$text viewModel.type.get(): ${viewModel.type.get()}")
+                        Log.e(TAG, "$text viewModel?.type?.get(): ${viewModel?.type?.get()}")
                         throw Exception(text)
                     }
                 }
@@ -99,7 +105,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
             } ?: run {
 
                 val text = App.geString(R.string.exceptions_send_map_item_missing_position)
-                Log.e(TAG, "$text viewModel.position.get(): ${viewModel.position.get()}")
+                Log.e(TAG, "$text viewModel?.position.get(): ${viewModel?.position?.get()}")
                 throw Exception(text)
             }
 
@@ -114,16 +120,16 @@ class MapItemCreationFragment: ViewPagerFragment() {
     @Throws(Exception::class)
     private fun tryToSendArena(geoHash: GeoHash, user: String) {
 
-        viewModel.name.get()?.let { name ->
+        viewModel?.name?.get()?.let { name ->
 
-            val isEX = viewModel.isEx.get() ?: run { false }
+            val isEX = viewModel?.isEx?.get() ?: run { false }
             val arena = FirebaseArena.new(name, geoHash, user, isEX)
             firebase.pushArena(arena)
 
         } ?: run {
 
             val text = App.geString(R.string.exceptions_send_map_item_missing_arena_name)
-            Log.e(TAG, "$text viewModel.name.get(): ${viewModel.name.get()}")
+            Log.e(TAG, "$text viewModel?.name.get(): ${viewModel?.name?.get()}")
             throw Exception(text)
         }
     }
@@ -131,7 +137,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
     @Throws(Exception::class)
     private fun tryToSendPokestop(geoHash: GeoHash, user: String) {
 
-        viewModel.name.get()?.let { name ->
+        viewModel?.name?.get()?.let { name ->
 
             val pokestop = FirebasePokestop.new(name, geoHash, user)
             firebase.pushPokestop(pokestop)
@@ -139,23 +145,12 @@ class MapItemCreationFragment: ViewPagerFragment() {
         } ?: run {
 
             val text = App.geString(R.string.exceptions_send_map_item_missing_pokestop_name)
-            Log.e(TAG, "$text viewModel.name.get(): ${viewModel.name.get()}")
+            Log.e(TAG, "$text viewModel?.name.get(): ${viewModel?.name?.get()}")
             throw Exception(text)
         }
     }
 
     private fun close() {
         fragmentManager?.popBackStack()
-    }
-
-
-    companion object {
-
-        fun newInstance(latLng: LatLng): MapItemCreationFragment {
-            val fragment = MapItemCreationFragment()
-            fragment.position = latLng
-
-            return fragment
-        }
     }
 }

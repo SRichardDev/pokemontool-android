@@ -256,14 +256,12 @@ open class BaseMapFragment : Fragment() {
     }
 
     fun updateCameraPosition(latLng: LatLng, zoomLevel: ZoomLevel = zoomLevelDefault, onFinished: () -> Unit = {}) {
-        Log.d(TAG, "Debug:: updateCameraPosition($latLng, ${zoomLevel.name}), map: $map")
 
         map?.let { googleMap ->
             val cameraPosition = CameraPosition.Builder().target(latLng).zoom(zoomLevel.value).build()
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), animationCallback(onFinished))
         } ?: run {
             geoHashStartPosition = GeoHash(latLng)
-            Log.w(TAG, "Debug:: updateCameraPosition($latLng), map not ready, store geoHashStartPosition: $geoHashStartPosition")
         }
     }
 

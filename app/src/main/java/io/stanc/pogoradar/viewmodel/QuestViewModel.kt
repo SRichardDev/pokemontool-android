@@ -31,7 +31,6 @@ class QuestViewModel : ViewModel() {
 
         pokestop?.quest?.let { firebaseQuest ->
 
-            Log.w(TAG, "Debug:: updateViewModel(), firebaseQuest.id: ${firebaseQuest.id}, FirebaseDefinitions.quests: ${FirebaseDefinitions.quests}")
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
                 val validQuest = (firebaseQuest.timestamp as? Long)?.let { timestamp ->
@@ -43,7 +42,6 @@ class QuestViewModel : ViewModel() {
                 questExists.set(validQuest)
                 quest.set(questDefinition.questDescription)
                 reward.set(questDefinition.reward)
-                Log.w(TAG, "Debug:: updateViewModel(), imageName: ${questDefinition.imageName}")
                 questImage.set(imageDrawable(questDefinition.imageName, context))
 
             } ?: run {
@@ -57,7 +55,6 @@ class QuestViewModel : ViewModel() {
     }
 
     private fun resetData() {
-        Log.w(TAG, "Debug:: resetData()")
         questExists.set(false)
         quest.set(App.geString(R.string.pokestop_quest_none))
         reward.set(App.geString(R.string.pokestop_quest_none))

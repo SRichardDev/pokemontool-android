@@ -5,11 +5,19 @@ import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
+import io.stanc.pogoradar.utils.addOnPropertyChanged
 import java.lang.ref.WeakReference
 
 
 object AppSettings {
     private val TAG = javaClass.name
+
+    private var enableArenasCallback: Observable.OnPropertyChangedCallback? = null
+    private var justRaidArenasCallback: Observable.OnPropertyChangedCallback? = null
+    private var justEXArenasCallback: Observable.OnPropertyChangedCallback? = null
+    private var enablePokestopsCallback: Observable.OnPropertyChangedCallback? = null
+    private var justQuestPokestopsCallback: Observable.OnPropertyChangedCallback? = null
+    private var enableSubscriptionsCallback: Observable.OnPropertyChangedCallback? = null
 
     val enableArenas = ObservableField<Boolean>()
     val justRaidArenas = ObservableField<Boolean>()
@@ -47,53 +55,53 @@ object AppSettings {
 
     private fun setupOnPropertiesChanged(preferences: SharedPreferences) {
 
-        enableArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (enableArenasCallback == null) {
+            enableArenasCallback = enableArenas.addOnPropertyChanged { enableArenas ->
                 preferences.edit().putBoolean(AppSettings::enableArenas.name, enableArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
-        })
+        }
 
-        justRaidArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (justRaidArenasCallback == null) {
+            justRaidArenasCallback = justRaidArenas.addOnPropertyChanged { justRaidArenas ->
                 preferences.edit().putBoolean(AppSettings::justRaidArenas.name, justRaidArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
-        })
+        }
 
-        justEXArenas.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (justEXArenasCallback == null) {
+            justEXArenasCallback = justEXArenas.addOnPropertyChanged { justEXArenas ->
                 preferences.edit().putBoolean(AppSettings::justEXArenas.name, justEXArenas.get() == true)?.apply()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
-        })
+        }
 
-        enablePokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (enablePokestopsCallback == null) {
+            enablePokestopsCallback = enablePokestops.addOnPropertyChanged { enablePokestops ->
                 preferences.edit().putBoolean(AppSettings::enablePokestops.name, enablePokestops.get() == true)?.apply()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
             }
-        })
+        }
 
-        justQuestPokestops.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (justQuestPokestopsCallback == null) {
+            justQuestPokestopsCallback = justQuestPokestops.addOnPropertyChanged { justQuestPokestops ->
                 preferences.edit().putBoolean(AppSettings::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
             }
-        })
+        }
 
-        enableSubscriptions.addOnPropertyChangedCallback(object: Observable.OnPropertyChangedCallback() {
-            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+        if (enableSubscriptionsCallback == null) {
+            enableSubscriptionsCallback = enableSubscriptions.addOnPropertyChanged { enableSubscriptions ->
                 FirebaseUser.changePushNotifications(enableSubscriptions.get() == true)
                 observers.forEach {
                     it.value.get()?.onSubscriptionsEnableDidChange()
                 }
             }
-        })
+        }
     }
 
     /**

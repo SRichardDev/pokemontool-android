@@ -15,30 +15,23 @@ class RaidStateViewModel: ViewModel() {
     val raidTime = ObservableField<String?>()
     val isRaidAnnounced = ObservableField<Boolean>()
 
-    init {
-        updateData(raid)
-    }
-
     fun updateData(raid: FirebaseRaid?) {
 //        Log.d(TAG, "Debug:: updateData(raid: $raid)")
         this.raid = raid
 
         raid?.let {
-            changeRaidData()
-        } ?: run {
-            resetRaidData()
-        }
 
+            raidState.set(currentRaidState())
+            raidTime.set(raidTime())
+            isRaidAnnounced.set(currentRaidState() != RaidState.NONE)
+
+        } ?: run {
+            reset()
+        }
 //        Log.d(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
     }
 
-    private fun changeRaidData() {
-        raidState.set(currentRaidState())
-        raidTime.set(raidTime())
-        isRaidAnnounced.set(currentRaidState() != RaidState.NONE)
-    }
-
-    private fun resetRaidData() {
+    fun reset() {
         raidState.set(RaidState.NONE)
         raidTime.set(null)
         isRaidAnnounced.set(false)

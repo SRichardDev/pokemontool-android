@@ -34,9 +34,9 @@
     <fragment android:id="@+id/policyFragment" android:name="io.stanc.pogoradar.screen.PolicyFragment"
               android:label="PolicyFragment"
               tools:layout="@layout/fragment_policy"/>
-    <fragment android:id="@+id/arenaFragment" android:name="io.stanc.pogoradar.screen.ArenaFragment"
+    <fragment android:id="@+id/arenaFragment" android:name="io.stanc.pogoradar.screen.arena.ArenaFragment"
               android:label="ArenaFragment"
-              tools:layout="@layout/fragment_arena">
+              tools:layout="@layout/fragment_arena_info">
         <action android:id="@+id/action_arenaFragment_to_raidFragment" app:destination="@id/raidFragment"/>
         <action android:id="@+id/action_arenaFragment_to_participantsFragment"
                 app:destination="@id/participantsFragment"/>
@@ -44,7 +44,7 @@
     <fragment android:id="@+id/questFragment" android:name="io.stanc.pogoradar.screen.pokestop.QuestFragment"
               android:label="QuestFragment"
               tools:layout="@layout/fragment_quest"/>
-    <fragment android:id="@+id/raidFragment" android:name="io.stanc.pogoradar.screen.RaidFragment"
+    <fragment android:id="@+id/raidFragment" android:name="io.stanc.pogoradar.screen.arena.RaidFragment"
               android:label="RaidFragment"
               tools:layout="@layout/fragment_raid"/>
     <fragment android:id="@+id/mapSettingsFragment" android:name="io.stanc.pogoradar.screen.MapSettingsFragment"
@@ -53,7 +53,7 @@
     <fragment android:id="@+id/mapItemCreationFragment" android:name="io.stanc.pogoradar.screen.MapItemCreationFragment"
               android:label="MapItemCreationFragment"
               tools:layout="@layout/layout_viewpager_flow"/>
-    <fragment android:id="@+id/participantsFragment" android:name="io.stanc.pogoradar.screen.ParticipantsFragment"
+    <fragment android:id="@+id/participantsFragment" android:name="io.stanc.pogoradar.screen.arena.ParticipantsFragment"
               android:label="ParticipantsFragment"
               tools:layout="@layout/layout_participants"/>
     <fragment android:id="@+id/accountFragment" android:name="io.stanc.pogoradar.screen.account.AccountFragment"

@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.screen.pokestop
+package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
 import android.util.Log
@@ -10,25 +10,26 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
-import io.stanc.pogoradar.firebase.node.FirebasePokestop
+import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.screen.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
-import io.stanc.pogoradar.viewmodel.QuestViewModel
+import io.stanc.pogoradar.viewmodel.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.RaidViewModel
 
 
-class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
+class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
 
     private val TAG = javaClass.name
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
-    override fun onDataChanged(dataObject: FirebasePokestop?) {
+    override fun onDataChanged(dataObject: FirebaseArena?) {
         updateViewModel(dataObject)
     }
-    private val pokestopObserver = object: FirebaseNodeObserverManager.Observer<FirebasePokestop> {
 
-        override fun onItemChanged(item: FirebasePokestop) {
+    private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
+
+        override fun onItemChanged(item: FirebaseArena) {
             dataObject = item
         }
 
@@ -38,31 +39,29 @@ class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootLayout = inflater.inflate(R.layout.fragment_pokestop, container, false)
+        val rootLayout = inflater.inflate(R.layout.fragment_arena, container, false)
 
         dataObject?.let {
             AppbarManager.setTitle(it.name)
-            firebase.addObserver(pokestopObserver, it)
+            firebase.addObserver(arenaObserver, it)
             updateViewModel(it)
         }
 
-        ShowFragmentManager.replaceFragment(PokestopInfoFragment(), childFragmentManager, R.id.pokestop_layout)
+        ShowFragmentManager.replaceFragment(ArenaInfoFragment(), childFragmentManager, R.id.arena_layout)
 
         return rootLayout
     }
 
     override fun onDestroyView() {
-        dataObject?.let { firebase.removeObserver(pokestopObserver, it) }
+        dataObject?.let { firebase.removeObserver(arenaObserver, it) }
         AppbarManager.reset()
         super.onDestroyView()
     }
 
-    private fun updateViewModel(pokestop: FirebasePokestop?) {
-
-        Log.w(TAG, "Debug:: updateViewModel(pokestop: $pokestop), activity: $activity")
+    private fun updateViewModel(arena: FirebaseArena?) {
         activity?.let {
-            ViewModelProviders.of(it).get(PokestopViewModel::class.java).updateData(pokestop, it)
-            ViewModelProviders.of(it).get(QuestViewModel::class.java).updateData(pokestop, it)
+            ViewModelProviders.of(it).get(ArenaViewModel::class.java).updateData(arena, it)
+            ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(arena, it)
         }
     }
 }

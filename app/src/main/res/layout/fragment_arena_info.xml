@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="raidViewModel"
+            type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
+        <variable
+            name="arenaViewModel"
+            type="io.stanc.pogoradar.viewmodel.ArenaViewModel"/>
+
+        <import type="android.view.View"/>
+        <import type="io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState"/>
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/layout_padding_screen">
+
+            <ImageView
+                android:id="@+id/arena_icon"
+                style="@style/Image"
+                android:layout_width="@dimen/image_size_big"
+                android:layout_height="@dimen/image_size_big"
+                android:layout_gravity="center"
+                android:src="@{arenaViewModel.arenaImage}"
+                tools:src="@drawable/icon_arena_30dp"
+                tools:ignore="ContentDescription"/>
+
+            <include layout="@layout/layout_divider"/>
+
+            <Button
+                android:id="@+id/arena_raid_button_new_raid"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/arena_raid_button_new_raid"
+                android:visibility="@{raidViewModel.isRaidAnnounced ? View.GONE : View.VISIBLE}"
+                tools:visibility="visible"/>
+
+            <LinearLayout
+                android:id="@+id/arena_layout_raid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="@{raidViewModel.isRaidAnnounced ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/arena_raid_icon"
+                    style="@style/Image"
+                    android:layout_width="@dimen/image_size_small"
+                    android:layout_height="@dimen/image_size_small"
+                    android:layout_gravity="center"
+                    android:src="@{raidViewModel.raidImage}"
+                    tools:src="@drawable/icon_crosshair_100dp"
+                    tools:ignore="ContentDescription"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small">
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{raidViewModel.raidState == RaidState.EGG_HATCHES ? @string/arena_raid_time_until_egg_hatches : @string/arena_raid_time_until_raid_ends}"
+                        tools:text="Until:"/>
+
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/layout_margin_small"
+                        android:text="@{raidViewModel.raidTime}"
+                        tools:text="-00:00:00"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{raidViewModel.isRaidBossMissing ? View.VISIBLE : View.GONE}">
+
+                    <include layout="@layout/fragment_raidbosses"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/arena_raid_button_raidboss"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_raidboss"
+                    android:visibility="@{raidViewModel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+
+                <include layout="@layout/layout_divider"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small">
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/arena_raid_meetup_time"
+                        tools:text="Until:"/>
+
+
+                    <TextView
+                        style="@style/TextStyle_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/layout_margin_small"
+                        android:text="@{raidViewModel.meetupTime}"
+                        tools:text="-00:00:00"/>
+
+                </LinearLayout>
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_participants"/>
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@{raidViewModel.numParticipants}"
+                    tools:text="1000"/>
+
+                <Button
+                    android:id="@+id/arena_raid_button_participants_list"
+                    style="@style/ButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/arena_raid_participants_list"/>
+
+                <include
+                    layout="@layout/layout_raid_meetup_time"
+                    android:id="@+id/raid_layout_meetup"
+                    android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/layout_margin_small">
+
+                    <TextView
+                            android:id="@+id/arena_raid_textview_register"
+                            style="@style/TextStyle_default"
+                            android:layout_width="0dp"
+                            android:layout_weight="3"
+                            android:layout_height="wrap_content"
+                            android:text="@string/arena_raid_register"/>
+
+                    <Switch
+                            android:id="@+id/arena_raid_switch_register"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/layout_margin_small"
+                            android:checked="@{raidViewModel.isUserParticipate}"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <include layout="@layout/layout_divider"/>
+
+            <include layout="@layout/layout_map_item_infos"
+                     bind:viewModel="@{arenaViewModel.mapItemInfoViewModel}"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

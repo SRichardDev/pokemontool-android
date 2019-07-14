@@ -1,23 +1,30 @@
 package io.stanc.pogoradar.viewmodel
 
+import android.content.Context
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
 import android.util.Log
+import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
+import io.stanc.pogoradar.map.MapIconFactory
+import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Observables.dependantObservableField
 import io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState
 
-class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
-
+class RaidViewModel: ViewModel() {
     private val TAG = javaClass.name
 
+    private var arena: FirebaseArena? = null
     private var firebase: FirebaseDatabase = FirebaseDatabase()
+    val raidImage = ObservableField<Drawable?>()
 
-    private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel.new(arena.raid)
+    private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel.new(arena?.raid)
     var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel.new(null)
 
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
@@ -66,10 +73,6 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
         raidMeetupViewModel.isUserParticipate.get()
     }
 
-    init {
-        updateData(arena)
-    }
-
     override fun onCleared() {
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
         super.onCleared()
@@ -79,25 +82,36 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
      * interface
      */
 
-    fun updateData(arena: FirebaseArena) {
-//        Log.i(TAG, "Debug:: updateData($arena)")
-
-        requestRaidMeetupData(arena)
-
-        raidStateViewModel.updateData(arena.raid)
-
-        arena.raid?.let { raid ->
-
-            isRaidBossMissing.set(isRaidAnnounced.get() == true && raidState.get() == RaidState.RAID_RUNNING && raid.raidBossId == null)
-
-        } ?: run {
-
-            isRaidBossMissing.set(false)
-        }
-
+    fun updateData(arena: FirebaseArena?, context: Context) {
+        Log.i(TAG, "Debug:: updateData($arena)")
         this.arena = arena
 
+        arena?.let {
+
+            requestRaidMeetupData(arena)
+
+            raidStateViewModel.updateData(arena.raid)
+            raidImage.set(imageDrawable(arena, context))
+
+            arena.raid?.let { raid ->
+
+                isRaidBossMissing.set(isRaidAnnounced.get() == true && raidState.get() == RaidState.RAID_RUNNING && raid.raidBossId == null)
+
+            } ?: run {
+
+                isRaidBossMissing.set(false)
+            }
+
+        } ?: run {
+            reset()
+        }
+
 //        Log.i(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.get()}, isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
+    }
+
+    fun reset() {
+        isRaidBossMissing.set(false)
+        raidStateViewModel.reset()
     }
 
     fun changeParticipation(participate: Boolean) {
@@ -117,7 +131,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     fun createMeetup(meetupTime: String) {
 
-        arena.raid?.let { raid ->
+        arena?.raid?.let { raid ->
 
             val raidMeetup = FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
             firebase.pushRaidMeetup(raid.databasePath(), raidMeetup)
@@ -129,7 +143,7 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
 
     fun sendRaidBoss(raidBoss: FirebaseRaidbossDefinition) {
 
-        arena.raid?.let { raid ->
+        arena?.raid?.let { raid ->
             firebase.pushRaidBoss(raid.databasePath(), raidBoss)
         }
     }
@@ -137,6 +151,10 @@ class RaidViewModel(private var arena: FirebaseArena): ViewModel() {
     /**
      * private
      */
+
+    private fun imageDrawable(arena: FirebaseArena, context: Context): Drawable? {
+        return FirebaseImageMapper.raidDrawable(context, arena)
+    }
 
     private fun requestRaidMeetupData(arena: FirebaseArena) {
 
