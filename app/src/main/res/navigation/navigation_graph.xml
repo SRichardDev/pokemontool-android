@@ -8,18 +8,38 @@
               tools:layout="@layout/fragment_map_grid">
         <action android:id="@+id/action_mapInteractionFragment_to_pokestopFragment"
                 app:destination="@id/pokestopFragment"
-                app:enterAnim="@anim/nav_default_enter_anim"
-                app:exitAnim="@anim/nav_default_exit_anim"
-                app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-                app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
-        <action android:id="@+id/action_mapInteractionFragment_to_policyFragment" app:destination="@id/policyFragment"/>
-        <action android:id="@+id/action_mapInteractionFragment_to_arenaFragment" app:destination="@id/arenaFragment"/>
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_policyFragment" app:destination="@id/policyFragment"
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
+        <action android:id="@+id/action_mapInteractionFragment_to_arenaFragment" app:destination="@id/arenaFragment"
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
         <action android:id="@+id/action_mapInteractionFragment_to_mapSettingsFragment"
-                app:destination="@id/mapSettingsFragment"/>
+                app:destination="@id/mapSettingsFragment"
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
         <action android:id="@+id/action_mapInteractionFragment_to_mapItemCreationFragment"
-                app:destination="@id/mapItemCreationFragment"/>
+                app:destination="@id/mapItemCreationFragment"
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
         <action android:id="@+id/action_mapInteractionFragment_to_accountFragment"
-                app:destination="@id/accountFragment"/>
+                app:destination="@id/accountFragment"
+                app:enterAnim="@anim/nav_enter"
+                app:exitAnim="@anim/nav_exit"
+                app:popEnterAnim="@anim/nav_pop_enter"
+                app:popExitAnim="@anim/nav_pop_exit"/>
     </fragment>
     <fragment android:id="@+id/pokestopFragment" android:name="io.stanc.pogoradar.screen.pokestop.PokestopFragment"
               android:label="PokestopFragment"

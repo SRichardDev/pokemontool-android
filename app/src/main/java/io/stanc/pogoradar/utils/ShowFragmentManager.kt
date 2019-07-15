@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import io.stanc.pogoradar.R
 
 object ShowFragmentManager {
     private val TAG = javaClass.name
@@ -18,6 +19,7 @@ object ShowFragmentManager {
         val fragmentTag = fragment::class.java.name
 
         if(!fragmentAlreadyExists(fragmentTag, fragmentManager)) {
+//            TODO: .setCustomAnimations(R.anim.enter_?, R.anim.exit_?)
             fragmentManager.beginTransaction().add(layoutResId, fragment, fragmentTag).addToBackStack(null).commit()
         }
     }

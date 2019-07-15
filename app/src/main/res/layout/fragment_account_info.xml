@@ -19,6 +19,7 @@
         android:id="@+id/account_info_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingTop="@dimen/layout_padding_screen"
         android:paddingStart="@dimen/layout_padding_screen"
         android:paddingEnd="@dimen/layout_padding_screen">
 
@@ -31,7 +32,6 @@
                 android:layout_width="@dimen/image_size_big"
                 android:layout_height="@dimen/image_size_big"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
                 android:src="@drawable/icon_medal_none_96dp"
                 android:visibility="@{viewModel.team == null ? View.VISIBLE : View.GONE}"
                 tools:ignore="ContentDescription"/>
