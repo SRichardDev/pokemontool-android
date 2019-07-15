@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -18,8 +19,10 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.NotificationHolder
+import io.stanc.pogoradar.screen.MapInteractionFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.PermissionManager
+import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_progress.*
 
@@ -48,6 +51,9 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
         // notification check
         onNotification(intent)
+
+        // map screen
+        setupMapScreen()
     }
 
     override fun onStart() {
@@ -139,23 +145,27 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
      * Screens
      */
 
+    private fun setupMapScreen() {
+        ShowFragmentManager.replaceFragment(MapInteractionFragment(), supportFragmentManager, R.id.fragment_map)
+    }
+
     private fun showMapFragment() {
 
-        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.mapInteractionFragment) {
-            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.blankFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
         }
     }
 
     private fun showAccountFragment() {
 
-        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
-        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_accountFragment)
+        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
+        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_accountFragment)
     }
 
     private fun showPolicyFragment() {
 
-        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
-        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
+        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
+        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_policyFragment)
     }
 
     companion object {

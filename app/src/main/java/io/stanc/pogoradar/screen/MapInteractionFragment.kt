@@ -241,7 +241,7 @@ class MapInteractionFragment: Fragment() {
         val bundle = Bundle().apply {
             this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, arena)
         }
-        findNavController().navigate(R.id.action_mapInteractionFragment_to_arenaFragment, bundle)
+        findNavController().navigate(R.id.action_blankFragment_to_arenaFragment, bundle)
     }
 
     private fun showPokestopFragment(pokestop: FirebasePokestop) {
@@ -249,7 +249,7 @@ class MapInteractionFragment: Fragment() {
         val bundle = Bundle().apply {
             this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, pokestop)
         }
-        findNavController().navigate(R.id.action_mapInteractionFragment_to_pokestopFragment, bundle)
+        findNavController().navigate(R.id.action_blankFragment_to_pokestopFragment, bundle)
     }
 
     private fun showMapItemCreationFragment(latLng: LatLng) {
@@ -257,12 +257,12 @@ class MapInteractionFragment: Fragment() {
         val bundle = Bundle().apply {
             this.putParcelable(PARCELABLE_EXTRA_DATA_OBJECT, latLng)
         }
-        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapItemCreationFragment, bundle)
+        findNavController().navigate(R.id.action_blankFragment_to_mapItemCreationFragment, bundle)
     }
 
     private fun showMapSettingsFragment() {
         resetModes()
-        findNavController().navigate(R.id.action_mapInteractionFragment_to_mapSettingsFragment)
+        findNavController().navigate(R.id.action_blankFragment_to_mapSettingsFragment)
     }
 
     /**

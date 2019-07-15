@@ -53,16 +53,25 @@
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
     <string name="authentication_medal_text_raids">Eingereichte Raids</string>
     <string name="authentication_medal_text_quests">Eingereichte Quests</string>
-    <string name="authentication_login_description">Lege einen Account an oder melde dich an, um den vollen Umfang der App zu benutzen.</string>
+    <string name="authentication_login_description">Lege einen Account an oder melde dich an, um den vollen Umfang der
+        App zu benutzen.
+    </string>
     <string name="authentication_login_button_signin">Anmelden</string>
     <string name="authentication_login_button_signup">Account anlegen</string>
     <string name="authentication_login_button_signout">Abmelden</string>
     <string name="authentication_login_button_verification">Sende Verifikations-E-Mail\n(User wird ausgeloggt)</string>
-    <string name="authentication_login_email_description">Um einen Account zu erstellen benötigen wir eine gültige E-Mail Adresse von dir. Bitte achte darauf, dass die E-Mail Adresse korrekt ist, da du von uns eine Bestätigungs-E-Mail bekommst.</string>
+    <string name="authentication_login_email_description">Um einen Account zu erstellen benötigen wir eine gültige
+        E-Mail Adresse von dir. Bitte achte darauf, dass die E-Mail Adresse korrekt ist, da du von uns eine
+        Bestätigungs-E-Mail bekommst.
+    </string>
     <string name="authentication_login_email_edit_hint_text">Trage hier deine E-Mail Adresse ein</string>
-    <string name="authentication_login_password_description">Bitte wähle ein Passwort aus. Dieses muss mindestens 6 Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.</string>
+    <string name="authentication_login_password_description">Bitte wähle ein Passwort aus. Dieses muss mindestens 6
+        Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.
+    </string>
     <string name="authentication_login_password_edit_hint_text">Trage hier dein Passwort ein</string>
-    <string name="authentication_login_name_description">Bitte gebe deinen Trainer Namen ein, den du auch im Spiel verwendest.</string>
+    <string name="authentication_login_name_description">Bitte gebe deinen Trainer Namen ein, den du auch im Spiel
+        verwendest.
+    </string>
     <string name="authentication_login_name_edit_hint_text">Trage hier deinen Trainer Namen ein</string>
 
     <string name="authentication_login_screen_title_1">E-Mail</string>
@@ -89,17 +98,24 @@
     <string name="map_title_arena">Neue Arena</string>
     <string name="map_title_pokestop">Neuer Pok&#233;stop</string>
     <string name="map_max_zooming_level">Max Zoom Stufe erreicht. Bitte zoome näher heran.</string>
-    <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder ein neues hinzufügen kannst.</string>
+    <string name="map_max_subscriptions">Max Anzahl an Gebieten erreicht. Bitte lösche erst ein Gebiet bevor du wieder
+        ein neues hinzufügen kannst.
+    </string>
     <string name="map_map_item_edittext">Bitte füge hier den Name der/des %s aus dem Spiel ein.</string>
     <string name="map_map_item_which_item_to_add">Was möchtest du einrichten?</string>
     <string name="map_map_item_position_correct">Stimmt die Position?</string>
-    <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest und schiebe es bis die Position passt.</string>
+    <string name="map_map_item_position_correct_subtext">Du kannst die Position hier verschieben. Halte das Symbol fest
+        und schiebe es bis die Position passt.
+    </string>
     <string name="map_map_item_name_of_pokestop">Wie heißt der Pok&#233;stop?</string>
     <string name="map_map_item_name_of_arena">Wie heißt die Arena?</string>
-    <string name="map_map_item_name_of_item_subtext">Bitte gebe genau den Namen ein, den du auch im Spiel findest.</string>
+    <string name="map_map_item_name_of_item_subtext">Bitte gebe genau den Namen ein, den du auch im Spiel findest.
+    </string>
     <string name="map_map_item_isex_arena">EX-Arena?</string>
     <string name="map_map_item_check_data">Sind deine Eingaben korrekt?</string>
-    <string name="map_map_item_check_data_subtext">Bitte beachte, dass es sich hier um nutzergenerierte Daten handelt. Stelle sicher, dass alles korrekt ist, damit andere Spieler den Pokestop/ die Arena auch finden können.</string>
+    <string name="map_map_item_check_data_subtext">Bitte beachte, dass es sich hier um nutzergenerierte Daten handelt.
+        Stelle sicher, dass alles korrekt ist, damit andere Spieler den Pokestop/ die Arena auch finden können.
+    </string>
     <string name="map_map_item_button_further">Weiter</string>
     <string name="map_map_item_button_send">Absenden</string>
     <string name="map_map_item_creation_page_title_1">Position</string>
@@ -175,21 +191,31 @@
     <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
     <string name="exceptions_login_missing_data">Fehler! Anmeldedaten sind unvollständig.</string>
     <string name="exceptions_subscription_sending_failed">Fehler! Gebiete konnten nicht aktualisiert werden.</string>
-    <string name="exceptions_location_permission_denied">Bitte aktiviere die Location Berechtigung, um die App im vollen Umfang benutzen zu können.</string>
+    <string name="exceptions_location_permission_denied">Bitte aktiviere die Location Berechtigung, um die App im vollen
+        Umfang benutzen zu können.
+    </string>
 
     <!-- Popups / Dialogs -->
     <string name="popup_info_button_neutral">OK</string>
     <string name="popup_info_missing_raidboss_id_title">Bitte wähle den korrekten Raidboss aus.</string>
     <string name="popup_info_push_registration_title">Push Nachrichten registrieren</string>
-    <string name="popup_info_push_registration_message">Bitte klicke auf die Gebiete für die du über Raids &amp; Quests benachrichtigt werden möchtest.</string>
-    <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?</string>
+    <string name="popup_info_push_registration_message">Bitte klicke auf die Gebiete für die du über Raids &amp; Quests
+        benachrichtigt werden möchtest.
+    </string>
+    <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?
+    </string>
     <string name="dialog_gps_disabled_button_positive">Ja</string>
     <string name="dialog_gps_disabled_button_negative">Nein</string>
-    <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.</string>
-    <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nZiehe dazu den Drawer vom linken Rand in den Screen und klicke auf \"Account\".</string>
+    <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.
+    </string>
+    <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nZiehe
+        dazu den Drawer vom linken Rand in den Screen und klicke auf \"Account\".
+    </string>
 
     <!-- App Info Label -->
-    <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell sein.</string>
+    <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell
+        sein.
+    </string>
     <string name="info_label_arena_filter">Achtung: Arena filter ist aktiviert!</string>
     <string name="info_label_pokestop_filter">Achtung: Pok&#233;stop filter ist aktiviert!</string>
     <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
@@ -199,5 +225,8 @@
     <string name="policy_button_terms_conditions">Terms &amp; Conditions</string>
     <string name="policy_button_privacy_policy">Datenschutzerklärung</string>
     <string name="policy_button_license">Open-Source-Lizenzen</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
