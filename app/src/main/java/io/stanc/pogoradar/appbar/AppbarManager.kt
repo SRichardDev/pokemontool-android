@@ -24,6 +24,7 @@ class AppbarManager {
             Companion.defaultOnNavigationIconClicked = defaultOnNavigationIconClicked
 
             setTitle(defaultTitle)
+            hideNavigationIcon()
         }
 
 
@@ -37,6 +38,7 @@ class AppbarManager {
 
         fun reset() {
             defaultTitle?.let { setTitle(it) }
+            hideNavigationIcon()
         }
 
         /**
@@ -52,6 +54,15 @@ class AppbarManager {
             toolbar?.get()?.setNavigationIconClickListener { onNavigationIconClicked() }
         }
 
+        fun showNavigationIcon() {
+            toolbar?.get()?.showNavigationIcon()
+        }
+
+        fun hideNavigationIcon() {
+            toolbar?.get()?.hideNavigationIcon()
+        }
+
+
         /**
          * Title
          */
@@ -63,6 +74,7 @@ class AppbarManager {
             if (onTitleLongClicked != EMPTY_LAMBDA) {
                 toolbar?.get()?.setTitleLongClickListener { onTitleLongClicked() }
             }
+            showNavigationIcon()
         }
 
         /**

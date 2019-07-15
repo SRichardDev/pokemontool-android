@@ -45,7 +45,7 @@ class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
     }
 
     override fun hideNavigationIcon() {
-        navigationIcon.visibility = View.GONE
+        navigationIcon.visibility = View.INVISIBLE
     }
 
     override fun setNavigationIcon(navigationIconResID: Int) {
@@ -85,8 +85,8 @@ class PoGoToolbar @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
     override fun hideMenu(type: Toolbar.MenuType) {
         when(type) {
-            Toolbar.MenuType.Icon -> menuIcon.visibility = View.GONE
-            Toolbar.MenuType.Button -> menuButton.visibility = View.GONE
+            Toolbar.MenuType.Icon -> menuIcon.visibility = View.INVISIBLE
+            Toolbar.MenuType.Button -> menuButton.visibility = View.INVISIBLE
         }
 
     }

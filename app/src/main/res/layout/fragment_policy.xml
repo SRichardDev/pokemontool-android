@@ -3,8 +3,9 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:paddingTop="@dimen/layout_padding_screen"
               android:paddingStart="@dimen/layout_padding_screen"
-        android:paddingEnd="@dimen/layout_padding_screen">
+              android:paddingEnd="@dimen/layout_padding_screen">
 
     <!-- TODO... -->
     <!--<Button-->

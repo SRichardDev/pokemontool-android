@@ -5,14 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.NavigationUI
-import com.google.android.material.navigation.NavigationView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
@@ -22,27 +17,22 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
-import io.stanc.pogoradar.firebase.node.FirebaseUserNode
-import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.firebase.NotificationHolder
+import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.PermissionManager
-import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.utils.WaitingSpinner
-import kotlinx.android.synthetic.main.layout_navigation_header.*
 import kotlinx.android.synthetic.main.layout_progress.*
-import java.lang.ref.WeakReference
 
 
-class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private var drawerLayout: DrawerLayout? = null
     private var appInfoLabelController: AppInfoLabelController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // content
-        setContentView(R.layout.activity_drawer)
+        setContentView(R.layout.activity_start)
 
         // app bar
         setupToolbar()
@@ -51,13 +41,10 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         setupAppLabel()
 
         // navigation drawer
-        setupDrawer()
+        setupNavigationView()
 
         // progress view
         WaitingSpinner.initialize(layout_progress, progressbar_text, window)
-
-        // first screen
-        showMapFragment()
 
         // notification check
         onNotification(intent)
@@ -91,16 +78,12 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
     override fun onResume() {
         super.onResume()
-        FirebaseUser.addAuthStateObserver(authStateObserver)
-        FirebaseUser.addUserDataObserver(userDataObserver)
         FirebaseUser.startAuthentication()
         appInfoLabelController?.start()
     }
 
     override fun onPause() {
         FirebaseUser.stopAuthentication()
-        FirebaseUser.removeAuthStateObserver(authStateObserver)
-        FirebaseUser.removeUserDataObserver(userDataObserver)
         appInfoLabelController?.stop()
         super.onPause()
     }
@@ -108,18 +91,6 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     private fun showPopupIfUserIsLoggedOut() {
         if(FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedOut) {
             Popup.showInfo(this, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
-        }
-    }
-
-    override fun onBackPressed() {
-
-        drawerLayout?.let { drawerLayout ->
-
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            } else {
-                super.onBackPressed()
-            }
         }
     }
 
@@ -133,10 +104,7 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         (findViewById(R.id.activity_toolbar) as? PoGoToolbar)?.let { toolbar ->
 
             AppbarManager.setup(toolbar, resources.getString(R.string.default_app_title), defaultOnNavigationIconClicked = {
-
-                findViewById<View>(R.id.nav_view)?.let { navView ->
-                    drawerLayout?.openDrawer(navView)
-                }
+                this.onBackPressed()
             })
         }
     }
@@ -147,32 +115,24 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         }
     }
 
-    private fun setupDrawer() {
+    private fun setupNavigationView() {
+        findViewById<BottomNavigationView>(R.id.navigationView)?.setOnNavigationItemSelectedListener(this)
+    }
 
-        drawerLayout = findViewById(R.id.drawer_layout)
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        drawerLayout?.let { drawerLayout ->
-
-            val weakActivity = WeakReference(this)
-            val toggle = object : ActionBarDrawerToggle(this, drawerLayout, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-
-                override fun onDrawerOpened(drawerView: View) {
-                    super.onDrawerOpened(drawerView)
-                    weakActivity.get()?.let { SystemUtils.hideKeyboard(activity = it) }
-                    updateNavText()
-                }
+        when (item.itemId) {
+            R.id.nav_account -> {
+                showAccountFragment()
             }
-
-            drawerLayout.addDrawerListener(toggle)
-            findViewById<NavigationView>(R.id.nav_view)?.setNavigationItemSelectedListener(this)
-
-//            findViewById<NavigationView>(R.id.nav_view)?.let { navigationView ->
-//                NavigationUI.setupWithNavController(navigationView, this.findNavController(R.id.nav_host_fragment))
-//            }
-
-
-            toggle.syncState()
+            R.id.nav_map -> {
+                showMapFragment()
+            }
+            R.id.nav_policy -> {
+                showPolicyFragment()
+            }
         }
+        return true
     }
 
     /**
@@ -196,43 +156,6 @@ class StartActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelect
 
         this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.mapInteractionFragment, false)
         this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_mapInteractionFragment_to_policyFragment)
-    }
-
-    /**
-     * Navigation drawer
-     */
-
-    private val authStateObserver = object : FirebaseUser.AuthStateObserver {
-        override fun authStateChanged(newAuthState: FirebaseUser.AuthState) {
-            updateNavText()
-        }
-    }
-
-    private val userDataObserver = object : FirebaseUser.UserDataObserver {
-        override fun userDataChanged(user: FirebaseUserNode?) {
-            updateNavText()
-        }
-    }
-
-    private fun updateNavText() {
-        nav_header_subtitle?.text = FirebaseUser.authStateText(baseContext)
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-
-        when (item.itemId) {
-            R.id.nav_account -> {
-                showAccountFragment()
-            }
-            R.id.nav_map -> {
-                showMapFragment()
-            }
-            R.id.nav_policy -> {
-                showPolicyFragment()
-            }
-        }
-        drawerLayout?.closeDrawer(GravityCompat.START)
-        return true
     }
 
     companion object {

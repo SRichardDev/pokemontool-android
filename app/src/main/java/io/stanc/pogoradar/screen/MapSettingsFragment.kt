@@ -25,7 +25,7 @@ class MapSettingsFragment: Fragment() {
     }
 
     override fun onPause() {
-        AppbarManager.setTitle(getString(R.string.default_app_title))
+        AppbarManager.reset()
         super.onPause()
     }
 }
