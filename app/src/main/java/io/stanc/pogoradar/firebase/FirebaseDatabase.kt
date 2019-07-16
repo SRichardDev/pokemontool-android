@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.database.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
+import io.stanc.pogoradar.firebase.DatabaseKeys.MEETUP_TIME
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUP_ID
@@ -106,14 +107,11 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * raids & meetups
      */
 
-    fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup? = null) {
-
+    fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup) {
         removeRaidMeetupIfExists(raid.databasePath()) {
-
+            
             FirebaseServer.setNode(raid)
-            newRaidMeetup?.let {
-                pushRaidMeetup(raid.databasePath(), newRaidMeetup)
-            }
+            pushRaidMeetup(raid.databasePath(), newRaidMeetup)
         }
 
         FirebaseUser.saveSubmittedRaids()
@@ -123,12 +121,22 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
 
         raidMeetupId?.let { id ->
+
             FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
-            pushRaidMeetupParticipation(id)
+            val userParticipants =  raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
+            if (userParticipants) {
+                pushRaidMeetupParticipation(id)
+            }
         }
 
         return raidMeetupId
     }
+
+    fun changeMeetupTime(raidMeetupId: String, time: String) {
+        FirebaseServer.setData("$RAID_MEETUPS/$raidMeetupId/$MEETUP_TIME", time, callbackForVoid())
+        pushRaidMeetupParticipation(raidMeetupId)
+    }
+
 
     private fun removeRaidMeetupIfExists(raidDatabasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 

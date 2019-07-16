@@ -212,8 +212,8 @@
     <!-- Popups / Dialogs -->
     <string name="popup_info_button_neutral">OK</string>
     <string name="popup_info_missing_raidboss_id_title">Bitte wähle den korrekten Raidboss aus.</string>
-    <string name="popup_info_push_registration_title">Push Nachrichten registrieren</string>
-    <string name="popup_info_push_registration_message">Bitte klicke auf die Gebiete für die du über Raids &amp; Quests
+    <string name="popup_info_push_registration_title">Push Nachrichten</string>
+    <string name="popup_info_push_registration_message">Bitte klicke auf die Karte.\nDie Flächen markieren die Gebiete für die du über Raids &amp; Quests
         benachrichtigt werden möchtest.
     </string>
     <string name="dialog_gps_disabled_message">Dein GPS scheint ausgeschaltet zu sein, möchtest du es einschalten?

@@ -17,17 +17,12 @@
         <import type="io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState"/>
     </data>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white">
+    <ScrollView style="@style/FullscreenLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="@dimen/layout_padding_screen"
-        android:paddingEnd="@dimen/layout_padding_screen">
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/arena_icon"

@@ -87,8 +87,7 @@ class ArenaInfoFragment: Fragment() {
                     if (viewModel.isRaidMeetupAnnounced.get() == true) {
                         viewModel.changeParticipation(isChecked)
                     } else {
-                        val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
-                        viewModel.createMeetup(meetupTime)
+                        viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
                     }
                 }
             }

@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
+import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
@@ -292,25 +293,25 @@ class RaidFragment: Fragment() {
 
     private fun sendRaid(geoHash: GeoHash, arenaId: String, raidbossId: String) {
         val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId, raidbossId)
-        pushRaidAndMeetupIfUserParticipates(raid)
+        pushRaidAndMeetup(raid)
         closeScreen()
     }
 
     private fun sendEgg(geoHash: GeoHash, arenaId: String) {
         val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId)
-        pushRaidAndMeetupIfUserParticipates(raid)
+        pushRaidAndMeetup(raid)
         closeScreen()
     }
 
-    private fun pushRaidAndMeetupIfUserParticipates(raid: FirebaseRaid) {
+    private fun pushRaidAndMeetup(raid: FirebaseRaid) {
 
-        val raidMeetup = if (isUserParticipating) {
-            val meetupTime = TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
-            FirebaseRaidMeetup("", meetupTime, participantUserIds = emptyList(), chat = emptyList())
+        val meetupTime = if (isUserParticipating) {
+            TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
         } else {
-            null
+            DatabaseKeys.DEFAULT_MEETUP_TIME
         }
 
+        val raidMeetup = FirebaseRaidMeetup.new(meetupTime)
         firebase.pushRaid(raid, raidMeetup)
     }
 

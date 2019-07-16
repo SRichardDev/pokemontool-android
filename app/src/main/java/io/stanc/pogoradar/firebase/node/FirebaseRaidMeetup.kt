@@ -51,5 +51,13 @@ data class FirebaseRaidMeetup(
                 null
             }
         }
+
+        fun new(meetupTime: String): FirebaseRaidMeetup {
+            return new("", meetupTime)
+        }
+
+        fun new(id: String, meetupTime: String): FirebaseRaidMeetup {
+            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = emptyList(), chat = emptyList())
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
@@ -35,7 +36,7 @@ class RaidMeetupViewModel: ViewModel() {
     }
 
     private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
-        isRaidMeetupAnnounced.set(true)
+        isRaidMeetupAnnounced.set(raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME)
         numParticipants.set(raidMeetup.participantUserIds.size.toString())
         isUserParticipate.set(raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id))
         meetupTime.set(raidMeetup.meetupTime)
