@@ -148,12 +148,12 @@ object FirebaseUser {
                 data?.let { token ->
                     updateNotificationToken(token)
                 } ?: run {
-                    Log.w(TAG, "request notification token failed. Error: token data: $data")
+                    Log.e(TAG, "request notification token failed. Error: token data: $data")
                 }
             }
 
             override fun onFailed(message: String?) {
-                Log.w(TAG, "request notification token failed. Error: $message")
+                Log.e(TAG, "request notification token failed. Error: $message")
             }
         })
     }
@@ -264,7 +264,7 @@ object FirebaseUser {
             }
 
             override fun onFailed(message: String?) {
-                Log.w(TAG, "failed to update user! Error: $message")
+                Log.e(TAG, "failed to update user! Error: $message")
             }
         })
     }
@@ -307,6 +307,7 @@ object FirebaseUser {
         auth.addAuthStateListener { onAuthStateChanged() }
         startListenForUserDataChanges()
         auth.currentUser?.reload()
+        requestNotificationToken()
     }
 
     fun stopAuthentication() {
