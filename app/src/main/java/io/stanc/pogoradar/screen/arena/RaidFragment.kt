@@ -73,19 +73,19 @@ class RaidFragment: Fragment() {
         setupRaidbossList()
     }
 
+    override fun onStart() {
+        super.onStart()
+        AppbarManager.setTitle(getString(R.string.raid_app_title, raidLevel))
+    }
+
     override fun onResume() {
         super.onResume()
-        AppbarManager.setTitle(getString(R.string.raid_app_title, raidLevel))
         updateLayoutsForRaidLevel()
         selectEggImageButton(raidLevel)
         meetupTimeHour = Calendar.getInstance().time.hours
         meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
 
-    override fun onPause() {
-        AppbarManager.reset()
-        super.onPause()
-    }
     /**
      * setup
      */

@@ -46,15 +46,18 @@ class MapItemCreationFragment: ViewPagerFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel?.type?.get()?.let { updateTitle(it) }
+    }
+
     override fun onResume() {
         super.onResume()
-        viewModel?.type?.get()?.let { updateTitle(it) }
         viewModel?.type?.addOnPropertyChangedCallback(onTypeChangeCallback)
     }
 
     override fun onPause() {
         viewModel?.type?.removeOnPropertyChangedCallback(onTypeChangeCallback)
-        AppbarManager.reset()
         super.onPause()
     }
 

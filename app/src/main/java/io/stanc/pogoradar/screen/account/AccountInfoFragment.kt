@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import io.stanc.pogoradar.App
 import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
@@ -35,14 +36,19 @@ class AccountInfoFragment: Fragment() {
         binding.settings = AppSettings
 
         binding.root.findViewById<Button>(R.id.account_info_button)?.setOnClickListener {
-            ShowFragmentManager.replaceFragment(AccountInfoEditFragment(), fragmentManager, R.id.account_layout)
+            ShowFragmentManager.showFragment(AccountInfoEditFragment(), fragmentManager, R.id.account_layout)
         }
 
         return binding.root
     }
+
+    override fun onStart() {
+        super.onStart()
+        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
+    }
+
     override fun onResume() {
         super.onResume()
-        AppbarManager.setTitle(getString(R.string.authentication_app_title))
         AppbarManager.setMenuButton(R.string.authentication_button_sign_out, onMenuIconClicked = {
             FirebaseUser.signOut()
         })
@@ -51,7 +57,6 @@ class AccountInfoFragment: Fragment() {
 
     override fun onPause() {
         FirebaseUser.removeUserDataObserver(userDataObserver)
-        AppbarManager.reset()
         AppbarManager.resetMenu()
         super.onPause()
     }

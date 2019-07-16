@@ -19,13 +19,8 @@ class MapSettingsFragment: Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        AppbarManager.setTitle(App.geString(R.string.map_settings_title))
-    }
-
-    override fun onPause() {
-        AppbarManager.reset()
-        super.onPause()
+    override fun onStart() {
+        super.onStart()
+        AppbarManager.setTitle(getString(R.string.map_settings_title))
     }
 }

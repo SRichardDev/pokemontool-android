@@ -41,7 +41,6 @@ class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
         val rootLayout = inflater.inflate(R.layout.fragment_pokestop, container, false)
 
         dataObject?.let {
-            AppbarManager.setTitle(it.name)
             firebase.addObserver(pokestopObserver, it)
             updateViewModel(it)
         }
@@ -51,9 +50,13 @@ class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
         return rootLayout
     }
 
+    override fun onStart() {
+        super.onStart()
+        dataObject?.let { AppbarManager.setTitle(it.name) }
+    }
+
     override fun onDestroyView() {
         dataObject?.let { firebase.removeObserver(pokestopObserver, it) }
-        AppbarManager.reset()
         super.onDestroyView()
     }
 

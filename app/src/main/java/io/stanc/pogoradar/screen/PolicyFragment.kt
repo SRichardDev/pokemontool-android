@@ -33,13 +33,8 @@ class PolicyFragment: Fragment() {
         return rootLayout
     }
 
-    override fun onResume() {
-        super.onResume()
-        AppbarManager.setTitle(App.geString(R.string.policy_app_title))
-    }
-
-    override fun onPause() {
-        AppbarManager.reset()
-        super.onPause()
+    override fun onStart() {
+        super.onStart()
+        AppbarManager.setTitle(getString(R.string.policy_app_title))
     }
 }

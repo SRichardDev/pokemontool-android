@@ -69,15 +69,18 @@ class AccountLoginFragment: Fragment() {
         return rootLayout
     }
 
+    override fun onStart() {
+        super.onStart()
+        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
+    }
+
     override fun onResume() {
         super.onResume()
-        AppbarManager.setTitle(App.geString(R.string.authentication_app_title))
         FirebaseUser.addAuthStateObserver(authStateObserver)
     }
 
     override fun onPause() {
         FirebaseUser.removeAuthStateObserver(authStateObserver)
-        AppbarManager.reset()
         super.onPause()
     }
 

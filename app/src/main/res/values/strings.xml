@@ -79,7 +79,7 @@
     <string name="authentication_login_password_description_signup">Bitte wähle ein Passwort aus. Dieses muss mindestens 6
         Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.
     </string>
-    <string name="authentication_login_password_description_signin">Bitte gebe dein Passwort ein.\nBeachte: dieses muss mindestens 6
+    <string name="authentication_login_password_description_signin">Bitte gebe dein Passwort ein. Dieses muss mindestens 6
         Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.
     </string>
     <string name="authentication_login_password_edit_hint_text">Trage hier dein Passwort ein</string>

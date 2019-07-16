@@ -41,7 +41,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
         val rootLayout = inflater.inflate(R.layout.fragment_arena, container, false)
 
         dataObject?.let {
-            AppbarManager.setTitle(it.name)
             firebase.addObserver(arenaObserver, it)
             updateViewModel(it)
         }
@@ -51,9 +50,13 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
         return rootLayout
     }
 
+    override fun onStart() {
+        super.onStart()
+        dataObject?.let { AppbarManager.setTitle(it.name) }
+    }
+
     override fun onDestroyView() {
         dataObject?.let { firebase.removeObserver(arenaObserver, it) }
-        AppbarManager.reset()
         super.onDestroyView()
     }
 
