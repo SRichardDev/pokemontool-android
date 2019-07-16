@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.SystemUtils
@@ -53,7 +54,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
                 when(viewModel.signType.get()) {
 
                     SignType.SIGN_IN -> {
-                        FirebaseUser.signIn(viewModel.email.get()!!, viewModel.password.get()!!, signInUpCompletionCallback)
+                        FirebaseUser.signIn(viewModel.email.get()!!, viewModel.password.get()!!, signInCompletionCallback)
                     }
 
                     SignType.SIGN_UP -> {
@@ -64,7 +65,11 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
                             viewModel.team.get()!!,
                             viewModel.level.get()!!.toInt())
 
-                        FirebaseUser.signUp(userConfig, signInUpCompletionCallback)
+                        FirebaseUser.signUp(userConfig, signUpCompletionCallback)
+                    }
+
+                    SignType.PASSWORD_RESET -> {
+                        FirebaseUser.resetPassword(viewModel.email.get()!!, passwordResetCompletionCallback)
                     }
                 }
             }
@@ -75,12 +80,37 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
         }
     }
 
-    private val signInUpCompletionCallback = object: (Boolean, String?) -> Unit {
+    private val signUpCompletionCallback = object: (Boolean, String?) -> Unit {
         override fun invoke(taskSuccessful: Boolean, exception: String?) {
             if (taskSuccessful) {
                 close()
+                Popup.showInfo(context, R.string.authentication_state_successful_signup, R.string.authentication_state_successful_signup_subtext)
             } else {
                 val message = exception ?: App.geString(R.string.authentication_state_authentication_failed)
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private val signInCompletionCallback = object: (Boolean, String?) -> Unit {
+        override fun invoke(taskSuccessful: Boolean, exception: String?) {
+            if (taskSuccessful) {
+                close()
+                Popup.showInfo(context, R.string.authentication_state_successful_signin)
+            } else {
+                val message = exception ?: App.geString(R.string.authentication_state_authentication_failed)
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private val passwordResetCompletionCallback = object: (Boolean, String?) -> Unit {
+        override fun invoke(taskSuccessful: Boolean, exception: String?) {
+            if (taskSuccessful) {
+                close()
+                Popup.showInfo(context, R.string.authentication_state_successful_reset_password, R.string.authentication_state_successful_reset_password_subtext)
+            } else {
+                val message = exception ?: App.geString(R.string.authentication_state_password_reset_failed)
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
         }

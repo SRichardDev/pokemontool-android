@@ -22,9 +22,9 @@ class AccountLoginProcessFragmentPagerAdapter(fragmentManager: FragmentManager, 
 
     override fun getCount(): Int {
         return when(signType) {
+            SignType.PASSWORD_RESET -> 1
             SignType.SIGN_IN -> 2
             SignType.SIGN_UP -> 5
-            else -> 0
         }
     }
 

@@ -14,9 +14,7 @@
     <LinearLayout
       android:orientation="vertical"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:paddingStart="@dimen/layout_padding_screen"
-        android:paddingEnd="@dimen/layout_padding_screen">
+      android:layout_height="match_parent">
 
         <TextView
             style="@style/TextStyle_bold"

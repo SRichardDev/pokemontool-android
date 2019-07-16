@@ -15,9 +15,9 @@
     <string name="default_app_title">PoGO Radar</string>
 
     <!-- progress spinner -->
-    <string name="spinner_title_sign_up">Registriere Account…</string>
-    <string name="spinner_title_sign_in">Einloggen…</string>
-    <string name="spinner_title_email_verification">Daten werden gesendet…</string>
+    <string name="spinner_title_sign_up">Account wird angelegt…</string>
+    <string name="spinner_title_sign_in">Anmeldung…</string>
+    <string name="spinner_title_email_verification">E-Mail Bestätigungsanfrage wird gesendet…</string>
     <string name="spinner_title_loading_map_data">Kartenelemente werden aktualisiert…</string>
     <string name="spinner_title_loading_data">Durchsuche hohes Gras in der Umgebung…</string>
 
@@ -29,21 +29,27 @@
     <string name="authentication_app_title">Account</string>
     <string name="authentication_user_state">Account: %s</string>
     <string name="authentication_user_name">Benutzer: %s</string>
-    <string name="authentication_user_email">Email: %s</string>
+    <string name="authentication_user_email">E-Mail: %s</string>
 
     <string name="authentication_state_signed_in">Eingeloggt</string>
-    <string name="authentication_state_signed_in_but_missing_verification">Ausstehende Email Bestätigung…</string>
+    <string name="authentication_state_signed_in_but_missing_verification">Ausstehende E-Mail Bestätigung…</string>
     <string name="authentication_state_signed_out">Ausgeloggt</string>
+
+    <string name="authentication_state_successful_signup">Erfolgreich angemeldet!</string>
+    <string name="authentication_state_successful_signup_subtext">E-Mail Bestätigung wurde versendet…</string>
+    <string name="authentication_state_successful_signin">Erfolgreich angemeldet!</string>
+    <string name="authentication_state_successful_reset_password">Passwort zurückgesetzt!</string>
+    <string name="authentication_state_successful_reset_password_subtext">Bitte schaue in deine E-Mails.</string>
 
     <string name="authentication_state_synchronization_failed">Synchronisation fehlgeschlagen!</string>
     <string name="authentication_state_authentication_failed">Anmeldung fehlgeschlagen!</string>
-    <string name="authentication_state_verification_failed">Email Verifikation fehlgeschlagen!</string>
-    <string name="authentication_state_verification_successful">Email Verifikation wurde an %1$s gesendet.</string>
+    <string name="authentication_state_password_reset_failed">Passwort zurücksetzen fehlgeschlagen!</string>
+    <string name="authentication_state_verification_failed">E-Mail Verifikation fehlgeschlagen!</string>
 
     <string name="authentication_button_sign_in">Anmelden</string>
     <string name="authentication_button_sign_up">Registrieren</string>
     <string name="authentication_button_sign_out">Abmelden</string>
-    <string name="authentication_button_verify_email">Email verifizieren</string>
+    <string name="authentication_button_verify_email">E-Mail verifizieren</string>
     <string name="authentication_button_open_user_name">Benutzername ändern</string>
     <string name="authentication_button_send_user_name">Neuen Benutzernamen senden</string>
     <string name="authentication_button_edit_infos">Account Daten bearbeiten</string>
@@ -53,19 +59,27 @@
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
     <string name="authentication_medal_text_raids">Eingereichte Raids</string>
     <string name="authentication_medal_text_quests">Eingereichte Quests</string>
-    <string name="authentication_login_description">Lege einen Account an oder melde dich an, um den vollen Umfang der
-        App zu benutzen.
+    <string name="authentication_login_description">Erstelle einen neuen Account oder melde dich mit einem bestehenden Account an, um den vollen Umfang der
+        App nutzen zu können.
     </string>
     <string name="authentication_login_button_signin">Anmelden</string>
     <string name="authentication_login_button_signup">Account anlegen</string>
     <string name="authentication_login_button_signout">Abmelden</string>
+    <string name="authentication_login_button_reset_password">Passwort vergessen?\n(zurücksetzen)</string>
     <string name="authentication_login_button_verification">Sende Verifikations-E-Mail\n(User wird ausgeloggt)</string>
-    <string name="authentication_login_email_description">Um einen Account zu erstellen benötigen wir eine gültige
+    <string name="authentication_login_email_description_signup">Um einen Account zu erstellen benötigen wir eine gültige
         E-Mail Adresse von dir. Bitte achte darauf, dass die E-Mail Adresse korrekt ist, da du von uns eine
         Bestätigungs-E-Mail bekommst.
     </string>
+    <string name="authentication_login_email_description_signin">Bitte gebe deine Account E-Mail Adresse ein, mit der du dich registriert hast.
+    </string>
+    <string name="authentication_login_email_description_password_reset">Bitte gebe deine Account E-Mail Adresse ein, für die du dein Passwort zurücksetzen möchtest.
+    </string>
     <string name="authentication_login_email_edit_hint_text">Trage hier deine E-Mail Adresse ein</string>
-    <string name="authentication_login_password_description">Bitte wähle ein Passwort aus. Dieses muss mindestens 6
+    <string name="authentication_login_password_description_signup">Bitte wähle ein Passwort aus. Dieses muss mindestens 6
+        Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.
+    </string>
+    <string name="authentication_login_password_description_signin">Bitte gebe dein Passwort ein.\nBeachte: dieses muss mindestens 6
         Zeichen lang sein und muss aus Buchstaben und Zahlen bestehen.
     </string>
     <string name="authentication_login_password_edit_hint_text">Trage hier dein Passwort ein</string>
@@ -88,7 +102,7 @@
     <string name="authentication_login_details_code">Trainer Code:</string>
 
 
-    <string name="authentication_hint_email">Gebe deine Emailadresse hier ein.</string>
+    <string name="authentication_hint_email">Gebe deine E-Mailadresse hier ein.</string>
     <string name="authentication_hint_password">Gebe dein Passwort hier ein.</string>
 
     <string name="authentication_edittext_email_error">Benötigt!</string>
@@ -186,9 +200,9 @@
     <string name="exceptions_send_map_item_missing_arena_name">Fehler! Fehlender Arena Name.</string>
     <string name="exceptions_send_map_item_missing_pokestop_name">Fehler! Fehlender Pok&#233;stop Name.</string>
     <string name="exceptions_signup_password">Fehler! Passwort ist zu kurz.</string>
-    <string name="exceptions_signup_email">Fehler! Email scheint falsches Format zu haben.</string>
+    <string name="exceptions_signup_email">Fehler! E-Mail scheint falsches Format zu haben.</string>
     <string name="exceptions_signup_name">Fehler! Trainername fehlt.</string>
-    <string name="exceptions_sigin_email_password">Fehler! Email oder Passwort fehlt.</string>
+    <string name="exceptions_sigin_email_password">Fehler! E-Mail oder Passwort fehlt.</string>
     <string name="exceptions_login_missing_data">Fehler! Anmeldedaten sind unvollständig.</string>
     <string name="exceptions_subscription_sending_failed">Fehler! Gebiete konnten nicht aktualisiert werden.</string>
     <string name="exceptions_location_permission_denied">Bitte aktiviere die Location Berechtigung, um die App im vollen
@@ -208,8 +222,7 @@
     <string name="dialog_gps_disabled_button_negative">Nein</string>
     <string name="dialog_location_disabled_message">Bitte aktiviere die Lokalisierung um dieses Feature zu nutzen.
     </string>
-    <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nZiehe
-        dazu den Drawer vom linken Rand in den Screen und klicke auf \"Account\".
+    <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nKlicke dazu auf \"Account\" auf dem unteren Teil des Screens.
     </string>
 
     <!-- App Info Label -->

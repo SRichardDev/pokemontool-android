@@ -306,13 +306,16 @@ object FirebaseUser {
     fun startAuthentication() {
         auth.addAuthStateListener { onAuthStateChanged() }
         startListenForUserDataChanges()
-        auth.currentUser?.reload()
         requestNotificationToken()
     }
 
     fun stopAuthentication() {
         stopListenForUserDataChanges()
         auth.removeAuthStateListener { onAuthStateChanged() }
+    }
+
+    fun refresh() {
+        auth.currentUser?.reload()
     }
 
     /**
@@ -346,14 +349,15 @@ object FirebaseUser {
 
         auth.createUserWithEmailAndPassword(userLoginConfig.email, userLoginConfig.password).addOnCompleteListener { task ->
 
+            WaitingSpinner.hideProgress()
+
             if (task.isSuccessful) {
                 createUser(userLoginConfig)
+                sendEmailVerification(onCompletionCallback)
             } else {
-                Log.w(TAG, "signing up failed with error: ${task.exception?.message}")
+                Log.e(TAG, "signing up failed with error: ${task.exception?.message}")
+                onCompletionCallback(task.isSuccessful, task.exception?.message)
             }
-
-            onCompletionCallback(task.isSuccessful, task.exception?.message)
-            WaitingSpinner.hideProgress()
         }
     }
 
@@ -387,13 +391,22 @@ object FirebaseUser {
 
         auth.currentUser?.sendEmailVerification()?.addOnCompleteListener { task ->
 
-            if (task.isSuccessful) {
-                signOut()
-            } else {
-                Log.w(TAG, "email verification failed with error: ${task.exception?.message}")
+            if (!task.isSuccessful) {
+                Log.e(TAG, "email verification failed with error: ${task.exception?.message}")
             }
 
             WaitingSpinner.hideProgress()
+            onCompletionCallback(task.isSuccessful, task.exception?.message)
+        }
+    }
+
+    fun resetPassword(email: String, onCompletionCallback: (taskSuccessful: Boolean, exception: String?) -> Unit = { _, _ ->}) {
+
+        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.e(TAG, "resetting password failed with error: ${task.exception?.message}")
+            }
+
             onCompletionCallback(task.isSuccessful, task.exception?.message)
         }
     }

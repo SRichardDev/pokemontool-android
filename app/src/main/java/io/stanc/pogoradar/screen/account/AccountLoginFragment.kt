@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.Toast
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
@@ -25,9 +25,11 @@ class AccountLoginFragment: Fragment() {
 
     private var viewModel: LoginViewModel? = null
 
+    private var subTextView: TextView? = null
+
     private var signInButton: Button? = null
     private var signUpButton: Button? = null
-    private var verificationButton: Button? = null
+    private var passwordResetButton: Button? = null
     private var signOutButton: Button? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -39,32 +41,24 @@ class AccountLoginFragment: Fragment() {
 
         setupTeamImages(rootLayout)
 
+        subTextView = rootLayout.findViewById(R.id.account_sub_text)
+
         signInButton = rootLayout.findViewById(R.id.account_button_signin)
         signInButton?.setOnClickListener {
             viewModel?.signType?.set(SignType.SIGN_IN)
             ShowFragmentManager.showFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
-//            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
-            // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 
         signUpButton = rootLayout.findViewById(R.id.account_button_signup)
         signUpButton?.setOnClickListener {
             viewModel?.signType?.set(SignType.SIGN_UP)
             ShowFragmentManager.showFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
-//            findNavController().navigate(R.id.action_accountLoginFragment_to_accountLoginProcessFragment) // TODO: viewModel -> LoginProcessFragment
-            // TODO: if successful, after Button:Send/ close -> show AccountInfoFragment
         }
 
-        verificationButton = rootLayout.findViewById(R.id.account_button_verification)
-        verificationButton?.setOnClickListener {
-            FirebaseUser.sendEmailVerification { taskSuccessful, exception ->
-                if (taskSuccessful) {
-                    Toast.makeText(context, App.geString(R.string.authentication_state_verification_successful, FirebaseUser.userData?.email), Toast.LENGTH_LONG).show()
-                } else {
-                    Log.e(TAG, "sending email verification failed. exception: $exception")
-                    Toast.makeText(context, App.geString(R.string.authentication_state_verification_failed), Toast.LENGTH_LONG).show()
-                }
-            }
+        passwordResetButton = rootLayout.findViewById(R.id.account_button_reset_password)
+        passwordResetButton?.setOnClickListener {
+            viewModel?.signType?.set(SignType.PASSWORD_RESET)
+            ShowFragmentManager.showFragment(AccountLoginProcessFragment(), fragmentManager, R.id.account_layout)
         }
 
         signOutButton = rootLayout.findViewById(R.id.account_button_signout)
@@ -114,19 +108,24 @@ class AccountLoginFragment: Fragment() {
                     signInButton?.visibility = View.GONE
                     signUpButton?.visibility = View.GONE
                     signOutButton?.visibility = View.VISIBLE
-                    verificationButton?.visibility = View.GONE
+                    passwordResetButton?.visibility = View.GONE
+                    subTextView?.visibility = View.GONE
                 }
                 AuthState.UserLoggedInButUnverified -> {
                     signInButton?.visibility = View.GONE
                     signUpButton?.visibility = View.GONE
                     signOutButton?.visibility = View.VISIBLE
-                    verificationButton?.visibility = View.VISIBLE
+                    passwordResetButton?.visibility = View.GONE
+                    subTextView?.visibility = View.VISIBLE
+                    subTextView?.text = App.geString(R.string.authentication_state_signed_in_but_missing_verification)
                 }
                 AuthState.UserLoggedOut -> {
                     signInButton?.visibility = View.VISIBLE
                     signUpButton?.visibility = View.VISIBLE
                     signOutButton?.visibility = View.GONE
-                    verificationButton?.visibility = View.GONE
+                    passwordResetButton?.visibility = View.VISIBLE
+                    subTextView?.visibility = View.VISIBLE
+                    subTextView?.text = App.geString(R.string.authentication_state_signed_out)
                 }
             }
         }

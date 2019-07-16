@@ -13,7 +13,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/layout_padding_screen"
         android:background="@color/white">
 
         <LinearLayout
@@ -30,7 +29,7 @@
             <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"
                       android:id="@+id/map_item_mapview"
                       android:layout_width="match_parent"
-                      android:layout_height="300dp"
+                      android:layout_height="250dp"
                       android:layout_marginTop="@dimen/layout_margin_small"/>
 
             <TextView

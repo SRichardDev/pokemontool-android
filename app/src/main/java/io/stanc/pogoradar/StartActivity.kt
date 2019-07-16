@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.Window
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -23,6 +24,7 @@ import io.stanc.pogoradar.screen.MapInteractionFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.PermissionManager
 import io.stanc.pogoradar.utils.ShowFragmentManager
+import io.stanc.pogoradar.utils.SystemUtils
 import io.stanc.pogoradar.utils.WaitingSpinner
 import kotlinx.android.synthetic.main.layout_progress.*
 
@@ -30,6 +32,13 @@ import kotlinx.android.synthetic.main.layout_progress.*
 class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
     private var appInfoLabelController: AppInfoLabelController? = null
+    private var bottomNavigationView: BottomNavigationView? = null
+
+    private val systemObserver = object: SystemUtils.SystemObserver {
+        override fun onKeyboardVisibilityDidChange(isKeyboardVisible: Boolean) {
+            bottomNavigationView?.visibility = if (isKeyboardVisible) View.GONE else View.VISIBLE
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +67,22 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
     override fun onStart() {
         super.onStart()
+        FirebaseUser.startAuthentication()
+        appInfoLabelController?.start()
+        SystemUtils.addObserver(systemObserver, this)
         showPopupIfUserIsLoggedOut()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        FirebaseUser.refresh()
+    }
+
+    override fun onStop() {
+        FirebaseUser.stopAuthentication()
+        appInfoLabelController?.stop()
+        SystemUtils.removeObserver(systemObserver)
+        super.onStop()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -71,27 +95,15 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
             if (extras.containsKey(NOTIFICATION_FLAG)) {
                 NotificationContent.new(extras.getString(NOTIFICATION_TITLE),
-                                        extras.getString(NOTIFICATION_BODY),
-                                        extras.getDouble(NOTIFICATION_LATITUDE),
-                                        extras.getDouble(NOTIFICATION_LONGITUDE))?.let { notification ->
+                    extras.getString(NOTIFICATION_BODY),
+                    extras.getDouble(NOTIFICATION_LATITUDE),
+                    extras.getDouble(NOTIFICATION_LONGITUDE))?.let { notification ->
 
                     NotificationHolder.reportNotification(notification)
                     showMapFragment()
                 }
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        FirebaseUser.startAuthentication()
-        appInfoLabelController?.start()
-    }
-
-    override fun onPause() {
-        FirebaseUser.stopAuthentication()
-        appInfoLabelController?.stop()
-        super.onPause()
     }
 
     private fun showPopupIfUserIsLoggedOut() {
@@ -122,7 +134,8 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     }
 
     private fun setupNavigationView() {
-        findViewById<BottomNavigationView>(R.id.navigationView)?.setOnNavigationItemSelectedListener(this)
+        bottomNavigationView = findViewById(R.id.navigationView)
+        bottomNavigationView?.setOnNavigationItemSelectedListener(this)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
