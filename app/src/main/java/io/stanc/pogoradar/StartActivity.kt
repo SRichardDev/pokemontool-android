@@ -85,6 +85,12 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         super.onStop()
     }
 
+    override fun onBackPressed() {
+        if (!SystemUtils.onBackPressedHandled()) {
+            super.onBackPressed()
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         onNotification(intent)

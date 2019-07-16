@@ -17,6 +17,36 @@ object SystemUtils {
     private val TAG = javaClass.name
 
     /**
+     * Backpress registration
+     */
+
+    interface OnBackPressListener {
+        fun onBackPressed(): Boolean
+    }
+
+    @SuppressLint("UseSparseArrays")
+    private val onBackPressListeners = HashMap<Int, WeakReference<OnBackPressListener>>()
+
+    fun addListener(listener: OnBackPressListener) {
+        val weakListener = WeakReference(listener)
+        onBackPressListeners[listener.hashCode()] = weakListener
+    }
+
+    fun removeListener(listener: OnBackPressListener) {
+        onBackPressListeners.remove(listener.hashCode())
+    }
+
+    // TODO: specific order of listener to be handled possible backpress ?!
+    fun onBackPressedHandled(): Boolean {
+        onBackPressListeners.values.forEach {
+            if (it.get()?.onBackPressed() == true) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
      * Keyboard
      */
 
