@@ -6,60 +6,58 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-         android:layout_width="200dp"
-         android:layout_height="200dp"
-         android:padding="@dimen/layout_margin_small"
-         android:background="@color/white">
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:background="@color/white"
+            android:padding="@dimen/layout_margin_small">
 
         <ImageView
-            android:id="@+id/info_window_arena_imageview"
-            android:layout_width="0dp"
-            app:layout_constraintWidth_default="percent"
-            app:layout_constraintWidth_percent="0.3"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_default="percent"
-            app:layout_constraintHeight_percent="0.3"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/icon_arena_30dp"
-            tools:ignore="ContentDescription"/>
+                android:id="@+id/info_window_arena_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_arena_30dp"
+                tools:ignore="ContentDescription"/>
 
         <TextView
-            android:id="@+id/info_window_arena_textview_header"
-            style="@style/TextStyle_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            app:layout_constraintTop_toBottomOf="@id/info_window_arena_imageview"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textAlignment="center"
-            tools:text="debug header"/>
+                android:id="@+id/info_window_arena_textview_header"
+                style="@style/TextStyle_header"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="3"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:textAlignment="center"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                tools:text="very very very long long long debug header text"/>
 
         <TextView
-            android:id="@+id/info_window_arena_textview_subheader"
-            style="@style/TextStyle_sub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_margin_small"
-            app:layout_constraintTop_toBottomOf="@id/info_window_arena_textview_header"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textAlignment="center"
-            android:text="@string/map_info_window_arena_subheader_default"/>
+                android:id="@+id/info_window_arena_textview_subheader"
+                style="@style/TextStyle_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:textAlignment="center"
+                android:text="@string/map_info_window_arena_subheader_default"/>
 
         <TextView
-            android:id="@+id/info_window_arena_button_info"
-            style="@style/ButtonStyle_margin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:text="@string/map_info_window_arena_button_info"/>
+                android:id="@+id/info_window_arena_button_info"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/map_info_window_arena_button_info"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </LinearLayout>
