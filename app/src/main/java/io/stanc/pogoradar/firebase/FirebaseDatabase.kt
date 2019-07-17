@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.firebase
 
 import android.util.Log
-import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.database.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
@@ -109,30 +108,30 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup) {
         removeRaidMeetupIfExists(raid.databasePath()) {
-            
+
+            FirebaseUser.userData?.id?.let { userId ->
+                val userParticipants =  newRaidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
+                if (userParticipants && !newRaidMeetup.participantUserIds.contains(userId)) {
+                    newRaidMeetup.participantUserIds.add(userId)
+                }
+            }
+
+            createRaidMeetup(newRaidMeetup)?.let { raidMeetupId ->
+                raid.raidMeetupId = raidMeetupId
+            }
+
             FirebaseServer.setNode(raid)
-            pushRaidMeetup(raid.databasePath(), newRaidMeetup)
         }
 
         FirebaseUser.saveSubmittedRaids()
     }
 
-    fun pushRaidMeetup(raidDatabasePath: String, raidMeetup: FirebaseRaidMeetup): String? {
+    private fun createRaidMeetup(raidMeetup: FirebaseRaidMeetup): String? {
         val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-
-        raidMeetupId?.let { id ->
-
-            FirebaseServer.setData("$raidDatabasePath/$RAID_MEETUP_ID", id, callbackForVoid())
-            val userParticipants =  raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
-            if (userParticipants) {
-                pushRaidMeetupParticipation(id)
-            }
-        }
-
         return raidMeetupId
     }
 
-    fun changeMeetupTime(raidMeetupId: String, time: String) {
+    fun changeRaidMeetupTime(raidMeetupId: String, time: String) {
         FirebaseServer.setData("$RAID_MEETUPS/$raidMeetupId/$MEETUP_TIME", time, callbackForVoid())
         pushRaidMeetupParticipation(raidMeetupId)
     }

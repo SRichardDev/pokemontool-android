@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.viewmodel
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
@@ -13,8 +12,6 @@ import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
-import io.stanc.pogoradar.map.MapIconFactory
-import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Observables.dependantObservableField
 import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState
@@ -135,7 +132,7 @@ class RaidViewModel: ViewModel() {
         arena?.raid?.raidMeetupId?.let { raidMeetupId ->
 
             val meetupTime = TimeCalculator.format(hour, minutes)
-            firebase.changeMeetupTime(raidMeetupId, meetupTime)
+            firebase.changeRaidMeetupTime(raidMeetupId, meetupTime)
 
         } ?: run {
             Log.e(TAG, "Could not push raid meetup, because raid is null of arena: $arena")

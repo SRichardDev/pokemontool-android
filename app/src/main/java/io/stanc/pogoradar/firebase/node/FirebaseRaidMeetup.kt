@@ -10,8 +10,8 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
 data class FirebaseRaidMeetup(
     override val id: String,
     val meetupTime: String,
-    val participantUserIds: List<String>,
-    val chat: List<FirebaseChat>): FirebaseNode {
+    var participantUserIds: MutableList<String>,
+    val chats: List<FirebaseChat>): FirebaseNode {
 
     override fun databasePath(): String = RAID_MEETUPS
 
@@ -19,8 +19,12 @@ data class FirebaseRaidMeetup(
         val data = HashMap<String, Any>()
 
         data[MEETUP_TIME] = meetupTime
-        data[PARTICIPANTS] = participantUserIds
-        data[CHAT] = participantUserIds
+
+        val dataParticipants = HashMap<String, String>()
+        participantUserIds.forEach{ dataParticipants[it] = "" }
+        data[PARTICIPANTS] = dataParticipants
+
+        data[CHAT] = chats
 
         return data
     }
@@ -39,14 +43,14 @@ data class FirebaseRaidMeetup(
             val participantUserIds: List<String> = dataSnapshot.child(PARTICIPANTS).children.mapNotNull { it.key }
 
             val chats = mutableListOf<FirebaseChat>()
-            for (childSnapshot in dataSnapshot.child(CHAT).children) {
-                FirebaseChat.new(id, childSnapshot)?.let { chats.add(it) }
+            for (chatSnapshot in dataSnapshot.child(CHAT).children) {
+                FirebaseChat.new(id, chatSnapshot)?.let { chats.add(it) }
             }
 
-//            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds")
+            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds, chats: $chats")
 
             return if (meetupTime != null) {
-                FirebaseRaidMeetup(id, meetupTime, participantUserIds, chats)
+                FirebaseRaidMeetup(id, meetupTime, participantUserIds.toMutableList(), chats)
             } else {
                 null
             }
@@ -57,7 +61,7 @@ data class FirebaseRaidMeetup(
         }
 
         fun new(id: String, meetupTime: String): FirebaseRaidMeetup {
-            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = emptyList(), chat = emptyList())
+            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = mutableListOf(), chats = emptyList())
         }
     }
 }

@@ -16,7 +16,7 @@ class FirebaseChat (
     val senderId: String,
     val timestamp: Number): FirebaseNode {
 
-    override fun databasePath(): String = "$RAID_MEETUPS/$raidMeetupId/chat"
+    override fun databasePath(): String = "$RAID_MEETUPS/$raidMeetupId/chats"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
