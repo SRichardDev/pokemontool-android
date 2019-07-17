@@ -212,7 +212,7 @@ object IconFactory {
         val scaleFactor = when(sizeMode) {
             IconFactory.SizeMod.DEFAULT -> 1.0f
             IconFactory.SizeMod.BIG -> 1.5f
-            IconFactory.SizeMod.LARGE -> 3.0f
+            IconFactory.SizeMod.LARGE -> 4.0f
         }
         return (length * scaleFactor).toInt()
     }

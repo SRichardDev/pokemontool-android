@@ -121,9 +121,8 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
             }
 
             FirebaseServer.setNode(raid)
+            FirebaseUser.saveSubmittedRaids()
         }
-
-        FirebaseUser.saveSubmittedRaids()
     }
 
     private fun createRaidMeetup(raidMeetup: FirebaseRaidMeetup): String? {

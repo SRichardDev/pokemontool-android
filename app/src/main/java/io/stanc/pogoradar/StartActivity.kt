@@ -2,21 +2,19 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.Window
-import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_FLAG
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID_QUEST
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.NotificationHolder
@@ -93,7 +91,8 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     private fun onNotification(intent: Intent) {
         intent.extras?.let { extras ->
 
-            if (extras.containsKey(NOTIFICATION_FLAG)) {
+            // TODO: NOTIFICATION_TYPE == NOTIFICATION_TYPE_CHAT
+            if (extras.containsKey(NOTIFICATION_TYPE) && extras.getString(NOTIFICATION_TYPE) == NOTIFICATION_TYPE_RAID_QUEST) {
                 NotificationContent.new(extras.getString(NOTIFICATION_TITLE),
                     extras.getString(NOTIFICATION_BODY),
                     extras.getDouble(NOTIFICATION_LATITUDE),

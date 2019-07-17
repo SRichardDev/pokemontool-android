@@ -2,8 +2,8 @@
 
     <!-- keys & ids -->
     <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
-    <string name="firebase_notification_channel_id">3131830000</string>
-    <string name="firebase_notification_channel_name">PoGO Radar Info</string>
+    <string name="notification_channel_name">PoGO Radar Info</string>
+    <string name="notification_channel_id">3131830000</string>
 
     <!-- internal -->
     <string name="navigation_drawer_open">Open navigation drawer</string>

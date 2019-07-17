@@ -1,9 +1,6 @@
 package io.stanc.pogoradar.firebase
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -16,11 +13,13 @@ import com.google.firebase.messaging.RemoteMessage
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.StartActivity
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_FLAG
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_CHAT
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID_QUEST
 import io.stanc.pogoradar.utils.Kotlin
 
 
@@ -29,32 +28,66 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     // Notification in Background/Foreground:
     // https://medium.com/@Miqubel/mastering-firebase-notifications-36a3ffe57c41
 
+    // bundled Android notifications: https://blog.danlew.net/2017/02/07/correctly-handling-bundled-android-notifications/
+    // Info: https://code.tutsplus.com/tutorials/android-o-how-to-use-notification-channels--cms-28616
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-//        Log.i(TAG, "onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+        Log.d(TAG, "onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+
+        if(!tryToHandleRaidOrQuestMessage(message)) {
+            if(!tryToHandleChatMessage(message)) {
+                Log.e(TAG, "Could not build notification with data: ${message.data}")
+            }
+        }
+    }
+
+    private fun tryToHandleRaidOrQuestMessage(message: RemoteMessage): Boolean {
+
+        var handled = false
 
         Kotlin.safeLet( message.data[NOTIFICATION_TITLE],
-                        message.data[NOTIFICATION_BODY],
-                        message.data[NOTIFICATION_LATITUDE]?.toDoubleOrNull(),
-                        message.data[NOTIFICATION_LONGITUDE]?.toDoubleOrNull()) { title, body, lat, lng ->
-
-//            Log.d(TAG, "Debug:: onMessageReceived(title: $title): geoHash: ${GeoHash(lat, lng)}")
+            message.data[NOTIFICATION_BODY],
+            message.data[NOTIFICATION_LATITUDE]?.toDoubleOrNull(),
+            message.data[NOTIFICATION_LONGITUDE]?.toDoubleOrNull()) { title, body, lat, lng ->
 
             val intent = Intent(this, StartActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.putExtra(NOTIFICATION_FLAG, true)
+            intent.putExtra(NOTIFICATION_TYPE, NOTIFICATION_TYPE_RAID_QUEST)
             intent.putExtra(NOTIFICATION_TITLE, title)
             intent.putExtra(NOTIFICATION_BODY, body)
             intent.putExtra(NOTIFICATION_LATITUDE, lat)
             intent.putExtra(NOTIFICATION_LONGITUDE, lng)
 
-            val notification = buildNotification(title, body, intent)
-            postNotification(notification)
+            postNotification(title, body, intent, NOTIFICATION_TYPE_RAID_QUEST)
 
-        } ?: run {
-            Log.e(TAG, "Could not build notification with data: ${message.data}.\nError: lat: ${message.data[NOTIFICATION_LATITUDE]} or lng: ${message.data[NOTIFICATION_LONGITUDE]} could not be cast to double or title or body do not exist.")
+            handled = true
         }
+
+        return handled
     }
+
+    private fun tryToHandleChatMessage(message: RemoteMessage): Boolean {
+
+        var handled = false
+
+        Kotlin.safeLet( message.data[NOTIFICATION_TITLE],
+                        message.data[NOTIFICATION_BODY]) { title, body ->
+
+            val intent = Intent(this, StartActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.putExtra(NOTIFICATION_TYPE, NOTIFICATION_TYPE_CHAT)
+            intent.putExtra(NOTIFICATION_TITLE, title)
+            intent.putExtra(NOTIFICATION_BODY, body)
+
+            postNotification(title, body, intent, NOTIFICATION_TYPE_CHAT)
+
+            handled = true
+        }
+
+        return handled
+    }
+
 
     override fun onDeletedMessages() {
         super.onDeletedMessages()
@@ -77,7 +110,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         FirebaseUser.updateNotificationToken(token)
     }
 
-    private fun buildNotification(title: String?, contentDescription: String?, intent: Intent): Notification {
+    private fun buildNotification(title: String?, description: String?, intent: Intent, notificationType: String): Notification {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
@@ -86,34 +119,45 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             .setSmallIcon(R.mipmap.icon_launcher)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_launcher))
             .setContentTitle(title)
-            .setContentText(contentDescription)
+            .setContentText(description)
             .setStyle(NotificationCompat.BigTextStyle())
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setGroup(notificationType)
+            .setGroupSummary(true)
 
         return builder.build()
     }
 
-    private fun postNotification(notification: Notification) {
+    private fun postNotification(title: String?, description: String?, intent: Intent, notificationType: String) {
+
+        val notification = buildNotification(title, description, intent, notificationType)
 
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+            channel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            channel.enableVibration(true)
             manager.createNotificationChannel(channel)
         }
 
-        manager.notify(NOTIFICATION_ID, notification)
+        when(notificationType) {
+            NOTIFICATION_TYPE_RAID_QUEST -> manager.notify(NOTIFICATION_ID, notification)
+            NOTIFICATION_TYPE_CHAT -> manager.notify(NOTIFICATION_ID+1, notification)
+            else -> manager.notify(NOTIFICATION_ID, notification)
+        }
+
     }
 
     companion object {
 
         val TAG = this::class.java.name
 
-        private val NOTIFICATION_CHANNEL_ID: String = App.geString(R.string.firebase_notification_channel_id)!!
-        private val NOTIFICATION_CHANNEL_NAME: String = App.geString(R.string.firebase_notification_channel_name)!!
+        private val NOTIFICATION_CHANNEL_ID: String = App.geString(R.string.notification_channel_id)!!
+        private val NOTIFICATION_CHANNEL_NAME: String = App.geString(R.string.notification_channel_name)!!
         private val NOTIFICATION_ID: Int = App.getInteger(R.integer.firebase_notification_id)!!
     }
 }

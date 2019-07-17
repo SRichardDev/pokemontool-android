@@ -72,7 +72,9 @@ object DatabaseKeys {
     const val DATA_UNDEFINED = "---"
 
     // notifications
-    const val NOTIFICATION_FLAG = "notification"
+    const val NOTIFICATION_TYPE = "notificationType"
+    const val NOTIFICATION_TYPE_RAID_QUEST = "notificationRaidQuest"
+    const val NOTIFICATION_TYPE_CHAT = "notificationChat"
     const val NOTIFICATION_TITLE = "title"
     const val NOTIFICATION_BODY = "body"
     const val NOTIFICATION_LATITUDE = "latitude"
