@@ -2,7 +2,7 @@
 
     <!-- keys & ids -->
     <string name="google_map_api_key">AIzaSyDQQVaPUFFHgzAc0rXD4FDXsR8CfbmKzdE</string>
-    <string name="notification_channel_name">PoGO Radar Info</string>
+    <string name="notification_channel_name">Firebase Event Notification</string>
     <string name="notification_channel_id">3131830000</string>
 
     <!-- internal -->

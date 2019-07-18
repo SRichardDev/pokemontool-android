@@ -83,7 +83,6 @@ object SystemUtils {
             // 0.15 ratio is perhaps enough to determine keypad height.
             val isKeyboardNowVisible = keypadHeight > screenHeight * 0.15
 
-            Log.v(TAG, "global layout changed, isKeyboardNowVisible: $isKeyboardNowVisible, observers: ${observers.size}")
             observers.forEach { it.value.get()?.onKeyboardVisibilityDidChange(isKeyboardNowVisible) }
         }
     }

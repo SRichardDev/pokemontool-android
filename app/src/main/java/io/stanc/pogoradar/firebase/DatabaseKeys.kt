@@ -73,8 +73,9 @@ object DatabaseKeys {
 
     // notifications
     const val NOTIFICATION_TYPE = "notificationType"
-    const val NOTIFICATION_TYPE_RAID_QUEST = "notificationRaidQuest"
-    const val NOTIFICATION_TYPE_CHAT = "notificationChat"
+    const val NOTIFICATION_TYPE_RAID = "Raid Notifications"
+    const val NOTIFICATION_TYPE_QUEST = "Quest Notifications"
+    const val NOTIFICATION_TYPE_CHAT = "Chat Notifications"
     const val NOTIFICATION_TITLE = "title"
     const val NOTIFICATION_BODY = "body"
     const val NOTIFICATION_LATITUDE = "latitude"

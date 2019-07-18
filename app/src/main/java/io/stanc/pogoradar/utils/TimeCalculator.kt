@@ -141,7 +141,7 @@ object TimeCalculator {
 
             clockCalendar.time
 
-        } catch (e: ParseException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }
