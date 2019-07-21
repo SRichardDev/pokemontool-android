@@ -9,7 +9,7 @@
             android:orientation="vertical"
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:background="@color/white"
+            android:background="@drawable/background_info_window"
             android:padding="@dimen/layout_margin_small">
 
         <ImageView
