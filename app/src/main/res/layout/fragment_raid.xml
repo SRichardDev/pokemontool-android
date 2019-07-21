@@ -43,7 +43,7 @@
 
         <Switch android:id="@+id/raid_switch_egg"
                 style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/raid_check_egg"
                 android:switchPadding="@dimen/layout_margin_large"/>
@@ -89,7 +89,7 @@
 
         <Switch android:id="@+id/raid_switch_participation"
                 style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/raid_check_participation"
                 android:switchPadding="@dimen/layout_margin_large"/>

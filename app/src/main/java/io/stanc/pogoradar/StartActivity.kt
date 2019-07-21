@@ -172,14 +172,18 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
     private fun showAccountFragment() {
 
-        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
-        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_accountFragment)
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.accountFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_accountFragment)
+        }
     }
 
     private fun showPolicyFragment() {
 
-        this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
-        this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_policyFragment)
+        if (this.findNavController(R.id.nav_host_fragment).currentDestination?.id != R.id.policyFragment) {
+            this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
+            this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_policyFragment)
+        }
     }
 
     companion object {

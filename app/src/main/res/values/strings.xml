@@ -156,10 +156,10 @@
     <string name="raid_eggs_title">Raid Level:</string>
     <string name="raid_check_egg">Raid läuft bereits?</string>
     <string name="raid_raidboss_selection">Mögliche Raidbosse:</string>
-    <string name="raid_text_time_egg">Das Ei schlüpft um [h/min]:</string>
-    <string name="raid_text_time_raid">Der Raid läuft ab um [h/min]:</string>
+    <string name="raid_text_time_egg">Das Ei schlüpft um:</string>
+    <string name="raid_text_time_raid">Der Raid läuft ab um:</string>
     <string name="raid_check_participation">Nimmst du am Raid teil?</string>
-    <string name="raid_text_time_meetup">Treffzeitpunkt [h/min]:</string>
+    <string name="raid_text_time_meetup">Treffzeitpunkt:</string>
     <string name="raid_button_send">Raid melden</string>
 
     <!-- Arena -->
