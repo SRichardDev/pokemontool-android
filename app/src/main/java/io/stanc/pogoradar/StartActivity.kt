@@ -2,7 +2,6 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -22,10 +21,7 @@ import io.stanc.pogoradar.firebase.NotificationContent
 import io.stanc.pogoradar.firebase.NotificationHolder
 import io.stanc.pogoradar.screen.MapInteractionFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
-import io.stanc.pogoradar.utils.PermissionManager
-import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.utils.SystemUtils
-import io.stanc.pogoradar.utils.WaitingSpinner
+import io.stanc.pogoradar.utils.*
 import kotlinx.android.synthetic.main.layout_progress.*
 
 
@@ -38,6 +34,10 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         override fun onKeyboardVisibilityDidChange(isKeyboardVisible: Boolean) {
             bottomNavigationView?.visibility = if (isKeyboardVisible) View.GONE else View.VISIBLE
         }
+    }
+
+    private val delayedInfoLabelStart = DelayedTrigger(3000) {
+        appInfoLabelController?.start()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +68,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     override fun onStart() {
         super.onStart()
         FirebaseUser.startAuthentication()
-        appInfoLabelController?.start()
+        delayedInfoLabelStart.trigger()
         SystemUtils.addObserver(systemObserver, this)
         showPopupIfUserIsLoggedOut()
     }

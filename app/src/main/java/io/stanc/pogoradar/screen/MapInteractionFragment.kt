@@ -66,6 +66,7 @@ class MapInteractionFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+
         firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
 
         NotificationHolder.consumeNotification()?.let { notification ->

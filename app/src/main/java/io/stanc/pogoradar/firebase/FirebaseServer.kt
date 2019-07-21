@@ -14,7 +14,7 @@ object FirebaseServer {
     private val TAG = javaClass.name
 
     private val connectionRef: DatabaseReference
-    var connected: Boolean = true
+    var connected: Boolean = false
         private set
     private val connectionChangeListener = HashMap<Int, (Boolean) -> Unit>()
     private val connectionEventListener = object : ValueEventListener {

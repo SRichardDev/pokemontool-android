@@ -4,6 +4,7 @@ import android.util.Log
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
+import io.stanc.pogoradar.utils.DelayedTrigger
 import io.stanc.pogoradar.utils.WaitingSpinner
 
 object FirebaseDefinitions {
@@ -17,11 +18,8 @@ object FirebaseDefinitions {
 
     fun loadDefinitions(firebase: FirebaseDatabase) {
 
-        WaitingSpinner.showProgress(R.string.spinner_title_loading_data)
-
         loadRaidBosses(firebase, onCompletionCallback = {
             loadQuests(firebase, onCompletionCallback = {
-                WaitingSpinner.hideProgress()
             })
         })
     }
@@ -31,7 +29,7 @@ object FirebaseDefinitions {
 
         firebase.loadRaidBosses { firebaseRaidBosses ->
 
-//            Log.i(TAG, "Debug:: firebaseRaidBosses: ${firebaseRaidBosses?.size}")
+            Log.i(TAG, "loaded raidBosses: ${firebaseRaidBosses?.size}")
             firebaseRaidBosses?.let { raidBosses = it }
             onCompletionCallback()
         }
@@ -41,7 +39,7 @@ object FirebaseDefinitions {
 
         firebase.loadQuests { firebaseQuests ->
 
-//            Log.i(TAG, "Debug:: firebaseQuests: ${firebaseQuests?.size}")
+            Log.i(TAG, "loaded quests: ${firebaseQuests?.size}")
             firebaseQuests?.let { quests = it }
             onCompletionCallback()
         }
