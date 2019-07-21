@@ -50,6 +50,12 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="FullscreenLayout_padding">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/white</item>
         <item name="android:padding">@dimen/layout_padding_screen</item>
     </style>
 

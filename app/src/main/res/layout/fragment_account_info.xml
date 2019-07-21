@@ -15,18 +15,10 @@
         <import type="io.stanc.pogoradar.firebase.node.Team"/>
     </data>
 
-    <ScrollView
-        android:id="@+id/account_info_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="@dimen/layout_padding_screen"
-        android:paddingStart="@dimen/layout_padding_screen"
-        android:paddingEnd="@dimen/layout_padding_screen"
-        android:background="@color/white">
+    <ScrollView style="@style/FullscreenLayout"
+        android:id="@+id/account_info_layout">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <LinearLayout style="@style/FullscreenLayout_padding"
             android:orientation="vertical">
 
             <ImageView

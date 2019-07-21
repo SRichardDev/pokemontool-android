@@ -10,14 +10,9 @@
         <import type="io.stanc.pogoradar.viewmodel.MapItemViewModel.Type"/>
     </data>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white">
+    <ScrollView style="@style/FullscreenLayout">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <LinearLayout style="@style/FullscreenLayout_padding"
             android:orientation="vertical">
 
             <TextView

@@ -9,9 +9,8 @@
             type="io.stanc.pogoradar.AppSettings"/>
     </data>
 
-    <LinearLayout
-          android:orientation="vertical"
-          style="@style/FullscreenLayout">
+    <LinearLayout style="@style/FullscreenLayout_padding"
+          android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"

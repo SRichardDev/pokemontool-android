@@ -16,9 +16,7 @@
 
     <ScrollView style="@style/FullscreenLayout">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <LinearLayout style="@style/FullscreenLayout_padding"
             android:orientation="vertical">
 
             <fragment android:name="io.stanc.pogoradar.subscreen.BaseMapFragment"

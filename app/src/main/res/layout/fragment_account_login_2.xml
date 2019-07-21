@@ -8,10 +8,8 @@
             type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
     </data>
 
-    <LinearLayout
-      android:orientation="vertical"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
+    <LinearLayout style="@style/FullscreenLayout_padding"
+      android:orientation="vertical">
 
         <TextView
             style="@style/TextStyle_default"
