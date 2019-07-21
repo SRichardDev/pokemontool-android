@@ -36,7 +36,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         }
     }
 
-    private val delayedInfoLabelStart = DelayedTrigger(3000) {
+    private val delayedInfoLabelStart = DelayedTrigger(5000) {
         appInfoLabelController?.start()
     }
 
