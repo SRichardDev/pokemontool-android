@@ -12,10 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.geohash.GeoHash
@@ -26,6 +22,7 @@ import android.widget.Toast
 import io.stanc.pogoradar.App
 import com.google.android.gms.maps.model.MapStyleOptions
 import android.content.res.Resources
+import com.google.android.gms.maps.*
 
 
 // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
@@ -91,6 +88,9 @@ open class BaseMapFragment : Fragment() {
 
         // 3D buildings
         map?.isBuildingsEnabled = true
+
+        // disable map toolbar, because could not change position (directly below/behind FAB menu button)
+        map?.uiSettings?.isMapToolbarEnabled = false
 
         updateMyLocationEnabledPOI()
         moveCameraToStartPosition()

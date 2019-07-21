@@ -52,7 +52,7 @@ class MapInteractionFragment: Fragment() {
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootLayout = inflater.inflate(R.layout.fragment_map_grid, container, false)
+        val rootLayout = inflater.inflate(R.layout.fragment_map_interaction, container, false)
         setupMapFragment()
 
         // floating action buttons
