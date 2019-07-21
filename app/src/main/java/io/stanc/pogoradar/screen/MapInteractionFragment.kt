@@ -158,6 +158,17 @@ class MapInteractionFragment: Fragment() {
 
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
+        map?.cameraPosition?.zoom?.let { currentZoomValue ->
+            if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
+                loadMapItems()
+            }
+        }
+
+        clusterManager?.onCameraIdle()
+    }
+
+    private fun loadMapItems() {
+
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
@@ -172,11 +183,9 @@ class MapInteractionFragment: Fragment() {
                 }
 
             } ?: run {
-                Log.v(TAG, "Max zooming level reached!")
+                Log.w(TAG, "max size of GeoHash matrix reached!")
             }
         }
-
-        clusterManager?.onCameraIdle()
     }
 
     private fun isSameGeoHashList(list1: List<GeoHash>, list2: List<GeoHash>): Boolean {
