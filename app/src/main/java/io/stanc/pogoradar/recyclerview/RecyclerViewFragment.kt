@@ -19,6 +19,7 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
 
     private var listAdapter: RecyclerViewAdapter<ItemType>? = null
     private var recyclerView: RecyclerView? = null
+    private var dividerItemDecoration: DividerItemDecoration? = null
 
     enum class Orientation(val value: Int) {
         HORIZONTAL(LinearLayoutManager.HORIZONTAL),
@@ -68,18 +69,19 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
     private fun setupList(list: List<ItemType>) {
         recyclerView?.let { recyclerView ->
 
-            context?.let {
-                val adapter = onCreateListAdapter(it, list)
+            context?.let { context ->
+                val adapter = onCreateListAdapter(context, list)
 
-                val layoutManager = LinearLayoutManager(it)
+                val layoutManager = LinearLayoutManager(context)
                 layoutManager.orientation = orientation.value
                 recyclerView.layoutManager = layoutManager
 
-                val dividerItemDecoration = DividerItemDecoration(
-                    recyclerView.context,
-                    layoutManager.orientation
-                )
-                recyclerView.addItemDecoration(dividerItemDecoration)
+                DividerItemDecoration(recyclerView.context, layoutManager.orientation).apply {
+
+                    dividerItemDecoration?.let { recyclerView.removeItemDecoration(it) }
+                    recyclerView.addItemDecoration(this)
+                    dividerItemDecoration = this
+                }
 
                 recyclerView.adapter = adapter
                 listAdapter = adapter

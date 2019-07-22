@@ -5,6 +5,8 @@
               android:layout_height="@dimen/recycleview_list_item_height"
               android:layout_width="@dimen/recycleview_list_item_height"
               android:padding="@dimen/layout_margin_small"
+              android:layout_marginStart="@dimen/layout_margin_small"
+              android:layout_marginEnd="@dimen/layout_margin_small"
               style="@style/ImageButton"
               android:orientation="vertical">
 

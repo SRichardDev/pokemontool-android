@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	style="@style/CardViewLayout">
+
+	<Switch android:id="@+id/raid_switch_egg"
+			style="@style/TextStyle_bold"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/raid_check_egg"
+			android:layout_margin="@dimen/layout_margin_small"
+			android:switchPadding="@dimen/layout_margin_large"/>
+
+</androidx.cardview.widget.CardView>

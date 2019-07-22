@@ -94,7 +94,7 @@
                     android:layout_marginTop="@dimen/layout_margin_small"
                     android:visibility="@{raidViewModel.isRaidBossMissing ? View.VISIBLE : View.GONE}">
 
-                    <include layout="@layout/fragment_raidbosses"/>
+                    <include layout="@layout/cardview_raidbosses"/>
 
                 </LinearLayout>
 
@@ -161,7 +161,7 @@
                     android:text="@string/arena_raid_participants_list"/>
 
                 <include
-                    layout="@layout/layout_raid_meetup_time"
+                    layout="@layout/cardview_raid_meetup_time"
                     android:id="@+id/raid_layout_meetup"
                     android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
 

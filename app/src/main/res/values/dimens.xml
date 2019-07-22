@@ -29,7 +29,7 @@
     <dimen name="raid_picker_height">128dp</dimen>
 
     <dimen name="stroke_line">2dp</dimen>
-    <dimen name="corner_radius">10dp</dimen>
+    <dimen name="corner_radius_default">10dp</dimen>
 
     <dimen name="recycleview_list_item_height">96dp</dimen>
 

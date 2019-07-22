@@ -155,11 +155,12 @@
     <string name="raid_app_title">Neuer Level %d Raid</string>
     <string name="raid_eggs_title">Raid Level:</string>
     <string name="raid_check_egg">Raid läuft bereits?</string>
-    <string name="raid_raidboss_selection">Mögliche Raidbosse:</string>
+    <string name="raid_raidboss_selection">Wähle einen Raidboss aus: </string>
+    <string name="raid_raidboss_overview">Mögliche Raidbosse: </string>
     <string name="raid_text_time_egg">Das Ei schlüpft um:</string>
     <string name="raid_text_time_raid">Der Raid läuft ab um:</string>
-    <string name="raid_check_participation">Nimmst du am Raid teil?</string>
-    <string name="raid_text_time_meetup">Treffzeitpunkt:</string>
+    <string name="raid_check_participation">Teilnehmen: </string>
+    <string name="raid_text_time_meetup">Treffzeitpunkt: </string>
     <string name="raid_button_send">Raid melden</string>
 
     <!-- Arena -->
