@@ -376,6 +376,7 @@ class MapInteractionFragment: Fragment() {
             negativeButton?.visibility = View.VISIBLE
             currentMode = MapMode.EDIT_PUSH_REGISTRATION
             lastMarkerClicked?.hideInfoWindow()
+            famButton?.visibility = View.INVISIBLE
 
             WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
             firebase?.loadSubscriptions { geoHashes ->
@@ -399,6 +400,7 @@ class MapInteractionFragment: Fragment() {
             actionButtonLayout?.visibility = View.VISIBLE
             currentMode = MapMode.SET_NEW_POI
             lastMarkerClicked?.hideInfoWindow()
+            famButton?.visibility = View.INVISIBLE
             mapFragment?.zoomTo(ZoomLevel.STREET, true)
         }
     }
@@ -407,6 +409,7 @@ class MapInteractionFragment: Fragment() {
         poiImage?.visibility = View.INVISIBLE
         actionButtonLayout?.visibility = View.INVISIBLE
         negativeButton?.visibility = View.INVISIBLE
+        famButton?.visibility = View.VISIBLE
 
 //        if (currentMode == MapMode.EDIT_PUSH_REGISTRATION) {
 //
