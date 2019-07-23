@@ -8,8 +8,10 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Build.VERSION_CODES.O
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.MessagingStyle.MAXIMUM_RETAINED_MESSAGES
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -31,14 +33,27 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     private val TAG = this::class.java.name
 
-    private val maxNumberOfNotifications = 10
+    private val maxNumberOfNotifications = MAXIMUM_RETAINED_MESSAGES
     private var currentNotificationId = 0
+    private val latestNotificationId = "latestNotificationId"
 
     enum class NotificationType {
         Unknown,
         Raid,
         Quest,
         Chat
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        currentNotificationId = sharedPreferences.getInt(latestNotificationId, 0)
+    }
+
+    override fun onDestroy() {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        sharedPreferences.edit().putInt(latestNotificationId, currentNotificationId).apply()
+        super.onDestroy()
     }
 
     // Notification in Background/Foreground:
