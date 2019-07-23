@@ -7,14 +7,16 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.Switch
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentArenaInfoBinding
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.subscreen.RaidBossFragment
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.RaidViewModel
 import java.util.*
@@ -61,16 +63,27 @@ class ArenaInfoFragment: Fragment() {
     private fun setupRaidButtons(rootLayout: View) {
         Kotlin.safeLet(context, arenaViewModel?.arena) { context, arena ->
 
+            rootLayout.findViewById<TextView>(R.id.raidbosses_title)?.text = getString(R.string.raid_raidboss_selection)
+
             rootLayout.findViewById<Button>(R.id.arena_raid_button_new_raid)?.let {
                 it.setOnClickListener {
-                    ShowFragmentManager.showFragment(RaidFragment(), fragmentManager, R.id.arena_layout)
+                    if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                        ShowFragmentManager.showFragment(RaidFragment(), fragmentManager, R.id.arena_layout)
+                    } else {
+                        Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
+                    }
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.arena_raid_button_raidboss)?.let {
-                it.setOnClickListener {
-                    raidBossesFragment?.selectedItem()?.let {
-                        raidViewModel?.sendRaidBoss(it)
+            rootLayout.findViewById<Button>(R.id.raidbosses_button)?.apply {
+                this.visibility = View.VISIBLE
+                this.setOnClickListener {
+                    if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                        raidBossesFragment?.selectedItem()?.let {
+                            raidViewModel?.sendRaidBoss(it)
+                        }
+                    } else {
+                        Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
                     }
                 }
             }
@@ -81,13 +94,29 @@ class ArenaInfoFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Switch>(R.id.arena_raid_switch_register)?.setOnCheckedChangeListener { _, isChecked ->
-                raidViewModel?.let { viewModel ->
+            rootLayout.findViewById<Button>(R.id.raid_meetup_time_button)?.apply {
+                this.visibility = View.VISIBLE
+                this.setOnClickListener {
+                    raidViewModel?.let { viewModel ->
+                        if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                            if (viewModel.isRaidMeetupAnnounced.get() == false) {
+                                viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
+                            }
+                        } else {
+                            Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
+                        }
+                    }
+                }
+            }
 
-                    if (viewModel.isRaidMeetupAnnounced.get() == true) {
-                        viewModel.changeParticipation(isChecked)
+            rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.setOnCheckedChangeListener { _, isChecked ->
+                raidViewModel?.let { viewModel ->
+                    if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                        if (viewModel.isRaidMeetupAnnounced.get() == true) {
+                            viewModel.changeParticipation(isChecked)
+                        }
                     } else {
-                        viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
+                        Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
                     }
                 }
             }

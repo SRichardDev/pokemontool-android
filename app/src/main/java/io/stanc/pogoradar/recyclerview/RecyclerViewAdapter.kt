@@ -41,6 +41,8 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
 
     var onItemClickListener: OnItemClickListener? = null
 
+    var selectionEnabled: Boolean = true
+
     fun getItem(id: Any): ItemType = itemList.first { it.id == id }
 
     override fun getItemCount() = itemList.size
@@ -90,13 +92,16 @@ abstract class RecyclerViewAdapter<ItemType: IdItem>(private val context: Contex
 
     private fun selectItem(itemLayout: View, itemId: Any) {
 
-        if (onlyOneItemIsSelectable) {
-            deselectAllItems()
+        if (selectionEnabled) {
+
+            if (onlyOneItemIsSelectable) {
+                deselectAllItems()
+            }
+
+            itemLayout.isSelected = true
+            selectedItem = getItem(itemId)
+
+            onItemClickListener?.onClick(itemId)
         }
-
-        itemLayout.isSelected = true
-        selectedItem = getItem(itemId)
-
-        onItemClickListener?.onClick(itemId)
     }
 }

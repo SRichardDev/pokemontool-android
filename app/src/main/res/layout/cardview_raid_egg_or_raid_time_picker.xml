@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
 	style="@style/CardViewLayout">
 
 	<LinearLayout
@@ -36,6 +36,13 @@
 				android:layout_marginStart="@dimen/layout_margin_small"/>
 
 		</LinearLayout>
+
+		<io.stanc.pogoradar.utils.SegmentedControlView
+			android:id="@+id/raid_segmentedcontrolview_time_hour_minutes"
+			android:gravity="center"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="@dimen/layout_margin_small"/>
 
 	</LinearLayout>
 

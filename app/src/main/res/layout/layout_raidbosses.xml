@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="wrap_content" xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical">
 
     <TextView
+        android:id="@+id/raidbosses_title"
         style="@style/TextStyle_bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/raid_raidboss_selection"/>
+        android:text="@string/raid_raidboss_overview"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/raidbosses_recyclerview"
@@ -16,5 +17,15 @@
         android:layout_height="@dimen/recycleview_list_item_height"
         android:layout_marginTop="@dimen/layout_margin_small"
         android:orientation="horizontal"/>
+
+    <Button
+        android:id="@+id/raidbosses_button"
+        style="@style/ButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_margin_small"
+        android:text="@string/raid_button_send_raidboss"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
 </LinearLayout>

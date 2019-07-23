@@ -18,8 +18,11 @@ import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.subscreen.RaidBossFragment
 import io.stanc.pogoradar.utils.Kotlin
+import io.stanc.pogoradar.utils.SegmentedControlView
 import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.RaidViewModel
+import io.stanc.pogoradar.databinding.FragmentRaidBinding
 import java.util.*
 
 
@@ -42,30 +45,35 @@ class RaidFragment: Fragment() {
     private var eggImageButton5: ImageView? = null
 
     private var eggOrRaidTimerText: TextView? = null
+    private var raidBossesTitle: TextView? = null
     private var layoutRaidParticipation: View? = null
+    private var raidTimePickerHour: NumberPicker? = null
 
     private var raidLevel: Int = 3
     private var isEggAlreadyHatched: Boolean = false
     private var isUserParticipating: Boolean = false
-    private var timeUntilEventHour: Int = Calendar.getInstance().time.hours
-    private var timeUntilEventMinutes: Int = Calendar.getInstance().time.minutes
-    private var meetupTimeHour: Int = Calendar.getInstance().time.hours
-    private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
+    private var timeUntilEventHour: Int = -1
+    private var timeUntilEventMinutes: Int = 0
+    private var meetupTimeHour: Int = 0
+    private var meetupTimeMinutes: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootLayout = inflater.inflate(R.layout.fragment_raid, container, false)
+        val binding = FragmentRaidBinding.inflate(inflater, container, false)
 
         activity?.let {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
+            binding.raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
         }
 
-        setupEggImages(rootLayout)
-        setupSwitches(rootLayout)
-        setupTimePicker(rootLayout)
-        setupButton(rootLayout)
+        binding.root.findViewById<TextView>(R.id.arena_title)?.text = arenaViewModel?.arena?.name
 
-        this.rootLayout = rootLayout
-        return rootLayout
+        setupEggImages(binding.root)
+        setupSwitches(binding.root)
+        setupTimePicker(binding.root)
+        setupButton(binding.root)
+
+        this.rootLayout = binding.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -125,23 +133,44 @@ class RaidFragment: Fragment() {
 
     private fun setupRaidbossList() {
         raidBossesFragment = childFragmentManager.findFragmentById(R.id.fragment_raidbosses) as? RaidBossFragment
+        raidBossesFragment?.enableSelectItem(false)
     }
 
     private fun setupSwitches(rootLayout: View) {
 
         eggOrRaidTimerText = rootLayout.findViewById(R.id.raid_text_egg_time)
-
-        layoutRaidParticipation = rootLayout.findViewById(R.id.layout_raid_participation)
-        layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
+        raidBossesTitle = rootLayout.findViewById(R.id.raidbosses_title)
 
         rootLayout.findViewById<Switch>(R.id.raid_switch_egg)?.let { switch ->
             switch.setOnCheckedChangeListener { _, isChecked ->
                 isEggAlreadyHatched = isChecked
-                eggOrRaidTimerText?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(
-                    R.string.raid_text_time_egg
-                )
+                eggOrRaidTimerText?.text = if (isEggAlreadyHatched) getString(R.string.raid_text_time_raid) else getString(R.string.raid_text_time_egg)
+                raidBossesTitle?.text = if (isEggAlreadyHatched) getString(R.string.raid_raidboss_selection) else getString(R.string.raid_raidboss_overview)
+                raidBossesFragment?.deselectAllItems()
+                raidBossesFragment?.enableSelectItem(isEggAlreadyHatched)
             }
         }
+
+        val segmentedControlView = rootLayout.findViewById<SegmentedControlView>(R.id.raid_segmentedcontrolview_time_hour_minutes)
+        segmentedControlView.setSegment(getString(R.string.raid_button_time_hour), SegmentedControlView.Selection.LEFT)
+        segmentedControlView.setSegment(getString(R.string.raid_button_time_minutes), SegmentedControlView.Selection.RIGHT)
+        segmentedControlView.setOnSelectionChangeListener(object : SegmentedControlView.OnSelectionChangeListener{
+            override fun onSelectionChange(selection: SegmentedControlView.Selection) {
+                when(selection) {
+                    SegmentedControlView.Selection.LEFT -> {
+                        raidTimePickerHour?.visibility = View.VISIBLE
+                    }
+                    SegmentedControlView.Selection.RIGHT -> {
+                        raidTimePickerHour?.visibility = View.GONE
+                        timeUntilEventHour = -1
+                    }
+                    else -> Log.w(TAG, "unsupported selection: ${selection.name} for layout raid_segmentedcontrolview_time_hour_minutes")
+                }
+            }
+        })
+
+        layoutRaidParticipation = rootLayout.findViewById(R.id.layout_raid_participation)
+        layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
 
         rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.let { switch ->
             switch.setOnCheckedChangeListener { _, isChecked ->
@@ -155,18 +184,18 @@ class RaidFragment: Fragment() {
 
         // egg/raid formattedTime
 
-        val eventPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg_hours)
-        eventPickerHour.minValue = 0
-        eventPickerHour.maxValue = 23
-        eventPickerHour.value = timeUntilEventHour
-        eventPickerHour.setOnValueChangedListener { _, _, newValue ->
+        raidTimePickerHour = rootLayout.findViewById(R.id.raid_picker_time_egg_hours)
+        raidTimePickerHour?.minValue = 0
+        raidTimePickerHour?.maxValue = 23
+        raidTimePickerHour?.value = Calendar.getInstance().time.hours
+        raidTimePickerHour?.setOnValueChangedListener { _, _, newValue ->
             timeUntilEventHour = newValue
         }
 
         val eventPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_picker_time_egg_minutes)
         eventPickerMinutes.minValue = 0
         eventPickerMinutes.maxValue = 59
-        eventPickerMinutes.value = timeUntilEventMinutes
+        eventPickerMinutes.value = Calendar.getInstance().time.minutes
         eventPickerMinutes.setOnValueChangedListener { _, _, newValue ->
             timeUntilEventMinutes = newValue
         }
@@ -176,7 +205,7 @@ class RaidFragment: Fragment() {
         val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_hour)
         meetupPickerHour.minValue = 0
         meetupPickerHour.maxValue = 23
-        meetupPickerHour.value = meetupTimeHour
+        meetupPickerHour.value = Calendar.getInstance().time.hours
         meetupPickerHour.setOnValueChangedListener { _, _, newValue ->
             meetupTimeHour = newValue
         }
@@ -184,7 +213,7 @@ class RaidFragment: Fragment() {
         val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_minutes)
         meetupPickerMinutes.minValue = 0
         meetupPickerMinutes.maxValue = 59
-        meetupPickerMinutes.value = meetupTimeMinutes
+        meetupPickerMinutes.value = Calendar.getInstance().time.minutes
         meetupPickerMinutes.setOnValueChangedListener { _, _, newValue ->
             meetupTimeMinutes = newValue
         }
@@ -292,13 +321,27 @@ class RaidFragment: Fragment() {
     }
 
     private fun sendRaid(geoHash: GeoHash, arenaId: String, raidbossId: String) {
-        val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId, raidbossId)
+//        Log.d(TAG, "Debug:: sendRaid($geoHash, $arenaId), ($timeUntilEventHour:$timeUntilEventMinutes)")
+
+        val raid = if (timeUntilEventHour == -1) {
+            FirebaseRaid.new(raidLevel, timeUntilEventMinutes, geoHash, arenaId, raidbossId)
+        } else {
+            FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId, raidbossId)
+        }
+
         pushRaidAndMeetup(raid)
         closeScreen()
     }
 
     private fun sendEgg(geoHash: GeoHash, arenaId: String) {
-        val raid = FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId)
+//        Log.d(TAG, "Debug:: sendEgg($geoHash, $arenaId), ($timeUntilEventHour:$timeUntilEventMinutes)")
+
+        val raid = if (timeUntilEventHour == -1) {
+            FirebaseRaid.new(raidLevel, timeUntilEventMinutes, geoHash, arenaId)
+        } else {
+            FirebaseRaid.new(raidLevel, timeUntilEventHour, timeUntilEventMinutes, geoHash, arenaId)
+        }
+
         pushRaidAndMeetup(raid)
         closeScreen()
     }

@@ -3,15 +3,19 @@
 
     <data>
         <variable
-            name="viewModel"
+            name="mapItemInfoViewModel"
             type="io.stanc.pogoradar.viewmodel.MapItemInfoViewModel" />
     </data>
 
-    <LinearLayout android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
+    <androidx.cardview.widget.CardView
+        style="@style/CardViewLayout">
 
-        <TextView
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:padding="@dimen/layout_margin_small">
+
+            <TextView
                 style="@style/TextStyle_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -19,16 +23,16 @@
                 android:layout_marginTop="@dimen/layout_margin_small"
                 android:text="@string/coordinates"/>
 
-        <TextView
+            <TextView
                 android:id="@+id/map_item_infos_textview_coordinates"
                 style="@style/TextStyle_default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@{viewModel.coordinates}"/>
+                android:text="@{mapItemInfoViewModel.coordinates}"/>
 
-        <TextView
+            <TextView
                 style="@style/TextStyle_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -36,15 +40,17 @@
                 android:layout_marginTop="@dimen/layout_margin_small"
                 android:text="@string/added_from"/>
 
-        <TextView
+            <TextView
                 android:id="@+id/map_item_infos_textview_added_from_user"
                 style="@style/TextStyle_default"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginTop="@dimen/layout_margin_small"
-                android:text="@{viewModel.submitter}"/>
+                android:text="@{mapItemInfoViewModel.submitter}"/>
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </layout>

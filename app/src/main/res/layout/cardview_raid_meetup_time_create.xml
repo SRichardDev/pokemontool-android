@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+    style="@style/CardViewLayout">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/layout_margin_small">
+
+        <TextView
+            style="@style/TextStyle_bold"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="start"
+            android:text="@string/raid_text_time_meetup"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/layout_margin_small">
+
+            <NumberPicker
+                android:id="@+id/raid_meetup_time_hour"
+                android:layout_height="@dimen/raid_picker_height"
+                android:layout_width="wrap_content"/>
+
+            <NumberPicker
+                android:id="@+id/raid_meetup_time_minutes"
+                android:layout_height="@dimen/raid_picker_height"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="@dimen/layout_margin_small"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/raid_meetup_time_button"
+            style="@style/ButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_small"
+            android:text="@string/arena_raid_button_register"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -11,14 +11,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"/>
 
-    <include layout="@layout/layout_fab_expandable"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_marginEnd="@dimen/layout_margin_default"
-             android:layout_marginBottom="@dimen/layout_margin_default"
-             app:layout_constraintBottom_toBottomOf="parent"
-             app:layout_constraintEnd_toEndOf="parent"/>
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horizontal_center_guideline"
         android:layout_width="wrap_content"
@@ -39,6 +31,14 @@
         android:visibility="invisible"
         tools:visibility="visible"
         tools:ignore="ContentDescription"/>
+
+    <include layout="@layout/layout_fab_expandable"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginEnd="@dimen/layout_margin_default"
+             android:layout_marginBottom="@dimen/layout_margin_default"
+             app:layout_constraintBottom_toBottomOf="parent"
+             app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_map_layout_buttons"

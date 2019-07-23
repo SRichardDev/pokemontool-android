@@ -22,7 +22,7 @@
     <string name="spinner_title_loading_data">Durchsuche hohes Gras in der Umgebung…</string>
 
     <!-- Navigation Drawer -->
-    <string name="nav_header_account_state">Account Status:</string>
+    <string name="nav_header_account_state">Account Status: </string>
     <string name="nav_menu_item_map">Karte</string>
 
     <!-- Authentication -->
@@ -54,7 +54,7 @@
     <string name="authentication_button_send_user_name">Neuen Benutzernamen senden</string>
     <string name="authentication_button_edit_infos">Account Daten bearbeiten</string>
     <string name="authentication_button_enable_push_notifications">Push Nachrichten</string>
-    <string name="authentication_button_medal">Medaillien:</string>
+    <string name="authentication_button_medal">Medaillien: </string>
     <string name="authentication_medal_text_pokestops">Eingereichte Pok&#233;stops</string>
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>
     <string name="authentication_medal_text_raids">Eingereichte Raids</string>
@@ -94,12 +94,12 @@
     <string name="authentication_login_screen_title_4">Account Details</string>
     <string name="authentication_login_screen_title_5">Prüfen</string>
 
-    <string name="authentication_login_details_email">E-Mail:</string>
-    <string name="authentication_login_details_password">Password:</string>
-    <string name="authentication_login_details_name">Trainer Name:</string>
-    <string name="authentication_login_details_team">Team:</string>
-    <string name="authentication_login_details_level">Level:</string>
-    <string name="authentication_login_details_code">Trainer Code:</string>
+    <string name="authentication_login_details_email">E-Mail: </string>
+    <string name="authentication_login_details_password">Password: </string>
+    <string name="authentication_login_details_name">Trainer Name: </string>
+    <string name="authentication_login_details_team">Team: </string>
+    <string name="authentication_login_details_level">Level: </string>
+    <string name="authentication_login_details_code">Trainer Code: </string>
 
 
     <string name="authentication_hint_email">Gebe deine E-Mailadresse hier ein.</string>
@@ -153,46 +153,48 @@
 
     <!-- Raid -->
     <string name="raid_app_title">Neuer Level %d Raid</string>
-    <string name="raid_eggs_title">Raid Level:</string>
+    <string name="raid_eggs_title">Raid Level: </string>
     <string name="raid_check_egg">Raid läuft bereits?</string>
     <string name="raid_raidboss_selection">Wähle einen Raidboss aus: </string>
     <string name="raid_raidboss_overview">Mögliche Raidbosse: </string>
-    <string name="raid_text_time_egg">Das Ei schlüpft um:</string>
-    <string name="raid_text_time_raid">Der Raid läuft ab um:</string>
+    <string name="raid_text_time_egg">Zeit bis Ei schlüpft: </string>
+    <string name="raid_text_time_raid">Zeit bis Raid endet: </string>
     <string name="raid_check_participation">Teilnehmen: </string>
     <string name="raid_text_time_meetup">Treffzeitpunkt: </string>
+    <string name="raid_button_time_hour">Uhrzeit</string>
+    <string name="raid_button_time_minutes">Minuten</string>
     <string name="raid_button_send">Raid melden</string>
+	<string name="raid_button_send_raidboss">Raidboss melden</string>
 
     <!-- Arena -->
-    <string name="arena_gold_arena">Gold Arena:</string>
+    <string name="arena_gold_arena">Gold Arena: </string>
 
     <string name="arena_raid_button_new_raid">Neuen Raid melden</string>
-    <string name="arena_raid_meetup_time">Treffzeitpunkt:</string>
+    <string name="arena_raid_meetup_time">Treffzeitpunkt: </string>
     <string name="arena_raid_meetup_time_none">noch keiner gemeldet</string>
     <string name="arena_raid_time_none">-00:00</string>
-    <string name="arena_raid_time_until_egg_hatches">Ei schlüpft um:</string>
-    <string name="arena_raid_time_until_raid_ends">Raid endet um:</string>
-    <string name="arena_raid_participants">Anzahl der Teilnehmer:</string>
+    <string name="arena_raid_time_until_egg_hatches">Ei schlüpft um: </string>
+    <string name="arena_raid_time_until_raid_ends">Raid endet um: </string>
+    <string name="arena_raid_participants">Anzahl der Teilnehmer: </string>
     <string name="arena_raid_participants_list">Teilnehmerliste</string>
     <string name="arena_raid_chat">Chat</string>
-    <string name="arena_raid_register">Anmelden:</string>
-    <string name="arena_raid_raidboss">Raidboss melden</string>
+    <string name="arena_raid_button_register">Teilnehmen</string>
 
     <!-- Pokestop -->
-    <string name="pokestop_active_quest">Aktive Quest:</string>
-    <string name="pokestop_quest_reward">Belohnung:</string>
+    <string name="pokestop_active_quest">Aktive Quest: </string>
+    <string name="pokestop_quest_reward">Belohnung: </string>
     <string name="pokestop_quest_none">Kein Quest gemeldet</string>
     <string name="pokestop_quest_button_new_quest">Neue Quest melden</string>
-    <string name="pokestop_quest_title_new_quest">Neue Quest:</string>
+    <string name="pokestop_quest_title_new_quest">Neue Quest: </string>
     <string name="pokestop_quest_search_field_hint">Quests durchsuchen</string>
     <string name="pokestop_quest_popup_title">Quest wirklich melden?</string>
     <string name="pokestop_quest_popup_button_send">Senden</string>
     <string name="pokestop_quest_popup_button_cancel">Abbrechen</string>
 
     <!-- Commmon -->
-    <string name="coordinates">Koordinaten:</string>
+    <string name="coordinates">Koordinaten: </string>
     <string name="coordinates_format">(%s, %s)</string>
-    <string name="added_from">Hinzugefügt von:</string>
+    <string name="added_from">Hinzugefügt von: </string>
 
     <!-- Exceptions -->
     <string name="exceptions_send_map_item_invalid_type">Fehler! Unbekannter Kartentyp.</string>

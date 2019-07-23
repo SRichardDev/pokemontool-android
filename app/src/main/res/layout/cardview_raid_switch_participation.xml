@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	style="@style/CardViewLayout">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<Switch android:id="@+id/raid_switch_participation"
-			style="@style/TextStyle_bold"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/raid_check_participation"
-			android:layout_margin="@dimen/layout_margin_small"
-			android:switchPadding="@dimen/layout_margin_large"/>
+	<data>
+		<variable
+			name="raidViewModel"
+			type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
+	</data>
 
-</androidx.cardview.widget.CardView>
+	<androidx.cardview.widget.CardView style="@style/CardViewLayout">
+
+		<Switch android:id="@+id/raid_switch_participation"
+				style="@style/TextStyle_bold"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/raid_check_participation"
+				android:layout_margin="@dimen/layout_margin_small"
+				android:switchPadding="@dimen/layout_margin_large"
+				android:checked="@{raidViewModel.isUserParticipate}"/>
+
+	</androidx.cardview.widget.CardView>
+
+</layout>

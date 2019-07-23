@@ -93,12 +93,14 @@ class RaidViewModel: ViewModel() {
 
             arena.raid?.let { raid ->
 
-                isRaidBossMissing.set(isRaidAnnounced.get() == true && raidState.get() == RaidState.RAID_RUNNING && raid.raidBossId == null)
+                isRaidBossMissing.set(isRaidAnnounced.get() == true && raid.raidBossId == null)
 
             } ?: run {
 
                 isRaidBossMissing.set(false)
             }
+
+            Log.i(TAG, "Debug:: updateData($arena) isRaidBossMissing: ${isRaidBossMissing.get()}")
 
         } ?: run {
             reset()

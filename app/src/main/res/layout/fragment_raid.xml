@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            style="@style/FullscreenLayout">
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout style="@style/FullscreenLayout_padding"
-        android:orientation="vertical">
+    <data>
+        <variable
+            name="raidViewModel"
+            type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
+    </data>
 
-        <include layout="@layout/cardview_raid_egg_overview"/>
+    <ScrollView style="@style/FullscreenLayout">
 
-        <include layout="@layout/cardview_raid_egg_level"/>
+        <LinearLayout style="@style/FullscreenLayout_padding"
+                      android:orientation="vertical">
 
-        <include layout="@layout/cardview_raid_switch_running"/>
+            <include layout="@layout/cardview_raid_egg_overview"/>
 
-        <include layout="@layout/cardview_raidbosses"/>
+            <include layout="@layout/cardview_raid_egg_level"/>
 
-        <include layout="@layout/cardview_raid_egg_or_raid_time_picker"/>
+            <include layout="@layout/cardview_raid_switch_running"/>
 
-        <include layout="@layout/cardview_raid_switch_participation"/>
+            <include layout="@layout/cardview_raidbosses"/>
 
-        <include layout="@layout/cardview_raid_meetup_time"
-                 android:id="@+id/layout_raid_participation"/>
+            <include layout="@layout/cardview_raid_egg_or_raid_time_picker"/>
 
-        <Button
-            android:id="@+id/raid_button_send"
-            style="@style/ButtonStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/raid_button_send"/>
+            <include layout="@layout/cardview_raid_switch_participation"
+                     bind:raidViewModel="@{raidViewModel}"/>
 
-    </LinearLayout>
+            <include layout="@layout/cardview_raid_meetup_time_create"
+                     android:id="@+id/layout_raid_participation"/>
 
-</ScrollView>
+            <Button
+                android:id="@+id/raid_button_send"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/raid_button_send"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</layout>

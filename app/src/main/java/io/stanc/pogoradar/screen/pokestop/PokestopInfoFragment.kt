@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.databinding.FragmentPokestopInfoBinding
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.map.ClusterPokestopRenderer
 import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
@@ -46,7 +48,11 @@ class PokestopInfoFragment: Fragment() {
         setupMapFragment()
 
         binding.root.findViewById<Button>(R.id.pokestop_button_new_quest)?.setOnClickListener {
-            ShowFragmentManager.showFragment(QuestFragment(), fragmentManager, R.id.pokestop_layout)
+            if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                ShowFragmentManager.showFragment(QuestFragment(), fragmentManager, R.id.pokestop_layout)
+            } else {
+                Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
+            }
         }
 
         return binding.root

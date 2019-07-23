@@ -33,7 +33,7 @@
                 android:layout_marginTop="@dimen/layout_margin_small"
                 app:textLeft="@{Type.Pokestop.name}"
                 app:textRight="@{Type.Arena.name}"
-                app:onSelectionChangeListener="@{viewModel.onSelectedStateDidChange}"/>
+                app:onSelectionChangeListener="@{viewModel::onSelectedStateDidChange}"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"

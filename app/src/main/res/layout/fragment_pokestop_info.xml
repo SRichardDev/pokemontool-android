@@ -96,8 +96,8 @@
 
             <include layout="@layout/layout_divider"/>
 
-            <include layout="@layout/layout_map_item_infos"
-                bind:viewModel="@{pokestopViewModel.mapItemInfoViewModel}"/>
+            <include layout="@layout/cardview_map_item_infos"
+                bind:mapItemInfoViewModel="@{pokestopViewModel.mapItemInfoViewModel}"/>
 
         </LinearLayout>
 

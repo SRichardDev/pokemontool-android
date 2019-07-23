@@ -53,6 +53,14 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
         return listAdapter?.selectedItem
     }
 
+    fun enableSelectItem(enabled: Boolean) {
+        listAdapter?.selectionEnabled = enabled
+    }
+
+    fun deselectAllItems() {
+        listAdapter?.deselectAllItems()
+    }
+
     /**
      * setup
      */
@@ -84,6 +92,7 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
                 }
 
                 recyclerView.adapter = adapter
+                listAdapter?.selectionEnabled?.let { adapter.selectionEnabled = it }
                 listAdapter = adapter
             }
         }
