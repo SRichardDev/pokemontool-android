@@ -16,7 +16,7 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Kotlin
-import io.stanc.pogoradar.viewmodel.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.arena.isArenaVisibleOnMap
 
 
 class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
@@ -24,7 +24,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 ) : DefaultClusterRenderer<ClusterArena>(context, map, clusterManager) {
 
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterArena>): Boolean {
-        return cluster.items.filter { ArenaViewModel.new(it.arena, context).isArenaVisibleOnMap.get() == true }.size > 3
+        return cluster.items.filter { isArenaVisibleOnMap(it.arena) }.size > 3
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
@@ -37,7 +37,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
     override fun onClusterItemRendered(clusterItem: ClusterArena?, marker: Marker?) {
         Kotlin.safeLet(clusterItem, marker) { _clusterItem, _marker ->
             _marker.tag = _clusterItem.arena
-            _marker.isVisible = ArenaViewModel.new(_clusterItem.arena, context).isArenaVisibleOnMap.get() == true
+            _marker.isVisible = isArenaVisibleOnMap(_clusterItem.arena)
         }
         super.onClusterItemRendered(clusterItem, marker)
     }

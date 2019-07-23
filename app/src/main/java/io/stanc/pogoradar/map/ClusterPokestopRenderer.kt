@@ -16,7 +16,7 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Kotlin
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
 
 
 class ClusterPokestopRenderer(

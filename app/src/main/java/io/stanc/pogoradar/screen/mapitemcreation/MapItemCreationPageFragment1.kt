@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.screen.mapitemcreation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.databinding.FragmentMapItemCreation1Binding
 import io.stanc.pogoradar.utils.addOnPropertyChanged
-import io.stanc.pogoradar.viewmodel.MapItemViewModel
+import io.stanc.pogoradar.viewmodel.MapItemCreationViewModel
 import io.stanc.pogoradar.viewpager.ViewPagerViewModel
 
 class MapItemCreationPageFragment1: Fragment() {
 
     private val TAG = javaClass.name
 
-    private var viewModel: MapItemViewModel? = null
+    private var viewModel: MapItemCreationViewModel? = null
     private var viewPagerViewModel: ViewPagerViewModel? = null
 
     private var onNameChangeCallback: Observable.OnPropertyChangedCallback? = null
@@ -26,7 +25,7 @@ class MapItemCreationPageFragment1: Fragment() {
         val binding = FragmentMapItemCreation1Binding.inflate(inflater, container, false)
 
         activity?.let {
-            viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+            viewModel = ViewModelProviders.of(it).get(MapItemCreationViewModel::class.java)
             viewPagerViewModel = ViewModelProviders.of(it).get(ViewPagerViewModel::class.java)
 
             onNameChangeCallback = viewModel?.name?.addOnPropertyChanged {

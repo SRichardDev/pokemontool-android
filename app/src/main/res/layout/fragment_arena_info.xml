@@ -8,13 +8,13 @@
 
         <variable
             name="raidViewModel"
-            type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
+            type="io.stanc.pogoradar.viewmodel.arena.RaidViewModel"/>
         <variable
             name="arenaViewModel"
-            type="io.stanc.pogoradar.viewmodel.ArenaViewModel"/>
+            type="io.stanc.pogoradar.viewmodel.arena.ArenaViewModel"/>
 
         <import type="android.view.View"/>
-        <import type="io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState"/>
+        <import type="io.stanc.pogoradar.viewmodel.arena.RaidViewModel"/>
     </data>
 
     <ScrollView style="@style/FullscreenLayout">
@@ -52,8 +52,8 @@
                 <include layout="@layout/cardview_raid_participations"
                          bind:raidViewModel="@{raidViewModel}"/>
 
-                <include layout="@layout/cardview_raid_meetup_time_create"
-                         android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
+                <!--<include layout="@layout/cardview_raid_meetup_time_create"-->
+                         <!--android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>-->
 
                 <include layout="@layout/cardview_raid_switch_participation"
                          android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.VISIBLE : View.GONE}"

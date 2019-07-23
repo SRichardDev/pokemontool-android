@@ -6,8 +6,8 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogoradar.viewmodel.MapItemViewModel" />
-        <import type="io.stanc.pogoradar.viewmodel.MapItemViewModel.Type"/>
+            type="io.stanc.pogoradar.viewmodel.MapItemCreationViewModel" />
+        <import type="io.stanc.pogoradar.viewmodel.MapItemCreationViewModel.Type"/>
     </data>
 
     <ScrollView style="@style/FullscreenLayout">

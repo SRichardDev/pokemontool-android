@@ -12,7 +12,7 @@ class QuestAdapter(private val context: Context,
                    private val quests: List<FirebaseQuestDefinition>): RecyclerViewAdapter<FirebaseQuestDefinition>(context, quests.toMutableList()) {
 
     override val itemLayoutRes: Int
-        get() = R.layout.layout_list_item_quest
+        get() = R.layout.cardview_pokestop_quest_list_item
 
     override val clickableItemViewIdRes: Int
         get() = R.id.list_item_quest

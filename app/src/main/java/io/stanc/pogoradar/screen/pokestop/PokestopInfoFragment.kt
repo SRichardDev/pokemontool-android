@@ -18,8 +18,8 @@ import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
-import io.stanc.pogoradar.viewmodel.QuestViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.QuestViewModel
 
 
 class PokestopInfoFragment: Fragment() {

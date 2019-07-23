@@ -10,8 +10,11 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.IconFactory
-import io.stanc.pogoradar.viewmodel.QuestViewModel
-import io.stanc.pogoradar.viewmodel.RaidStateViewModel
+import io.stanc.pogoradar.viewmodel.arena.RaidState
+import io.stanc.pogoradar.viewmodel.pokestop.QuestViewModel
+import io.stanc.pogoradar.viewmodel.arena.RaidStateViewModel
+import io.stanc.pogoradar.viewmodel.arena.currentRaidState
+import io.stanc.pogoradar.viewmodel.arena.raidTime
 
 object MapIconFactory {
     private val TAG = javaClass.name
@@ -33,9 +36,8 @@ object MapIconFactory {
             }
 
             arena.raid?.let {
-                val viewModel = RaidStateViewModel.new(it)
-                if (viewModel.isRaidAnnounced.get() == true) {
-                    iconConfig.headerText = "[${viewModel.raidTime.get()}]"
+                if (currentRaidState(it) != RaidState.NONE) {
+                    iconConfig.headerText = "[${raidTime(it)}]"
                 }
             }
 

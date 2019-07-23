@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.viewmodel
 
-import android.content.Context
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.App

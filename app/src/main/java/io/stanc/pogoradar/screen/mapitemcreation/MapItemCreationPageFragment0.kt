@@ -18,11 +18,11 @@ import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.InterceptableScrollView
 import io.stanc.pogoradar.utils.Kotlin
-import io.stanc.pogoradar.viewmodel.MapItemViewModel
+import io.stanc.pogoradar.viewmodel.MapItemCreationViewModel
 
 class MapItemCreationPageFragment0: Fragment() {
 
-    private var viewModel: MapItemViewModel? = null
+    private var viewModel: MapItemCreationViewModel? = null
     private var scrollview: InterceptableScrollView? = null
     private var mapFragment: BaseMapFragment? = null
     private var map: GoogleMap? = null
@@ -42,7 +42,7 @@ class MapItemCreationPageFragment0: Fragment() {
         val binding = FragmentMapItemCreation0Binding.inflate(inflater, container, false)
 
         activity?.let {
-            viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+            viewModel = ViewModelProviders.of(it).get(MapItemCreationViewModel::class.java)
         }
 
         binding.viewModel = viewModel
@@ -107,11 +107,11 @@ class MapItemCreationPageFragment0: Fragment() {
         val markerOptions = Kotlin.safeLet(context, viewModel?.type?.get()) { context, mapItemType ->
 
             when(mapItemType) {
-                MapItemViewModel.Type.Arena ->  {
+                MapItemCreationViewModel.Type.Arena ->  {
                     val isArenaEx = viewModel?.isEx?.get()?: run { false }
                     ClusterArenaRenderer.arenaMarkerOptions(context, isArenaEx, IconFactory.SizeMod.BIG)
                 }
-                MapItemViewModel.Type.Pokestop ->  {
+                MapItemCreationViewModel.Type.Pokestop ->  {
                     ClusterPokestopRenderer.pokestopMarkerOptions(context, IconFactory.SizeMod.BIG)
                 }
             }

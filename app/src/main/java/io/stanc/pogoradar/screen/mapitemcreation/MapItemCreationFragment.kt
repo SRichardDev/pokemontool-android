@@ -17,8 +17,8 @@ import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.SystemUtils
-import io.stanc.pogoradar.viewmodel.MapItemViewModel
-import io.stanc.pogoradar.viewmodel.MapItemViewModel.Type
+import io.stanc.pogoradar.viewmodel.MapItemCreationViewModel
+import io.stanc.pogoradar.viewmodel.MapItemCreationViewModel.Type
 import io.stanc.pogoradar.viewpager.ViewPagerFragment
 
 
@@ -27,7 +27,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
     private val TAG = javaClass.name
 
     private val firebase = FirebaseDatabase()
-    private var viewModel: MapItemViewModel? = null
+    private var viewModel: MapItemCreationViewModel? = null
 
     private val onTypeChangeCallback = object : Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
@@ -39,7 +39,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
         super.onCreate(savedInstanceState)
         arguments?.getParcelable<LatLng>(ParcelableDataFragment.PARCELABLE_EXTRA_DATA_OBJECT)?.let { position ->
             activity?.let {
-                viewModel = ViewModelProviders.of(it).get(MapItemViewModel::class.java)
+                viewModel = ViewModelProviders.of(it).get(MapItemCreationViewModel::class.java)
                 viewModel?.reset()
                 viewModel?.position?.set(position)
             }

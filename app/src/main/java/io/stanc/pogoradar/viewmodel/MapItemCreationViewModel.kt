@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogoradar.utils.SegmentedControlView
 import io.stanc.pogoradar.utils.addOnPropertyChanged
 
-class MapItemViewModel: ViewModel() {
+class MapItemCreationViewModel: ViewModel() {
     private val TAG = javaClass.name
 
     enum class Type {

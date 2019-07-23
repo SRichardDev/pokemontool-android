@@ -7,9 +7,9 @@
     <data>
         <variable
             name="viewModel"
-            type="io.stanc.pogoradar.viewmodel.MapItemViewModel" />
+            type="io.stanc.pogoradar.viewmodel.MapItemCreationViewModel" />
         <import type="android.view.View"/>
-        <import type="io.stanc.pogoradar.viewmodel.MapItemViewModel.Type"/>
+        <import type="io.stanc.pogoradar.viewmodel.MapItemCreationViewModel.Type"/>
         <import type="io.stanc.pogoradar.utils.SegmentedControlView.Selection"/>
     </data>
 

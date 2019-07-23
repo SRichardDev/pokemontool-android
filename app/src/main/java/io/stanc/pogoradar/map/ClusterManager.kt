@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.map
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 //import com.arsy.maps_library.MapRipple
 import com.google.android.gms.maps.GoogleMap
@@ -16,9 +15,8 @@ import java.lang.ref.WeakReference
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.RefreshTimer
 import io.stanc.pogoradar.utils.TimeCalculator
-import io.stanc.pogoradar.viewmodel.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
-import io.stanc.pogoradar.viewmodel.RaidStateViewModel
+import io.stanc.pogoradar.viewmodel.arena.*
+import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
 
 
 class ClusterManager(context: Context, googleMap: GoogleMap, private val delegate: MarkerDelegate) {
@@ -68,7 +66,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val markers = arenaClusterManager.markerCollection.markers
             for (marker in markers) {
                 (marker.tag as? FirebaseArena)?.let {
-                    marker.isVisible = ArenaViewModel.new(it, context).isArenaVisibleOnMap.get() == true
+                    marker.isVisible = isArenaVisibleOnMap(it)
                 }
             }
             arenaClusterManager.cluster()
@@ -196,12 +194,9 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         arena.raid?.let { raid ->
 
-            val viewModel = RaidStateViewModel.new(raid)
+            if (currentRaidState(raid) != RaidState.NONE) {
 
-            if (viewModel.isRaidAnnounced.get() == true) {
-
-                Kotlin.safeLet(viewModel.raidTime.get(), (raid.timestamp as? Long)) { raidTime, timestamp ->
-
+                Kotlin.safeLet(raidTime(raid), (raid.timestamp as? Long)) { raidTime, timestamp ->
                     startRefreshTimer(arena, raidTime, timestamp)
                 }
             }

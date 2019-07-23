@@ -20,8 +20,8 @@ import io.stanc.pogoradar.subscreen.RaidBossFragment
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.SegmentedControlView
 import io.stanc.pogoradar.utils.TimeCalculator
-import io.stanc.pogoradar.viewmodel.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.RaidViewModel
+import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import io.stanc.pogoradar.databinding.FragmentRaidBinding
 import java.util.*
 
@@ -63,6 +63,7 @@ class RaidFragment: Fragment() {
         activity?.let {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             binding.raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
+            binding.lifecycleOwner = this.viewLifecycleOwner
         }
 
         binding.root.findViewById<TextView>(R.id.arena_title)?.text = arenaViewModel?.arena?.name
@@ -152,10 +153,13 @@ class RaidFragment: Fragment() {
         }
 
         val segmentedControlView = rootLayout.findViewById<SegmentedControlView>(R.id.raid_segmentedcontrolview_time_hour_minutes)
+        Log.d(TAG, "Debug:: setupSwitches() segmentedControlView: $segmentedControlView")
+
         segmentedControlView.setSegment(getString(R.string.raid_button_time_hour), SegmentedControlView.Selection.LEFT)
         segmentedControlView.setSegment(getString(R.string.raid_button_time_minutes), SegmentedControlView.Selection.RIGHT)
         segmentedControlView.setOnSelectionChangeListener(object : SegmentedControlView.OnSelectionChangeListener{
             override fun onSelectionChange(selection: SegmentedControlView.Selection) {
+                Log.d(TAG, "Debug:: onSelectionChange(${selection.name}), raidTimePickerHour: $raidTimePickerHour")
                 when(selection) {
                     SegmentedControlView.Selection.LEFT -> {
                         raidTimePickerHour?.visibility = View.VISIBLE

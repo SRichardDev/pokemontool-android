@@ -12,8 +12,8 @@ import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.viewmodel.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.RaidViewModel
+import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 
 
 class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {

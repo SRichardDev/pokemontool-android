@@ -20,7 +20,7 @@ import io.stanc.pogoradar.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogoradar.recyclerview.RecyclerViewAdapter
 import io.stanc.pogoradar.recyclerview.RecyclerViewFragment
 import io.stanc.pogoradar.recyclerviewadapter.QuestAdapter
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
 
 
 class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
@@ -38,6 +38,8 @@ class QuestFragment: RecyclerViewFragment<FirebaseQuestDefinition>() {
 
     override val orientation: Orientation
         get() = Orientation.VERTICAL
+
+    override val showItemDivider: Boolean = false
 
     override val initItemList: List<FirebaseQuestDefinition>
         get() = FirebaseDefinitions.quests

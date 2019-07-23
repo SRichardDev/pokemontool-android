@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +18,12 @@ import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.subscreen.RaidBossFragment
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.viewmodel.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.RaidViewModel
+import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
+import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import java.util.*
 
 class ArenaInfoFragment: Fragment() {
+    private val TAG = javaClass.name
 
     private var arenaViewModel: ArenaViewModel? = null
     private var raidViewModel: RaidViewModel? = null
@@ -35,12 +37,14 @@ class ArenaInfoFragment: Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentArenaInfoBinding.inflate(inflater, container, false)
 
+        Log.d(TAG, "Debug:: onCreateView()")
         activity?.let {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
 
             binding.arenaViewModel = arenaViewModel
             binding.raidViewModel = raidViewModel
+            binding.lifecycleOwner = this.viewLifecycleOwner
         }
 
         viewBinding = binding
@@ -52,6 +56,7 @@ class ArenaInfoFragment: Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Log.d(TAG, "Debug:: onResume()")
         meetupTimeHour = Calendar.getInstance().time.hours
         meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
@@ -99,7 +104,7 @@ class ArenaInfoFragment: Fragment() {
                 this.setOnClickListener {
                     raidViewModel?.let { viewModel ->
                         if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
-                            if (viewModel.isRaidMeetupAnnounced.get() == false) {
+                            if (viewModel.isRaidMeetupAnnounced.value == false) {
                                 viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
                             }
                         } else {
@@ -112,7 +117,7 @@ class ArenaInfoFragment: Fragment() {
             rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.setOnCheckedChangeListener { _, isChecked ->
                 raidViewModel?.let { viewModel ->
                     if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
-                        if (viewModel.isRaidMeetupAnnounced.get() == true) {
+                        if (viewModel.isRaidMeetupAnnounced.value == true) {
                             viewModel.changeParticipation(isChecked)
                         }
                     } else {

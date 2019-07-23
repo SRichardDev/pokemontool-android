@@ -41,6 +41,8 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
 
     abstract fun onCreateListAdapter(context: Context, list: List<ItemType>): RecyclerViewAdapter<ItemType>
 
+    open val showItemDivider: Boolean = true
+
     /**
      * interface
      */
@@ -84,11 +86,13 @@ abstract class RecyclerViewFragment<ItemType: IdItem>: Fragment() {
                 layoutManager.orientation = orientation.value
                 recyclerView.layoutManager = layoutManager
 
-                DividerItemDecoration(recyclerView.context, layoutManager.orientation).apply {
+                if (showItemDivider) {
+                    DividerItemDecoration(recyclerView.context, layoutManager.orientation).apply {
 
-                    dividerItemDecoration?.let { recyclerView.removeItemDecoration(it) }
-                    recyclerView.addItemDecoration(this)
-                    dividerItemDecoration = this
+                        dividerItemDecoration?.let { recyclerView.removeItemDecoration(it) }
+                        recyclerView.addItemDecoration(this)
+                        dividerItemDecoration = this
+                    }
                 }
 
                 recyclerView.adapter = adapter

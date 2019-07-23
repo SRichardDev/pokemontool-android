@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.screen.pokestop
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,8 @@ import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
-import io.stanc.pogoradar.viewmodel.PokestopViewModel
-import io.stanc.pogoradar.viewmodel.QuestViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
+import io.stanc.pogoradar.viewmodel.pokestop.QuestViewModel
 
 
 class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {

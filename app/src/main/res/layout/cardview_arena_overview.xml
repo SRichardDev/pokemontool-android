@@ -4,12 +4,12 @@
 	<data>
 		<variable
 			name="arenaViewModel"
-			type="io.stanc.pogoradar.viewmodel.ArenaViewModel"/>
+			type="io.stanc.pogoradar.viewmodel.arena.ArenaViewModel"/>
 
 		<variable
 			name="raidViewModel"
-			type="io.stanc.pogoradar.viewmodel.RaidViewModel"/>
-		<import type="io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState"/>
+			type="io.stanc.pogoradar.viewmodel.arena.RaidViewModel"/>
+		<import type="io.stanc.pogoradar.viewmodel.arena.RaidState"/>
 		<import type="android.view.View"/>
 	</data>
 

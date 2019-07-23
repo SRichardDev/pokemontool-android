@@ -7,10 +7,10 @@
     <data>
         <variable
             name="questViewModel"
-            type="io.stanc.pogoradar.viewmodel.QuestViewModel" />
+            type="io.stanc.pogoradar.viewmodel.pokestop.QuestViewModel" />
         <variable
             name="pokestopViewModel"
-            type="io.stanc.pogoradar.viewmodel.PokestopViewModel" />
+            type="io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel" />
         <import type="android.view.View"/>
     </data>
 
@@ -25,76 +25,23 @@
                       android:layout_height="250dp"
                       app:layout_constraintEnd_toEndOf="parent"
                       app:layout_constraintStart_toStartOf="parent"
-                      app:layout_constraintTop_toTopOf="parent"/>
+                      app:layout_constraintTop_toTopOf="parent"
+                      android:layout_marginBottom="@dimen/layout_margin_small"/>
 
             <Button
                 android:id="@+id/pokestop_button_new_quest"
                 style="@style/ButtonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/layout_margin_small"
                 android:text="@string/pokestop_quest_button_new_quest"
+                android:layout_marginBottom="@dimen/layout_margin_small"
                 android:visibility="@{questViewModel.questExists ? View.GONE : View.VISIBLE}"
                 tools:visibility="visible"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="@{questViewModel.questExists ? View.VISIBLE : View.GONE}"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@string/pokestop_active_quest"/>
-
-                    <TextView
-                        style="@style/TextStyle_default"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@{questViewModel.quest}"
-                        tools:text="Super cool quest"/>
-
-                    <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@string/pokestop_quest_reward"/>
-
-                    <TextView
-                        style="@style/TextStyle_default"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/layout_margin_small"
-                        android:text="@{questViewModel.reward}"
-                        tools:text="Super big reward"/>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/pokestop_layout_quest_image"
-                    style="@style/Image"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:src="@{questViewModel.questImage}"
-                    tools:ignore="contentDescription"/>
-
-            </LinearLayout>
-
-            <include layout="@layout/layout_divider"/>
+            <include layout="@layout/cardview_pokestop_quest"
+                     bind:questViewModel="@{questViewModel}"
+                     android:visibility="@{questViewModel.questExists ? View.VISIBLE : View.GONE}"
+                     tools:visibility="visible"/>
 
             <include layout="@layout/cardview_map_item_infos"
                 bind:mapItemInfoViewModel="@{pokestopViewModel.mapItemInfoViewModel}"/>

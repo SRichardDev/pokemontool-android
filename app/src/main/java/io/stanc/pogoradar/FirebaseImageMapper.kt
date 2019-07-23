@@ -8,8 +8,8 @@ import io.stanc.pogoradar.firebase.FirebaseDefinitions.quests
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.firebase.node.Team
-import io.stanc.pogoradar.viewmodel.RaidStateViewModel
-import io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState
+import io.stanc.pogoradar.viewmodel.arena.RaidState
+import io.stanc.pogoradar.viewmodel.arena.currentRaidState
 import java.io.IOException
 
 object FirebaseImageMapper {
@@ -25,7 +25,7 @@ object FirebaseImageMapper {
 
         arena?.raid?.let { raid ->
 
-            when(RaidStateViewModel.new(raid).currentRaidState()) {
+            when(currentRaidState(arena?.raid)) {
 
                 RaidState.RAID_RUNNING -> {
                     raidBosses.find { it.id == raid.raidBossId }?.imageName?.let { imageName ->

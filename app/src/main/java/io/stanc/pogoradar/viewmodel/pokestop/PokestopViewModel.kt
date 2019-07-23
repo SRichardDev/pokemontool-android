@@ -1,13 +1,12 @@
-package io.stanc.pogoradar.viewmodel
+package io.stanc.pogoradar.viewmodel.pokestop
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
-import io.stanc.pogoradar.App
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.AppSettings
-import io.stanc.pogoradar.R
 import io.stanc.pogoradar.geohash.GeoHash
+import io.stanc.pogoradar.viewmodel.MapItemInfoViewModel
 
 class PokestopViewModel: ViewModel() {
 

@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.viewmodel
+package io.stanc.pogoradar.viewmodel.pokestop
 
 import androidx.lifecycle.ViewModel
 import android.content.Context

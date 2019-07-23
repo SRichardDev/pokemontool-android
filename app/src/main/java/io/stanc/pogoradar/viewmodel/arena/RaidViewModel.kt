@@ -1,20 +1,21 @@
-package io.stanc.pogoradar.viewmodel
+package io.stanc.pogoradar.viewmodel.arena
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
+import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
 import io.stanc.pogoradar.utils.Observables.dependantObservableField
 import io.stanc.pogoradar.utils.TimeCalculator
-import io.stanc.pogoradar.viewmodel.RaidStateViewModel.RaidState
 
 class RaidViewModel: ViewModel() {
     private val TAG = javaClass.name
@@ -23,8 +24,8 @@ class RaidViewModel: ViewModel() {
     private var firebase: FirebaseDatabase = FirebaseDatabase()
     val raidImage = ObservableField<Drawable?>()
 
-    private var raidStateViewModel: RaidStateViewModel = RaidStateViewModel.new(arena?.raid)
-    var raidMeetupViewModel: RaidMeetupViewModel = RaidMeetupViewModel.new(null)
+    private val raidStateViewModel = RaidStateViewModel()
+    val raidMeetupViewModel = RaidMeetupViewModel()
 
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 
@@ -41,36 +42,21 @@ class RaidViewModel: ViewModel() {
      * observable fields
      */
 
-
-    val isRaidBossMissing = ObservableField<Boolean>(false) // isRaidAnnounced && raidState == RaidState.RAID_RUNNING && arena.raid?.raidBossId == null
+    val isRaidBossMissing = MutableLiveData<Boolean>() // isRaidAnnounced && raidState == RaidState.RAID_RUNNING && arena.raid?.raidBossId == null
 
     // RaidStateViewModel
-    val raidState = dependantObservableField(raidStateViewModel.raidState) {
-        raidStateViewModel.raidState.get()
-    }
-    val raidTime = dependantObservableField(raidStateViewModel.raidTime) {
-        raidStateViewModel.raidTime.get()
-    }
-    val isRaidAnnounced = dependantObservableField(raidStateViewModel.isRaidAnnounced) {
-        raidStateViewModel.isRaidAnnounced.get()
-    }
+
+    val raidState: MutableLiveData<RaidState> = raidStateViewModel.raidState
+    val raidTime: MutableLiveData<String?> = raidStateViewModel.raidTime
+    val isRaidAnnounced: MutableLiveData<Boolean> = raidStateViewModel.isRaidAnnounced
 
     // RaidMeetupViewModel
-    val isRaidMeetupAnnounced = dependantObservableField(raidMeetupViewModel.isRaidMeetupAnnounced) {
-        raidMeetupViewModel.isRaidMeetupAnnounced.get()
-    }
-    val meetupTime = dependantObservableField(raidMeetupViewModel.meetupTime) {
-        raidMeetupViewModel.meetupTime.get()
-    }
-    val numParticipants = dependantObservableField(raidMeetupViewModel.numParticipants) {
-        raidMeetupViewModel.numParticipants.get()
-    }
-    val participants = dependantObservableField(raidMeetupViewModel.participants) {
-        raidMeetupViewModel.participants.get()
-    }
-    val isUserParticipate = dependantObservableField(raidMeetupViewModel.isUserParticipate) {
-        raidMeetupViewModel.isUserParticipate.get()
-    }
+
+    val isRaidMeetupAnnounced: MutableLiveData<Boolean> = raidMeetupViewModel.isRaidMeetupAnnounced
+    val meetupTime: MutableLiveData<String> = raidMeetupViewModel.meetupTime
+    val numParticipants: MutableLiveData<String> = raidMeetupViewModel.numParticipants
+    val participants: MutableLiveData<List<FirebasePublicUser>> = raidMeetupViewModel.participants
+    val isUserParticipate: MutableLiveData<Boolean> = raidMeetupViewModel.isUserParticipate
 
     override fun onCleared() {
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
@@ -93,14 +79,14 @@ class RaidViewModel: ViewModel() {
 
             arena.raid?.let { raid ->
 
-                isRaidBossMissing.set(isRaidAnnounced.get() == true && raid.raidBossId == null)
+                isRaidBossMissing.value = isRaidAnnounced.value == true && raid.raidBossId == null
 
             } ?: run {
 
-                isRaidBossMissing.set(false)
+                isRaidBossMissing.value = false
             }
 
-            Log.i(TAG, "Debug:: updateData($arena) isRaidBossMissing: ${isRaidBossMissing.get()}")
+            Log.i(TAG, "Debug:: updateData($arena) isRaidBossMissing: ${isRaidBossMissing.value}")
 
         } ?: run {
             reset()
@@ -110,7 +96,7 @@ class RaidViewModel: ViewModel() {
     }
 
     fun reset() {
-        isRaidBossMissing.set(false)
+        isRaidBossMissing.value = false
         raidStateViewModel.reset()
     }
 

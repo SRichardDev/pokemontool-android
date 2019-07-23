@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="questViewModel"
+            type="io.stanc.pogoradar.viewmodel.pokestop.QuestViewModel"/>
+    </data>
+
+    <androidx.cardview.widget.CardView style="@style/CardViewLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/layout_margin_small">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/pokestop_active_quest"/>
+
+                <TextView
+                    style="@style/TextStyle_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@{questViewModel.quest}"
+                    tools:text="Super cool quest"/>
+
+                <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@string/pokestop_quest_reward"/>
+
+                <TextView
+                    style="@style/TextStyle_default"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:text="@{questViewModel.reward}"
+                    tools:text="Super big reward"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/pokestop_layout_quest_image"
+                style="@style/Image"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:src="@{questViewModel.questImage}"
+                tools:ignore="contentDescription"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>
