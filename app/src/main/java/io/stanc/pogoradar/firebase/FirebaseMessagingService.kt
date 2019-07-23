@@ -156,7 +156,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     private fun postNotification(title: String?, description: String?, intent: Intent, notificationType: String) {
 
-        val notification = buildNotification(title, description, intent, notificationType)
+        val notification = buildNotification(title, description, intent, notificationType, requestCode = currentNotificationId)
 
         val manager = NotificationManagerCompat.from(this)
 
@@ -171,10 +171,10 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         updateNotificationId()
     }
 
-    private fun buildNotification(title: String?, description: String?, intent: Intent, notificationType: String): Notification {
+    private fun buildNotification(title: String?, description: String?, intent: Intent, notificationType: String, requestCode: Int): Notification {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, requestCode, intent, PendingIntent.FLAG_ONE_SHOT)
 
         val builder = NotificationCompat.Builder(this, notificationType)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_launcher))
