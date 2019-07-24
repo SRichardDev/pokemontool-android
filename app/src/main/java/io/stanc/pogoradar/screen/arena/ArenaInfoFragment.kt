@@ -10,6 +10,7 @@ import android.widget.NumberPicker
 import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
@@ -20,7 +21,7 @@ import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
-import java.util.*
+import java.util.Calendar
 
 class ArenaInfoFragment: Fragment() {
     private val TAG = javaClass.name
@@ -34,24 +35,37 @@ class ArenaInfoFragment: Fragment() {
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
     private var raidBossesFragment: RaidBossFragment? = null
 
+    private val liveDataObserver = Observer<Boolean> {
+        Log.w(TAG, "Debug:: liveDataObserver changed: $it")
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentArenaInfoBinding.inflate(inflater, container, false)
 
-        Log.d(TAG, "Debug:: onCreateView()")
         activity?.let {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
 
+            Log.d(TAG, "Debug:: onCreateView() isRaidMeetupAnnounced: ${raidViewModel?.isRaidMeetupAnnounced?.value}")
+
             binding.arenaViewModel = arenaViewModel
             binding.raidViewModel = raidViewModel
-            binding.lifecycleOwner = this.viewLifecycleOwner
+            binding.lifecycleOwner = this
         }
+
+        // TODO: debugging
+        binding.raidViewModel?.isRaidMeetupAnnounced?.observe(this, liveDataObserver)
 
         viewBinding = binding
 
         updateLayout()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        viewBinding?.raidViewModel?.isRaidMeetupAnnounced?.removeObserver(liveDataObserver)
+        super.onDestroyView()
     }
 
     override fun onResume() {

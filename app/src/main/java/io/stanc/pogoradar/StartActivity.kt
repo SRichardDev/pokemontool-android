@@ -2,6 +2,7 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -59,6 +60,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         WaitingSpinner.initialize(layout_progress, progressbar_text, window)
 
         // notification check
+        Log.d(TAG, "Debug:: onCreate($intent)")
         onNotification(intent)
 
         // map screen
@@ -87,19 +89,25 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.d(TAG, "Debug:: onNewIntent($intent)")
         onNotification(intent)
     }
 
     private fun onNotification(intent: Intent) {
+
         intent.extras?.let { extras ->
 
             // TODO: NOTIFICATION_TYPE == NOTIFICATION_TYPE_CHAT
             if (extras.containsKey(NOTIFICATION_TYPE) && (extras.getString(NOTIFICATION_TYPE) == NOTIFICATION_TYPE_RAID || extras.getString(NOTIFICATION_TYPE) == NOTIFICATION_TYPE_QUEST)) {
+
+                Log.d(TAG, "Debug:: onNotification($intent)...")
+
                 NotificationContent.new(extras.getString(NOTIFICATION_TITLE),
                     extras.getString(NOTIFICATION_BODY),
                     extras.getDouble(NOTIFICATION_LATITUDE),
                     extras.getDouble(NOTIFICATION_LONGITUDE))?.let { notification ->
 
+                    Log.i(TAG, "Debug:: onNotification(): $notification => NotificationHolder.reportNotification")
                     NotificationHolder.reportNotification(notification)
                     showMapFragment()
                 }

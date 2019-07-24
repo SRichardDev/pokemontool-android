@@ -20,11 +20,11 @@ class RaidMeetupViewModel: ViewModel() {
     var raidMeetup: FirebaseRaidMeetup? = null
         private set
 
-    val isRaidMeetupAnnounced = MutableLiveData<Boolean>()
-    val meetupTime = MutableLiveData<String>()
-    val numParticipants = MutableLiveData<String>()
-    val participants = MutableLiveData<List<FirebasePublicUser>>()
-    val isUserParticipate = MutableLiveData<Boolean>()
+    val isRaidMeetupAnnounced = MutableLiveData<Boolean>(false)
+    val meetupTime = MutableLiveData<String>(App.geString(R.string.arena_raid_meetup_time_none))
+    val numParticipants = MutableLiveData<String>("0")
+    val participants = MutableLiveData<List<FirebasePublicUser>>(emptyList())
+    val isUserParticipate = MutableLiveData<Boolean>(false)
 
     fun updateData(raidMeetup: FirebaseRaidMeetup?) {
         this.raidMeetup = raidMeetup

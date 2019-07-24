@@ -52,12 +52,12 @@
                 <include layout="@layout/cardview_raid_participations"
                          bind:raidViewModel="@{raidViewModel}"/>
 
-                <!--<include layout="@layout/cardview_raid_meetup_time_create"-->
-                         <!--android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>-->
-
                 <include layout="@layout/cardview_raid_switch_participation"
                          android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.VISIBLE : View.GONE}"
                          bind:raidViewModel="@{raidViewModel}"/>
+
+                <include layout="@layout/cardview_raid_meetup_time_create"
+                         android:visibility="@{raidViewModel.isRaidMeetupAnnounced ? View.GONE : View.VISIBLE}"/>
 
             </LinearLayout>
 

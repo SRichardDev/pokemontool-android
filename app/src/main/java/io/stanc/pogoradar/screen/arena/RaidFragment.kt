@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
@@ -23,7 +24,7 @@ import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import io.stanc.pogoradar.databinding.FragmentRaidBinding
-import java.util.*
+import java.util.Calendar
 
 
 class RaidFragment: Fragment() {
@@ -32,8 +33,6 @@ class RaidFragment: Fragment() {
     private var arenaViewModel: ArenaViewModel? = null
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
-
-    private var rootLayout: View? = null
 
     private var raidBossesFragment: RaidBossFragment? = null
 
@@ -46,7 +45,6 @@ class RaidFragment: Fragment() {
 
     private var eggOrRaidTimerText: TextView? = null
     private var raidBossesTitle: TextView? = null
-    private var layoutRaidParticipation: View? = null
     private var raidTimePickerHour: NumberPicker? = null
 
     private var raidLevel: Int = 3
@@ -57,13 +55,31 @@ class RaidFragment: Fragment() {
     private var meetupTimeHour: Int = 0
     private var meetupTimeMinutes: Int = 0
 
+    private val onTimeSelectionChangeListener = object : SegmentedControlView.OnSelectionChangeListener {
+
+        override fun onSelectionChange(selection: SegmentedControlView.Selection) {
+            Log.d(TAG, "Debug:: onSelectionChange(${selection.name}), raidTimePickerHour: $raidTimePickerHour")
+            when(selection) {
+                SegmentedControlView.Selection.LEFT -> {
+                    raidTimePickerHour?.visibility = View.VISIBLE
+                }
+                SegmentedControlView.Selection.RIGHT -> {
+                    raidTimePickerHour?.visibility = View.GONE
+                    timeUntilEventHour = -1
+                }
+                else -> Log.w(TAG, "unsupported selection: ${selection.name} for layout raid_segmentedcontrolview_time_hour_minutes")
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentRaidBinding.inflate(inflater, container, false)
 
         activity?.let {
+            Log.d(TAG, "Debug:: onCreateView()")
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             binding.raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
-            binding.lifecycleOwner = this.viewLifecycleOwner
+            binding.lifecycleOwner = this
         }
 
         binding.root.findViewById<TextView>(R.id.arena_title)?.text = arenaViewModel?.arena?.name
@@ -73,7 +89,6 @@ class RaidFragment: Fragment() {
         setupTimePicker(binding.root)
         setupButton(binding.root)
 
-        this.rootLayout = binding.root
         return binding.root
     }
 
@@ -152,35 +167,11 @@ class RaidFragment: Fragment() {
             }
         }
 
-        val segmentedControlView = rootLayout.findViewById<SegmentedControlView>(R.id.raid_segmentedcontrolview_time_hour_minutes)
-        Log.d(TAG, "Debug:: setupSwitches() segmentedControlView: $segmentedControlView")
+        rootLayout.findViewById<SegmentedControlView>(R.id.raid_segmentedcontrolview_time_hour_minutes)?.let { segmentedControlView ->
 
-        segmentedControlView.setSegment(getString(R.string.raid_button_time_hour), SegmentedControlView.Selection.LEFT)
-        segmentedControlView.setSegment(getString(R.string.raid_button_time_minutes), SegmentedControlView.Selection.RIGHT)
-        segmentedControlView.setOnSelectionChangeListener(object : SegmentedControlView.OnSelectionChangeListener{
-            override fun onSelectionChange(selection: SegmentedControlView.Selection) {
-                Log.d(TAG, "Debug:: onSelectionChange(${selection.name}), raidTimePickerHour: $raidTimePickerHour")
-                when(selection) {
-                    SegmentedControlView.Selection.LEFT -> {
-                        raidTimePickerHour?.visibility = View.VISIBLE
-                    }
-                    SegmentedControlView.Selection.RIGHT -> {
-                        raidTimePickerHour?.visibility = View.GONE
-                        timeUntilEventHour = -1
-                    }
-                    else -> Log.w(TAG, "unsupported selection: ${selection.name} for layout raid_segmentedcontrolview_time_hour_minutes")
-                }
-            }
-        })
-
-        layoutRaidParticipation = rootLayout.findViewById(R.id.layout_raid_participation)
-        layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
-
-        rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.let { switch ->
-            switch.setOnCheckedChangeListener { _, isChecked ->
-                isUserParticipating = isChecked
-                layoutRaidParticipation?.visibility = if (isUserParticipating) View.VISIBLE else View.GONE
-            }
+            segmentedControlView.setSegment(getString(R.string.raid_button_time_hour), SegmentedControlView.Selection.LEFT)
+            segmentedControlView.setSegment(getString(R.string.raid_button_time_minutes), SegmentedControlView.Selection.RIGHT)
+            segmentedControlView.setOnSelectionChangeListener(onTimeSelectionChangeListener)
         }
     }
 

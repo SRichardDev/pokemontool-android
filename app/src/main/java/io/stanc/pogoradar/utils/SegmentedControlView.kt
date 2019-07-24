@@ -6,6 +6,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.StateListDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.util.AttributeSet
+import android.util.Log
 import android.util.StateSet
 import android.view.View
 import android.widget.LinearLayout

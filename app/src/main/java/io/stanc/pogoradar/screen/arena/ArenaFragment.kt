@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,6 +63,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
 
     private fun updateViewModel(arena: FirebaseArena?) {
         activity?.let {
+            Log.d(TAG, "Debug:: updateViewModel($arena)")
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).updateData(arena, it)
             ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(arena, it)
         }
