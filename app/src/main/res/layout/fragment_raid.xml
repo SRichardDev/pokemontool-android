@@ -3,8 +3,8 @@
 
     <data>
         <variable
-            name="raidViewModel"
-            type="io.stanc.pogoradar.viewmodel.arena.RaidViewModel"/>
+            name="raidCreationViewModel"
+            type="io.stanc.pogoradar.viewmodel.arena.RaidCreationViewModel"/>
         <import type="android.view.View"/>
     </data>
 
@@ -24,11 +24,10 @@
             <include layout="@layout/cardview_raid_egg_or_raid_time_picker"/>
 
             <include layout="@layout/cardview_raid_switch_participation"
-                     bind:raidViewModel="@{raidViewModel}"/>
+                     bind:raidCreationViewModel="@{raidCreationViewModel}"/>
 
             <include layout="@layout/cardview_raid_meetup_time_create"
-                     android:id="@+id/test"
-                     android:visibility="@{raidViewModel.isUserParticipate ? View.VISIBLE : View.GONE}"/>
+                     android:visibility="@{raidCreationViewModel.isUserParticipate ? View.VISIBLE : View.GONE}"/>
 
             <Button
                 android:id="@+id/raid_button_send"

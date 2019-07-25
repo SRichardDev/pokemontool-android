@@ -1,13 +1,11 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.NumberPicker
-import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,6 +21,7 @@ import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import java.util.Calendar
 
+
 class ArenaInfoFragment: Fragment() {
     private val TAG = javaClass.name
 
@@ -35,8 +34,14 @@ class ArenaInfoFragment: Fragment() {
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
     private var raidBossesFragment: RaidBossFragment? = null
 
-    private val liveDataObserver = Observer<Boolean> {
-        Log.w(TAG, "Debug:: liveDataObserver changed: $it")
+    private val raidBossMissingObserver = Observer<Boolean> { isMissing ->
+        raidBossesFragment?.let { raidBossesFragment ->
+            if (isMissing) {
+                childFragmentManager.beginTransaction().show(raidBossesFragment).commit()
+            } else {
+                childFragmentManager.beginTransaction().hide(raidBossesFragment).commit()
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,15 +51,12 @@ class ArenaInfoFragment: Fragment() {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
 
-            Log.d(TAG, "Debug:: onCreateView() isRaidMeetupAnnounced: ${raidViewModel?.isRaidMeetupAnnounced?.value}")
-
             binding.arenaViewModel = arenaViewModel
             binding.raidViewModel = raidViewModel
             binding.lifecycleOwner = this
         }
 
-        // TODO: debugging
-        binding.raidViewModel?.isRaidMeetupAnnounced?.observe(this, liveDataObserver)
+        raidViewModel?.isRaidBossMissing?.observe(this, raidBossMissingObserver)
 
         viewBinding = binding
 
@@ -64,13 +66,12 @@ class ArenaInfoFragment: Fragment() {
     }
 
     override fun onDestroyView() {
-        viewBinding?.raidViewModel?.isRaidMeetupAnnounced?.removeObserver(liveDataObserver)
+        raidViewModel?.isRaidBossMissing?.removeObserver(raidBossMissingObserver)
         super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "Debug:: onResume()")
         meetupTimeHour = Calendar.getInstance().time.hours
         meetupTimeMinutes = Calendar.getInstance().time.minutes
     }
@@ -113,8 +114,7 @@ class ArenaInfoFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.raid_meetup_time_button)?.apply {
-                this.visibility = View.VISIBLE
+            rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.apply {
                 this.setOnClickListener {
                     raidViewModel?.let { viewModel ->
                         if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
@@ -127,18 +127,6 @@ class ArenaInfoFragment: Fragment() {
                     }
                 }
             }
-
-            rootLayout.findViewById<Switch>(R.id.raid_switch_participation)?.setOnCheckedChangeListener { _, isChecked ->
-                raidViewModel?.let { viewModel ->
-                    if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
-                        if (viewModel.isRaidMeetupAnnounced.value == true) {
-                            viewModel.changeParticipation(isChecked)
-                        }
-                    } else {
-                        Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
-                    }
-                }
-            }
         }
     }
 
@@ -146,7 +134,7 @@ class ArenaInfoFragment: Fragment() {
 
         // meetup formattedTime
 
-        val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_hour)
+        val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.arena_meetup_time_hour)
         meetupPickerHour.minValue = 0
         meetupPickerHour.maxValue = 23
         meetupPickerHour.value = meetupTimeHour
@@ -154,7 +142,7 @@ class ArenaInfoFragment: Fragment() {
             meetupTimeHour = newValue
         }
 
-        val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.raid_meetup_time_minutes)
+        val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.arena_meetup_time_minutes)
         meetupPickerMinutes.minValue = 0
         meetupPickerMinutes.maxValue = 60
         meetupPickerMinutes.value = meetupTimeMinutes

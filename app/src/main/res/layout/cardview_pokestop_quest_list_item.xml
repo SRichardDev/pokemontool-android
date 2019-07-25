@@ -1,49 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                   xmlns:tools="http://schemas.android.com/tools"
-                                   style="@style/CardViewLayout">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent">
 
-    <LinearLayout
-        android:id="@+id/list_item_quest"
-        style="@style/ImageButton"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/recycleview_list_item_height"
-        android:padding="@dimen/layout_margin_small">
-
-        <ImageView
-            android:id="@+id/list_item_quest_image"
-            style="@style/Image"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            tools:src="@drawable/icon_star_gold_30dp"
-            tools:ignore="contentDescription"/>
+    <androidx.cardview.widget.CardView style="@style/CardViewLayout">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="4"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:id="@+id/list_item_quest"
+            style="@style/ImageButton"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/recycleview_list_item_height"
+            android:padding="@dimen/layout_margin_small">
 
-            <TextView
-                android:id="@+id/list_item_quest_textview_name"
-                style="@style/TextStyle_bold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                tools:text="Quest name"/>
+            <ImageView
+                android:id="@+id/list_item_quest_image"
+                style="@style/Image"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                tools:src="@drawable/icon_star_gold_30dp"
+                tools:ignore="contentDescription"/>
 
-            <TextView
-                android:id="@+id/list_item_quest_textview_reward"
-                style="@style/TextStyle_default"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_margin_small"
-                tools:text="Quest reward"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/list_item_quest_textview_name"
+                    style="@style/TextStyle_bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    tools:text="Quest name"/>
+
+                <TextView
+                    android:id="@+id/list_item_quest_textview_reward"
+                    style="@style/TextStyle_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    tools:text="Quest reward"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-</androidx.cardview.widget.CardView>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

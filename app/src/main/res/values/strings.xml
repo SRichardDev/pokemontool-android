@@ -178,7 +178,8 @@
     <string name="arena_raid_participants">Anzahl der Teilnehmer: </string>
     <string name="arena_raid_participants_list">Teilnehmerliste</string>
     <string name="arena_raid_chat">Chat</string>
-    <string name="arena_raid_button_register">Teilnehmen</string>
+    <string name="arena_raid_button_send_meetup_time">Bestätigen</string>
+    <string name="arena_raid_button_change_meetup_time">Treffzeitpunkt ändern</string>
 
     <!-- Pokestop -->
     <string name="pokestop_active_quest">Aktive Quest: </string>

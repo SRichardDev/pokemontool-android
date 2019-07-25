@@ -158,6 +158,9 @@ class MapInteractionFragment: Fragment() {
 
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
+        val zoomLevel = map?.cameraPosition?.zoom
+        Log.w(TAG, "Debug:: current zoom level: $zoomLevel")
+
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
                 loadMapItems()
@@ -179,6 +182,12 @@ class MapInteractionFragment: Fragment() {
                         firebase?.loadArenas(geoHash)
                     }
 
+//                    mapGridProvider?.clearGeoHashGridList()
+//                    newGeoHashMatrix.forEach { geoHash ->
+//                        mapGridProvider?.showGeoHashGrid(geoHash)
+//                    }
+//                    Log.d(TAG, "Debug:: lastGeoHashMatrix: $lastGeoHashMatrix")
+//                    Log.d(TAG, "Debug::  newGeoHashMatrix: $newGeoHashMatrix")
                     lastGeoHashMatrix = newGeoHashMatrix
                 }
 

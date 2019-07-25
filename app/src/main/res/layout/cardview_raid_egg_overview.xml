@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-	xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-	style="@style/CardViewLayout">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  xmlns:tools="http://schemas.android.com/tools"
+			  android:layout_height="wrap_content"
+			  android:layout_width="match_parent">
 
-	<LinearLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:padding="@dimen/layout_margin_small">
+	<androidx.cardview.widget.CardView style="@style/CardViewLayout">
 
-		<ImageView
-			android:id="@+id/raid_egg"
-			style="@style/Image"
-			android:layout_width="@dimen/image_size_big"
-			android:layout_height="@dimen/image_size_big"
-			android:layout_gravity="center"
-			android:src="@drawable/icon_level_2_30dp"
-			tools:ignore="ContentDescription"/>
-
-		<TextView
-			android:id="@+id/arena_title"
-			style="@style/TextStyle_header"
-			android:layout_width="wrap_content"
+		<LinearLayout
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_gravity="center"
-			android:layout_marginTop="@dimen/layout_margin_small"
-			tools:text="Super Gold Arena"/>
+			android:orientation="vertical"
+			android:padding="@dimen/layout_margin_small">
 
-	</LinearLayout>
+			<ImageView
+				android:id="@+id/raid_egg"
+				style="@style/Image"
+				android:layout_width="@dimen/image_size_big"
+				android:layout_height="@dimen/image_size_big"
+				android:layout_gravity="center"
+				android:src="@drawable/icon_level_2_30dp"
+				tools:ignore="ContentDescription"/>
 
-</androidx.cardview.widget.CardView>
+			<TextView
+				android:id="@+id/arena_title"
+				style="@style/TextStyle_header"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:textAlignment="center"
+				android:layout_marginTop="@dimen/layout_margin_small"
+				tools:text="Super Gold Arena"/>
+
+		</LinearLayout>
+
+	</androidx.cardview.widget.CardView>
+</LinearLayout>

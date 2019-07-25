@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_height="wrap_content"
               android:layout_width="match_parent">
 
@@ -26,17 +27,25 @@
                 android:layout_marginTop="@dimen/layout_margin_small">
 
                 <NumberPicker
-                    android:id="@+id/raid_meetup_time_hour"
+                    android:id="@+id/arena_meetup_time_hour"
                     android:layout_height="@dimen/raid_picker_height"
                     android:layout_width="wrap_content"/>
 
                 <NumberPicker
-                    android:id="@+id/raid_meetup_time_minutes"
+                    android:id="@+id/arena_meetup_time_minutes"
                     android:layout_height="@dimen/raid_picker_height"
                     android:layout_width="wrap_content"
                     android:layout_marginStart="@dimen/layout_margin_small"/>
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/arena_meetup_time_button"
+                style="@style/ButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/layout_margin_small"
+                android:text="@string/arena_raid_button_send_meetup_time"/>
 
         </LinearLayout>
 

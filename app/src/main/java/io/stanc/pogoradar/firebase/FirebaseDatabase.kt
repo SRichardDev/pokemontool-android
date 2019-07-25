@@ -132,7 +132,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun changeRaidMeetupTime(raidMeetupId: String, time: String) {
         FirebaseServer.setData("$RAID_MEETUPS/$raidMeetupId/$MEETUP_TIME", time, callbackForVoid())
-        pushRaidMeetupParticipation(raidMeetupId)
     }
 
 

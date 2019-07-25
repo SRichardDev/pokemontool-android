@@ -3,8 +3,8 @@
 
 	<data>
 		<variable
-			name="raidCreationViewModel"
-			type="io.stanc.pogoradar.viewmodel.arena.RaidCreationViewModel"/>
+			name="raidViewModel"
+			type="io.stanc.pogoradar.viewmodel.arena.RaidViewModel"/>
 	</data>
 
 	<androidx.cardview.widget.CardView style="@style/CardViewLayout">
@@ -15,8 +15,8 @@
 				android:text="@string/raid_check_participation"
 				android:layout_margin="@dimen/layout_margin_small"
 				android:switchPadding="@dimen/layout_margin_large"
-				android:checked="@={raidCreationViewModel.isUserParticipate}"/>
-		<!--android:onCheckedChanged="@{(switch, checked) -> raidCreationViewModel.changeUser(checked)}"-->
+				android:checked="@{raidViewModel.isUserParticipate}"
+				android:onCheckedChanged="@{(switch, checked) -> raidViewModel.changeParticipation(checked)}"/>
 
 	</androidx.cardview.widget.CardView>
 

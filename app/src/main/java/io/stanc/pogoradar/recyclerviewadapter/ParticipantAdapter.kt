@@ -28,7 +28,7 @@ class ParticipantAdapter(private val context: Context,
         participants.find { it.id == id }?.let { participant ->
 
             TEAM_COLOR[participant.team]?.let { colorInt ->
-                (holder.itemView as? CardView)?.setCardBackgroundColor(ContextCompat.getColor(context, colorInt))
+                holder.itemView.findViewById<CardView>(R.id.cardview)?.setCardBackgroundColor(ContextCompat.getColor(context, colorInt))
             }
             holder.itemView.findViewById<TextView>(R.id.list_item_participant_level).text = participant.level.toString()
             holder.itemView.findViewById<TextView>(R.id.list_item_participant_name).text = participant.name

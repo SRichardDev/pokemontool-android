@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/CardViewLayout">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_height="wrap_content"
+              android:layout_width="match_parent">
 
-    <fragment
-        android:name="io.stanc.pogoradar.subscreen.RaidBossFragment"
-        android:id="@+id/fragment_raidbosses"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/layout_margin_small"/>
+    <androidx.cardview.widget.CardView style="@style/CardViewLayout">
 
-</androidx.cardview.widget.CardView>
+        <fragment
+            android:name="io.stanc.pogoradar.subscreen.RaidBossFragment"
+            android:id="@+id/fragment_raidbosses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

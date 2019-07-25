@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
+import io.stanc.pogoradar.databinding.FragmentRaidBinding
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
@@ -22,8 +23,7 @@ import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.SegmentedControlView
 import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
-import io.stanc.pogoradar.databinding.FragmentRaidBinding
+import io.stanc.pogoradar.viewmodel.arena.RaidCreationViewModel
 import java.util.Calendar
 
 
@@ -31,6 +31,7 @@ class RaidFragment: Fragment() {
     private val TAG = javaClass.name
 
     private var arenaViewModel: ArenaViewModel? = null
+    private var raidCreationViewModel: RaidCreationViewModel? = null
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
@@ -49,7 +50,6 @@ class RaidFragment: Fragment() {
 
     private var raidLevel: Int = 3
     private var isEggAlreadyHatched: Boolean = false
-    private var isUserParticipating: Boolean = false
     private var timeUntilEventHour: Int = -1
     private var timeUntilEventMinutes: Int = 0
     private var meetupTimeHour: Int = 0
@@ -72,15 +72,21 @@ class RaidFragment: Fragment() {
         }
     }
 
+//    private val foobarObserver = Observer<Boolean> { value ->
+//        Log.d(TAG, "Debug:: foobarObserver, new value: $value")
+//    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentRaidBinding.inflate(inflater, container, false)
 
         activity?.let {
-            Log.d(TAG, "Debug:: onCreateView()")
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
-            binding.raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
-            binding.lifecycleOwner = this
         }
+
+        raidCreationViewModel = ViewModelProviders.of(this).get(RaidCreationViewModel::class.java)
+//        raidCreationViewModel?.isUserParticipate?.observe(this, foobarObserver)
+        binding.raidCreationViewModel = raidCreationViewModel
+        binding.lifecycleOwner = this
 
         binding.root.findViewById<TextView>(R.id.arena_title)?.text = arenaViewModel?.arena?.name
 
@@ -91,6 +97,11 @@ class RaidFragment: Fragment() {
 
         return binding.root
     }
+
+//    override fun onDestroyView() {
+//        raidCreationViewModel?.isUserParticipate?.removeObserver(foobarObserver)
+//        super.onDestroyView()
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -343,7 +354,7 @@ class RaidFragment: Fragment() {
 
     private fun pushRaidAndMeetup(raid: FirebaseRaid) {
 
-        val meetupTime = if (isUserParticipating) {
+        val meetupTime = if (raidCreationViewModel?.isUserParticipate?.value == true) {
             TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
         } else {
             DatabaseKeys.DEFAULT_MEETUP_TIME

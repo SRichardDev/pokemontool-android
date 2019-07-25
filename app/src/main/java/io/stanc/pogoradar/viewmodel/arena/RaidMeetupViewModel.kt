@@ -2,7 +2,6 @@ package io.stanc.pogoradar.viewmodel.arena
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
