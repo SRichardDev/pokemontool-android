@@ -38,7 +38,6 @@ class RaidMeetupViewModel: ViewModel() {
 
     private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
         isRaidMeetupAnnounced.value = raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
-        Log.i(TAG, "Debug:: changeMeetupData($raidMeetup) isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.value}")
         numParticipants.value = raidMeetup.participantUserIds.size.toString()
         isUserParticipate.value = raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id)
         meetupTime.value = raidMeetup.meetupTime
@@ -48,7 +47,6 @@ class RaidMeetupViewModel: ViewModel() {
 
     fun reset() {
         isRaidMeetupAnnounced.value = false
-        Log.i(TAG, "Debug:: reset() isRaidMeetupAnnounced: $isRaidMeetupAnnounced")
         numParticipants.value = "0"
         participants.value = emptyList()
         isUserParticipate.value = false

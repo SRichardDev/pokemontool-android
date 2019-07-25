@@ -85,13 +85,9 @@ class RaidViewModel: ViewModel() {
 
             requestRaidMeetupData(arena)
 
-            Log.i(TAG, "Debug:: updateData($arena) isRaidBossMissing: ${isRaidBossMissing.value}")
-
         } ?: run {
             reset()
         }
-
-        Log.i(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.value}, isRaidAnnounced: ${isRaidAnnounced.value}, isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.value} raidState: ${raidState.value?.name}, raidTime: ${raidTime.value}")
     }
 
     fun reset() {
@@ -99,11 +95,9 @@ class RaidViewModel: ViewModel() {
         raidStateViewModel.reset()
         raidMeetupViewModel.reset()
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
-        Log.v(TAG, "Debug:: updateData(), isRaidBossMissing: ${isRaidBossMissing.value}, isRaidAnnounced: ${isRaidAnnounced.value}, isRaidMeetupAnnounced: ${isRaidMeetupAnnounced.value} raidState: ${raidState.value?.name}, raidTime: ${raidTime.value}")
     }
 
     fun changeParticipation(participate: Boolean) {
-        Log.d(TAG, "Debug:: changeParticipation($participate), raidMeetupViewModel.raidMeetup: ${raidMeetupViewModel.raidMeetup}")
 
         raidMeetupViewModel.raidMeetup?.id?.let {
 
@@ -155,7 +149,6 @@ class RaidViewModel: ViewModel() {
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
 
         if (isRaidAnnounced.value == true) {
-            Log.i(TAG, "Debug:: requestRaidMeetupData()  arena.raid?.raidMeetupId?: ${arena.raid?.raidMeetupId}")
             arena.raid?.raidMeetupId?.let { id ->
 
                 val raidMeetup = FirebaseRaidMeetup.new(id, DatabaseKeys.DEFAULT_MEETUP_TIME)

@@ -16,7 +16,6 @@
 				android:layout_margin="@dimen/layout_margin_small"
 				android:switchPadding="@dimen/layout_margin_large"
 				android:checked="@={raidCreationViewModel.isUserParticipate}"/>
-		<!--android:onCheckedChanged="@{(switch, checked) -> raidCreationViewModel.changeUser(checked)}"-->
 
 	</androidx.cardview.widget.CardView>
 

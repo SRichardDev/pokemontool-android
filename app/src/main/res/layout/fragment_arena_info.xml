@@ -44,13 +44,13 @@
                 android:visibility="@{raidViewModel.isRaidAnnounced ? View.VISIBLE : View.GONE}">
 
                 <include layout="@layout/cardview_raidbosses"
-                         android:visibility="@{raidViewModel.isRaidBossMissing ? View.VISIBLE : View.GONE}"/>
+                         bind:isVisible="@{raidViewModel.isRaidBossMissing}"/>
 
                 <include layout="@layout/cardview_arena_meetup_time"
                          bind:raidViewModel="@{raidViewModel}"/>
 
                 <include layout="@layout/cardview_arena_meetup_time_create"
-                         android:visibility="@{raidViewModel.isChangingMeetupTime ? View.VISIBLE : View.GONE}"/>
+                         bind:isVisible="@{raidViewModel.isChangingMeetupTime}"/>
 
                 <include layout="@layout/cardview_arena_participations"
                          bind:raidViewModel="@{raidViewModel}"/>

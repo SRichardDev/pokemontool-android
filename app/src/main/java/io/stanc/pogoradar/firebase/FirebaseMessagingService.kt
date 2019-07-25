@@ -46,7 +46,6 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i(TAG, "Debug:: onCreate()")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         currentNotificationId = sharedPreferences.getInt(latestNotificationId, 0)
     }
@@ -54,7 +53,6 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     override fun onDestroy() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPreferences.edit().putInt(latestNotificationId, currentNotificationId).apply()
-        Log.i(TAG, "Debug:: onDestroy()")
         super.onDestroy()
     }
 
@@ -65,7 +63,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+//        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
         when(notificationType(message.data)) {
 
@@ -169,7 +167,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             manager.createNotificationChannel(channel)
         }
 
-        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
+//        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
         manager.notify(currentNotificationId, notification)
         updateNotificationId()
     }

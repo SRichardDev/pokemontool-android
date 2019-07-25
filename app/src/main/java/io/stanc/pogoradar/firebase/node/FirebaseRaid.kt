@@ -96,7 +96,7 @@ data class FirebaseRaid private constructor(override val id: String,
         fun new(raidLevel: Int, timeEggHatchesMinutes: Int, geoHash: GeoHash, arenaId: String): FirebaseRaid {
             val timeEggHatchesDate = TimeCalculator.addTime(TimeCalculator.currentDate(), timeEggHatchesMinutes)
             val formattedTimeEggHatches = TimeCalculator.format(timeEggHatchesDate)
-            Log.i(TAG, "Debug:: new Raid($geoHash, $arenaId) timeEggHatchesMinutes: $timeEggHatchesMinutes, timeEggHatchesDate: $timeEggHatchesDate, formattedTimeEggHatches: $formattedTimeEggHatches")
+//            Log.i(TAG, "Debug:: new Raid($geoHash, $arenaId) timeEggHatchesMinutes: $timeEggHatchesMinutes, timeEggHatchesDate: $timeEggHatchesDate, formattedTimeEggHatches: $formattedTimeEggHatches")
             val formattedTimeRaidEnds = TimeCalculator.dateOfToday(formattedTimeEggHatches)?.let { dateEggHatches ->
                 val date = TimeCalculator.addTime(dateEggHatches, RAID_DURATION)
                 TimeCalculator.format(date)
@@ -127,7 +127,7 @@ data class FirebaseRaid private constructor(override val id: String,
 
             val timeRaidEndsDate = TimeCalculator.addTime(TimeCalculator.currentDate(), timeRaidEndsMinutes)
             val formattedTimeRaidEnds = TimeCalculator.format(timeRaidEndsDate)
-            Log.i(TAG, "Debug:: new Raid($geoHash, $arenaId) timeRaidEndsMinutes: $timeRaidEndsMinutes, timeRaidEndsDate: $timeRaidEndsDate, formattedTimeRaidEnds: $formattedTimeRaidEnds")
+//            Log.i(TAG, "Debug:: new Raid($geoHash, $arenaId) timeRaidEndsMinutes: $timeRaidEndsMinutes, timeRaidEndsDate: $timeRaidEndsDate, formattedTimeRaidEnds: $formattedTimeRaidEnds")
 
             val formattedTimeEggHatches = TimeCalculator.dateOfToday(formattedTimeRaidEnds)?.let {
                 TimeCalculator.format(TimeCalculator.addTime(it, -RAID_DURATION))

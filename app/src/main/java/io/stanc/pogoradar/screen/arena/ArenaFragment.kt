@@ -63,7 +63,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
 
     private fun updateViewModel(arena: FirebaseArena?) {
         activity?.let {
-            Log.d(TAG, "Debug:: updateViewModel($arena)")
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).updateData(arena, it)
             ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(arena, it)
         }

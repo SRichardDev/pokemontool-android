@@ -27,7 +27,7 @@
                      bind:raidCreationViewModel="@{raidCreationViewModel}"/>
 
             <include layout="@layout/cardview_raid_meetup_time_create"
-                     android:visibility="@{raidCreationViewModel.isUserParticipate ? View.VISIBLE : View.GONE}"/>
+                     bind:isVisible="@{raidCreationViewModel.isUserParticipate}"/>
 
             <Button
                 android:id="@+id/raid_button_send"

@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_height="wrap_content"
-              android:layout_width="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.cardview.widget.CardView style="@style/CardViewLayout">
+    <data>
+        <variable
+                name="isVisible"
+                type="Boolean"/>
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.cardview.widget.CardView style="@style/CardViewLayout"
+                                       android:visibility="@{(isVisible ?? true)? View.VISIBLE : View.GONE}">
 
         <LinearLayout
             android:layout_height="wrap_content"
@@ -41,4 +47,4 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-</LinearLayout>
+</layout>

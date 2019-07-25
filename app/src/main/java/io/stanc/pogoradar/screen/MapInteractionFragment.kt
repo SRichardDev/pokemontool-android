@@ -159,7 +159,7 @@ class MapInteractionFragment: Fragment() {
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
         val zoomLevel = map?.cameraPosition?.zoom
-        Log.w(TAG, "Debug:: current zoom level: $zoomLevel")
+//        Log.w(TAG, "Debug:: current zoom level: $zoomLevel")
 
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {

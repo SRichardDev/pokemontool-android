@@ -58,7 +58,6 @@ class RaidFragment: Fragment() {
     private val onTimeSelectionChangeListener = object : SegmentedControlView.OnSelectionChangeListener {
 
         override fun onSelectionChange(selection: SegmentedControlView.Selection) {
-            Log.d(TAG, "Debug:: onSelectionChange(${selection.name}), raidTimePickerHour: $raidTimePickerHour")
             when(selection) {
                 SegmentedControlView.Selection.LEFT -> {
                     raidTimePickerHour?.visibility = View.VISIBLE
@@ -72,10 +71,6 @@ class RaidFragment: Fragment() {
         }
     }
 
-//    private val foobarObserver = Observer<Boolean> { value ->
-//        Log.d(TAG, "Debug:: foobarObserver, new value: $value")
-//    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentRaidBinding.inflate(inflater, container, false)
 
@@ -84,7 +79,7 @@ class RaidFragment: Fragment() {
         }
 
         raidCreationViewModel = ViewModelProviders.of(this).get(RaidCreationViewModel::class.java)
-//        raidCreationViewModel?.isUserParticipate?.observe(this, foobarObserver)
+
         binding.raidCreationViewModel = raidCreationViewModel
         binding.lifecycleOwner = this
 
@@ -97,11 +92,6 @@ class RaidFragment: Fragment() {
 
         return binding.root
     }
-
-//    override fun onDestroyView() {
-//        raidCreationViewModel?.isUserParticipate?.removeObserver(foobarObserver)
-//        super.onDestroyView()
-//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

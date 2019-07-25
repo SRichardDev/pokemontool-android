@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,16 +35,6 @@ class ArenaInfoFragment: Fragment() {
     private var meetupTimeMinutes: Int = Calendar.getInstance().time.minutes
     private var raidBossesFragment: RaidBossFragment? = null
 
-    private val raidBossMissingObserver = Observer<Boolean> { isMissing ->
-        raidBossesFragment?.let { raidBossesFragment ->
-            if (isMissing) {
-                childFragmentManager.beginTransaction().show(raidBossesFragment).commit()
-            } else {
-                childFragmentManager.beginTransaction().hide(raidBossesFragment).commit()
-            }
-        }
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentArenaInfoBinding.inflate(inflater, container, false)
 
@@ -56,18 +47,11 @@ class ArenaInfoFragment: Fragment() {
             binding.lifecycleOwner = this
         }
 
-        raidViewModel?.isRaidBossMissing?.observe(this, raidBossMissingObserver)
-
         viewBinding = binding
 
         updateLayout()
 
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        raidViewModel?.isRaidBossMissing?.removeObserver(raidBossMissingObserver)
-        super.onDestroyView()
     }
 
     override fun onResume() {
@@ -114,16 +98,13 @@ class ArenaInfoFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.apply {
-                this.setOnClickListener {
-                    raidViewModel?.let { viewModel ->
-                        if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
-                            if (viewModel.isRaidMeetupAnnounced.value == false) {
-                                viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
-                            }
-                        } else {
-                            Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
-                        }
+            rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.setOnClickListener {
+
+                raidViewModel?.let { viewModel ->
+                    if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
+                        viewModel.changeMeetupTime(meetupTimeHour, meetupTimeMinutes)
+                    } else {
+                        Popup.showInfo(context, title = R.string.authentication_state_signed_out, description = R.string.dialog_user_logged_out_message)
                     }
                 }
             }
