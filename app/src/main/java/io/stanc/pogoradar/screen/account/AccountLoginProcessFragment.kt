@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.App
@@ -39,7 +38,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
 
         } catch (e: Exception) {
             // TODO: Popup implementation
-            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            Popup.showToast(context, e.message)
         }
     }
 
@@ -87,7 +86,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
                 Popup.showInfo(context, R.string.authentication_state_successful_signup, R.string.authentication_state_successful_signup_subtext)
             } else {
                 val message = exception ?: App.geString(R.string.authentication_state_authentication_failed)
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                Popup.showToast(context, message)
             }
         }
     }
@@ -99,7 +98,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
                 Popup.showInfo(context, R.string.authentication_state_successful_signin)
             } else {
                 val message = exception ?: App.geString(R.string.authentication_state_authentication_failed)
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                Popup.showToast(context, message)
             }
         }
     }
@@ -111,7 +110,7 @@ class AccountLoginProcessFragment: ViewPagerFragment() {
                 Popup.showInfo(context, R.string.authentication_state_successful_reset_password, R.string.authentication_state_successful_reset_password_subtext)
             } else {
                 val message = exception ?: App.geString(R.string.authentication_state_password_reset_failed)
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                Popup.showToast(context, message)
             }
         }
     }

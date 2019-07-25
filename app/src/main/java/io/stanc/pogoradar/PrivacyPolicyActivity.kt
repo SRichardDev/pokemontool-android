@@ -8,7 +8,6 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Toast
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 
@@ -33,7 +32,7 @@ class PrivacyPolicyActivity: Activity() {
             val context = applicationContext
             webview.webViewClient = object : WebViewClient() {
                 override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
-                    Toast.makeText(context, description, Toast.LENGTH_SHORT).show()
+                    Popup.showToast(context, description)
                 }
 
                 @TargetApi(android.os.Build.VERSION_CODES.M)

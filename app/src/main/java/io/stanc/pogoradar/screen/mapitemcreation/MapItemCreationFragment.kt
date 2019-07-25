@@ -2,12 +2,12 @@ package io.stanc.pogoradar.screen.mapitemcreation
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.databinding.Observable
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.model.LatLng
 import io.stanc.pogoradar.App
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
@@ -73,7 +73,7 @@ class MapItemCreationFragment: ViewPagerFragment() {
 
         } catch (e: Exception) {
             // TODO: Popup implementation
-            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            Popup.showToast(context, e.message)
         }
     }
 

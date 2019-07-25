@@ -92,8 +92,12 @@ class RaidViewModel: ViewModel() {
 
     fun reset() {
         isRaidBossMissing.value = false
+        raidImage.value = null
+        isChangingMeetupTime.value = false
+
         raidStateViewModel.reset()
         raidMeetupViewModel.reset()
+
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
     }
 

@@ -28,6 +28,8 @@ import kotlinx.android.synthetic.main.layout_progress.*
 
 class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener {
 
+    private val TAG = this::class.java.name
+
     private var appInfoLabelController: AppInfoLabelController? = null
     private var bottomNavigationView: BottomNavigationView? = null
 
@@ -187,9 +189,5 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
             this.findNavController(R.id.nav_host_fragment).popBackStack(R.id.blankFragment, false)
             this.findNavController(R.id.nav_host_fragment).navigate(R.id.action_blankFragment_to_policyFragment)
         }
-    }
-
-    companion object {
-        private val TAG = this::class.java.name
     }
 }

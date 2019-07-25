@@ -2,7 +2,9 @@ package io.stanc.pogoradar.subscreen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Context.LOCATION_SERVICE
 import android.content.Intent
+import android.content.res.Resources
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -12,17 +14,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.model.*
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.subscreen.ZoomLevel.*
 import io.stanc.pogoradar.utils.PermissionManager
-import android.content.Context.LOCATION_SERVICE
-import android.widget.Toast
-import io.stanc.pogoradar.App
-import com.google.android.gms.maps.model.MapStyleOptions
-import android.content.res.Resources
-import com.google.android.gms.maps.*
 
 
 // google map zoom levels: https://developers.google.com/maps/documentation/android-sdk/views
@@ -59,7 +60,7 @@ open class BaseMapFragment : Fragment() {
         }
 
         override fun onLocationPermissionDenied() {
-            Toast.makeText(context, App.geString(R.string.exceptions_location_permission_denied), Toast.LENGTH_LONG).show()
+            Popup.showToast(context, R.string.exceptions_location_permission_denied)
         }
     }
 

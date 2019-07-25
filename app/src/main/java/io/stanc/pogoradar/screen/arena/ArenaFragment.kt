@@ -58,6 +58,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
 
     override fun onDestroyView() {
         dataObject?.let { firebase.removeObserver(arenaObserver, it) }
+        updateViewModel(null)
         super.onDestroyView()
     }
 

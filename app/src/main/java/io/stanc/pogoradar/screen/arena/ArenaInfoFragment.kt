@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +8,6 @@ import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
@@ -20,7 +18,7 @@ import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
-import java.util.Calendar
+import java.util.*
 
 
 class ArenaInfoFragment: Fragment() {
@@ -92,10 +90,12 @@ class ArenaInfoFragment: Fragment() {
                 }
             }
 
-            rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.let {
-                it.setOnClickListener {
-                    ShowFragmentManager.showFragment(ParticipantsFragment(), fragmentManager, R.id.arena_layout)
-                }
+            rootLayout.findViewById<Button>(R.id.arena_raid_button_participants_list)?.setOnClickListener {
+                ShowFragmentManager.showFragment(ParticipantsFragment(), fragmentManager, R.id.arena_layout)
+            }
+
+            rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.setOnClickListener {
+                Popup.showToast(context, R.string.dialog_info_coming_soon)
             }
 
             rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.setOnClickListener {

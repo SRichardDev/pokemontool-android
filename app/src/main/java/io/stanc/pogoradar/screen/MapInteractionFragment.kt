@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -232,12 +231,12 @@ class MapInteractionFragment: Fragment() {
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
             firebase?.addSubscriptionForPush(geoHash) { successful ->
                 if (!successful) {
-                    Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
+                    Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                 }
             }
             mapGridProvider.showGeoHashGrid(geoHash)
         } else {
-            Toast.makeText(context, R.string.map_max_subscriptions, Toast.LENGTH_LONG).show()
+            Popup.showToast(context, R.string.map_max_subscriptions)
         }
     }
 
@@ -245,7 +244,7 @@ class MapInteractionFragment: Fragment() {
 
         firebase?.removePushSubscription(geoHash) { successful ->
             if (!successful) {
-                Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
+                Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
             }
         }
         mapGridProvider.removeGeoHashGrid(geoHash)
@@ -364,7 +363,7 @@ class MapInteractionFragment: Fragment() {
                         if (successful) {
                             mapGridProvider?.clearGeoHashGridList()
                         } else {
-                            Toast.makeText(context, R.string.exceptions_subscription_sending_failed, Toast.LENGTH_LONG).show()
+                            Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                         }
                     })
                 }

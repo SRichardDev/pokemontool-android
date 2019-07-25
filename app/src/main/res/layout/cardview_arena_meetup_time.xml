@@ -20,28 +20,21 @@
                 android:orientation="vertical"
                 android:padding="@dimen/layout_margin_small">
 
-            <LinearLayout
-                    android:layout_width="match_parent"
+            <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:text="@string/arena_raid_meetup_time"
+                    tools:text="Until:"/>
 
-                <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/arena_raid_meetup_time"
-                        tools:text="Until:"/>
-
-                <TextView
-                        style="@style/TextStyle_bold"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/layout_margin_small"
-                        android:text="@{raidViewModel.meetupTime}"
-                        tools:text="-00:00:00"/>
-
-            </LinearLayout>
+            <TextView
+                    style="@style/TextStyle_bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@{raidViewModel.meetupTime}"
+                    tools:text="-00:00:00"/>
 
             <Button
                 style="@style/ButtonStyle"
