@@ -6,6 +6,7 @@ import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.messaging.FirebaseMessaging
 import io.stanc.pogoradar.firebase.node.FirebaseNode
 import java.lang.ref.WeakReference
 
@@ -249,6 +250,18 @@ object FirebaseServer {
 
     fun removeData(databasePath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         databaseRef.child(databasePath).removeValue().addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
+
+    fun subscribeToTopic(topicPath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        FirebaseMessaging.getInstance().subscribeToTopic(topicPath).addOnCompleteListener { task ->
+            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+        }
+    }
+
+    fun subscribeFromTopic(topicPath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topicPath).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

@@ -81,6 +81,12 @@ object DatabaseKeys {
     const val NOTIFICATION_LATITUDE = "latitude"
     const val NOTIFICATION_LONGITUDE = "longitude"
 
+    const val NOTIFICATION_TOPIC_LEVEL = "level-"
+    const val NOTIFICATION_TOPIC_QUESTS = "quests"
+    const val NOTIFICATION_TOPIC_RAIDS = "raids"
+    const val NOTIFICATION_TOPIC_MEETUPS_GROUP = "meetups"
+    const val NOTIFICATION_TOPIC_INCIDENT = "incident"
+
     const val MAX_SUBSCRIPTIONS = 100
     const val PLATFORM_ANDROID = "android"
 

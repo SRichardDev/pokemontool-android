@@ -8,6 +8,10 @@ import com.google.firebase.database.core.utilities.Utilities
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_INCIDENT
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_LEVEL
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_QUESTS
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_RAIDS
 import io.stanc.pogoradar.firebase.DatabaseKeys.PLATFORM_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
@@ -61,7 +65,29 @@ object FirebaseUser {
      * user
      */
 
+    // TODO: e.g. see user id: r8vOaq7Z2QPlZs2PfGrYqGoXckR2
+
+    // TODO: Firebase:user
+    // "isPushActive", "notificationToken", ""
+    // write: "subscribedGeohashArenas" + "subscribedGeohashPokestops"
+    // read: "subscribedGeohashArenas"
+
     fun changePushNotifications(isPushAktive: Boolean, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseServer.subscribeToTopic(NOTIFICATION_TOPIC_RAIDS)
+        FirebaseServer.subscribeToTopic(NOTIFICATION_TOPIC_QUESTS)
+        FirebaseServer.subscribeToTopic(NOTIFICATION_TOPIC_INCIDENT)
+        FirebaseServer.subscribeToTopic("${NOTIFICATION_TOPIC_LEVEL}1")
+        FirebaseServer.subscribeToTopic("${NOTIFICATION_TOPIC_LEVEL}2")
+        FirebaseServer.subscribeToTopic("${NOTIFICATION_TOPIC_LEVEL}3")
+        FirebaseServer.subscribeToTopic("${NOTIFICATION_TOPIC_LEVEL}4")
+        FirebaseServer.subscribeToTopic("${NOTIFICATION_TOPIC_LEVEL}5")
+
+        // TODO: deprecated, will be removed in the future
+        changePushActive(isPushAktive, onCompletionCallback)
+    }
+
+    private fun changePushActive(isPushAktive: Boolean, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         userData?.let { userNode ->
 
@@ -250,6 +276,7 @@ object FirebaseUser {
     }
 
     fun updateNotificationToken(token: String) {
+        // TODO: subscripe for topic "platform" "android"
         userData?.copy(notificationToken = token, platform = PLATFORM_ANDROID)?.let { userDataCopy ->
             updateServerData(userDataCopy)
         }

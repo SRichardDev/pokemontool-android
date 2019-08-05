@@ -63,7 +63,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-//        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
         when(notificationType(message.data)) {
 
@@ -76,22 +76,22 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onDeletedMessages() {
         super.onDeletedMessages()
-//        Log.i(TAG, "Debug:: onDeletedMessages()")
+        Log.i(TAG, "Debug:: onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
         super.onMessageSent(var1)
-//        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
+        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
         super.onSendError(var1, var2)
-//        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
+        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-//        Log.i(TAG, "Debug:: onNewToken(token: $token) for user: ${FirebaseUser.userData}")
+        Log.i(TAG, "Debug:: onNewToken(token: $token) for user: ${FirebaseUser.userData}")
         FirebaseUser.updateNotificationToken(token)
     }
 
@@ -167,7 +167,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             manager.createNotificationChannel(channel)
         }
 
-//        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
+        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
         manager.notify(currentNotificationId, notification)
         updateNotificationId()
     }
