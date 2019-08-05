@@ -95,7 +95,8 @@ class ArenaInfoFragment: Fragment() {
             }
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.setOnClickListener {
-                Popup.showToast(context, R.string.dialog_info_coming_soon)
+//                Popup.showToast(context, R.string.dialog_info_coming_soon)
+                ShowFragmentManager.showFragment(ChatFragment(), fragmentManager, R.id.arena_layout)
             }
 
             rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.setOnClickListener {

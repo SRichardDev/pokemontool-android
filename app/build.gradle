@@ -69,6 +69,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0-alpha02'
 
+    // chat sdk
+    implementation 'co.chatsdk.chatsdk:chat-sdk-core:4.8.2'
+    implementation 'co.chatsdk.chatsdk:chat-sdk-ui:4.8.2'
+    implementation 'co.chatsdk.chatsdk:chat-sdk-firebase-adapter:4.8.2'
+    implementation 'co.chatsdk.chatsdk:chat-sdk-firebase-file-storage:4.8.2'
+
     // TODO: Number Picker
 //    implementation 'com.shawnlin:number-picker:2.4.8'
 
