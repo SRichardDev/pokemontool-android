@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
-            android:maxLines="2"
+            android:maxLines="1"
             android:layout_marginTop="@dimen/layout_margin_small"
             android:hint="@string/authentication_login_password_edit_hint_text"
             android:text="@={viewModel.password}"/>
