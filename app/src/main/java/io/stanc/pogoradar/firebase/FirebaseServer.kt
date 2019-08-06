@@ -254,14 +254,14 @@ object FirebaseServer {
         }
     }
 
-    fun subscribeToTopic(topicPath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        FirebaseMessaging.getInstance().subscribeToTopic(topicPath).addOnCompleteListener { task ->
+    fun subscribeToTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }
 
-    fun subscribeFromTopic(topicPath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
-        FirebaseMessaging.getInstance().unsubscribeFromTopic(topicPath).addOnCompleteListener { task ->
+    fun subscribeFromTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }
     }

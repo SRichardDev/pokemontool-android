@@ -335,6 +335,18 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * location subscriptions - implementation
      */
 
+//    fun subscribeToTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+//        FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener { task ->
+//            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+//        }
+//    }
+//
+//    fun subscribeFromTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+//        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener { task ->
+//            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+//        }
+//    }
+
     private fun addSubscriptionFor(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         FirebaseUser.userData?.let { user ->
