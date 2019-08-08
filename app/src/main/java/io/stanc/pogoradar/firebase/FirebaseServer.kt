@@ -260,7 +260,7 @@ object FirebaseServer {
         }
     }
 
-    fun subscribeFromTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun unsubscribeFromTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener { task ->
             onCompletionCallback?.let { callback<Void, Void>(task, it) }
         }

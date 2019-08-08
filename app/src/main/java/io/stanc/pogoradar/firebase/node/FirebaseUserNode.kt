@@ -11,8 +11,10 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_RAIDS
+import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASH_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASH_POKESTOPS
+import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
@@ -20,6 +22,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PLATFORM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
+import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TOPICS
 import io.stanc.pogoradar.geohash.GeoHash
 
 enum class Team {
@@ -48,8 +51,9 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var submittedPokestops: Number = 0,
                                                 var submittedQuests: Number = 0,
                                                 var submittedRaids: Number = 0,
-                                                var subscribedGeohashArenas: List<GeoHash>? = emptyList(),
-                                                var subscribedGeohashPokestops: List<GeoHash>? = emptyList(),
+                                                var subscribedGeohashes: List<GeoHash>? = emptyList(),
+                                                var subscribedRaidMeetups: List<String>? = emptyList(),
+                                                var notificationTopics: List<String>? = emptyList(),
                                                 var photoURL: Uri? = null): FirebaseNode {
 
     override fun databasePath(): String {
@@ -90,7 +94,6 @@ data class FirebaseUserNode private constructor(override var id: String,
             val email = dataSnapshot.child(EMAIL).value as? String
             val notificationToken = dataSnapshot.child(NOTIFICATION_TOKEN).value as? String
             val platform = dataSnapshot.child(USER_PLATFORM).value as? String
-            val notificationActive = dataSnapshot.child(NOTIFICATION_ACTIVE).value as? Boolean
 
             val submittedArenas =
                 (dataSnapshot.child(SUBMITTED_ARENAS) as? DataSnapshot)?.childrenCount ?: run { null }
@@ -107,8 +110,9 @@ data class FirebaseUserNode private constructor(override var id: String,
             val code = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_CODE).value as? String
             val level = dataSnapshot.child(USER_PUBLIC_DATA).child(USER_LEVEL).value as? Number
 
-            val subscribedGeohashPokestops = (dataSnapshot.child(SUBSCRIBED_GEOHASH_POKESTOPS) as? DataSnapshot)?.children?.mapNotNull { child -> child.key?.let { GeoHash(it) } }?.toList()
-            val subscribedGeohashArenas = (dataSnapshot.child(SUBSCRIBED_GEOHASH_ARENAS) as? DataSnapshot)?.children?.mapNotNull { child -> child.key?.let { GeoHash(it) } }?.toList()
+            val subscribedGeohashes = (dataSnapshot.child(SUBSCRIBED_GEOHASHES) as? DataSnapshot)?.children?.mapNotNull { child -> child.key?.let { GeoHash(it) } }?.toList()
+            val subscribedRaidMeetups = (dataSnapshot.child(SUBSCRIBED_RAID_MEETUPS) as? DataSnapshot)?.children?.mapNotNull { child -> child.key }?.toList()
+            val topics = (dataSnapshot.child(USER_TOPICS) as? DataSnapshot)?.children?.mapNotNull { child -> child.key }?.toList()
 
 //            Log.v(TAG, "id: $id, name: $name, email: $email, team: $team, level: $level, notificationToken: $notificationToken, submittedArenas: $submittedArenas, submittedPokestops: $submittedPokestops")
 
@@ -127,8 +131,9 @@ data class FirebaseUserNode private constructor(override var id: String,
                 submittedQuests?.let { user.submittedQuests = it }
                 submittedRaids?.let { user.submittedRaids = it }
 
-                subscribedGeohashPokestops?.let { user.subscribedGeohashPokestops = it }
-                subscribedGeohashArenas?.let { user.subscribedGeohashArenas = it }
+                subscribedGeohashes?.let { user.subscribedGeohashes = it }
+                subscribedRaidMeetups?.let { user.subscribedRaidMeetups = it }
+                topics?.let { user.notificationTopics = it }
 
                 return user
             }
