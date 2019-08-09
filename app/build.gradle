@@ -24,6 +24,9 @@ android {
     dataBinding {
         enabled = true
     }
+    lintOptions {
+        disable 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
+    }
 }
 
 androidExtensions {

@@ -229,7 +229,7 @@ class MapInteractionFragment: Fragment() {
     private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
-            firebase?.addSubscriptionForPush(geoHash) { successful ->
+            firebase?.addAreaSubscription(geoHash) { successful ->
                 if (!successful) {
                     Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                 }
@@ -387,7 +387,7 @@ class MapInteractionFragment: Fragment() {
             famButton?.visibility = View.INVISIBLE
 
             WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-            firebase?.loadSubscriptions { geoHashes ->
+            firebase?.loadAreaSubscriptions { geoHashes ->
 
                 geoHashes?.let {
                     for (geoHash in geoHashes) {

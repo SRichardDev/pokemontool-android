@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.firebase
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
@@ -16,8 +17,6 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_RAIDS
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
-import io.stanc.pogoradar.firebase.DatabaseKeys.SubscriptionType
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
@@ -25,14 +24,12 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TOPICS
-import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.firebase.node.Team
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.ObserverManager
 import io.stanc.pogoradar.utils.WaitingSpinner
 import java.util.regex.Pattern
-
 
 object FirebaseUser {
     private val TAG = javaClass.name
@@ -79,27 +76,27 @@ object FirebaseUser {
 
             if (isPushAktive) {
 
-                registerForPush(NOTIFICATION_TOPIC_PLATFORM)
-                registerForPush(NOTIFICATION_TOPIC_RAIDS)
-                registerForPush(NOTIFICATION_TOPIC_QUESTS)
-                registerForPush(NOTIFICATION_TOPIC_INCIDENTS)
-                registerForPush("${NOTIFICATION_TOPIC_LEVEL}1")
-                registerForPush("${NOTIFICATION_TOPIC_LEVEL}2")
-                registerForPush("${NOTIFICATION_TOPIC_LEVEL}3")
-                registerForPush("${NOTIFICATION_TOPIC_LEVEL}4")
-                registerForPush("${NOTIFICATION_TOPIC_LEVEL}5")
+                registerForPushNotifications(NOTIFICATION_TOPIC_PLATFORM)
+                registerForPushNotifications(NOTIFICATION_TOPIC_RAIDS)
+                registerForPushNotifications(NOTIFICATION_TOPIC_QUESTS)
+                registerForPushNotifications(NOTIFICATION_TOPIC_INCIDENTS)
+                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}1")
+                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}2")
+                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}3")
+                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}4")
+                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}5")
 
             } else {
 
-                deregisterFromPush(NOTIFICATION_TOPIC_PLATFORM)
-                deregisterFromPush(NOTIFICATION_TOPIC_RAIDS)
-                deregisterFromPush(NOTIFICATION_TOPIC_QUESTS)
-                deregisterFromPush(NOTIFICATION_TOPIC_INCIDENTS)
-                deregisterFromPush("${NOTIFICATION_TOPIC_LEVEL}1")
-                deregisterFromPush("${NOTIFICATION_TOPIC_LEVEL}2")
-                deregisterFromPush("${NOTIFICATION_TOPIC_LEVEL}3")
-                deregisterFromPush("${NOTIFICATION_TOPIC_LEVEL}4")
-                deregisterFromPush("${NOTIFICATION_TOPIC_LEVEL}5")
+                deregisterFromPushNotifications(NOTIFICATION_TOPIC_PLATFORM)
+                deregisterFromPushNotifications(NOTIFICATION_TOPIC_RAIDS)
+                deregisterFromPushNotifications(NOTIFICATION_TOPIC_QUESTS)
+                deregisterFromPushNotifications(NOTIFICATION_TOPIC_INCIDENTS)
+                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}1")
+                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}2")
+                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}3")
+                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}4")
+                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}5")
             }
 
         } ?: run {
@@ -107,7 +104,7 @@ object FirebaseUser {
         }
     }
 
-    fun registerForPush(topic: String) {
+    fun registerForPushNotifications(topic: String) {
 
         userData?.let { user ->
 
@@ -120,7 +117,7 @@ object FirebaseUser {
         }
     }
 
-    fun deregisterFromPush(topic: String) {
+    fun deregisterFromPushNotifications(topic: String) {
 
         FirebaseServer.unsubscribeFromTopic(topic)
         userData?.id?.let { userId ->
@@ -244,60 +241,60 @@ object FirebaseUser {
         }
     }
 
-    fun addUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        auth.currentUser?.let { firebaseUser ->
-            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", firebaseGeoHash(geoHash), "", object : FirebaseServer.OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
-                    onCompletionCallback(false)
-                }
-            })
-        }
-    }
-
-    fun addUserSubscriptions(type: SubscriptionType, geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        auth.currentUser?.let { firebaseUser ->
-
-            val data = HashMap<String, Any>()
-            geoHashes.forEach { data[firebaseGeoHash(it)] = "" }
-
-            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", data, object : FirebaseServer.OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
-                    onCompletionCallback(false)
-                }
-            })
-        }
-    }
-
-    fun removeUserSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-
-        auth.currentUser?.let { firebaseUser ->
-            FirebaseServer.removeData("$USERS/${firebaseUser.uid}/$SUBSCRIBED_GEOHASHES/${firebaseGeoHash(geoHash)}", object : FirebaseServer.OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "failed to remove subscription for ${type.name}! Error: $message")
-                    onCompletionCallback(false)
-                }
-            })
-        }
-    }
+//    fun addUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        auth.currentUser?.let { firebaseUser ->
+//            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", firebaseGeoHash(geoHash), "", object : FirebaseServer.OnCompleteCallback<Void> {
+//
+//                override fun onSuccess(data: Void?) {
+//                    onCompletionCallback(true)
+//                }
+//
+//                override fun onFailed(message: String?) {
+//                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
+//                    onCompletionCallback(false)
+//                }
+//            })
+//        }
+//    }
+//
+//    fun addUserSubscriptions(type: SubscriptionType, geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        auth.currentUser?.let { firebaseUser ->
+//
+//            val data = HashMap<String, Any>()
+//            geoHashes.forEach { data[firebaseGeoHash(it)] = "" }
+//
+//            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", data, object : FirebaseServer.OnCompleteCallback<Void> {
+//
+//                override fun onSuccess(data: Void?) {
+//                    onCompletionCallback(true)
+//                }
+//
+//                override fun onFailed(message: String?) {
+//                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
+//                    onCompletionCallback(false)
+//                }
+//            })
+//        }
+//    }
+//
+//    fun removeUserSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        auth.currentUser?.let { firebaseUser ->
+//            FirebaseServer.removeData("$USERS/${firebaseUser.uid}/$SUBSCRIBED_GEOHASHES/${firebaseGeoHash(geoHash)}", object : FirebaseServer.OnCompleteCallback<Void> {
+//
+//                override fun onSuccess(data: Void?) {
+//                    onCompletionCallback(true)
+//                }
+//
+//                override fun onFailed(message: String?) {
+//                    Log.w(TAG, "failed to remove subscription for ${type.name}! Error: $message")
+//                    onCompletionCallback(false)
+//                }
+//            })
+//        }
+//    }
 
     fun updateNotificationToken(token: String) {
         // TODO: subscripe for topic "platform" "android"

@@ -288,10 +288,10 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     /**
-     * location subscriptions - interface
+     * location subscriptions
      */
 
-    fun loadSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
+    fun loadAreaSubscriptions(onCompletionCallback: (geoHashes: List<GeoHash>?) -> Unit) {
 
         FirebaseUser.userData?.let { user ->
 
@@ -303,8 +303,35 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         }
     }
 
-    fun addSubscriptionForPush(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        addSubscriptionFor(geoHash, onCompletionCallback)
+    fun addAreaSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseUser.userData?.let { user ->
+
+
+            if (user.subscribedGeohashes?.contains(geoHash) == false) {
+
+                // add geohash to user
+                // add geohash to firebase topics
+            }
+
+            FirebaseServer.addData("$SUBSCRIBED_GEOHASHES/${firebaseGeoHash(geoHash)}", user.id, "", object : OnCompleteCallback<Void> {
+
+                override fun onSuccess(data: Void?) {
+                    FirebaseUser.addUserSubscription(type, geoHash) { taskSuccessful ->
+                        onCompletionCallback(taskSuccessful)
+                    }
+                }
+
+                override fun onFailed(message: String?) {
+                    Log.w(TAG, "subscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
+                    onCompletionCallback(false)
+                }
+            })
+
+        } ?: run {
+            Log.e(TAG, "addSubscriptionFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
+            onCompletionCallback(false)
+        }
     }
 
 //    fun setSubscriptionsForPush(geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
@@ -343,29 +370,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 //        }
 //    }
 
-    private fun addSubscriptionFor(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
-        FirebaseUser.userData?.let { user ->
-
-            FirebaseServer.addData("${type.subscriptionDatabaseKey}/${firebaseGeoHash(geoHash)}", user.id, "", object : OnCompleteCallback<Void> {
-
-                override fun onSuccess(data: Void?) {
-                    FirebaseUser.addUserSubscription(type, geoHash) { taskSuccessful ->
-                        onCompletionCallback(taskSuccessful)
-                    }
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "subscription onFailed for (${type.subscriptionDatabaseKey}), uid: ${user.id}, geoHash: $geoHash [$message]")
-                    onCompletionCallback(false)
-                }
-            })
-
-        } ?: run {
-            Log.e(TAG, "addSubscriptionFor ${type.subscriptionDatabaseKey} in $geoHash failed. FirebaseUser.userData: ${FirebaseUser.userData}")
-            onCompletionCallback(false)
-        }
-    }
 
 //    private fun setSubscriptionsFor(type: SubscriptionType, newGeoHashes: List<GeoHash>, oldGeoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 //
