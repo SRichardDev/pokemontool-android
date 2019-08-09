@@ -3,6 +3,7 @@ package io.stanc.pogoradar
 import android.content.SharedPreferences
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
+import io.stanc.pogoradar.firebase.FirebaseNotification
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.utils.addOnPropertyChanged
@@ -96,7 +97,7 @@ object AppSettings {
 
         if (enableSubscriptionsCallback == null) {
             enableSubscriptionsCallback = enableSubscriptions.addOnPropertyChanged { enableSubscriptions ->
-                FirebaseUser.changePushNotifications(enableSubscriptions.get() == true)
+                FirebaseNotification.changeActivation(enableSubscriptions.get() == true)
                 observers.forEach {
                     it.value.get()?.onSubscriptionsEnableDidChange()
                 }

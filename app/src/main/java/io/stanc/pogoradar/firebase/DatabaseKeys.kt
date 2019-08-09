@@ -54,6 +54,7 @@ object DatabaseKeys {
     const val USER_LEVEL = "level"
     const val USER_TEAM = "team"
     const val USER_CODE = "trainerCode"
+    const val USER_PLATFORM_ANDROID = "android"
     const val SUBMITTED_ARENAS = "submittedArenas"
     const val SUBMITTED_POKESTOPS = "submittedPokestops"
     const val SUBMITTED_QUESTS = "submittedQuests"
@@ -91,7 +92,6 @@ object DatabaseKeys {
     const val NOTIFICATION_TOPIC_INCIDENTS = "incidents"
 
     const val MAX_SUBSCRIPTIONS = 100
-    const val PLATFORM_ANDROID = "android"
 
     fun firebaseGeoHash(geoHash: GeoHash): String = geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)
 

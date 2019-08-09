@@ -1,18 +1,11 @@
 package io.stanc.pogoradar.firebase
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_INCIDENTS
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_LEVEL
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_PLATFORM
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_QUESTS
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_RAIDS
-import io.stanc.pogoradar.firebase.DatabaseKeys.PLATFORM_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
@@ -21,9 +14,9 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_NAME
+import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PLATFORM_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
-import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TOPICS
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.firebase.node.Team
 import io.stanc.pogoradar.geohash.GeoHash
@@ -62,68 +55,6 @@ object FirebaseUser {
     /**
      * user
      */
-
-    // TODO: e.g. see user id: r8vOaq7Z2QPlZs2PfGrYqGoXckR2
-
-    // TODO: Firebase:user
-    // "isPushActive", "notificationToken", ""
-    // write: "subscribedGeohashArenas" + "subscribedGeohashPokestops"
-    // read: "subscribedGeohashArenas"
-
-    fun changePushNotifications(isPushAktive: Boolean) {
-
-        userData?.id?.let { userId ->
-
-            if (isPushAktive) {
-
-                registerForPushNotifications(NOTIFICATION_TOPIC_PLATFORM)
-                registerForPushNotifications(NOTIFICATION_TOPIC_RAIDS)
-                registerForPushNotifications(NOTIFICATION_TOPIC_QUESTS)
-                registerForPushNotifications(NOTIFICATION_TOPIC_INCIDENTS)
-                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}1")
-                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}2")
-                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}3")
-                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}4")
-                registerForPushNotifications("${NOTIFICATION_TOPIC_LEVEL}5")
-
-            } else {
-
-                deregisterFromPushNotifications(NOTIFICATION_TOPIC_PLATFORM)
-                deregisterFromPushNotifications(NOTIFICATION_TOPIC_RAIDS)
-                deregisterFromPushNotifications(NOTIFICATION_TOPIC_QUESTS)
-                deregisterFromPushNotifications(NOTIFICATION_TOPIC_INCIDENTS)
-                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}1")
-                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}2")
-                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}3")
-                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}4")
-                deregisterFromPushNotifications("${NOTIFICATION_TOPIC_LEVEL}5")
-            }
-
-        } ?: run {
-            Log.e(TAG, "could not change push notification (isPushAktive: $isPushAktive), because user: ${userData?.id}")
-        }
-    }
-
-    fun registerForPushNotifications(topic: String) {
-
-        userData?.let { user ->
-
-            user.notificationTopics?.let { topics ->
-                if (!topics.contains(topic)) {
-                    FirebaseServer.subscribeToTopic(topic)
-                    FirebaseServer.addData("$USERS/${user.id}/$USER_TOPICS", topic, "")
-                }
-            }
-        }
-    }
-
-    fun deregisterFromPushNotifications(topic: String) {
-
-        FirebaseServer.unsubscribeFromTopic(topic)
-        userData?.id?.let { userId ->
-            FirebaseServer.removeData("$USERS/$userId/$USER_TOPICS/$topic")
-        }
-    }
 
     fun saveSubmittedArena(arenaId: String, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         saveSubmittedMapItem(arenaId, geoHash, SUBMITTED_ARENAS, onCompletionCallback)
@@ -298,7 +229,7 @@ object FirebaseUser {
 
     fun updateNotificationToken(token: String) {
         // TODO: subscripe for topic "platform" "android"
-        userData?.copy(notificationToken = token, platform = PLATFORM_ANDROID)?.let { userDataCopy ->
+        userData?.copy(notificationToken = token, platform = USER_PLATFORM_ANDROID)?.let { userDataCopy ->
             updateServerData(userDataCopy)
         }
     }
