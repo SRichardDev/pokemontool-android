@@ -80,7 +80,7 @@ class LoginViewModel: ViewModel() {
 
         name.set(null)
         email.set(null)
-        code.set("0000 0000 0000")
+        code.set("")
         level.set("0")
         numberPokestops.set(0)
         numberArenas.set(0)
