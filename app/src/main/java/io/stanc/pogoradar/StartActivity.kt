@@ -2,7 +2,6 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -74,6 +73,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         delayedInfoLabelStart.trigger()
         SystemUtils.addObserver(systemObserver, this)
         showPopupIfUserIsLoggedOut()
+        UpdateManager.start()
     }
 
     override fun onResume() {
@@ -82,6 +82,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     }
 
     override fun onStop() {
+        UpdateManager.stop()
         FirebaseUser.stopAuthentication()
         appInfoLabelController?.stop()
         SystemUtils.removeObserver(systemObserver)

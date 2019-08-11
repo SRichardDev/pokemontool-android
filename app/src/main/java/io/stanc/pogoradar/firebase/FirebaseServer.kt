@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.firebase
 
 import android.util.Log
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.*
 import com.google.firebase.database.FirebaseDatabase
@@ -8,7 +9,12 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.messaging.FirebaseMessaging
 import io.stanc.pogoradar.firebase.node.FirebaseNode
+import io.stanc.pogoradar.utils.Async
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.lang.ref.WeakReference
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 object FirebaseServer {
@@ -89,6 +95,18 @@ object FirebaseServer {
             callback.onFailed(task.exception?.message)
         }
     }
+
+    private suspend fun <T> awaitTaskCompletion(block: (OnCompleteListener<T>) -> Unit) : Boolean =
+        suspendCancellableCoroutine { cont ->
+            block(OnCompleteListener { task ->
+
+                if (!task.isSuccessful) {
+                    Log.e(TAG, "awaitCompletion, task failed with exception: ${task.exception?.message}")
+                }
+
+                cont.resume(task.isSuccessful)
+            })
+        }
 
     private val nodeDidChangeListener = HashMap<Pair<Int, String>, NodeEventListener>()
 
@@ -192,78 +210,120 @@ object FirebaseServer {
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
-    fun updateNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun updateNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "updateNode '$firebaseNode' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun setNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun setNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(firebaseNode.databasePath()).setValue(firebaseNode.data()).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "setNode '$firebaseNode' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun setData(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun setData(databasePath: String, data: Any, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(databasePath).setValue(data).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "setData '$data' in $databasePath failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
+    fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
         val newNode = databaseRef.child(databasePath).push()
         newNode.setValue(data).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "createNodeByAutoId '$databasePath' with data: $data failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
         return newNode.key
     }
 
-    fun setDataByAutoId(databasePath: String, data: Any, onCompletionCallback: OnCompleteCallback<Void>? = null): String? {
+    fun setDataByAutoId(databasePath: String, data: Any, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
         val newNode = databaseRef.child(databasePath).push()
         newNode.setValue(data).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "setDataByAutoId data: $data in '$databasePath' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
         return newNode.key
     }
 
-    fun addData(databasePath: String, data: HashMap<String, Any>, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun addData(databasePath: String, data: HashMap<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(databasePath).updateChildren(data).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "addData data: $data in '$databasePath' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun addData(databasePath: String, key: String, value: Any, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun addData(databasePath: String, key: String, value: Any, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(databasePath).child(key).setValue(value).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "addData [key: $key, value: $value] in '$databasePath' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         removeNode(firebaseNode.databasePath(), firebaseNode.id, onCompletionCallback)
     }
 
-    fun removeNode(noteDatabasePath: String, nodeId: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun removeNode(noteDatabasePath: String, nodeId: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(noteDatabasePath).child(nodeId).removeValue().addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "removeNode '$noteDatabasePath' with id:$nodeId failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun removeData(databasePath: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun removeData(databasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(databasePath).removeValue().addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "removeData '$databasePath' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun subscribeToTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun subscribeToTopic(topic: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "subscribeToTopic '$topic' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun unsubscribeFromTopic(topic: String, onCompletionCallback: OnCompleteCallback<Void>? = null) {
+    fun unsubscribeFromTopic(topic: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit) {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener { task ->
-            onCompletionCallback?.let { callback<Void, Void>(task, it) }
+            task.exception?.let {
+                Log.e(TAG, "unsubscribeFromTopic '$topic' failed. Exception: [$it]")
+            }
+            onCompletionCallback(task.isSuccessful)
         }
+    }
+
+    suspend fun unsubscribeFromTopic(topic: String): Boolean {
+
+        val successful = awaitTaskCompletion<Void> {
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener(it)
+        }
+
+        return successful
     }
 
 

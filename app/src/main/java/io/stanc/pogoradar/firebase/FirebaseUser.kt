@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.UpdateManager
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
@@ -27,7 +28,7 @@ import java.util.regex.Pattern
 object FirebaseUser {
     private val TAG = javaClass.name
 
-    const val MIN_PASSWORD_LENGTH = 6
+    private const val MIN_PASSWORD_LENGTH = 6
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val authStateObserverManager = ObserverManager<AuthStateObserver>()
@@ -40,16 +41,22 @@ object FirebaseUser {
             userDataObserverManager.observers().filterNotNull().forEach { it.userDataChanged(userData) }
         }
 
+    // TODO: 1. update internal "userData" after state changed to "AuthState.UserLoggedIn", after that notify all other external observer about authStateChange !
+    // TODO: problem: otherwise, other classes got "AuthState.UserLoggedIn", but "userData" is null
     private val authStateObserver = object : AuthStateObserver {
         override fun authStateChanged(newAuthState: AuthState) {
             if (newAuthState == FirebaseUser.AuthState.UserLoggedIn) {
+
+                // handle version update changes
+                UpdateManager.updateDatabaseDependingOnAppVersion()
+
                 requestNotificationToken()
             }
         }
     }
 
     init {
-        addAuthStateObserver(authStateObserver)
+        authStateObserverManager.addObserver(authStateObserver)
     }
 
     /**
@@ -84,16 +91,15 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            FirebaseServer.setData("$USERS/${userNode.id}/$submissionFirebaseKey", value, object: FirebaseServer.OnCompleteCallback<Void> {
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
+            FirebaseServer.setData("$USERS/${userNode.id}/$submissionFirebaseKey", value) { successful ->
 
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "sending $submissionFirebaseKey of $value failed. Error: $message")
+                if (successful) {
+                    onCompletionCallback(true)
+                } else {
+                    Log.w(TAG, "sending $submissionFirebaseKey of $value failed.")
                     onCompletionCallback(false)
                 }
-            })
+            }
 
         } ?: run {
             Log.e(TAG, "cannot send $submissionFirebaseKey of $value, because: userData: $userData")
@@ -104,16 +110,7 @@ object FirebaseUser {
 
         userData?.let { userNode ->
 
-            FirebaseServer.addData("$USERS/${userNode.id}/$submissionFirebaseKey", id, DatabaseKeys.firebaseGeoHash(geoHash), object: FirebaseServer.OnCompleteCallback<Void> {
-                override fun onSuccess(data: Void?) {
-                    onCompletionCallback(true)
-                }
-
-                override fun onFailed(message: String?) {
-                    Log.w(TAG, "sending $submissionFirebaseKey of $id failed. Error: $message")
-                    onCompletionCallback(false)
-                }
-            })
+            FirebaseServer.addData("$USERS/${userNode.id}/$submissionFirebaseKey", id, DatabaseKeys.firebaseGeoHash(geoHash), onCompletionCallback)
 
         } ?: run { Log.e(TAG, "cannot send $submissionFirebaseKey of $id, because: userData: $userData") }
     }
@@ -172,61 +169,6 @@ object FirebaseUser {
         }
     }
 
-//    fun addUserSubscription(type: SubscriptionType, geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-//
-//        auth.currentUser?.let { firebaseUser ->
-//            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", firebaseGeoHash(geoHash), "", object : FirebaseServer.OnCompleteCallback<Void> {
-//
-//                override fun onSuccess(data: Void?) {
-//                    onCompletionCallback(true)
-//                }
-//
-//                override fun onFailed(message: String?) {
-//                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
-//                    onCompletionCallback(false)
-//                }
-//            })
-//        }
-//    }
-//
-//    fun addUserSubscriptions(type: SubscriptionType, geoHashes: List<GeoHash>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-//
-//        auth.currentUser?.let { firebaseUser ->
-//
-//            val data = HashMap<String, Any>()
-//            geoHashes.forEach { data[firebaseGeoHash(it)] = "" }
-//
-//            FirebaseServer.addData("$USERS/${firebaseUser.uid}/${type.userDataKey}", data, object : FirebaseServer.OnCompleteCallback<Void> {
-//
-//                override fun onSuccess(data: Void?) {
-//                    onCompletionCallback(true)
-//                }
-//
-//                override fun onFailed(message: String?) {
-//                    Log.w(TAG, "failed to subscribe for ${type.name}! Error: $message")
-//                    onCompletionCallback(false)
-//                }
-//            })
-//        }
-//    }
-//
-//    fun removeUserSubscription(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-//
-//        auth.currentUser?.let { firebaseUser ->
-//            FirebaseServer.removeData("$USERS/${firebaseUser.uid}/$SUBSCRIBED_GEOHASHES/${firebaseGeoHash(geoHash)}", object : FirebaseServer.OnCompleteCallback<Void> {
-//
-//                override fun onSuccess(data: Void?) {
-//                    onCompletionCallback(true)
-//                }
-//
-//                override fun onFailed(message: String?) {
-//                    Log.w(TAG, "failed to remove subscription for ${type.name}! Error: $message")
-//                    onCompletionCallback(false)
-//                }
-//            })
-//        }
-//    }
-
     fun updateNotificationToken(token: String) {
         // TODO: subscripe for topic "platform" "android"
         userData?.copy(notificationToken = token, platform = USER_PLATFORM_ANDROID)?.let { userDataCopy ->
@@ -236,16 +178,14 @@ object FirebaseUser {
 
     private fun updateServerData(localUserData: FirebaseUserNode) {
 
-        FirebaseServer.updateNode(localUserData, object : FirebaseServer.OnCompleteCallback<Void> {
+        FirebaseServer.updateNode(localUserData) { successful ->
 
-            override fun onSuccess(data: Void?) {
+            if (successful) {
                 Log.v(TAG, "successfully updated user...")
+            } else {
+                Log.e(TAG, "failed to update user!")
             }
-
-            override fun onFailed(message: String?) {
-                Log.e(TAG, "failed to update user! Error: $message")
-            }
-        })
+        }
     }
 
 
@@ -415,8 +355,8 @@ object FirebaseUser {
 
     private val onAuthStateChanged: () -> Unit = {
         Log.i(TAG, "onAuthStateChanged(${authState().name}) for user: $userData")
-        authStateObserverManager.observers().filterNotNull().forEach { it.authStateChanged(authState()) }
         updateUserDataDependingOnAuthState()
+        authStateObserverManager.observers().filterNotNull().forEach { it.authStateChanged(authState()) }
     }
 
     private fun updateUserDataDependingOnAuthState() {
@@ -453,6 +393,7 @@ object FirebaseUser {
         auth.currentUser?.uid?.let { uid ->
             FirebaseServer.removeNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
             FirebaseServer.addNodeEventListener("$USERS/$uid", userNodeDidChangeCallback)
+            FirebaseServer.keepSyncDatabaseChilds("$USERS/$uid")
         }
     }
 

@@ -47,14 +47,13 @@ object DatabaseKeys {
     const val EMAIL = "email"
     const val USER_ID = "id"
     const val NOTIFICATION_TOKEN = "notificationToken"
-    const val NOTIFICATION_ACTIVE = "isPushActive"
     const val USER_PLATFORM = "platform"
+    const val USER_PLATFORM_ANDROID = "android"
     const val USER_PUBLIC_DATA = "publicData"
     const val USER_NAME = "trainerName"
     const val USER_LEVEL = "level"
     const val USER_TEAM = "team"
     const val USER_CODE = "trainerCode"
-    const val USER_PLATFORM_ANDROID = "android"
     const val SUBMITTED_ARENAS = "submittedArenas"
     const val SUBMITTED_POKESTOPS = "submittedPokestops"
     const val SUBMITTED_QUESTS = "submittedQuests"
@@ -62,13 +61,9 @@ object DatabaseKeys {
     const val SUBSCRIBED_RAID_MEETUPS = "subscribedRaidMeetups"
     const val SUBSCRIBED_GEOHASHES = "subscribedGeohashes"
     const val USER_TOPICS = "topics"
-//    const val SUBSCRIBED_GEOHASH_POKESTOPS = "subscribedGeohashPokestops"
-//    const val SUBSCRIBED_GEOHASH_ARENAS = "subscribedGeohashArenas"
 
     // common
     const val REGISTERED_USERS = "registeredUsers"
-//    const val REGISTERED_USERS_ARENAS = "registeredUsersArenas"
-//    const val REGISTERED_USERS_POKESTOPS = "registeredUsersPokestops"
     const val NAME = "name"
     const val SUBMITTER = "submitter"
     const val TIMESTAMP = "timestamp"
@@ -85,7 +80,7 @@ object DatabaseKeys {
     const val NOTIFICATION_LATITUDE = "latitude"
     const val NOTIFICATION_LONGITUDE = "longitude"
 
-    const val NOTIFICATION_TOPIC_PLATFORM = "android"
+    const val NOTIFICATION_TOPIC_ANDROID = "android"
     const val NOTIFICATION_TOPIC_LEVEL = "level-"
     const val NOTIFICATION_TOPIC_QUESTS = "quests"
     const val NOTIFICATION_TOPIC_RAIDS = "raids"
@@ -94,9 +89,4 @@ object DatabaseKeys {
     const val MAX_SUBSCRIPTIONS = 100
 
     fun firebaseGeoHash(geoHash: GeoHash): String = geoHash.toString().substring(0, GEO_HASH_AREA_PRECISION)
-
-//    enum class SubscriptionType(val userDataKey: String, val subscriptionDatabaseKey: String) {
-//        Arena(SUBSCRIBED_GEOHASH_ARENAS, REGISTERED_USERS_ARENAS),
-//        Pokestop(SUBSCRIBED_GEOHASH_POKESTOPS, REGISTERED_USERS_POKESTOPS)
-//    }
 }

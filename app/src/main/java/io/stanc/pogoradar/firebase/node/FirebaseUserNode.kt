@@ -4,17 +4,15 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.EMAIL
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_ACTIVE
-import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOKEN
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_ARENAS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_RAIDS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASH_ARENAS
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASH_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_RAID_MEETUPS
+import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
@@ -45,8 +43,6 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var notificationToken: String? = null,
                                                 var platform: String? = null,
                                                 var code: String? = null,
-                                                var isNotificationActive: Boolean = true,
-                                                var isVerified: Boolean = false,
                                                 var submittedArenas: Number = 0,
                                                 var submittedPokestops: Number = 0,
                                                 var submittedQuests: Number = 0,
@@ -54,6 +50,7 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var subscribedGeohashes: List<GeoHash>? = emptyList(),
                                                 var subscribedRaidMeetups: List<String>? = emptyList(),
                                                 var notificationTopics: List<String>? = emptyList(),
+                                                var isNotificationActive: Boolean = true,
                                                 var photoURL: Uri? = null): FirebaseNode {
 
     override fun databasePath(): String {
@@ -65,7 +62,6 @@ data class FirebaseUserNode private constructor(override var id: String,
 
         data[USER_ID] = id
         data[EMAIL] = email
-        data[NOTIFICATION_ACTIVE] = isNotificationActive
         notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
         platform?.let { data[USER_PLATFORM] = it }
 
@@ -88,7 +84,7 @@ data class FirebaseUserNode private constructor(override var id: String,
 
         fun new(dataSnapshot: DataSnapshot): FirebaseUserNode? {
 
-//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val email = dataSnapshot.child(EMAIL).value as? String
@@ -124,7 +120,6 @@ data class FirebaseUserNode private constructor(override var id: String,
 
                 notificationToken?.let { user.notificationToken = it }
                 platform?.let { user.platform = it }
-                notificationActive?.let { user.isNotificationActive = it }
 
                 submittedArenas?.let { user.submittedArenas = it }
                 submittedPokestops?.let { user.submittedPokestops = it }
@@ -133,7 +128,12 @@ data class FirebaseUserNode private constructor(override var id: String,
 
                 subscribedGeohashes?.let { user.subscribedGeohashes = it }
                 subscribedRaidMeetups?.let { user.subscribedRaidMeetups = it }
-                topics?.let { user.notificationTopics = it }
+                topics?.let {
+                    user.notificationTopics = it
+                    user.isNotificationActive = it.contains(NOTIFICATION_TOPIC_ANDROID)
+                } ?: run {
+                    user.isNotificationActive = false
+                }
 
                 return user
             }

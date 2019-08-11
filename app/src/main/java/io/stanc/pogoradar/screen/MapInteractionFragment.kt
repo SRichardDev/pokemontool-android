@@ -17,11 +17,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.firebase.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
-import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseDefinitions
-import io.stanc.pogoradar.firebase.NotificationContent
-import io.stanc.pogoradar.firebase.NotificationHolder
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.geohash.GeoHash
@@ -229,7 +226,7 @@ class MapInteractionFragment: Fragment() {
     private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
-            firebase?.addAreaSubscription(geoHash) { successful ->
+            FirebaseNotification.subscribeToArea(geoHash) { successful ->
                 if (!successful) {
                     Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                 }
@@ -242,7 +239,7 @@ class MapInteractionFragment: Fragment() {
 
     private fun removeSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
-        firebase?.removePushSubscription(geoHash) { successful ->
+        FirebaseNotification.unsubscribeFromArea(geoHash) { successful ->
             if (!successful) {
                 Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
             }
@@ -358,7 +355,7 @@ class MapInteractionFragment: Fragment() {
                 MapMode.EDIT_PUSH_REGISTRATION -> {
 
                     WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-                    firebase?.removeAllPushSubscriptions(onCompletionCallback = { successful ->
+                    FirebaseNotification.unsubscribeFromAllAreas(onCompletionCallback = { successful ->
                         WaitingSpinner.hideProgress()
                         if (successful) {
                             mapGridProvider?.clearGeoHashGridList()
@@ -387,7 +384,7 @@ class MapInteractionFragment: Fragment() {
             famButton?.visibility = View.INVISIBLE
 
             WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-            firebase?.loadAreaSubscriptions { geoHashes ->
+            FirebaseNotification.loadAreaSubscriptions { geoHashes ->
 
                 geoHashes?.let {
                     for (geoHash in geoHashes) {

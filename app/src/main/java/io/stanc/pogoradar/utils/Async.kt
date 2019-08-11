@@ -6,17 +6,26 @@ import kotlin.coroutines.resumeWithException
 
 object Async {
 
-    interface Response<T> {
+    interface Callback<T> {
         fun onCompletion(result: T)
         fun onException(e: Exception?)
     }
 
-    suspend fun <T> awaitResponse(block: (Response<T>) -> Unit) : T =
+    suspend fun <T> awaitCallback(block: (Callback<T>) -> Unit) : T =
         suspendCancellableCoroutine { cont ->
-            block(object : Response<T> {
+            block(object : Callback<T> {
                 override fun onCompletion(result: T) = cont.resume(result)
                 override fun onException(e: Exception?) {
                     e?.let { cont.resumeWithException(it) }
+                }
+            })
+        }
+
+    suspend fun waitForCompletion(block: ((Boolean) -> Unit) -> Unit) : Boolean =
+        suspendCancellableCoroutine { cont ->
+            block(object: (Boolean) -> Unit {
+                override fun invoke(isSuccessful: Boolean) {
+                    cont.resume(isSuccessful)
                 }
             })
         }
