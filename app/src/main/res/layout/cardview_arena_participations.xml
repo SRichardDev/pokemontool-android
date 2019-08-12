@@ -28,12 +28,13 @@
 			<TextView
 				style="@style/TextStyle_bold"
 				android:id="@+id/cardview_arena_participations_num"
+				android:textSize="@dimen/font_size_30"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				app:layout_constraintTop_toBottomOf="@id/cardview_arena_participations_text"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="parent"
-				android:layout_marginTop="@dimen/layout_margin_small"
+				android:layout_margin="@dimen/layout_margin_medium"
 				android:text="@{raidViewModel.numParticipants}"
 				tools:text="1000"/>
 
@@ -52,7 +53,7 @@
 				app:layout_constraintTop_toBottomOf="@id/cardview_arena_participations_num"
 				app:layout_constraintStart_toStartOf="parent"
 				app:layout_constraintEnd_toEndOf="@id/guideline_vertical_center"
-				android:layout_marginTop="@dimen/layout_margin_small"
+				android:layout_marginTop="@dimen/layout_margin_medium"
 				android:layout_marginEnd="@dimen/layout_margin_small"
 				android:text="@string/arena_raid_participants_list"/>
 
@@ -64,7 +65,7 @@
 				app:layout_constraintTop_toBottomOf="@id/cardview_arena_participations_num"
 				app:layout_constraintEnd_toEndOf="parent"
 				app:layout_constraintStart_toStartOf="@id/guideline_vertical_center"
-				android:layout_marginTop="@dimen/layout_margin_small"
+				android:layout_marginTop="@dimen/layout_margin_medium"
 				android:layout_marginStart="@dimen/layout_margin_small"
 				android:text="@string/arena_raid_chat"/>
 

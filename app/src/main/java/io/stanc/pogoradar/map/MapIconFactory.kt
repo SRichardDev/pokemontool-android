@@ -27,9 +27,7 @@ object MapIconFactory {
 
         return backgroundDrawable(context, arena.isEX)?.let { backgroundDrawable ->
 
-            val iconConfig = IconFactory.IconConfig(
-                backgroundDrawable
-            )
+            val iconConfig = IconFactory.IconConfig(backgroundDrawable)
 
             FirebaseImageMapper.raidDrawable(context, arena)?.let { foregroundDrawable ->
                 iconConfig.foregroundDrawable = foregroundDrawable
@@ -41,7 +39,7 @@ object MapIconFactory {
                 }
             }
 
-            iconConfig.footerText = arena.name
+//            iconConfig.footerText = arena.name
             iconConfig.sizeMod = sizeMod
 
             IconFactory.bitmap(context, iconConfig)
@@ -90,7 +88,7 @@ object MapIconFactory {
                 }
             }
 
-            iconConfig.footerText = pokestop.name
+//            iconConfig.footerText = pokestop.name
             iconConfig.sizeMod = sizeMod
 
             IconFactory.bitmap(context, iconConfig)

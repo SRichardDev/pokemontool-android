@@ -29,12 +29,13 @@
 
             <TextView
                     style="@style/TextStyle_bold"
+                    android:textSize="@dimen/font_size_30"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:layout_margin="@dimen/layout_margin_medium"
                     android:layout_gravity="center_horizontal"
                     android:text="@{raidViewModel.meetupTime}"
-                    tools:text="-00:00:00"/>
+                    tools:text="00:00"/>
 
             <Button
                 style="@style/ButtonStyle"

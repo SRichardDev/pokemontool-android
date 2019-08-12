@@ -232,38 +232,18 @@ object FirebaseNotification {
      * notification settings
      */
 
-    fun changeActivation(isPushAktive: Boolean) {
+    fun changeActivation(isPushActive: Boolean) {
 
         FirebaseUser.userData?.id?.let { userId ->
 
-            // TODO: .. not all at once, push for user is off, if NOTIFICATION_TOPIC_ANDROID is removed
-            if (isPushAktive) {
-
+            if (isPushActive) {
                 registerForPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_ANDROID)
-                registerForPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_RAIDS)
-                registerForPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_QUESTS)
-                registerForPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_INCIDENTS)
-                registerForPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}1")
-                registerForPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}2")
-                registerForPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}3")
-                registerForPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}4")
-                registerForPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}5")
-
             } else {
-
-                deregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_ANDROID)
-                deregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_RAIDS)
-                deregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_QUESTS)
-                deregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_INCIDENTS)
-                deregisterFromPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}1")
-                deregisterFromPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}2")
-                deregisterFromPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}3")
-                deregisterFromPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}4")
-                deregisterFromPushNotifications("${DatabaseKeys.NOTIFICATION_TOPIC_LEVEL}5")
+                unregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_ANDROID)
             }
 
         } ?: run {
-            Log.e(TAG, "could not change push notification (isPushAktive: $isPushAktive), because user: ${FirebaseUser.userData?.id}")
+            Log.e(TAG, "could not change push notification (isPushActive: $isPushActive), because user: ${FirebaseUser.userData?.id}")
         }
     }
 
@@ -288,7 +268,7 @@ object FirebaseNotification {
         }
     }
 
-    private fun deregisterFromPushNotifications(topic: String) {
+    private fun unregisterFromPushNotifications(topic: String) {
 
         FirebaseUser.userData?.id?.let { userId ->
             Log.v(TAG, "Debug:: deregisterFromPushNotifications($topic)")
