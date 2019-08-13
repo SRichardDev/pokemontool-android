@@ -24,7 +24,7 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 ) : DefaultClusterRenderer<ClusterArena>(context, map, clusterManager) {
 
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterArena>): Boolean {
-        return cluster.items.filter { isArenaVisibleOnMap(it.arena) }.size > 3
+        return cluster.items.filter { isArenaVisibleOnMap(it.arena) }.size > 10
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {

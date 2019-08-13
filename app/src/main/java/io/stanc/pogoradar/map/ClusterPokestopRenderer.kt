@@ -25,7 +25,7 @@ class ClusterPokestopRenderer(
 ) : DefaultClusterRenderer<ClusterPokestop>(context, map, clusterManager) {
 
     override fun shouldRenderAsCluster(cluster: Cluster<ClusterPokestop>): Boolean {
-        return cluster.items.filter { PokestopViewModel.new(it.pokestop, context).isPokestopVisibleOnMap.get() == true }.size > 3
+        return cluster.items.filter { PokestopViewModel.new(it.pokestop, context).isPokestopVisibleOnMap.get() == true }.size > 10
     }
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
