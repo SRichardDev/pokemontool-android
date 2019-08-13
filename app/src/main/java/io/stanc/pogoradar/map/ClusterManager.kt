@@ -26,8 +26,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
     private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
     
-    private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
-    private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
+    private val pokestopClustering = DelayedTrigger(0) { pokestopClusterManager.cluster() }
+    private val arenaClustering = DelayedTrigger(0) { arenaClusterManager.cluster() }
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
 //    private val context = WeakReference(context)
