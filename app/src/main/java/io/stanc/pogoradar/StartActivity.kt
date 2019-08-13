@@ -135,9 +135,9 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     }
 
     private fun setupAppLabel() {
-        findViewById<View>(R.id.app_info_label)?.let {
-            appInfoLabelController = AppInfoLabelController(it)
-        }
+//        findViewById<View>(R.id.app_info_label)?.let {
+//            appInfoLabelController = AppInfoLabelController(it)
+//        }
     }
 
     private fun setupNavigationView() {
