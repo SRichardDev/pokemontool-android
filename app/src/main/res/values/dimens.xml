@@ -17,7 +17,7 @@
     <dimen name="layout_padding_popup">4dp</dimen>
 
     <dimen name="layout_margin_large">32dp</dimen>
-    <dimen name="layout_margin_medium">25dp</dimen>
+    <dimen name="layout_margin_medium">24dp</dimen>
     <dimen name="layout_margin_default">16dp</dimen>
     <dimen name="layout_margin_small">8dp</dimen>
 

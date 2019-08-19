@@ -17,8 +17,8 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID
 import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.NotificationContent
-import io.stanc.pogoradar.firebase.NotificationHolder
+import io.stanc.pogoradar.firebase.notification.NotificationContent
+import io.stanc.pogoradar.firebase.notification.NotificationHolder
 import io.stanc.pogoradar.screen.MapInteractionFragment
 import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.*

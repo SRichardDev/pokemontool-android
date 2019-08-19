@@ -53,7 +53,9 @@
     <string name="authentication_button_open_user_name">Benutzername ändern</string>
     <string name="authentication_button_send_user_name">Neuen Benutzernamen senden</string>
     <string name="authentication_button_edit_infos">Account Daten bearbeiten</string>
-    <string name="authentication_button_enable_push_notifications">Push Nachrichten</string>
+    <string name="authentication_button_enable_push_notifications">Push Nachrichten: </string>
+    <string name="authentication_button_enable_push_notifications_for_quests">Feldforschungen: </string>
+    <string name="authentication_button_enable_push_notifications_for_raids">Raids: </string>
     <string name="authentication_button_medal">Medaillien: </string>
     <string name="authentication_medal_text_pokestops">Eingereichte Pok&#233;stops</string>
     <string name="authentication_medal_text_arenas">Eingereichte Arenen</string>

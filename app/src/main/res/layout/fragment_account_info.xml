@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
-        xmlns:tools="http://schemas.android.com/tools"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -10,9 +9,7 @@
                 type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
         <variable
                 name="settings"
-                type="io.stanc.pogoradar.AppSettings"/>
-        <import type="android.view.View"/>
-        <import type="io.stanc.pogoradar.firebase.node.Team"/>
+                type="io.stanc.pogoradar.firebase.notification.NotificationSettings"/>
     </data>
 
     <ScrollView style="@style/FullscreenLayout"
@@ -21,119 +18,15 @@
         <LinearLayout style="@style/FullscreenLayout_padding"
                       android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                    style="@style/CardViewLayout">
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/layout_margin_small">
-                    <ImageView
-                            android:layout_width="@dimen/image_size_big"
-                            android:layout_height="@dimen/image_size_big"
-                            android:layout_gravity="center"
-                            android:src="@drawable/icon_medal_none_96dp"
-                            android:visibility="@{viewModel.team == null ? View.VISIBLE : View.GONE}"
-                            tools:ignore="ContentDescription"/>
+            <include layout="@layout/cardview_account_team_image"
+                     bind:viewModel="@{viewModel}"/>
 
-                    <ImageView
-                            android:layout_width="@dimen/image_size_big"
-                            android:layout_height="@dimen/image_size_big"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/layout_margin_small"
-                            android:src="@drawable/mystic"
-                            android:visibility="@{viewModel.team == Team.MYSTIC ? View.VISIBLE : View.GONE}"
-                            tools:ignore="ContentDescription"/>
+            <include layout="@layout/cardview_push_notifications"
+                     bind:settings="@{settings}"/>
 
-                    <ImageView
-                            android:layout_width="@dimen/image_size_big"
-                            android:layout_height="@dimen/image_size_big"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/layout_margin_small"
-                            android:src="@drawable/icon_valor_512dp"
-                            android:visibility="@{viewModel.team == Team.VALOR ? View.VISIBLE : View.GONE}"
-                            tools:ignore="ContentDescription"/>
+            <include layout="@layout/cardview_account_medals"
+                     bind:viewModel="@{viewModel}"/>
 
-                    <ImageView
-                            android:layout_width="@dimen/image_size_big"
-                            android:layout_height="@dimen/image_size_big"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/layout_margin_small"
-                            android:src="@drawable/icon_instinct_512dp"
-                            android:visibility="@{viewModel.team == Team.INSTINCT ? View.VISIBLE : View.GONE}"
-                            tools:ignore="ContentDescription"/>
-
-                    <TextView
-                            style="@style/TextStyle_header"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/layout_margin_small"
-                            android:text="@{viewModel.level}"/>
-
-                    <TextView
-                            style="@style/TextStyle_bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginTop="@dimen/layout_margin_small"
-                            android:text="@{viewModel.name}"/>
-
-                    <Button
-                            android:id="@+id/account_info_button"
-                            style="@style/ButtonStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/layout_margin_default"
-                            android:text="@string/authentication_button_edit_infos"/>
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                    style="@style/CardViewLayout">
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="@dimen/layout_margin_small">
-
-                    <TextView
-                            style="@style/TextStyle_bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/authentication_button_enable_push_notifications"/>
-
-                    <Switch
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:checked="@={settings.enableSubscriptions}"/>
-
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-
-            <androidx.cardview.widget.CardView
-                    style="@style/CardViewLayout">
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/layout_margin_small">
-                    <TextView
-                            style="@style/TextStyle_bold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/authentication_button_medal"/>
-
-                    <include layout="@layout/layout_table_medals"
-                             android:layout_width="wrap_content"
-                             android:layout_height="wrap_content"
-                             android:layout_gravity="center"
-                             app:viewModel="@{viewModel}"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
         </LinearLayout>
 
     </ScrollView>

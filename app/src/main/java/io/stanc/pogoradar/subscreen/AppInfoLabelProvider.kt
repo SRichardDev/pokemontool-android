@@ -62,15 +62,16 @@ class AppInfoLabelController(layout: View) {
             updateLayout()
         }
 
-        override fun onSubscriptionsEnableDidChange() {
-            if (AppSettings.enableSubscriptions.get() == false) {
-                subscriptionsEnableTextView.get()?.visibility = View.VISIBLE
-                subscriptionsEnableTextView.get()?.text = App.geString(R.string.info_label_subscriptions_disabled)
-            } else {
-                subscriptionsEnableTextView.get()?.visibility = View.GONE
-            }
-            updateLayout()
-        }
+        // TODO: add notification info to AppInfoLabel
+//        override fun onSubscriptionsEnableDidChange() {
+//            if (AppSettings.enableSubscriptions.get() == false) {
+//                subscriptionsEnableTextView.get()?.visibility = View.VISIBLE
+//                subscriptionsEnableTextView.get()?.text = App.geString(R.string.info_label_subscriptions_disabled)
+//            } else {
+//                subscriptionsEnableTextView.get()?.visibility = View.GONE
+//            }
+//            updateLayout()
+//        }
     }
 
     private fun updateLayout() {

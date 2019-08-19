@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.firebase
+package io.stanc.pogoradar.firebase.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -26,6 +26,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_CHAT
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.Kotlin
 
 

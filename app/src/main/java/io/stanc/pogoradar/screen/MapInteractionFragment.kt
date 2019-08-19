@@ -21,6 +21,9 @@ import io.stanc.pogoradar.firebase.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
+import io.stanc.pogoradar.firebase.notification.FirebaseNotification
+import io.stanc.pogoradar.firebase.notification.NotificationContent
+import io.stanc.pogoradar.firebase.notification.NotificationHolder
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider

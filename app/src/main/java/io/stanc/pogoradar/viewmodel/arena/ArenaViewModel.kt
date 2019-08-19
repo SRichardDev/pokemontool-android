@@ -3,12 +3,9 @@ package io.stanc.pogoradar.viewmodel.arena
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.lifecycle.ViewModel
-import androidx.databinding.ObservableField
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.firebase.node.FirebaseArena
-import io.stanc.pogoradar.AppSettings
 import io.stanc.pogoradar.map.MapIconFactory
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.viewmodel.MapItemInfoViewModel

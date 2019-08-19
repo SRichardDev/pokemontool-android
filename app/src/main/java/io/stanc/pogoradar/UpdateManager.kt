@@ -1,14 +1,10 @@
 package io.stanc.pogoradar
 
 import io.stanc.pogoradar.geohash.GeoHash
-import android.content.pm.PackageManager
-import android.content.Context
 import android.util.Log
-import androidx.core.content.pm.PackageInfoCompat
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
-import io.stanc.pogoradar.firebase.FirebaseDefinitions.raidBosses
-import io.stanc.pogoradar.firebase.FirebaseNotification
+import io.stanc.pogoradar.firebase.notification.FirebaseNotification
 import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode

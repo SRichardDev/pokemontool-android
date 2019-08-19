@@ -3,9 +3,6 @@ package io.stanc.pogoradar
 import android.content.SharedPreferences
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
-import io.stanc.pogoradar.firebase.FirebaseNotification
-import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.utils.addOnPropertyChanged
 import java.lang.ref.WeakReference
 
@@ -18,22 +15,12 @@ object AppSettings {
     private var justEXArenasCallback: Observable.OnPropertyChangedCallback? = null
     private var enablePokestopsCallback: Observable.OnPropertyChangedCallback? = null
     private var justQuestPokestopsCallback: Observable.OnPropertyChangedCallback? = null
-    private var enableSubscriptionsCallback: Observable.OnPropertyChangedCallback? = null
 
     val enableArenas = ObservableField<Boolean>()
     val justRaidArenas = ObservableField<Boolean>()
     val justEXArenas = ObservableField<Boolean>()
     val enablePokestops = ObservableField<Boolean>()
     val justQuestPokestops = ObservableField<Boolean>()
-    val enableSubscriptions = ObservableField<Boolean>()
-
-    private val userDataObserver = object: FirebaseUser.UserDataObserver {
-        override fun userDataChanged(user: FirebaseUserNode?) {
-            user?.isNotificationActive?.let {
-                enableSubscriptions.set(it)
-            }
-        }
-    }
 
     init {
 
@@ -43,7 +30,6 @@ object AppSettings {
             setupOnPropertiesChanged(preferences)
         }
 
-        FirebaseUser.addUserDataObserver(userDataObserver)
     }
 
     private fun setupInitFieldValues(preferences: SharedPreferences) {
@@ -94,15 +80,6 @@ object AppSettings {
                 }
             }
         }
-
-        if (enableSubscriptionsCallback == null) {
-            enableSubscriptionsCallback = enableSubscriptions.addOnPropertyChanged { enableSubscriptions ->
-                FirebaseNotification.changeActivation(enableSubscriptions.get() == true)
-                observers.forEach {
-                    it.value.get()?.onSubscriptionsEnableDidChange()
-                }
-            }
-        }
     }
 
     /**
@@ -112,7 +89,6 @@ object AppSettings {
     interface MapSettingObserver {
         fun onArenasVisibilityDidChange()
         fun onPokestopsVisibilityDidChange()
-        fun onSubscriptionsEnableDidChange() {}
     }
 
     private val observers = HashMap<Int, WeakReference<MapSettingObserver>>()
@@ -122,7 +98,6 @@ object AppSettings {
         observers[observer.hashCode()] = weakObserver
         observer.onArenasVisibilityDidChange()
         observer.onPokestopsVisibilityDidChange()
-        observer.onSubscriptionsEnableDidChange()
     }
 
     fun removeObserver(observer: MapSettingObserver) {

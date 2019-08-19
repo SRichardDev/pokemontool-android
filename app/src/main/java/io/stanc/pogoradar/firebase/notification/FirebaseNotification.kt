@@ -1,10 +1,13 @@
-package io.stanc.pogoradar.firebase
+package io.stanc.pogoradar.firebase.notification
 
 import android.util.Log
+import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
+import io.stanc.pogoradar.firebase.FirebaseServer
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.Async.waitForCompletion
 import kotlinx.coroutines.*
@@ -54,7 +57,10 @@ object FirebaseNotification {
                     if (successful) {
 
                         FirebaseServer.subscribeToTopic(formattedGeoHash) { successful ->
-                            Log.v(TAG, "Debug:: subscribeToArea($geoHash), subscribeToTopic: $successful")
+                            Log.v(
+                                TAG,
+                                "Debug:: subscribeToArea($geoHash), subscribeToTopic: $successful"
+                            )
 
                             if (successful) {
                                 onCompletionCallback(true)
@@ -86,15 +92,25 @@ object FirebaseNotification {
 
                 Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash)")
                 FirebaseServer.removeData("$USERS/${user.id}/$SUBSCRIBED_GEOHASHES/$formattedGeoHash") { successful ->
-                    Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash), removeData: $successful")
+                    Log.v(
+                        TAG,
+                        "Debug:: unsubscribeFromArea($geoHash), removeData: $successful"
+                    )
                     if (successful) {
 
                         FirebaseServer.unsubscribeFromTopic(formattedGeoHash) { successful ->
-                            Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash), unsubscribeFromTopic: $successful")
+                            Log.v(
+                                TAG,
+                                "Debug:: unsubscribeFromArea($geoHash), unsubscribeFromTopic: $successful"
+                            )
                             if (successful) {
                                 onCompletionCallback(true)
                             } else {
-                                FirebaseServer.addData("$USERS/${user.id}/$SUBSCRIBED_GEOHASHES", formattedGeoHash, "")
+                                FirebaseServer.addData(
+                                    "$USERS/${user.id}/$SUBSCRIBED_GEOHASHES",
+                                    formattedGeoHash,
+                                    ""
+                                )
                                 onCompletionCallback(false)
                             }
                         }
@@ -123,7 +139,10 @@ object FirebaseNotification {
                 val formattedGeoHash = firebaseGeoHash(geoHash)
 
                 successful = waitForCompletion {
-                    FirebaseServer.removeData("$USERS/${user.id}/$SUBSCRIBED_GEOHASHES/$formattedGeoHash", it)
+                    FirebaseServer.removeData(
+                        "$USERS/${user.id}/$SUBSCRIBED_GEOHASHES/$formattedGeoHash",
+                        it
+                    )
                 }
 
                 if (successful) {
@@ -151,7 +170,11 @@ object FirebaseNotification {
                 var successfullyUnsubscribedAllAreas = true
 
                 user.subscribedGeohashes?.forEach { geoHash ->
-                    val result = async { unsubscribeFromArea(geoHash) }
+                    val result = async {
+                        unsubscribeFromArea(
+                            geoHash
+                        )
+                    }
                     if (!result.await()) {
                         successfullyUnsubscribedAllAreas = false
                     }
@@ -173,7 +196,11 @@ object FirebaseNotification {
 
             if (user.subscribedRaidMeetups?.contains(raidMeetupId) == false) {
 
-                FirebaseServer.addData("$USERS/${user.id}/$SUBSCRIBED_RAID_MEETUPS", raidMeetupId, "") { successful ->
+                FirebaseServer.addData(
+                    "$USERS/${user.id}/$SUBSCRIBED_RAID_MEETUPS",
+                    raidMeetupId,
+                    ""
+                ) { successful ->
 
                     if (successful) {
                         FirebaseServer.subscribeToTopic(raidMeetupId) { successful ->
@@ -212,7 +239,11 @@ object FirebaseNotification {
                             if (successful) {
                                 onCompletionCallback(true)
                             } else {
-                                FirebaseServer.addData("$USERS/${user.id}/$SUBSCRIBED_RAID_MEETUPS", raidMeetupId, "")
+                                FirebaseServer.addData(
+                                    "$USERS/${user.id}/$SUBSCRIBED_RAID_MEETUPS",
+                                    raidMeetupId,
+                                    ""
+                                )
                                 onCompletionCallback(false)
                             }
                         }
@@ -232,31 +263,23 @@ object FirebaseNotification {
      * notification settings
      */
 
-    fun changeActivation(isPushActive: Boolean) {
-
-        FirebaseUser.userData?.id?.let { userId ->
-
-            if (isPushActive) {
-                registerForPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_ANDROID)
-            } else {
-                unregisterFromPushNotifications(DatabaseKeys.NOTIFICATION_TOPIC_ANDROID)
-            }
-
-        } ?: run {
-            Log.e(TAG, "could not change push notification (isPushActive: $isPushActive), because user: ${FirebaseUser.userData?.id}")
-        }
-    }
-
-    private fun registerForPushNotifications(topic: String) {
+    fun registerForPushNotifications(topic: String) {
 
         FirebaseUser.userData?.let { user ->
 
             if (user.notificationTopics?.contains(topic) != true) {
                 Log.v(TAG, "Debug:: registerForPushNotifications($topic)")
                 FirebaseServer.subscribeToTopic(topic) { successful ->
-                    Log.v(TAG, "Debug:: registerForPushNotifications($topic), subscribeToTopic: $successful")
+                    Log.v(
+                        TAG,
+                        "Debug:: registerForPushNotifications($topic), subscribeToTopic: $successful"
+                    )
                     if (successful) {
-                        FirebaseServer.addData("$USERS/${user.id}/${DatabaseKeys.USER_TOPICS}", topic, "")
+                        FirebaseServer.addData(
+                            "$USERS/${user.id}/${DatabaseKeys.USER_TOPICS}",
+                            topic,
+                            ""
+                        )
                     }
                 }
             } else {
@@ -268,12 +291,15 @@ object FirebaseNotification {
         }
     }
 
-    private fun unregisterFromPushNotifications(topic: String) {
+    fun deregisterFromPushNotifications(topic: String) {
 
         FirebaseUser.userData?.id?.let { userId ->
             Log.v(TAG, "Debug:: deregisterFromPushNotifications($topic)")
             FirebaseServer.unsubscribeFromTopic(topic) { successful ->
-                Log.v(TAG, "Debug:: deregisterFromPushNotifications($topic), unsubscribeFromTopic: $successful")
+                Log.v(
+                    TAG,
+                    "Debug:: deregisterFromPushNotifications($topic), unsubscribeFromTopic: $successful"
+                )
                 if (successful) {
                     FirebaseServer.removeData("$USERS/$userId/${DatabaseKeys.USER_TOPICS}/$topic")
                 }
