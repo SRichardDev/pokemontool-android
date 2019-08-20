@@ -3,6 +3,7 @@ package io.stanc.pogoradar.firebase.node
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.DatabaseKeys.EMAIL
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOKEN
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
@@ -13,6 +14,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_RAIDS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
+import io.stanc.pogoradar.firebase.DatabaseKeys.USER_APP_LAST_OPENED
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
@@ -21,6 +23,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PLATFORM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TOPICS
+import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.geohash.GeoHash
 
 enum class Team {
@@ -51,6 +54,7 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var subscribedRaidMeetups: List<String>? = emptyList(),
                                                 var notificationTopics: List<String>? = emptyList(),
                                                 var isNotificationActive: Boolean = true,
+                                                var timestampAppLastOpened: Number? = null,
                                                 var photoURL: Uri? = null): FirebaseNode {
 
     override fun databasePath(): String {
@@ -64,6 +68,8 @@ data class FirebaseUserNode private constructor(override var id: String,
         data[EMAIL] = email
         notificationToken?.let { data[NOTIFICATION_TOKEN] = it }
         platform?.let { data[USER_PLATFORM] = it }
+        timestampAppLastOpened?.let { data[USER_APP_LAST_OPENED] = it }
+
 
         val publicData = HashMap<String, Any>()
         publicData[USER_NAME] = name
@@ -84,12 +90,13 @@ data class FirebaseUserNode private constructor(override var id: String,
 
         fun new(dataSnapshot: DataSnapshot): FirebaseUserNode? {
 
-            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val email = dataSnapshot.child(EMAIL).value as? String
             val notificationToken = dataSnapshot.child(NOTIFICATION_TOKEN).value as? String
             val platform = dataSnapshot.child(USER_PLATFORM).value as? String
+            val timestampAppLastOpened = dataSnapshot.child(USER_APP_LAST_OPENED).value as? Number
 
             val submittedArenas =
                 (dataSnapshot.child(SUBMITTED_ARENAS) as? DataSnapshot)?.childrenCount ?: run { null }
@@ -120,6 +127,7 @@ data class FirebaseUserNode private constructor(override var id: String,
 
                 notificationToken?.let { user.notificationToken = it }
                 platform?.let { user.platform = it }
+                timestampAppLastOpened?.let { user.timestampAppLastOpened = it }
 
                 submittedArenas?.let { user.submittedArenas = it }
                 submittedPokestops?.let { user.submittedPokestops = it }

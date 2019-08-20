@@ -10,10 +10,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID
 import io.stanc.pogoradar.firebase.FirebaseUser

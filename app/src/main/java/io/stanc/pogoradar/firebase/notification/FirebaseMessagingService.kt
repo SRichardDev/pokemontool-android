@@ -66,12 +66,20 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         super.onMessageReceived(message)
         Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
-        when(notificationType(message.data)) {
+        // TODO: different notification types are NOT supported yet
+//        when(notificationType(message.data)) {
+//
+//            NotificationType.Raid -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
+//            NotificationType.Quest -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_QUEST)
+//            NotificationType.Chat -> postChatNotification(message)
+//            else -> {}
+//        }
 
-            NotificationType.Raid -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
-            NotificationType.Quest -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_QUEST)
-            NotificationType.Chat -> postChatNotification(message)
-            else -> {}
+        // TODO: just a workaround, see comment above
+        if (message.data.containsKey(NOTIFICATION_LATITUDE) && message.data.containsKey(NOTIFICATION_LONGITUDE)) {
+            postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
+        } else {
+            postChatNotification(message)
         }
     }
 
@@ -96,6 +104,7 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         FirebaseUser.updateNotificationToken(token)
     }
 
+    // TODO: determine notificationType should be handled explicitly with json keyword, not implicitly with string comparison
     private fun notificationType(messageData: Map<String, String>): NotificationType {
 
         return Kotlin.safeLet(messageData[NOTIFICATION_TITLE], messageData[NOTIFICATION_BODY]) { title, body ->

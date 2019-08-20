@@ -12,6 +12,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTED_RAIDS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
+import io.stanc.pogoradar.firebase.DatabaseKeys.USER_APP_LAST_OPENED
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_CODE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_LEVEL
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_NAME
@@ -20,6 +21,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.firebase.node.Team
+import io.stanc.pogoradar.firebase.notification.FirebaseNotification
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.ObserverManager
 import io.stanc.pogoradar.utils.WaitingSpinner
@@ -33,30 +35,40 @@ object FirebaseUser {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val authStateObserverManager = ObserverManager<AuthStateObserver>()
     private val userDataObserverManager = ObserverManager<UserDataObserver>()
+    private var timestampAlreadyUpdated = false
 
     var userData: FirebaseUserNode? = null
         private set(value) {
             field = value
-            Log.i(TAG, "user data changed: $value")
+            Log.d(TAG, "user data changed: $value")
             userDataObserverManager.observers().filterNotNull().forEach { it.userDataChanged(userData) }
         }
 
-    // TODO: 1. update internal "userData" after state changed to "AuthState.UserLoggedIn", after that notify all other external observer about authStateChange !
-    // TODO: problem: otherwise, other classes got "AuthState.UserLoggedIn", but "userData" is null
     private val authStateObserver = object : AuthStateObserver {
         override fun authStateChanged(newAuthState: AuthState) {
             if (newAuthState == FirebaseUser.AuthState.UserLoggedIn) {
-
-                // handle version update changes
-                UpdateManager.updateDatabaseDependingOnAppVersion()
-
                 requestNotificationToken()
+            }
+        }
+    }
+
+    private val userDataObserver = object : UserDataObserver {
+        override fun userDataChanged(user: FirebaseUserNode?) {
+            user?.let {
+                FirebaseNotification.unsubscribeFromAllOldRaidMeetups { successful ->
+                    if (successful && !timestampAlreadyUpdated) {
+                        Log.v(TAG, "push new user timestamp to server.")
+                        timestampAlreadyUpdated = true
+                        updateUserTimestamp()
+                    }
+                }
             }
         }
     }
 
     init {
         authStateObserverManager.addObserver(authStateObserver)
+        userDataObserverManager.addObserver(userDataObserver)
     }
 
     /**
@@ -166,6 +178,12 @@ object FirebaseUser {
             FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_CODE", userProfileConfig.code)
             FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_TEAM", userProfileConfig.team)
             FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_PUBLIC_DATA/$USER_LEVEL", userProfileConfig.level)
+        }
+    }
+
+    fun updateUserTimestamp() {
+        auth.currentUser?.let { firebaseUser ->
+            FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_APP_LAST_OPENED", FirebaseServer.timestamp())
         }
     }
 

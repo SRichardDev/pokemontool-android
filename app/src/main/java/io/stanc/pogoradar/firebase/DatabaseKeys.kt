@@ -54,6 +54,7 @@ object DatabaseKeys {
     const val USER_LEVEL = "level"
     const val USER_TEAM = "team"
     const val USER_CODE = "trainerCode"
+    const val USER_APP_LAST_OPENED = "appLastOpened"
     const val SUBMITTED_ARENAS = "submittedArenas"
     const val SUBMITTED_POKESTOPS = "submittedPokestops"
     const val SUBMITTED_QUESTS = "submittedQuests"

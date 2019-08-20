@@ -19,6 +19,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.FirebaseServer.OnCompleteCallback
 import io.stanc.pogoradar.firebase.FirebaseServer.requestNode
 import io.stanc.pogoradar.firebase.node.*
+import io.stanc.pogoradar.firebase.notification.FirebaseNotification
 import io.stanc.pogoradar.geohash.GeoHash
 import java.lang.ref.WeakReference
 
@@ -168,16 +169,30 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
 
     fun pushRaidMeetupParticipation(raidMeetupId: String) {
 
-        FirebaseUser.userData?.id?.let {
-            FirebaseServer.addData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", it, "")
+        FirebaseUser.userData?.id?.let { userId ->
+            FirebaseNotification.subscribeToRaidMeetup(raidMeetupId) { successful ->
+
+                if (successful) {
+                    FirebaseServer.addData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", userId, "")
+                } else {
+                    Log.e(TAG, "could not push raidmeetup (with id: $raidMeetupId) participation, because subscribeToRaidMeetup failed.")
+                }
+            }
         } ?: run {
             Log.e(TAG, "could not push raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
     }
 
     fun cancelRaidMeetupParticipation(raidMeetupId: String) {
-        FirebaseUser.userData?.id?.let {
-            FirebaseServer.removeData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS/$it")
+        FirebaseUser.userData?.id?.let { userId ->
+            FirebaseNotification.unsubscribeFromRaidMeetup(raidMeetupId) { successful ->
+
+                if (successful) {
+                    FirebaseServer.removeData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS/$userId")
+                } else {
+                    Log.e(TAG, "could not cancel raidmeetup (with id: $raidMeetupId) participation, because unsubscribeFromRaidMeetup failed.")
+                }
+            }
         } ?: run {
             Log.e(TAG, "could not cancel raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }

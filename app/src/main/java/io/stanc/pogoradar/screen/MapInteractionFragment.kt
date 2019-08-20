@@ -387,7 +387,7 @@ class MapInteractionFragment: Fragment() {
             famButton?.visibility = View.INVISIBLE
 
             WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-            FirebaseNotification.loadAreaSubscriptions { geoHashes ->
+            FirebaseNotification.requestAreaSubscriptions { geoHashes ->
 
                 geoHashes?.let {
                     for (geoHash in geoHashes) {

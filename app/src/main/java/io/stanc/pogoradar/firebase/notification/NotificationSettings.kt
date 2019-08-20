@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.firebase.notification
 
-import android.util.Log
 import androidx.databinding.ObservableField
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_LEVEL
@@ -27,7 +26,6 @@ object NotificationSettings {
 
     private val userDataObserver = object: FirebaseUser.UserDataObserver {
         override fun userDataChanged(user: FirebaseUserNode?) {
-            Log.i(TAG, "Debug:: userDataChanged($user)")
 
             user?.isNotificationActive?.let {
                 enableNotifications.set(it)
@@ -43,20 +41,10 @@ object NotificationSettings {
                 enableNotificationsForRaidsWith4Star.set(topics.contains("${NOTIFICATION_TOPIC_LEVEL}4"))
                 enableNotificationsForRaidsWith5Star.set(topics.contains("${NOTIFICATION_TOPIC_LEVEL}5"))
             }
-
-            Log.d(TAG, "Debug:: enableNotifications: ${enableNotifications.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForQuests: ${enableNotificationsForQuests.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaids: ${enableNotificationsForRaids.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaidsWith1Star: ${enableNotificationsForRaidsWith1Star.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaidsWith2Star: ${enableNotificationsForRaidsWith2Star.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaidsWith3Star: ${enableNotificationsForRaidsWith3Star.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaidsWith4Star: ${enableNotificationsForRaidsWith4Star.get()}")
-            Log.d(TAG, "Debug:: enableNotificationsForRaidsWith5Star: ${enableNotificationsForRaidsWith5Star.get()}")
         }
     }
 
     init {
-        Log.d(TAG, "Debug:: init()...")
         setupOnPropertiesChanged()
         FirebaseUser.addUserDataObserver(userDataObserver)
     }
@@ -100,15 +88,11 @@ object NotificationSettings {
     private fun addOnPropertyChangedForTopicNotification(observableField: ObservableField<Boolean>, notificationTopic: String) {
 
         observableField.addOnPropertyChanged { enableNotifications ->
-            Log.i(TAG, "Debug:: addOnPropertyChanged($notificationTopic): ${enableNotifications.get()}")
+
             if (enableNotifications.get() == true) {
-                FirebaseNotification.registerForPushNotifications(
-                    notificationTopic
-                )
+                FirebaseNotification.subscribeToTopic(notificationTopic)
             } else {
-                FirebaseNotification.deregisterFromPushNotifications(
-                    notificationTopic
-                )
+                FirebaseNotification.unsubscribeFromTopic(notificationTopic)
             }
         }
     }
