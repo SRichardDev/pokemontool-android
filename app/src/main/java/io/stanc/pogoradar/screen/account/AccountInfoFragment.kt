@@ -51,6 +51,7 @@ class AccountInfoFragment: Fragment() {
             FirebaseUser.signOut()
         })
         FirebaseUser.addUserDataObserver(userDataObserver)
+        NotificationSettings.updateNotificationSettings()
     }
 
     override fun onPause() {

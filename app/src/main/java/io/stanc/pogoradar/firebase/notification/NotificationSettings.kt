@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.firebase.notification
 
+import android.util.Log
 import androidx.databinding.ObservableField
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_LEVEL
@@ -24,14 +25,19 @@ object NotificationSettings {
     val enableNotificationsForRaidsWith4Star = ObservableField<Boolean>(true)
     val enableNotificationsForRaidsWith5Star = ObservableField<Boolean>(true)
 
-    private val userDataObserver = object: FirebaseUser.UserDataObserver {
-        override fun userDataChanged(user: FirebaseUserNode?) {
+    init {
+        setupOnPropertiesChanged()
+    }
 
-            user?.isNotificationActive?.let {
+    fun updateNotificationSettings() {
+
+        FirebaseUser.userData?.let { user ->
+            
+            user.isNotificationActive.let {
                 enableNotifications.set(it)
             }
 
-            user?.notificationTopics?.let { topics ->
+            user.notificationTopics?.let { topics ->
 
                 enableNotificationsForQuests.set(topics.contains(NOTIFICATION_TOPIC_QUESTS))
                 enableNotificationsForRaids.set(topics.contains(NOTIFICATION_TOPIC_RAIDS))
@@ -41,12 +47,9 @@ object NotificationSettings {
                 enableNotificationsForRaidsWith4Star.set(topics.contains("${NOTIFICATION_TOPIC_LEVEL}4"))
                 enableNotificationsForRaidsWith5Star.set(topics.contains("${NOTIFICATION_TOPIC_LEVEL}5"))
             }
+        } ?: run {
+            Log.e(TAG, "updating notification settings failed, because user data: ${FirebaseUser.userData}")
         }
-    }
-
-    init {
-        setupOnPropertiesChanged()
-        FirebaseUser.addUserDataObserver(userDataObserver)
     }
 
     private fun setupOnPropertiesChanged() {
@@ -88,7 +91,6 @@ object NotificationSettings {
     private fun addOnPropertyChangedForTopicNotification(observableField: ObservableField<Boolean>, notificationTopic: String) {
 
         observableField.addOnPropertyChanged { enableNotifications ->
-
             if (enableNotifications.get() == true) {
                 FirebaseNotification.subscribeToTopic(notificationTopic)
             } else {
