@@ -233,12 +233,12 @@
     <string name="dialog_info_coming_soon">Coming soon!</string>
 
     <!-- App Info Label -->
-    <string name="info_label_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell
+    <string name="app_info_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell
         sein.
     </string>
-    <string name="info_label_arena_filter">Achtung: Arena filter ist aktiviert!</string>
-    <string name="info_label_pokestop_filter">Achtung: Pok&#233;stop filter ist aktiviert!</string>
-    <string name="info_label_subscriptions_disabled">Achtung: Notifications sind deaktiviert!</string>
+    <string name="app_info_map_filter_active">Karten Filter aktiv!</string>
+    <string name="app_info_notifications_disabled_title">Push Nachrichten deaktiviert!</string>
+    <string name="app_info_notifications_disabled_description">Du bekommst ab jetzt keine Nachrichten mehr</string>
 
     <!-- Policy -->
     <string name="policy_app_title">Terms &amp; Conditions</string>

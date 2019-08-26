@@ -9,7 +9,7 @@
             type="io.stanc.pogoradar.viewmodel.LoginViewModel" />
         <variable
             name="settings"
-            type="io.stanc.pogoradar.AppSettings"/>
+            type="io.stanc.pogoradar.MapFilterSettings"/>
         <import type="android.view.View"/>
         <import type="io.stanc.pogoradar.firebase.node.Team"/>
         <import type="io.stanc.pogoradar.utils.SegmentedControlView.Selection"/>

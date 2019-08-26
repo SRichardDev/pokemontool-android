@@ -2,13 +2,16 @@ package io.stanc.pogoradar.firebase.notification
 
 import android.util.Log
 import androidx.databinding.ObservableField
+import io.stanc.pogoradar.App
+import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_LEVEL
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_RAIDS
 import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.node.FirebaseUserNode
+import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.addOnPropertyChanged
+import kotlinx.android.synthetic.main.layout_app_info_label.*
 
 object NotificationSettings {
 
@@ -29,10 +32,37 @@ object NotificationSettings {
         setupOnPropertiesChanged()
     }
 
+    fun informUserAboutDisabledNotificationsIfNeeded() {
+
+        val allNotificationsAreDisabled = enableNotificationsForQuests.get() == false &&
+                enableNotificationsForRaids.get() == false &&
+                enableNotificationsForRaidsWith1Star.get() == false &&
+                enableNotificationsForRaidsWith2Star.get() == false &&
+                enableNotificationsForRaidsWith3Star.get() == false &&
+                enableNotificationsForRaidsWith4Star.get() == false &&
+                enableNotificationsForRaidsWith5Star.get() == false
+
+        if (enableNotifications.get() == false || allNotificationsAreDisabled) {
+
+            val title = App.geString(R.string.app_info_notifications_disabled_title)
+            val description = App.geString(R.string.app_info_notifications_disabled_description)
+
+            Kotlin.safeLet(title, description) { title, description ->
+
+                FirebaseNotificationService.instance?.get()?.postLocalNotification(title, description) ?: run {
+                    Log.e(TAG, "Could not send local notification, because FirebaseNotificationService.instance is null!")
+                }
+
+            } ?: run {
+                Log.e(TAG, "Could not send local notification, because title: $title or description: $description!")
+            }
+        }
+    }
+
     fun updateNotificationSettings() {
 
         FirebaseUser.userData?.let { user ->
-            
+
             user.isNotificationActive.let {
                 enableNotifications.set(it)
             }

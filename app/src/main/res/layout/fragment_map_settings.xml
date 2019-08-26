@@ -6,7 +6,7 @@
 
         <variable
             name="settings"
-            type="io.stanc.pogoradar.AppSettings"/>
+            type="io.stanc.pogoradar.MapFilterSettings"/>
     </data>
 
     <LinearLayout style="@style/FullscreenLayout_padding"

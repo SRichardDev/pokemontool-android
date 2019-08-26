@@ -1,16 +1,16 @@
 package io.stanc.pogoradar.viewmodel.arena
 
-import io.stanc.pogoradar.AppSettings
+import io.stanc.pogoradar.MapFilterSettings
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 
 
 fun isArenaVisibleOnMap(arena: FirebaseArena): Boolean {
 
-    var visible = AppSettings.enableArenas.get() == true
+    var visible = MapFilterSettings.enableArenas.get() == true
     if (visible) {
-        visible = !(!arena.isEX && AppSettings.justEXArenas.get() == true)
+        visible = !(!arena.isEX && MapFilterSettings.justEXArenas.get() == true)
         if (visible) {
-            visible = !(currentRaidState(arena.raid) == RaidState.NONE && AppSettings.justRaidArenas.get() == true)
+            visible = !(currentRaidState(arena.raid) == RaidState.NONE && MapFilterSettings.justRaidArenas.get() == true)
         }
     }
 

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -15,6 +16,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogoradar.MapFilterSettings
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.*
@@ -31,6 +33,7 @@ import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
 import io.stanc.pogoradar.utils.WaitingSpinner
+import io.stanc.pogoradar.databinding.FragmentMapInteractionBinding
 
 
 class MapInteractionFragment: Fragment() {
@@ -51,8 +54,14 @@ class MapInteractionFragment: Fragment() {
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootLayout = inflater.inflate(R.layout.fragment_map_interaction, container, false)
+        val binding = FragmentMapInteractionBinding.inflate(inflater, container, false)
+        binding.settings = MapFilterSettings
+        val rootLayout = binding.root
+
         setupMapFragment()
+
+        // warning info label
+        rootLayout.findViewById<TextView>(R.id.warning_info_text)?.text = getText(R.string.app_info_map_filter_active)
 
         // floating action buttons
         setupFAB(rootLayout)

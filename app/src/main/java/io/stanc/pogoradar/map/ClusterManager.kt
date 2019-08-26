@@ -6,7 +6,7 @@ import android.view.View
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
-import io.stanc.pogoradar.AppSettings
+import io.stanc.pogoradar.MapFilterSettings
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
@@ -60,7 +60,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         }
     }
 
-    private val mapSettingsObserver = object : AppSettings.MapSettingObserver {
+    private val mapSettingsObserver = object : MapFilterSettings.MapSettingObserver {
 
         override fun onArenasVisibilityDidChange() {
             val markers = arenaClusterManager.markerCollection.markers
@@ -90,7 +90,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         googleMap.setOnInfoWindowClickListener { this.onInfoWindowClicked(it) }
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
 
-        AppSettings.addObserver(mapSettingsObserver)
+        MapFilterSettings.addObserver(mapSettingsObserver)
     }
 
     /**

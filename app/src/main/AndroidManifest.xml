@@ -52,7 +52,7 @@
         <!-- Firebase -->
         <!-- TODO: android:exported="false" ? -->
         <service
-                android:name=".firebase.notification.FirebaseMessagingService"
+                android:name=".firebase.notification.FirebaseNotificationService"
                 android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

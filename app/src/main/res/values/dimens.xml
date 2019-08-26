@@ -22,6 +22,7 @@
     <dimen name="layout_margin_small">8dp</dimen>
 
     <dimen name="text_margin">4dp</dimen>
+    <dimen name="text_margin_big">12dp</dimen>
 
     <dimen name="image_size_big">128dp</dimen>
     <dimen name="image_size_medium">96dp</dimen>
