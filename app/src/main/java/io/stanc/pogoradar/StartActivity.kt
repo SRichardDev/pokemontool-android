@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import io.stanc.pogoradar.UpdateManager.showVersionInfoIfNotAlreadyShown
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
@@ -75,6 +76,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     override fun onResume() {
         super.onResume()
         FirebaseUser.refresh()
+        showVersionInfoIfNotAlreadyShown(this)
     }
 
     override fun onStop() {

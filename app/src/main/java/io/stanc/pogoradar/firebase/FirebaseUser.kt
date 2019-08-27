@@ -181,9 +181,13 @@ object FirebaseUser {
         }
     }
 
-    fun updateUserTimestamp() {
-        auth.currentUser?.let { firebaseUser ->
+    fun updateUserTimestamp(): Boolean {
+        return auth.currentUser?.let { firebaseUser ->
             FirebaseServer.setData("$USERS/${firebaseUser.uid}/$USER_APP_LAST_OPENED", FirebaseServer.timestamp())
+            true
+        } ?: run {
+            Log.w(TAG, "could not update user timestamp, currentUser: ${auth.currentUser}")
+            false
         }
     }
 
