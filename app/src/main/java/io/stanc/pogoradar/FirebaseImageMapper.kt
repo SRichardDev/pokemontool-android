@@ -75,6 +75,7 @@ object FirebaseImageMapper {
 
     private fun raidBossPlaceholerDrawable(context: Context, raidLevel: Int): Drawable? {
         // TODO: need alpha value, not white
+        // TODO: Egg of image should be same size as egg of icon_level_x_30dp
         return when(raidLevel) {
             1 -> context.getDrawable(R.drawable.icon_level_1_hatched)
             2 -> context.getDrawable(R.drawable.icon_level_2_hatched)
