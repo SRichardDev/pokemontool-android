@@ -30,9 +30,7 @@ object FirebaseImageMapper {
                 RaidState.RAID_RUNNING -> {
 
                     return arena.raid.raidBossId?.let { raidBossId ->
-
                         raidBossDrawable(context, raidBossId)
-
                     } ?: run {
                         raidBossPlaceholerDrawable(context, raid.level)
                     }
@@ -77,11 +75,11 @@ object FirebaseImageMapper {
         // TODO: need alpha value, not white
         // TODO: Egg of image should be same size as egg of icon_level_x_30dp
         return when(raidLevel) {
-            1 -> context.getDrawable(R.drawable.icon_level_1_hatched)
-            2 -> context.getDrawable(R.drawable.icon_level_2_hatched)
-            3 -> context.getDrawable(R.drawable.icon_level_3_hatched)
-            4 -> context.getDrawable(R.drawable.icon_level_4_hatched)
-            5 -> context.getDrawable(R.drawable.icon_level_5_hatched)
+            1 -> context.getDrawable(R.drawable.icon_level_1_hatched_30dp)
+            2 -> context.getDrawable(R.drawable.icon_level_2_hatched_30dp)
+            3 -> context.getDrawable(R.drawable.icon_level_3_hatched_30dp)
+            4 -> context.getDrawable(R.drawable.icon_level_4_hatched_30dp)
+            5 -> context.getDrawable(R.drawable.icon_level_5_hatched_30dp)
             else -> null
         }
     }

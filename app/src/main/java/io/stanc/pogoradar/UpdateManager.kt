@@ -42,6 +42,7 @@ object UpdateManager {
     init {
         App.preferences?.let { preferences ->
             versionChange105Updated = preferences.getBoolean(VERSION_CHANGE_105, false)
+            versionInfo105Displayed = preferences.getBoolean(VERSION_INFO_105, false)
         }
     }
 
