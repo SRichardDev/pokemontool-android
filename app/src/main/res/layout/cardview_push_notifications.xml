@@ -5,6 +5,7 @@
         <variable
             name="settings"
             type="io.stanc.pogoradar.firebase.notification.NotificationSettings"/>
+        <import type="android.view.View"/>
     </data>
 
     <androidx.cardview.widget.CardView style="@style/CardViewLayout">
@@ -38,7 +39,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{settings.enableNotifications ? View.VISIBLE : View.GONE}">
 
                 <TextView
                         style="@style/TextStyle_bold"
@@ -58,7 +60,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{settings.enableNotifications ? View.VISIBLE : View.GONE}">
 
                 <TextView
                         style="@style/TextStyle_bold"
@@ -78,7 +81,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{(settings.enableNotifications &amp;&amp; settings.enableNotificationsForRaids) ? View.VISIBLE : View.GONE}">
 
                 <ImageView
                         style="@style/Image"
@@ -123,7 +127,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{(settings.enableNotifications &amp;&amp; settings.enableNotificationsForRaids) ? View.VISIBLE : View.GONE}">
 
                 <ImageView
                         style="@style/Image"
@@ -162,7 +167,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{(settings.enableNotifications &amp;&amp; settings.enableNotificationsForRaids) ? View.VISIBLE : View.GONE}">
 
                 <ImageView
                         style="@style/Image"
@@ -195,7 +201,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{(settings.enableNotifications &amp;&amp; settings.enableNotificationsForRaids) ? View.VISIBLE : View.GONE}">
 
                 <ImageView
                         style="@style/Image"
@@ -222,7 +229,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/layout_margin_small">
+                    android:layout_marginTop="@dimen/layout_margin_small"
+                    android:visibility="@{(settings.enableNotifications &amp;&amp; settings.enableNotificationsForRaids) ? View.VISIBLE : View.GONE}">
 
                 <ImageView
                         style="@style/Image"
