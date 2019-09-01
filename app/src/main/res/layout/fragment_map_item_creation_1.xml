@@ -21,7 +21,7 @@
                 android:text="@{viewModel.type == Type.Pokestop ? @string/map_map_item_name_of_pokestop : @string/map_map_item_name_of_arena}"/>
 
             <TextView
-                style="@style/TextStyle_sub"
+                style="@style/TextStyle_sub_highlighted"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/map_map_item_name_of_item_subtext"

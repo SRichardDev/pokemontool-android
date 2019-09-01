@@ -37,7 +37,7 @@
                 tools:text="MapType: Name"/>
 
             <TextView
-                style="@style/TextStyle_sub"
+                style="@style/TextStyle_sub_highlighted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/map_map_item_check_data_subtext"

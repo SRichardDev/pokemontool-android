@@ -9,7 +9,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
 
-class FirebaseChat (
+class FirebaseChat private constructor(
     override val id: String,
     private val raidMeetupId: String,
     val message: String,
@@ -40,7 +40,7 @@ class FirebaseChat (
             val senderId = dataSnapshot.child(CHAT_SENDER_ID).value as? String
             val timestamp = dataSnapshot.child(TIMESTAMP).value as? Number
 
-            Log.v(TAG, "raidMeetupId: $raidMeetupId, chatId: $id, message: $message, senderId: $senderId, timestamp: $timestamp")
+            Log.v(TAG, "raidMeetupId: $raidMeetupId, chatId: $id, message: $message, userId: $senderId, timestamp: $timestamp")
 
             if (id != null && message != null && senderId != null && timestamp != null) {
                 return FirebaseChat(id, raidMeetupId, message, senderId, timestamp)

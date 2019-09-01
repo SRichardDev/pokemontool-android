@@ -38,4 +38,9 @@
 
     <dimen name="font_size_30">30dp</dimen>
 
+    <!-- Chat dimens -->
+    <dimen name="chat_avatar_size">32dp</dimen>
+    <dimen name="chat_margin_small">4dp</dimen>
+    <dimen name="chat_margin_default">8dp</dimen>
+
 </resources>

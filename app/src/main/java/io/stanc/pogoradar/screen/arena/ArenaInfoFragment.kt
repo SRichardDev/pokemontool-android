@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.chat.ChatFragment
+import io.stanc.pogoradar.chat.ChatViewModel
 import io.stanc.pogoradar.databinding.FragmentArenaInfoBinding
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.subscreen.RaidBossFragment
@@ -96,7 +99,13 @@ class ArenaInfoFragment: Fragment() {
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.setOnClickListener {
 //                Popup.showToast(context, R.string.dialog_info_coming_soon)
-                ShowFragmentManager.showFragment(ChatFragment(), fragmentManager, R.id.arena_layout)
+                Log.i(TAG, "Debug:: start chat...")
+                activity?.let {
+                    val viewModel = ViewModelProviders.of(it).get(ChatViewModel::class.java)
+                    viewModel.userId = FirebaseUser.userData?.id
+                    firebase.addObserver(raidMeetupObserver, raidMeetup)
+                    ShowFragmentManager.showFragment(ChatFragment(), fragmentManager, R.id.arena_layout)
+                }
             }
 
             rootLayout.findViewById<Button>(R.id.arena_meetup_time_button)?.setOnClickListener {

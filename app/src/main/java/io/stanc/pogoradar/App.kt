@@ -10,13 +10,6 @@ import android.util.Log
 import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
 import androidx.core.content.pm.PackageInfoCompat
-import co.chatsdk.core.error.ChatSDKException
-import co.chatsdk.core.session.ChatSDK
-import co.chatsdk.core.session.Configuration
-import co.chatsdk.firebase.FirebaseNetworkAdapter
-import co.chatsdk.firebase.file_storage.FirebaseFileStorageModule
-import co.chatsdk.ui.manager.BaseInterfaceAdapter
-import io.stanc.pogoradar.utils.Kotlin
 
 class App: Application() {
     private val TAG = javaClass.name
@@ -32,7 +25,7 @@ class App: Application() {
             e.printStackTrace()
         }
         activateStrictMode()
-        setupFirebaseChat()
+//        setupChatSDK()
     }
 
     override fun onTerminate() {
@@ -51,36 +44,37 @@ class App: Application() {
         }
     }
 
-    private fun setupFirebaseChat() {
-
-        val context = applicationContext
-
-        try {
-            // Create a new configuration
-            val builder = Configuration.Builder(context)
-
-//            // Perform any other configuration steps (optional)
-//            builder.firebaseRootPath("prod")
-
-            // Initialize the Chat SDK
-            ChatSDK.initialize(builder.build(), FirebaseNetworkAdapter(), BaseInterfaceAdapter(context))
-
-            // File storage is needed for profile image upload and image messages
-            FirebaseFileStorageModule.activate()
-
-            // Push notification module, TODO: ?
-//            FirebasePushModule.activate()
-
-            // Activate any other modules you need.
-            // ...
-            // Uncomment this to enable Firebase UI
-            // FirebaseUIModule.activate(EmailAuthProvider.PROVIDER_ID, PhoneAuthProvider.PROVIDER_ID);
-
-        } catch (e: ChatSDKException) {
-            // Handle any exceptions
-            e.printStackTrace()
-        }
-    }
+//    private fun setupChatSDK() {
+//
+//        val context = applicationContext
+//
+//        try {
+//            // Create a new configuration
+//            val builder = Configuration.Builder(context)
+//
+////            // Perform any other configuration steps (optional)
+////            builder.firebaseRootPath("prod")
+//
+//            // Initialize the Chat SDK
+//            // TODO: use own adapters !
+//            Log.i(TAG, "Debug:: ChatSDK.initialize")
+//            ChatSDK.initialize(builder.build(), FirebaseNetworkAdapter(), BaseInterfaceAdapter(context))
+//
+//            // File storage is needed for profile image upload and image messages
+//            FirebaseFileStorageModule.activate()
+//
+//            // Push notification module, TODO: if chat firebase-push-notification should be handled separately
+////            FirebasePushModule.activate()
+//
+//            // Activate any other modules you need.
+//            // ...
+//            // Uncomment this to enable Firebase UI
+//            // FirebaseUIModule.activate(EmailAuthProvider.PROVIDER_ID, PhoneAuthProvider.PROVIDER_ID);
+//
+//        } catch (e: ChatSDKException) {
+//            e.printStackTrace()
+//        }
+//    }
 
     companion object {
 
