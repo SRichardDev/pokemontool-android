@@ -17,10 +17,12 @@
     <dimen name="layout_padding_popup">4dp</dimen>
 
     <dimen name="layout_margin_large">32dp</dimen>
+    <dimen name="layout_margin_medium">24dp</dimen>
     <dimen name="layout_margin_default">16dp</dimen>
     <dimen name="layout_margin_small">8dp</dimen>
 
     <dimen name="text_margin">4dp</dimen>
+    <dimen name="text_margin_big">12dp</dimen>
 
     <dimen name="image_size_big">128dp</dimen>
     <dimen name="image_size_medium">96dp</dimen>
@@ -32,5 +34,8 @@
     <dimen name="corner_radius_default">10dp</dimen>
 
     <dimen name="recycleview_list_item_height">96dp</dimen>
+
+
+    <dimen name="font_size_30">30dp</dimen>
 
 </resources>

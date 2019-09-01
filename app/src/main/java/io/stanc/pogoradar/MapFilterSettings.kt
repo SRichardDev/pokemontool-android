@@ -1,15 +1,14 @@
 package io.stanc.pogoradar
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
-import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.utils.addOnPropertyChanged
 import java.lang.ref.WeakReference
 
 
-object AppSettings {
+object MapFilterSettings {
     private val TAG = javaClass.name
 
     private var enableArenasCallback: Observable.OnPropertyChangedCallback? = null
@@ -17,22 +16,14 @@ object AppSettings {
     private var justEXArenasCallback: Observable.OnPropertyChangedCallback? = null
     private var enablePokestopsCallback: Observable.OnPropertyChangedCallback? = null
     private var justQuestPokestopsCallback: Observable.OnPropertyChangedCallback? = null
-    private var enableSubscriptionsCallback: Observable.OnPropertyChangedCallback? = null
 
     val enableArenas = ObservableField<Boolean>()
     val justRaidArenas = ObservableField<Boolean>()
     val justEXArenas = ObservableField<Boolean>()
     val enablePokestops = ObservableField<Boolean>()
     val justQuestPokestops = ObservableField<Boolean>()
-    val enableSubscriptions = ObservableField<Boolean>()
 
-    private val userDataObserver = object: FirebaseUser.UserDataObserver {
-        override fun userDataChanged(user: FirebaseUserNode?) {
-            user?.isNotificationActive?.let {
-                enableSubscriptions.set(it)
-            }
-        }
-    }
+    val anyFilterIsActive = ObservableField<Boolean>()
 
     init {
 
@@ -40,45 +31,49 @@ object AppSettings {
 
             setupInitFieldValues(preferences)
             setupOnPropertiesChanged(preferences)
+            checkWhetherFilterIsActive()
         }
 
-        FirebaseUser.addUserDataObserver(userDataObserver)
     }
 
     private fun setupInitFieldValues(preferences: SharedPreferences) {
-        enableArenas.set(preferences.getBoolean(AppSettings::enableArenas.name, true))
-        justRaidArenas.set(preferences.getBoolean(AppSettings::justRaidArenas.name, false))
-        justEXArenas.set(preferences.getBoolean(AppSettings::justEXArenas.name, false))
-        enablePokestops.set(preferences.getBoolean(AppSettings::enablePokestops.name, true))
-        justQuestPokestops.set(preferences.getBoolean(AppSettings::justQuestPokestops.name, false))
+        enableArenas.set(preferences.getBoolean(MapFilterSettings::enableArenas.name, true))
+        justRaidArenas.set(preferences.getBoolean(MapFilterSettings::justRaidArenas.name, false))
+        justEXArenas.set(preferences.getBoolean(MapFilterSettings::justEXArenas.name, false))
+        enablePokestops.set(preferences.getBoolean(MapFilterSettings::enablePokestops.name, true))
+        justQuestPokestops.set(preferences.getBoolean(MapFilterSettings::justQuestPokestops.name, false))
     }
 
     private fun setupOnPropertiesChanged(preferences: SharedPreferences) {
 
         if (enableArenasCallback == null) {
             enableArenasCallback = enableArenas.addOnPropertyChanged { enableArenas ->
-                preferences.edit().putBoolean(AppSettings::enableArenas.name, enableArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(MapFilterSettings::enableArenas.name, enableArenas.get() == true)?.apply()
+                checkWhetherFilterIsActive()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         }
 
         if (justRaidArenasCallback == null) {
             justRaidArenasCallback = justRaidArenas.addOnPropertyChanged { justRaidArenas ->
-                preferences.edit().putBoolean(AppSettings::justRaidArenas.name, justRaidArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(MapFilterSettings::justRaidArenas.name, justRaidArenas.get() == true)?.apply()
+                checkWhetherFilterIsActive()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         }
 
         if (justEXArenasCallback == null) {
             justEXArenasCallback = justEXArenas.addOnPropertyChanged { justEXArenas ->
-                preferences.edit().putBoolean(AppSettings::justEXArenas.name, justEXArenas.get() == true)?.apply()
+                preferences.edit().putBoolean(MapFilterSettings::justEXArenas.name, justEXArenas.get() == true)?.apply()
+                checkWhetherFilterIsActive()
                 observers.forEach { it.value.get()?.onArenasVisibilityDidChange() }
             }
         }
 
         if (enablePokestopsCallback == null) {
             enablePokestopsCallback = enablePokestops.addOnPropertyChanged { enablePokestops ->
-                preferences.edit().putBoolean(AppSettings::enablePokestops.name, enablePokestops.get() == true)?.apply()
+                preferences.edit().putBoolean(MapFilterSettings::enablePokestops.name, enablePokestops.get() == true)?.apply()
+                checkWhetherFilterIsActive()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
@@ -87,21 +82,25 @@ object AppSettings {
 
         if (justQuestPokestopsCallback == null) {
             justQuestPokestopsCallback = justQuestPokestops.addOnPropertyChanged { justQuestPokestops ->
-                preferences.edit().putBoolean(AppSettings::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
+                preferences.edit().putBoolean(MapFilterSettings::justQuestPokestops.name, justQuestPokestops.get() == true)?.apply()
+                checkWhetherFilterIsActive()
                 observers.forEach {
                     it.value.get()?.onPokestopsVisibilityDidChange()
                 }
             }
         }
+    }
 
-        if (enableSubscriptionsCallback == null) {
-            enableSubscriptionsCallback = enableSubscriptions.addOnPropertyChanged { enableSubscriptions ->
-                FirebaseUser.changePushNotifications(enableSubscriptions.get() == true)
-                observers.forEach {
-                    it.value.get()?.onSubscriptionsEnableDidChange()
-                }
-            }
-        }
+    private fun checkWhetherFilterIsActive() {
+
+        val atLeastOnFilterIstActive = enableArenas.get() == false ||
+                                                enablePokestops.get() == false ||
+                                                justEXArenas.get() == true ||
+                                                justRaidArenas.get() == true ||
+                                                justQuestPokestops.get() == true
+
+        Log.d(TAG, "Debug:: checkWhetherFilterIsActive($atLeastOnFilterIstActive), enableArenas: ${enableArenas.get()}, enablePokestops: ${enablePokestops.get()}, justEXArenas: ${justEXArenas.get()}, justRaidArenas: ${justRaidArenas.get()}, justQuestPokestops: ${justQuestPokestops.get()}")
+        anyFilterIsActive.set(atLeastOnFilterIstActive)
     }
 
     /**
@@ -111,7 +110,6 @@ object AppSettings {
     interface MapSettingObserver {
         fun onArenasVisibilityDidChange()
         fun onPokestopsVisibilityDidChange()
-        fun onSubscriptionsEnableDidChange() {}
     }
 
     private val observers = HashMap<Int, WeakReference<MapSettingObserver>>()
@@ -121,7 +119,6 @@ object AppSettings {
         observers[observer.hashCode()] = weakObserver
         observer.onArenasVisibilityDidChange()
         observer.onPokestopsVisibilityDidChange()
-        observer.onSubscriptionsEnableDidChange()
     }
 
     fun removeObserver(observer: MapSettingObserver) {

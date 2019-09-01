@@ -2,26 +2,26 @@ package io.stanc.pogoradar
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import io.stanc.pogoradar.UpdateManager.showVersionInfoIfNotAlreadyShown
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID
 import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.NotificationContent
-import io.stanc.pogoradar.firebase.NotificationHolder
+import io.stanc.pogoradar.firebase.notification.NotificationContent
+import io.stanc.pogoradar.firebase.notification.NotificationHolder
+import io.stanc.pogoradar.firebase.notification.NotificationSettings
 import io.stanc.pogoradar.screen.MapInteractionFragment
-import io.stanc.pogoradar.subscreen.AppInfoLabelController
 import io.stanc.pogoradar.utils.*
 import kotlinx.android.synthetic.main.layout_progress.*
 
@@ -30,7 +30,6 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
     private val TAG = this::class.java.name
 
-    private var appInfoLabelController: AppInfoLabelController? = null
     private var bottomNavigationView: BottomNavigationView? = null
 
     private val systemObserver = object: SystemUtils.SystemObserver {
@@ -40,7 +39,7 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     }
 
     private val delayedInfoLabelStart = DelayedTrigger(5000) {
-        appInfoLabelController?.start()
+        // TODO: add info banner for connection lost after several seconds after start
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,9 +50,6 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
 
         // app bar
         setupToolbar()
-
-        // app info label
-        setupAppLabel()
 
         // navigation drawer
         setupNavigationView()
@@ -74,17 +70,20 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         delayedInfoLabelStart.trigger()
         SystemUtils.addObserver(systemObserver, this)
         showPopupIfUserIsLoggedOut()
+        UpdateManager.start()
     }
 
     override fun onResume() {
         super.onResume()
         FirebaseUser.refresh()
+        showVersionInfoIfNotAlreadyShown(this)
     }
 
     override fun onStop() {
+        UpdateManager.stop()
         FirebaseUser.stopAuthentication()
-        appInfoLabelController?.stop()
         SystemUtils.removeObserver(systemObserver)
+        NotificationSettings.informUserAboutDisabledNotificationsIfNeeded()
         super.onStop()
     }
 
@@ -130,12 +129,6 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
             AppbarManager.setup(toolbar, resources.getString(R.string.default_app_title), defaultOnNavigationIconClicked = {
                 this.onBackPressed()
             })
-        }
-    }
-
-    private fun setupAppLabel() {
-        findViewById<View>(R.id.app_info_label)?.let {
-            appInfoLabelController = AppInfoLabelController(it)
         }
     }
 

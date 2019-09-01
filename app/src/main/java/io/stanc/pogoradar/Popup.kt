@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import io.stanc.pogoradar.utils.Kotlin.safeLet
 
+
 object Popup {
     private val TAG = javaClass.name
 
@@ -15,15 +16,22 @@ object Popup {
 
         context?.let {
 
-            val builder = AlertDialog.Builder(context)
-                .setTitle(title)
-                .setNeutralButton(R.string.popup_info_button_neutral, null)
+            try {
 
-            description?.let {
-                builder.setMessage(description)
+                val builder = AlertDialog.Builder(context)
+                    .setTitle(title)
+                    .setNeutralButton(R.string.popup_info_button_neutral, null)
+
+                description?.let {
+                    builder.setMessage(description)
+                }
+
+                builder.show()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
-            builder.show()
 
         } ?: run {
             Log.e(TAG, "could not show popup with title: $title, because context is null!")

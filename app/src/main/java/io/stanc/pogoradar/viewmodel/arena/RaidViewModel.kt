@@ -2,11 +2,9 @@ package io.stanc.pogoradar.viewmodel.arena
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import androidx.lifecycle.ViewModel
-import androidx.databinding.ObservableField
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
@@ -15,7 +13,6 @@ import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
-import io.stanc.pogoradar.utils.Observables.dependantObservableField
 import io.stanc.pogoradar.utils.TimeCalculator
 
 class RaidViewModel: ViewModel() {

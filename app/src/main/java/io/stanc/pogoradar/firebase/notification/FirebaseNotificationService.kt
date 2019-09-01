@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.firebase
+package io.stanc.pogoradar.firebase.notification
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -24,18 +24,20 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TITLE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_CHAT
-import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_QUEST
+import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_LOCAL
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TYPE_RAID
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.utils.Kotlin
+import java.lang.ref.WeakReference
 
 
-class FirebaseMessagingService: FirebaseMessagingService() {
+class FirebaseNotificationService: FirebaseMessagingService() {
 
     private val TAG = this::class.java.name
 
-    private val maxNumberOfNotifications = MAXIMUM_RETAINED_MESSAGES
-    private var currentNotificationId = 0
-    private val latestNotificationId = "latestNotificationId"
+    private val maxNumberOfFirebaseNotifications = MAXIMUM_RETAINED_MESSAGES
+    private var currentFirebaseNotificationId = 0
+    private val latestFirebaseNotificationId = "latestFirebaseNotificationId"
 
     enum class NotificationType {
         Unknown,
@@ -43,16 +45,32 @@ class FirebaseMessagingService: FirebaseMessagingService() {
         Quest,
         Chat
     }
+    
+    companion object {
+
+        private const val NOTIFICATION_ID_LOCAL = 10681
+
+        var instance: WeakReference<FirebaseNotificationService>? = null
+            private set
+    }
+
+    /**
+     * lifecycle
+     */
 
     override fun onCreate() {
         super.onCreate()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        currentNotificationId = sharedPreferences.getInt(latestNotificationId, 0)
+        currentFirebaseNotificationId = sharedPreferences.getInt(latestFirebaseNotificationId, 0)
+        Log.i(TAG, "Debug:: onCreate()")
+        instance = WeakReference(this)
     }
 
     override fun onDestroy() {
+        instance = null
+        Log.i(TAG, "Debug:: onDestroy()")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        sharedPreferences.edit().putInt(latestNotificationId, currentNotificationId).apply()
+        sharedPreferences.edit().putInt(latestFirebaseNotificationId, currentFirebaseNotificationId).apply()
         super.onDestroy()
     }
 
@@ -63,38 +81,61 @@ class FirebaseMessagingService: FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-//        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
+        Log.d(TAG, "Debug:: onMessageReceived(messageId: ${message.messageId}, messageType: ${message.messageType}, title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data})")
 
-        when(notificationType(message.data)) {
+        // TODO: different notification types are NOT supported yet
+//        when(notificationType(message.data)) {
+//
+//            NotificationType.Raid -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
+//            NotificationType.Quest -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_QUEST)
+//            NotificationType.Chat -> postChatNotification(message)
+//            else -> {}
+//        }
 
-            NotificationType.Raid -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
-            NotificationType.Quest -> postRaidOrQuestNotification(message, NOTIFICATION_TYPE_QUEST)
-            NotificationType.Chat -> postChatNotification(message)
-            else -> {}
+        // TODO: just a workaround, see comment above
+        if (message.data.containsKey(NOTIFICATION_LATITUDE) && message.data.containsKey(NOTIFICATION_LONGITUDE)) {
+            postRaidOrQuestNotification(message, NOTIFICATION_TYPE_RAID)
+        } else {
+            postChatNotification(message)
         }
     }
 
     override fun onDeletedMessages() {
         super.onDeletedMessages()
-//        Log.i(TAG, "Debug:: onDeletedMessages()")
+        Log.i(TAG, "Debug:: onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
         super.onMessageSent(var1)
-//        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
+        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
         super.onSendError(var1, var2)
-//        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
+        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-//        Log.i(TAG, "Debug:: onNewToken(token: $token) for user: ${FirebaseUser.userData}")
+        Log.i(TAG, "Debug:: onNewToken(token: $token) for user: ${FirebaseUser.userData}")
         FirebaseUser.updateNotificationToken(token)
     }
 
+    /**
+     * public interface
+     */
+    
+    fun postLocalNotification(title: String, description: String) {
+        Log.i(TAG, "Debug:: postLocalNotification($title)")
+        val intent = Intent(this, StartActivity::class.java)
+        postNotification(title, description, intent, NOTIFICATION_TYPE_LOCAL, NOTIFICATION_ID_LOCAL)
+    }
+
+    /**
+     * private
+     */
+
+    // TODO: determine notificationType should be handled explicitly with json keyword, not implicitly with string comparison
     private fun notificationType(messageData: Map<String, String>): NotificationType {
 
         return Kotlin.safeLet(messageData[NOTIFICATION_TITLE], messageData[NOTIFICATION_BODY]) { title, body ->
@@ -128,7 +169,8 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             intent.putExtra(NOTIFICATION_LATITUDE, lat)
             intent.putExtra(NOTIFICATION_LONGITUDE, lng)
 
-            postNotification(title, body, intent, notificationType)
+            postNotification(title, body, intent, notificationType, currentFirebaseNotificationId)
+            updateNotificationId()
 
         } ?: run {
             Log.e(TAG, "failed to build notification: $notificationType with message data: ${message.data}")
@@ -147,16 +189,17 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             intent.putExtra(NOTIFICATION_TITLE, title)
             intent.putExtra(NOTIFICATION_BODY, body)
 
-            postNotification(title, body, intent, NOTIFICATION_TYPE_CHAT)
+            postNotification(title, body, intent, NOTIFICATION_TYPE_CHAT, currentFirebaseNotificationId)
+            updateNotificationId()
 
         } ?: run {
             Log.e(TAG, "failed to build notification: $NOTIFICATION_TYPE_CHAT with message data: ${message.data}")
         }
     }
 
-    private fun postNotification(title: String?, description: String?, intent: Intent, notificationType: String) {
+    private fun postNotification(title: String?, description: String?, intent: Intent, notificationType: String, notificationId: Int) {
 
-        val notification = buildNotification(title, description, intent, notificationType, requestCode = currentNotificationId)
+        val notification = buildNotification(title, description, intent, notificationType, notificationId)
 
         val manager = NotificationManagerCompat.from(this)
 
@@ -167,15 +210,14 @@ class FirebaseMessagingService: FirebaseMessagingService() {
             manager.createNotificationChannel(channel)
         }
 
-//        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
-        manager.notify(currentNotificationId, notification)
-        updateNotificationId()
+        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
+        manager.notify(currentFirebaseNotificationId, notification)
     }
 
-    private fun buildNotification(title: String?, description: String?, intent: Intent, notificationType: String, requestCode: Int): Notification {
+    private fun buildNotification(title: String?, description: String?, intent: Intent, notificationType: String, notificationId: Int): Notification {
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent = PendingIntent.getActivity(this, requestCode, intent, PendingIntent.FLAG_ONE_SHOT)
+        val pendingIntent = PendingIntent.getActivity(this, notificationId, intent, PendingIntent.FLAG_ONE_SHOT)
 
         val builder = NotificationCompat.Builder(this, notificationType)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.icon_launcher))
@@ -192,6 +234,6 @@ class FirebaseMessagingService: FirebaseMessagingService() {
     }
 
     private fun updateNotificationId() {
-        currentNotificationId = (currentNotificationId+1)%maxNumberOfNotifications
+        currentFirebaseNotificationId = (currentFirebaseNotificationId+1)%maxNumberOfFirebaseNotifications
     }
 }

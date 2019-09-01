@@ -3,12 +3,13 @@ package io.stanc.pogoradar
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.util.Log
-import androidx.annotation.DimenRes
 import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
+import androidx.core.content.pm.PackageInfoCompat
 import co.chatsdk.core.error.ChatSDKException
 import co.chatsdk.core.session.ChatSDK
 import co.chatsdk.core.session.Configuration
@@ -24,6 +25,12 @@ class App: Application() {
         super.onCreate()
         appContext = this
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        try {
+            val packageInfo = baseContext.packageManager.getPackageInfo(baseContext.packageName, 0)
+            versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
         activateStrictMode()
         setupFirebaseChat()
     }
@@ -80,6 +87,8 @@ class App: Application() {
         private var appContext: Context? = null
 
         var preferences: SharedPreferences? = null
+            private set
+        var versionCode: Long? = null
             private set
 
         fun geString(@StringRes stringResId: Int, formatArg1: String? = null, formatArg2: String? = null): String? {

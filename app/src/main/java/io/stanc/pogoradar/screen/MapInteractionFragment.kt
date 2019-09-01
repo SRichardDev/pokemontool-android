@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -15,15 +16,16 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import io.stanc.pogoradar.MapFilterSettings
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
+import io.stanc.pogoradar.firebase.*
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
-import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseDefinitions
-import io.stanc.pogoradar.firebase.NotificationContent
-import io.stanc.pogoradar.firebase.NotificationHolder
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
+import io.stanc.pogoradar.firebase.notification.FirebaseNotification
+import io.stanc.pogoradar.firebase.notification.NotificationContent
+import io.stanc.pogoradar.firebase.notification.NotificationHolder
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.map.ClusterManager
 import io.stanc.pogoradar.map.MapGridProvider
@@ -31,6 +33,7 @@ import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
 import io.stanc.pogoradar.utils.WaitingSpinner
+import io.stanc.pogoradar.databinding.FragmentMapInteractionBinding
 
 
 class MapInteractionFragment: Fragment() {
@@ -51,8 +54,14 @@ class MapInteractionFragment: Fragment() {
 
     @SuppressLint("MissingPermission")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootLayout = inflater.inflate(R.layout.fragment_map_interaction, container, false)
+        val binding = FragmentMapInteractionBinding.inflate(inflater, container, false)
+        binding.settings = MapFilterSettings
+        val rootLayout = binding.root
+
         setupMapFragment()
+
+        // warning info label
+        rootLayout.findViewById<TextView>(R.id.warning_info_text)?.text = getText(R.string.app_info_map_filter_active)
 
         // floating action buttons
         setupFAB(rootLayout)
@@ -229,7 +238,7 @@ class MapInteractionFragment: Fragment() {
     private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
-            firebase?.addSubscriptionForPush(geoHash) { successful ->
+            FirebaseNotification.subscribeToArea(geoHash) { successful ->
                 if (!successful) {
                     Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                 }
@@ -242,7 +251,7 @@ class MapInteractionFragment: Fragment() {
 
     private fun removeSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
-        firebase?.removePushSubscription(geoHash) { successful ->
+        FirebaseNotification.unsubscribeFromArea(geoHash) { successful ->
             if (!successful) {
                 Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
             }
@@ -358,7 +367,7 @@ class MapInteractionFragment: Fragment() {
                 MapMode.EDIT_PUSH_REGISTRATION -> {
 
                     WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-                    firebase?.removeAllPushSubscriptions(onCompletionCallback = { successful ->
+                    FirebaseNotification.unsubscribeFromAllAreas(onCompletionCallback = { successful ->
                         WaitingSpinner.hideProgress()
                         if (successful) {
                             mapGridProvider?.clearGeoHashGridList()
@@ -387,7 +396,7 @@ class MapInteractionFragment: Fragment() {
             famButton?.visibility = View.INVISIBLE
 
             WaitingSpinner.showProgress(R.string.spinner_title_loading_map_data)
-            firebase?.loadSubscriptions { geoHashes ->
+            FirebaseNotification.requestAreaSubscriptions { geoHashes ->
 
                 geoHashes?.let {
                     for (geoHash in geoHashes) {

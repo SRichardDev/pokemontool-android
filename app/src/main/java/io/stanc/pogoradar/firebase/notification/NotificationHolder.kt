@@ -1,4 +1,4 @@
-package io.stanc.pogoradar.firebase
+package io.stanc.pogoradar.firebase.notification
 
 object NotificationHolder {
     private val TAG = javaClass.name

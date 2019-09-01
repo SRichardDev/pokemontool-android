@@ -14,18 +14,18 @@
             android:layout_height="@dimen/appbar_height"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <include layout="@layout/layout_app_info_label"
-             android:id="@+id/app_info_label"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             app:layout_constraintTop_toBottomOf="@id/activity_toolbar"
-             tools:layout_height="30dp"/>
+    <!--<include layout="@layout/layout_app_info_label"-->
+             <!--android:id="@+id/app_info_label"-->
+             <!--android:layout_width="match_parent"-->
+             <!--android:layout_height="0dp"-->
+             <!--app:layout_constraintTop_toBottomOf="@id/activity_toolbar"-->
+             <!--tools:layout_height="30dp"/>-->
 
     <FrameLayout
             android:id="@+id/fragment_map"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/app_info_label"
+            app:layout_constraintTop_toBottomOf="@id/activity_toolbar"
             app:layout_constraintBottom_toTopOf="@id/navigationView"/>
 
     <fragment
@@ -33,7 +33,7 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/app_info_label"
+            app:layout_constraintTop_toBottomOf="@id/activity_toolbar"
             app:layout_constraintBottom_toTopOf="@id/navigationView"
             app:defaultNavHost="true"
             app:navGraph="@navigation/navigation_graph" />

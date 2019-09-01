@@ -25,27 +25,19 @@ object FirebaseImageMapper {
 
         arena?.raid?.let { raid ->
 
-            when(currentRaidState(arena?.raid)) {
+            when(currentRaidState(arena.raid)) {
 
                 RaidState.RAID_RUNNING -> {
-                    raidBosses.find { it.id == raid.raidBossId }?.imageName?.let { imageName ->
-                        return assetDrawable(
-                            context,
-                            ASSETS_DIR_RAIDBOSSES,
-                            assetImageName = imageName
-                        )
+
+                    return arena.raid.raidBossId?.let { raidBossId ->
+                        raidBossDrawable(context, raidBossId)
+                    } ?: run {
+                        raidBossPlaceholerDrawable(context, raid.level)
                     }
                 }
 
                 RaidState.EGG_HATCHES -> {
-                    return when(raid.level) {
-                        1 -> context.getDrawable(R.drawable.icon_level_1_30dp)
-                        2 -> context.getDrawable(R.drawable.icon_level_2_30dp)
-                        3 -> context.getDrawable(R.drawable.icon_level_3_30dp)
-                        4 -> context.getDrawable(R.drawable.icon_level_4_30dp)
-                        5 -> context.getDrawable(R.drawable.icon_level_5_30dp)
-                        else -> null
-                    }
+                    return eggDrawable(context, raid.level)
                 }
 
                 RaidState.NONE -> return null
@@ -53,6 +45,43 @@ object FirebaseImageMapper {
         }
 
         return null
+    }
+
+    private fun eggDrawable(context: Context, raidLevel: Int): Drawable? {
+        return when(raidLevel) {
+            1 -> context.getDrawable(R.drawable.icon_level_1_30dp)
+            2 -> context.getDrawable(R.drawable.icon_level_2_30dp)
+            3 -> context.getDrawable(R.drawable.icon_level_3_30dp)
+            4 -> context.getDrawable(R.drawable.icon_level_4_30dp)
+            5 -> context.getDrawable(R.drawable.icon_level_5_30dp)
+            else -> null
+        }
+    }
+
+    private fun raidBossDrawable(context: Context, raidBossId: String): Drawable? {
+        raidBosses.find { it.id == raidBossId }?.imageName?.let { imageName ->
+            return assetDrawable(
+                context,
+                ASSETS_DIR_RAIDBOSSES,
+                assetImageName = imageName
+            )
+        } ?: run {
+            Log.e(TAG, "could not determine raidBoss drawable for raidBossId: $raidBossId")
+            return null
+        }
+    }
+
+    private fun raidBossPlaceholerDrawable(context: Context, raidLevel: Int): Drawable? {
+        // TODO: need alpha value, not white
+        // TODO: Egg of image should be same size as egg of icon_level_x_30dp
+        return when(raidLevel) {
+            1 -> context.getDrawable(R.drawable.icon_level_1_hatched_30dp)
+            2 -> context.getDrawable(R.drawable.icon_level_2_hatched_30dp)
+            3 -> context.getDrawable(R.drawable.icon_level_3_hatched_30dp)
+            4 -> context.getDrawable(R.drawable.icon_level_4_hatched_30dp)
+            5 -> context.getDrawable(R.drawable.icon_level_5_hatched_30dp)
+            else -> null
+        }
     }
 
     fun assetDrawable(context: Context, assetDir: String, assetImageName: String): Drawable? {

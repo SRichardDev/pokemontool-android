@@ -21,7 +21,7 @@
             style="@style/TextStyle_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            android:maxLines="1"
             android:layout_marginTop="@dimen/layout_margin_small"
             android:hint="@string/authentication_login_name_edit_hint_text"
             android:text="@={viewModel.name}"/>
