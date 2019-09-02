@@ -5,10 +5,13 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import io.stanc.pogoradar.App
 import io.stanc.pogoradar.FirebaseImageMapper
+import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
+import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
@@ -19,10 +22,12 @@ class RaidViewModel: ViewModel() {
     private val TAG = javaClass.name
 
     private var arena: FirebaseArena? = null
+    var raidMeetup: FirebaseRaidMeetup? = null
+        private set
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
     private val raidStateViewModel = RaidStateViewModel()
-    val raidMeetupViewModel = RaidMeetupViewModel()
+    private val raidMeetupViewModel = RaidMeetupViewModel()
 
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 
@@ -43,19 +48,17 @@ class RaidViewModel: ViewModel() {
     val raidImage = MutableLiveData<Drawable?>()
     val isChangingMeetupTime = MutableLiveData<Boolean>(false)
 
+    val isRaidMeetupAnnounced = MutableLiveData<Boolean>(false)
+    val meetupTime = MutableLiveData<String>(App.geString(R.string.arena_raid_meetup_time_none))
+    val numParticipants = MutableLiveData<String>("0")
+    val participants = MutableLiveData<List<FirebasePublicUser>>(emptyList())
+    val isUserParticipate = MutableLiveData<Boolean>(false)
+
     // RaidStateViewModel
 
     val raidState: MutableLiveData<RaidState> = raidStateViewModel.raidState
     val raidTime: MutableLiveData<String?> = raidStateViewModel.raidTime
     val isRaidAnnounced: MutableLiveData<Boolean> = raidStateViewModel.isRaidAnnounced
-
-    // RaidMeetupViewModel
-
-    val isRaidMeetupAnnounced: MutableLiveData<Boolean> = raidMeetupViewModel.isRaidMeetupAnnounced
-    val meetupTime: MutableLiveData<String> = raidMeetupViewModel.meetupTime
-    val numParticipants: MutableLiveData<String> = raidMeetupViewModel.numParticipants
-    val participants: MutableLiveData<List<FirebasePublicUser>> = raidMeetupViewModel.participants
-    val isUserParticipate: MutableLiveData<Boolean> = raidMeetupViewModel.isUserParticipate
 
     override fun onCleared() {
         reset()
@@ -87,6 +90,27 @@ class RaidViewModel: ViewModel() {
         }
     }
 
+    // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
+    fun updateData(raidMeetup: FirebaseRaidMeetup?) {
+        this.raidMeetup = raidMeetup
+
+        raidMeetup?.let {
+            changeMeetupData(raidMeetup)
+        } ?: run {
+            reset()
+        }
+//        Log.d(TAG, "Debug:: updateData(), numParticipants: ${numParticipants.get()}, participants: ${participants.get()}, isUserParticipate: ${isUserParticipate.get()}")
+    }
+
+    private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
+        isRaidMeetupAnnounced.value = raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
+        numParticipants.value = raidMeetup.participantUserIds.size.toString()
+        isUserParticipate.value = raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id)
+        meetupTime.value = raidMeetup.meetupTime
+
+        updateParticipantsList(raidMeetup)
+    }
+
     fun reset() {
         isRaidBossMissing.value = false
         raidImage.value = null
@@ -94,6 +118,12 @@ class RaidViewModel: ViewModel() {
 
         raidStateViewModel.reset()
         raidMeetupViewModel.reset()
+
+        isRaidMeetupAnnounced.value = false
+        numParticipants.value = "0"
+        participants.value = emptyList()
+        isUserParticipate.value = false
+        meetupTime.value = App.geString(R.string.arena_raid_meetup_time_none)
 
         raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
     }
@@ -158,6 +188,54 @@ class RaidViewModel: ViewModel() {
             } ?: run {
                 raidMeetupViewModel.updateData(null)
             }
+        }
+    }
+
+    private fun updateParticipantsList(raidMeetup: FirebaseRaidMeetup) {
+
+        removeParticipantsIfNecessary(raidMeetup)
+        addParticipantsIfNecessary(raidMeetup)
+    }
+
+    private fun removeParticipantsIfNecessary(raidMeetup: FirebaseRaidMeetup) {
+
+        var publicUsers = mutableListOf<FirebasePublicUser>()
+
+        participants.value?.let { participants ->
+
+            publicUsers = participants.toMutableList()
+
+            participants.forEach { publicUser ->
+
+                if (!raidMeetup.participantUserIds.contains(publicUser.id)) {
+                    publicUsers.find { it.id == publicUser.id }?.let {
+                        publicUsers.remove(it)
+                    }
+                }
+            }
+        }
+        participants.value = publicUsers
+    }
+
+    private fun addParticipantsIfNecessary(raidMeetup: FirebaseRaidMeetup) {
+
+        raidMeetup.participantUserIds.forEach {  userId ->
+
+            firebase.loadPublicUser(userId, onCompletionCallback = { publicUser ->
+
+                var publicUsers = mutableListOf<FirebasePublicUser>()
+
+                participants.value?.let { participants ->
+
+                    publicUsers = participants.toMutableList()
+
+                    if (!participants.contains(publicUser)) {
+                        publicUsers.add(publicUser)
+                    }
+                }
+
+                participants.value = publicUsers
+            })
         }
     }
 }

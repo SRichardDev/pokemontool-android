@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
+import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 
 class ChatViewModel: ViewModel() {
@@ -32,7 +33,7 @@ class ChatViewModel: ViewModel() {
         }
     }
 
-    fun updateData(raidMeetup: FirebaseRaidMeetup?) {
+    fun updateData(arena: FirebaseArena?) {
 
         raidMeetup?.let {
             firebase.addObserver(raidMeetupObserver, it)

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
+import io.stanc.pogoradar.chat.ChatViewModel
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
@@ -66,6 +67,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>() {
         activity?.let {
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).updateData(arena, it)
             ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(arena, it)
+            ViewModelProviders.of(it).get(ChatViewModel::class.java).updateData(arena, it)
         }
     }
 }
