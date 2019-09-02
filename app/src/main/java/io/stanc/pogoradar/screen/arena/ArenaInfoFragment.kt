@@ -101,9 +101,6 @@ class ArenaInfoFragment: Fragment() {
 //                Popup.showToast(context, R.string.dialog_info_coming_soon)
                 Log.i(TAG, "Debug:: start chat...")
                 activity?.let {
-                    val viewModel = ViewModelProviders.of(it).get(ChatViewModel::class.java)
-                    viewModel.userId = FirebaseUser.userData?.id
-                    firebase.addObserver(raidMeetupObserver, raidMeetup)
                     ShowFragmentManager.showFragment(ChatFragment(), fragmentManager, R.id.arena_layout)
                 }
             }
@@ -123,6 +120,7 @@ class ArenaInfoFragment: Fragment() {
 
     private fun setupTimePicker(rootLayout: View) {
 
+
         // meetup formattedTime
 
         val meetupPickerHour = rootLayout.findViewById<NumberPicker>(R.id.arena_meetup_time_hour)
@@ -135,7 +133,7 @@ class ArenaInfoFragment: Fragment() {
 
         val meetupPickerMinutes = rootLayout.findViewById<NumberPicker>(R.id.arena_meetup_time_minutes)
         meetupPickerMinutes.minValue = 0
-        meetupPickerMinutes.maxValue = 60
+        meetupPickerMinutes.maxValue = 59
         meetupPickerMinutes.value = meetupTimeMinutes
         meetupPickerMinutes.setOnValueChangedListener { _, _, newValue ->
             meetupTimeMinutes = newValue

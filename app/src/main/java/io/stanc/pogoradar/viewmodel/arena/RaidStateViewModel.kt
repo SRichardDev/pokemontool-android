@@ -1,5 +1,6 @@
 package io.stanc.pogoradar.viewmodel.arena
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
@@ -17,7 +18,7 @@ class RaidStateViewModel: ViewModel() {
     val isRaidAnnounced = MutableLiveData<Boolean>(false)
 
     fun updateData(raid: FirebaseRaid?) {
-//        Log.d(TAG, "Debug:: updateData(raid: $raid)")
+        Log.d(TAG, "Debug:: updateData(raid: $raid)")
         this.raid = raid
 
         raid?.let {
@@ -34,6 +35,7 @@ class RaidStateViewModel: ViewModel() {
     }
 
     fun reset() {
+        Log.d(TAG, "Debug:: reset()")
         raidState.value = RaidState.NONE
         raidTime.value = null
         isRaidAnnounced.value = false

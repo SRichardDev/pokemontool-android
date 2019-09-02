@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.viewmodel
 
-import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.lifecycle.ViewModel
@@ -81,7 +80,7 @@ class LoginViewModel: ViewModel() {
         name.set(null)
         email.set(null)
         code.set("")
-        level.set("0")
+        level.set("40")
         numberPokestops.set(0)
         numberArenas.set(0)
         numberRaids.set(0)

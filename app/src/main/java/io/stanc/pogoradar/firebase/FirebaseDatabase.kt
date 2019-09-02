@@ -131,7 +131,6 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         FirebaseServer.setData("$RAID_MEETUPS/$raidMeetupId/$MEETUP_TIME", time)
     }
 
-
     private fun removeRaidMeetupIfExists(raidDatabasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         FirebaseServer.requestDataValue("$raidDatabasePath/$RAID_MEETUP_ID", object: OnCompleteCallback<Any?> {
@@ -196,6 +195,11 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
         } ?: run {
             Log.e(TAG, "could not cancel raid meetup participation, because User.userData?.id?: ${FirebaseUser.userData?.id}")
         }
+    }
+
+    fun pushChatMessage(message: FirebaseChat): String? {
+        val chatMessageId = FirebaseServer.createNodeByAutoId(message.databasePath(), message.data())
+        return chatMessageId
     }
 
     fun loadPublicUser(userId: String, onCompletionCallback: (publicUser: FirebasePublicUser) -> Unit) {

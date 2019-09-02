@@ -21,7 +21,8 @@ class ChatFragment: Fragment(),
     MessagesListAdapter.OnLoadMoreListener,
     MessageInput.InputListener,
     MessageInput.AttachmentsListener,
-    MessageInput.TypingListener {
+    MessageInput.TypingListener,
+    ChatViewModel.ReceiveMessageDelegate {
 
     private val TAG = javaClass.name
 
@@ -29,7 +30,6 @@ class ChatFragment: Fragment(),
     private val imageLoader: ImageLoader? = null
 
     private val DEFAULT_MESSAGE_ID: String = "defaultMessageId"
-    private var messagesList: MessagesList? = null
     private var messagesAdapter: MessagesListAdapter<ChatMessage>? = null
 
     private var viewModel: ChatViewModel? = null
@@ -39,6 +39,7 @@ class ChatFragment: Fragment(),
 
         activity?.let {
             viewModel = ViewModelProviders.of(it).get(ChatViewModel::class.java)
+            viewModel?.setDelegate(this)
         }
 
         setupChatMessageList(rootLayout)
@@ -54,7 +55,7 @@ class ChatFragment: Fragment(),
 
     private fun setupChatMessageList(rootLayout: View) {
 
-        messagesList = rootLayout.findViewById(R.id.messagesList)
+        val messagesList = rootLayout.findViewById<MessagesList>(R.id.messagesList)
 
         val messageConfig = MessageHolders()
             .setIncomingTextConfig(IncomingTextMessageViewHolder::class.java, R.layout.chat_incoming_text_message)
@@ -70,7 +71,7 @@ class ChatFragment: Fragment(),
                 context?.let { Popup.showToast(it, message.text) }
             }
 
-            messagesList?.setAdapter(adapter)
+            messagesList.setAdapter(adapter)
             messagesAdapter = adapter
         }
     }
@@ -90,11 +91,20 @@ class ChatFragment: Fragment(),
         }
     }
 
-//    fun startChat() {
-//
-//        val firstMessage = ChatMessage.new("anyMessageId", userId, "This Debug User", "debug chat message")
-//        messagesAdapter?.addToStart(firstMessage, true)
-//    }
+    override fun onReceivedMessage(message: ChatMessage) {
+        Log.i(TAG, "Debug:: onReceivedMessage(message: $message)")
+        messagesAdapter?.addToStart(message, true)
+    }
+
+    override fun onUpdateMessageList(messages: List<ChatMessage>) {
+        Log.i(TAG, "Debug:: onUpdateMessageList(messages: $messages)")
+
+        messagesAdapter?.clear()
+
+        messages.forEach { message ->
+            messagesAdapter?.addToStart(message, true)
+        }
+    }
 
     override fun onSelectionChanged(count: Int) {
         Log.i(TAG, "Debug:: onSelectionChanged(count: $count)")
@@ -106,8 +116,11 @@ class ChatFragment: Fragment(),
 
     override fun onSubmit(input: CharSequence?): Boolean {
         Log.i(TAG, "Debug:: onSubmit(input: $input)")
-        val firstMessage = ChatMessage.new(DEFAULT_MESSAGE_ID, viewModel?.userId!!, viewModel?.userName!!, input.toString())
-        messagesAdapter?.addToStart(firstMessage, true)
+
+        val id = viewModel?.newMessage(viewModel?.userId!!, input.toString())
+        val newMessage = ChatMessage.new(id ?: DEFAULT_MESSAGE_ID, viewModel?.userId!!, viewModel?.userName!!, input.toString())
+        messagesAdapter?.addToStart(newMessage, true)
+
         return true
     }
 

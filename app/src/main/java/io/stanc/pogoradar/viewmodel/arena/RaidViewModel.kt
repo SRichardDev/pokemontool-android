@@ -5,12 +5,10 @@ import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import io.stanc.pogoradar.App
 import io.stanc.pogoradar.FirebaseImageMapper
-import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.DatabaseKeys
+import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
 import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
@@ -27,18 +25,6 @@ class RaidViewModel: ViewModel() {
     private var firebase: FirebaseDatabase = FirebaseDatabase()
 
     private val raidStateViewModel = RaidStateViewModel()
-    private val raidMeetupViewModel = RaidMeetupViewModel()
-
-    private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
-
-        override fun onItemChanged(item: FirebaseRaidMeetup) {
-            raidMeetupViewModel.updateData(item)
-        }
-
-        override fun onItemRemoved(itemId: String) {
-            raidMeetupViewModel.updateData(null)
-        }
-    }
 
     /**
      * observable fields
@@ -49,7 +35,7 @@ class RaidViewModel: ViewModel() {
     val isChangingMeetupTime = MutableLiveData<Boolean>(false)
 
     val isRaidMeetupAnnounced = MutableLiveData<Boolean>(false)
-    val meetupTime = MutableLiveData<String>(App.geString(R.string.arena_raid_meetup_time_none))
+    val meetupTime = MutableLiveData<String>(DEFAULT_MEETUP_TIME)
     val numParticipants = MutableLiveData<String>("0")
     val participants = MutableLiveData<List<FirebasePublicUser>>(emptyList())
     val isUserParticipate = MutableLiveData<Boolean>(false)
@@ -60,16 +46,16 @@ class RaidViewModel: ViewModel() {
     val raidTime: MutableLiveData<String?> = raidStateViewModel.raidTime
     val isRaidAnnounced: MutableLiveData<Boolean> = raidStateViewModel.isRaidAnnounced
 
-    override fun onCleared() {
-        reset()
-        super.onCleared()
-    }
-
     /**
      * interface
      */
 
+    fun participant(id: String): FirebasePublicUser? {
+        return participants.value?.firstOrNull { it.id == id }
+    }
+
     fun updateData(arena: FirebaseArena?, context: Context) {
+        Log.d(TAG, "Debug:: updateData(arena: $arena)")
         this.arena = arena
 
         arena?.let {
@@ -83,8 +69,6 @@ class RaidViewModel: ViewModel() {
                 false
             }
 
-            requestRaidMeetupData(arena)
-
         } ?: run {
             reset()
         }
@@ -92,6 +76,7 @@ class RaidViewModel: ViewModel() {
 
     // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
     fun updateData(raidMeetup: FirebaseRaidMeetup?) {
+        Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup)")
         this.raidMeetup = raidMeetup
 
         raidMeetup?.let {
@@ -112,25 +97,23 @@ class RaidViewModel: ViewModel() {
     }
 
     fun reset() {
+        Log.d(TAG, "Debug:: reset()")
         isRaidBossMissing.value = false
         raidImage.value = null
         isChangingMeetupTime.value = false
-
-        raidStateViewModel.reset()
-        raidMeetupViewModel.reset()
 
         isRaidMeetupAnnounced.value = false
         numParticipants.value = "0"
         participants.value = emptyList()
         isUserParticipate.value = false
-        meetupTime.value = App.geString(R.string.arena_raid_meetup_time_none)
+        meetupTime.value = DEFAULT_MEETUP_TIME
 
-        raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
+        raidStateViewModel.reset()
     }
 
     fun changeParticipation(participate: Boolean) {
 
-        raidMeetupViewModel.raidMeetup?.id?.let {
+        raidMeetup?.id?.let {
 
             if (participate) {
                 firebase.pushRaidMeetupParticipation(it)
@@ -139,7 +122,7 @@ class RaidViewModel: ViewModel() {
             }
 
         } ?: run {
-            Log.e(TAG, "could not changed participation($participate), because: raidMeetup?.id: ${raidMeetupViewModel.raidMeetup?.id}")
+            Log.e(TAG, "could not changed participation($participate), because: raidMeetup?.id: ${raidMeetup?.id}")
         }
     }
 
@@ -173,22 +156,6 @@ class RaidViewModel: ViewModel() {
 
     private fun imageDrawable(arena: FirebaseArena, context: Context): Drawable? {
         return FirebaseImageMapper.raidDrawable(context, arena)
-    }
-
-    private fun requestRaidMeetupData(arena: FirebaseArena) {
-
-        raidMeetupViewModel.raidMeetup?.let { firebase.removeObserver(raidMeetupObserver, it) }
-
-        if (isRaidAnnounced.value == true) {
-            arena.raid?.raidMeetupId?.let { id ->
-
-                val raidMeetup = FirebaseRaidMeetup.new(id, DatabaseKeys.DEFAULT_MEETUP_TIME)
-                firebase.addObserver(raidMeetupObserver, raidMeetup)
-
-            } ?: run {
-                raidMeetupViewModel.updateData(null)
-            }
-        }
     }
 
     private fun updateParticipantsList(raidMeetup: FirebaseRaidMeetup) {

@@ -48,5 +48,9 @@ class FirebaseChat private constructor(
 
             return null
         }
+
+        fun new(raidMeetupId: String, senderId: String, message: String): FirebaseChat {
+            return FirebaseChat("", raidMeetupId, message, senderId, TIMESTAMP_SERVER)
+        }
     }
 }
