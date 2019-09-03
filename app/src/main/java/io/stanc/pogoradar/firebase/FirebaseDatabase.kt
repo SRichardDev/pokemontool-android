@@ -3,6 +3,7 @@ package io.stanc.pogoradar.firebase
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
+import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT
 import io.stanc.pogoradar.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogoradar.firebase.DatabaseKeys.MEETUP_TIME
 import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
@@ -100,7 +101,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     /**
-     * raids & meetups
+     * raids & meetups & chats
      */
 
     fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup) {
@@ -200,6 +201,14 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     fun pushChatMessage(message: FirebaseChat): String? {
         val chatMessageId = FirebaseServer.createNodeByAutoId(message.databasePath(), message.data())
         return chatMessageId
+    }
+
+    fun addChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, raidMeetupId: String) {
+        FirebaseServer.addListEventListener("$RAID_MEETUPS/$raidMeetupId/$CHAT", observer)
+    }
+
+    fun removeChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, raidMeetupId: String) {
+        FirebaseServer.removeListEventListener("$RAID_MEETUPS/$raidMeetupId/$CHAT", observer)
     }
 
     fun loadPublicUser(userId: String, onCompletionCallback: (publicUser: FirebasePublicUser) -> Unit) {

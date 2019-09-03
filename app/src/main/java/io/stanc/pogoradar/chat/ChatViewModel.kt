@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.firebase.node.FirebaseChat
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
-import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
-import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import java.lang.ref.WeakReference
 
 class ChatViewModel: ViewModel() {
@@ -25,39 +23,69 @@ class ChatViewModel: ViewModel() {
     private var receiveMessageDelegate: WeakReference<ReceiveMessageDelegate>? = null
     private var sendMessageDelegate: WeakReference<SendMessageDelegate>? = null
 
-    var raidMeetup: FirebaseRaidMeetup? = null
     var userId: String? = null
     var userName: String? = null
-    var messages: List<ChatMessage> = mutableListOf()
+    var chatMessages: MutableList<ChatMessage> = mutableListOf()
+    private var chatParticipants: List<FirebasePublicUser>? = null
 
-    fun updateData(raidMeetup: FirebaseRaidMeetup?, user: FirebaseUserNode?, chatParticipants: List<FirebasePublicUser>?) {
-        Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup, user: $user, chatParticipants: $chatParticipants)")
-        raidMeetup?.let {
+    fun updateUser(user: FirebaseUserNode?) {
+        Log.d(TAG, "Debug:: updateUser(user: $user)")
+        user?.let {
 
-            userId = user?.id
-            userName = user?.name
-            messages = raidMeetup.chats.map { chat ->
+            userId = user.id
+            userName = user.name
+
+        } ?: run {
+
+            userId = null
+            userName = null
+        }
+    }
+
+    fun updateChatParticipants(chatParticipants: List<FirebasePublicUser>?) {
+        Log.d(TAG, "Debug:: updateChatParticipants(chats: $chatParticipants)")
+        this.chatParticipants = chatParticipants
+    }
+
+    fun updateChatMessages(chats: List<FirebaseChat>?) {
+        Log.d(TAG, "Debug:: updateChatMessages(chats: $chats)")
+
+        chats?.let {
+
+            chatMessages = chats.map { chat ->
                 chatParticipants?.firstOrNull { it.id == chat.senderId}?.let { publicUser ->
                     ChatMessage.new(chat, publicUser)
                 }
-            }.filterNotNull()
-
-            receiveMessageDelegate?.get()?.onUpdateMessageList(messages)
+            }.filterNotNull().toMutableList()
 
         } ?: run {
-            reset()
+
+            chatMessages = mutableListOf()
         }
 
-        this.raidMeetup = raidMeetup
+        receiveMessageDelegate?.get()?.onUpdateMessageList(chatMessages)
+    }
+
+    fun messageReceived(message: FirebaseChat) {
+        chatParticipants?.firstOrNull { it.id == message.senderId}?.let { publicUser ->
+
+            val chatMessage = ChatMessage.new(message, publicUser)
+            chatMessages.add(chatMessage)
+            receiveMessageDelegate?.get()?.onReceivedMessage(chatMessage)
+        }
+    }
+
+    fun messageRemoved(message: FirebaseChat) {
+        // TODO: ...
     }
 
     fun reset() {
         Log.d(TAG, "Debug:: reset()")
-        raidMeetup = null
 
         userId = null
         userName = null
-        messages = mutableListOf()
+        chatMessages = mutableListOf()
+        chatParticipants = null
 
         receiveMessageDelegate = null
         sendMessageDelegate = null

@@ -60,7 +60,7 @@ class App: Application() {
 //            Log.i(TAG, "Debug:: ChatSDK.initialize")
 //            ChatSDK.initialize(builder.build(), FirebaseNetworkAdapter(), BaseInterfaceAdapter(context))
 //
-//            // File storage is needed for profile image upload and image messages
+//            // File storage is needed for profile image upload and image chatMessages
 //            FirebaseFileStorageModule.activate()
 //
 //            // Push notification module, TODO: if chat firebase-push-notification should be handled separately

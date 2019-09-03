@@ -108,6 +108,10 @@ object FirebaseServer {
             })
         }
 
+    /**
+     * Node listener
+     */
+
     private val nodeDidChangeListener = HashMap<Pair<Int, String>, NodeEventListener>()
 
     fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
@@ -154,6 +158,63 @@ object FirebaseServer {
             } else {
                 callback.get()?.nodeChanged(p0)
             }
+        }
+    }
+
+    /**
+     * Child list listener
+     */
+
+    private val listDidChangeListener = HashMap<Pair<Int, String>, ListEventListener>()
+
+    fun addListEventListener(databasePath: String, callback: OnChildDidChangeCallback) {
+        if (!alreadyAddedToList(databasePath, callback)) {
+
+            val eventListener = ListEventListener(callback)
+            listDidChangeListener[Pair(callback.hashCode(), databasePath)] = eventListener
+            databaseRef.child(databasePath).addChildEventListener(eventListener)
+        }
+    }
+
+    fun removeListEventListener(databasePath: String, callback: OnChildDidChangeCallback) {
+        listDidChangeListener.remove(Pair(callback.hashCode(), databasePath))?.let {
+            databaseRef.child(databasePath).removeEventListener(it)
+        }
+    }
+
+    private fun alreadyAddedToList(databasePath: String, callback: OnChildDidChangeCallback): Boolean {
+        return listDidChangeListener.containsKey(Pair(callback.hashCode(), databasePath))
+    }
+
+    interface OnChildDidChangeCallback {
+        fun childAdded(dataSnapshot: DataSnapshot)
+        fun childChanged(dataSnapshot: DataSnapshot)
+        fun childRemoved(kdataSnapshot: DataSnapshot)
+    }
+
+    private class ListEventListener(callback: OnChildDidChangeCallback): ChildEventListener {
+        private val TAG = this.javaClass.name
+
+        private val callback = WeakReference(callback)
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e(TAG, "onCancelled(error: $error), listener was removed for ${callback.get()}")
+        }
+
+        override fun onChildMoved(dataSnapshot: DataSnapshot, childName: String?) {
+            callback.get()?.childChanged(dataSnapshot)
+        }
+
+        override fun onChildChanged(dataSnapshot: DataSnapshot, childName: String?) {
+            callback.get()?.childChanged(dataSnapshot)
+        }
+
+        override fun onChildAdded(dataSnapshot: DataSnapshot, childName: String?) {
+            callback.get()?.childAdded(dataSnapshot)
+        }
+
+        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+            callback.get()?.childRemoved(dataSnapshot)
         }
     }
 

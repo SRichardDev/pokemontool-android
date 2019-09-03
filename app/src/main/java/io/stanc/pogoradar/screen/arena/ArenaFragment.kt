@@ -6,21 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
+import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
-import io.stanc.pogoradar.chat.ChatMessage
 import io.stanc.pogoradar.chat.ChatViewModel
-import io.stanc.pogoradar.firebase.DatabaseKeys
-import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
-import io.stanc.pogoradar.firebase.FirebaseUser
+import io.stanc.pogoradar.firebase.*
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebaseChat
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
-import io.stanc.pogoradar.viewmodel.arena.RaidStateViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 
 
@@ -29,6 +25,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private val TAG = javaClass.name
 
     private var firebase: FirebaseDatabase = FirebaseDatabase()
+
+    private var arenaViewModel: ArenaViewModel? = null
+    private var raidViewModel: RaidViewModel? = null
+    private var chatViewModel: ChatViewModel? = null
 
     /**
      * Observer
@@ -52,9 +52,13 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         override fun onItemChanged(item: FirebaseRaidMeetup) {
             Log.v(TAG, "Debug:: raidMeetup.onItemChanged(item: $item)")
             activity?.let {
-                val raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
-                raidViewModel.updateData(item)
-                ViewModelProviders.of(it).get(ChatViewModel::class.java).updateData(item, FirebaseUser.userData, raidViewModel.participants.value)
+
+                if (item.id != raidViewModel?.raidMeetup?.id) {
+                    firebase.addChatObserver(chatObserver, item.id)
+                }
+
+                raidViewModel?.updateData(item)
+                chatViewModel?.updateChatParticipants(raidViewModel?.participants?.value)
             }
         }
 
@@ -62,10 +66,33 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             Log.v(TAG, "Debug:: raidMeetup.onItemRemoved(itemId: $itemId)")
             if (dataObject?.raid?.raidMeetupId == itemId) {
                 activity?.let {
-                    ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(null)
-                    ViewModelProviders.of(it).get(ChatViewModel::class.java).updateData(null, null, null)
+                    firebase.removeChatObserver(chatObserver, itemId)
+                    raidViewModel?.reset()
+                    chatViewModel?.reset()
                 }
             }
+        }
+    }
+
+    private val chatObserver = object: FirebaseServer.OnChildDidChangeCallback {
+
+        override fun childAdded(dataSnapshot: DataSnapshot) {
+
+            dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
+                FirebaseChat.new(raidMeetupId, dataSnapshot)?.let { chat ->
+                    chatViewModel?.messageReceived(chat)
+                }
+            }
+        }
+
+        override fun childChanged(dataSnapshot: DataSnapshot) {
+            Log.d(TAG, "Debug:: childChanged($dataSnapshot)")
+            // TODO ...
+        }
+
+        override fun childRemoved(dataSnapshot: DataSnapshot) {
+            Log.d(TAG, "Debug:: childRemoved($dataSnapshot)")
+            // TODO ...
         }
     }
 
@@ -90,9 +117,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         Log.i(TAG, "Debug:: onCreateView()")
         resetViewModels()
 
-        activity?.let {
-            ViewModelProviders.of(it).get(ChatViewModel::class.java).setDelegate(this)
-        }
+        setupViewModels()
 
         dataObject?.let { arena ->
             firebase.addObserver(arenaObserver, arena)
@@ -119,8 +144,8 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
     override fun onDataChanged(dataObject: FirebaseArena?) {
         activity?.let {
-            ViewModelProviders.of(it).get(ArenaViewModel::class.java).updateData(dataObject, it)
-            ViewModelProviders.of(it).get(RaidViewModel::class.java).updateData(dataObject, it)
+            arenaViewModel?.updateData(dataObject, it)
+            raidViewModel?.updateData(dataObject, it)
         }
 
         tryAddingRaidMeetupObserver(dataObject)
@@ -130,11 +155,24 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
      * Implementation
      */
 
+    private fun setupViewModels() {
+        activity?.let {
+            arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
+            raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
+            chatViewModel = ViewModelProviders.of(it).get(ChatViewModel::class.java)
+
+            arenaViewModel?.updateData(dataObject, it)
+            raidViewModel?.updateData(dataObject, it)
+
+            chatViewModel?.setDelegate(this)
+            chatViewModel?.updateUser(FirebaseUser.userData)
+        }
+    }
+
     private fun resetViewModels() {
         activity?.let {
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).reset()
             ViewModelProviders.of(it).get(RaidViewModel::class.java).reset()
-            ViewModelProviders.of(it).get(RaidStateViewModel::class.java).reset()
             ViewModelProviders.of(it).get(ChatViewModel::class.java).reset()
         }
     }
@@ -156,6 +194,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             arena.raid?.raidMeetupId?.let { raidMeetupId ->
                 val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)
                 firebase.removeObserver(raidMeetupObserver, raidMeetup)
+                firebase.removeChatObserver(chatObserver, raidMeetupId)
             }
         }
     }

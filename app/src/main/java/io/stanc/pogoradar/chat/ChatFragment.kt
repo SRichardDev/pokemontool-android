@@ -50,7 +50,7 @@ class ChatFragment: Fragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel?.messages?.let { showMessages(it) }
+        viewModel?.chatMessages?.let { showMessages(it) }
     }
 
     private fun setupChatMessageList(rootLayout: View) {
@@ -97,7 +97,7 @@ class ChatFragment: Fragment(),
     }
 
     override fun onUpdateMessageList(messages: List<ChatMessage>) {
-        Log.i(TAG, "Debug:: onUpdateMessageList(messages: $messages)")
+        Log.i(TAG, "Debug:: onUpdateMessageList(chatMessages: $messages)")
 
         messagesAdapter?.clear()
 
