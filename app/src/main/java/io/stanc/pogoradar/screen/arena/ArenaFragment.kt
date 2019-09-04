@@ -53,49 +53,30 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         override fun onItemChanged(item: FirebaseRaidMeetup) {
             Log.v(TAG, "Debug:: raidMeetup.onItemChanged(item: $item)")
             activity?.let {
-
-                if (item.id != raidViewModel?.raidMeetup?.id) {
-                    firebase.addChatObserver(chatObserver, item.id)
-                }
-
                 raidViewModel?.updateData(item)
-                Log.v(TAG, "Debug:: raidMeetup.onItemChanged() participants: ${raidViewModel?.participants?.value}")
-                raidViewModel?.participants?.value?.let { list ->
-                    chatViewModel?.updateChatParticipants(list)
-                }
+                firebase.addChatObserver(chatObserver, item.id)
             }
         }
 
-        override fun onItemRemoved(itemId: String) {
-            Log.w(TAG, "Debug:: raidMeetup.onItemRemoved(itemId: $itemId) -> reset viewModels")
-            if (dataObject?.raid?.raidMeetupId == itemId) {
-                activity?.let {
-                    firebase.removeChatObserver(chatObserver, itemId)
-                    raidViewModel?.reset()
-                    chatViewModel?.reset()
-                }
-            }
-        }
+        override fun onItemRemoved(itemId: String) {}
     }
 
     private val chatObserver = object: FirebaseServer.OnChildDidChangeCallback {
 
         override fun childAdded(dataSnapshot: DataSnapshot) {
-
+            Log.d(TAG, "Debug:: childAdded($dataSnapshot)")
             dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
                 FirebaseChat.new(raidMeetupId, dataSnapshot)?.let { chat ->
-                    chatViewModel?.messageReceived(chat)
+                    chatViewModel?.receiveMessage(chat)
                 }
             }
         }
 
         override fun childChanged(dataSnapshot: DataSnapshot) {
-            Log.d(TAG, "Debug:: childChanged($dataSnapshot)")
             // TODO ...
         }
 
         override fun childRemoved(dataSnapshot: DataSnapshot) {
-            Log.d(TAG, "Debug:: childRemoved($dataSnapshot)")
             // TODO ...
         }
     }
@@ -173,7 +154,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
             chatViewModel?.setDelegate(this)
             FirebaseUser.userData?.let { user ->
-                chatViewModel?.updateUser(user)
+                chatViewModel?.setUser(user)
             }
         }
     }

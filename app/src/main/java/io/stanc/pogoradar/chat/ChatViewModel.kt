@@ -2,8 +2,8 @@ package io.stanc.pogoradar.chat
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseChat
-import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import java.lang.ref.WeakReference
 
@@ -11,9 +11,10 @@ class ChatViewModel: ViewModel() {
 
     private val TAG = javaClass.name
 
+    private var firebase: FirebaseDatabase = FirebaseDatabase()
+
     interface ReceiveMessageDelegate {
         fun onReceivedMessage(message: ChatMessage)
-        fun onUpdateMessageList(messages: List<ChatMessage>)
     }
 
     interface SendMessageDelegate {
@@ -26,57 +27,21 @@ class ChatViewModel: ViewModel() {
     var userId: String? = null
     var userName: String? = null
     var chatMessages: MutableList<ChatMessage> = mutableListOf()
-    private var chatParticipants: List<FirebasePublicUser>? = null
 
-    fun updateUser(user: FirebaseUserNode) {
-        Log.d(TAG, "Debug:: updateUser(user: $user)")
+    fun setUser(user: FirebaseUserNode) {
         userId = user.id
         userName = user.name
     }
 
-    fun updateChatParticipants(chatParticipants: List<FirebasePublicUser>) {
-        Log.d(TAG, "Debug:: updateChatParticipants(user: $chatParticipants)")
-        this.chatParticipants = chatParticipants
+    fun receiveMessage(message: FirebaseChat) {
+        onMessageReceived(message)
     }
 
-    fun updateChatMessages(chats: List<FirebaseChat>) {
-        Log.d(TAG, "Debug:: updateChatMessages(chats: $chats)")
-
-        chatMessages = chats.map { chat ->
-            chatParticipants?.firstOrNull { it.id == chat.senderId}?.let { publicUser ->
-                ChatMessage.new(chat, publicUser)
-            }
-        }.filterNotNull().toMutableList()
-
-        receiveMessageDelegate?.get()?.onUpdateMessageList(chatMessages)
-    }
-
-    fun messageReceived(message: FirebaseChat) {
-        chatParticipants?.firstOrNull { it.id == message.senderId}?.let { publicUser ->
-
-            val chatMessage = ChatMessage.new(message, publicUser)
-            chatMessages.add(chatMessage)
-            receiveMessageDelegate?.get()?.onReceivedMessage(chatMessage)
-        }
-    }
-
-    fun messageRemoved(message: FirebaseChat) {
+    fun removeMessage(message: FirebaseChat) {
         // TODO: ...
     }
 
-    fun reset() {
-        Log.w(TAG, "Debug:: reset()")
-
-        userId = null
-        userName = null
-        chatMessages = mutableListOf()
-        chatParticipants = null
-
-        receiveMessageDelegate = null
-        sendMessageDelegate = null
-    }
-
-    fun newMessage(senderId: String, text: String): String? {
+    fun writeNewMessage(senderId: String, text: String): String? {
         return sendMessageDelegate?.get()?.onSendingMessage(senderId, text)
     }
 
@@ -86,5 +51,29 @@ class ChatViewModel: ViewModel() {
 
     fun setDelegate(delegate: SendMessageDelegate) {
         sendMessageDelegate = WeakReference(delegate)
+    }
+
+    fun reset() {
+        userId = null
+        userName = null
+        chatMessages = mutableListOf()
+
+        receiveMessageDelegate = null
+        sendMessageDelegate = null
+    }
+
+    private fun onMessageReceived(message: FirebaseChat) {
+
+        Log.d(TAG, "Debug:: onMessageReceived($message)")
+        firebase.loadPublicUser(message.senderId, onCompletionCallback = { publicUser ->
+
+            Log.d(TAG, "Debug:: onMessageReceived(), found $publicUser")
+            val chatMessage = ChatMessage.new(message, publicUser)
+            if (!chatMessages.any { it.id == chatMessage.id }) {
+                Log.d(TAG, "Debug:: onMessageReceived() new => add to chat messages.")
+                chatMessages.add(chatMessage)
+                receiveMessageDelegate?.get()?.onReceivedMessage(chatMessage)
+            }
+        })
     }
 }

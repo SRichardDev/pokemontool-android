@@ -55,7 +55,6 @@ class RaidViewModel: ViewModel() {
     }
 
     fun updateData(arena: FirebaseArena, context: Context) {
-        Log.d(TAG, "Debug:: updateData(arena: $arena)")
         this.arena = arena
 
         arena.raid?.let { raidStateViewModel.updateData(it) }
@@ -70,7 +69,6 @@ class RaidViewModel: ViewModel() {
 
     // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
     fun updateData(raidMeetup: FirebaseRaidMeetup) {
-        Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup)")
         this.raidMeetup = raidMeetup
 
         changeMeetupData(raidMeetup)
@@ -87,7 +85,6 @@ class RaidViewModel: ViewModel() {
     }
 
     fun reset() {
-        Log.w(TAG, "Debug:: reset()")
         isRaidBossMissing.value = false
         raidImage.value = null
         isChangingMeetupTime.value = false

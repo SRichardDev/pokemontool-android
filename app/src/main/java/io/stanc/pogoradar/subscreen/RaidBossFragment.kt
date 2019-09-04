@@ -22,12 +22,12 @@ class RaidBossFragment: RecyclerViewFragment<FirebaseRaidbossDefinition>() {
         get() = Orientation.HORIZONTAL
 
     override val initItemList: List<FirebaseRaidbossDefinition>
-        get() = FirebaseDefinitions.raidBosses.filter { it.level.toInt() == initRaidLevel }
+        get() = FirebaseDefinitions.raidBosses.filter { it.level.toIntOrNull() == initRaidLevel }
 
     override fun onCreateListAdapter(context: Context, list: List<FirebaseRaidbossDefinition>) = RaidBossAdapter(context, list)
 
     fun showList(raidLevel: Int) {
-        val newList = FirebaseDefinitions.raidBosses.filter { it.level.toInt() == raidLevel }
+        val newList = FirebaseDefinitions.raidBosses.filter { it.level.toIntOrNull() == raidLevel }
         showList(newList)
     }
 }

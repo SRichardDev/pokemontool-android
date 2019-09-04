@@ -14,6 +14,7 @@ import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
+import kotlin.random.Random
 
 
 class ChatFragment: Fragment(),
@@ -29,9 +30,7 @@ class ChatFragment: Fragment(),
     // TODO: no avatar images yet
     private val imageLoader: ImageLoader? = null
 
-    private val DEFAULT_MESSAGE_ID: String = "defaultMessageId"
     private var messagesAdapter: MessagesListAdapter<ChatMessage>? = null
-
     private var viewModel: ChatViewModel? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,9 +47,12 @@ class ChatFragment: Fragment(),
         return rootLayout
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel?.chatMessages?.let { showMessages(it) }
+    override fun onResume() {
+        super.onResume()
+        messagesAdapter?.clear()
+        viewModel?.chatMessages?.sortedBy { it.createdAt }?.forEach { chatMessage ->
+            showMessage(chatMessage)
+        }
     }
 
     private fun setupChatMessageList(rootLayout: View) {
@@ -84,44 +86,30 @@ class ChatFragment: Fragment(),
         input.setAttachmentsListener(this)
     }
 
-    private fun showMessages(messages: List<ChatMessage>) {
-
-        messages.sortedBy { it.createdAt }.forEach {
-            messagesAdapter?.addToStart(it, true)
-        }
+    private fun showMessage(chatMessage: ChatMessage) {
+        messagesAdapter?.addToStart(chatMessage, true)
     }
 
     override fun onReceivedMessage(message: ChatMessage) {
-        Log.i(TAG, "Debug:: onReceivedMessage(message: $message)")
-        messagesAdapter?.addToStart(message, true)
-    }
-
-    override fun onUpdateMessageList(messages: List<ChatMessage>) {
-        Log.i(TAG, "Debug:: onUpdateMessageList(chatMessages: $messages)")
-
-        messagesAdapter?.clear()
-
-        messages.forEach { message ->
-            messagesAdapter?.addToStart(message, true)
-        }
-    }
-
-    override fun onSelectionChanged(count: Int) {
-        Log.i(TAG, "Debug:: onSelectionChanged(count: $count)")
-    }
-
-    override fun onLoadMore(page: Int, totalItemsCount: Int) {
-        Log.i(TAG, "Debug:: onLoadMore(page: $page, totalItemsCount: $totalItemsCount)")
+        showMessage(message)
     }
 
     override fun onSubmit(input: CharSequence?): Boolean {
-        Log.i(TAG, "Debug:: onSubmit(input: $input)")
+        val id = if(Random.nextBoolean()) viewModel?.userId!! else "2uZhDGFm1wX6iFCSegjU9suFcfV2"
 
-        val id = viewModel?.newMessage(viewModel?.userId!!, input.toString())
-        val newMessage = ChatMessage.new(id ?: DEFAULT_MESSAGE_ID, viewModel?.userId!!, viewModel?.userName!!, input.toString())
-        messagesAdapter?.addToStart(newMessage, true)
+        Log.i(TAG, "Debug:: onSubmit(input: $input for user: $id)")
+        viewModel?.writeNewMessage(id, input.toString())
+//        val id = viewModel?.writeNewMessage(viewModel?.userId!!, input.toString())
 
         return true
+    }
+
+    override fun onSelectionChanged(count: Int) {
+        // not needed yet
+    }
+
+    override fun onLoadMore(page: Int, totalItemsCount: Int) {
+        // not needed yet
     }
 
     override fun onAddAttachments() {

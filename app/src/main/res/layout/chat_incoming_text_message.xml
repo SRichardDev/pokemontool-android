@@ -4,8 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/chat_margin_default"
-        android:layout_marginBottom="@dimen/chat_margin_default"
+        android:layout_marginTop="@dimen/chat_margin_small"
+        android:layout_marginBottom="@dimen/chat_margin_small"
         android:layout_marginStart="@dimen/layout_padding_screen"
         android:layout_marginEnd="@dimen/layout_padding_screen">
 
@@ -18,9 +18,12 @@
         tools:ignore="ContentDescription"
         tools:src="@drawable/icon_star_gold_30dp"/>
 
+    <!--app:layout_constrainedWidth="true"-->
+    <!--app:layout_constraintWidth_default="wrap"-->
     <LinearLayout
         android:id="@id/bubble"
         android:layout_width="wrap_content"
+        app:layout_constrainedWidth="true"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/messageUserAvatar"
@@ -41,7 +44,7 @@
             android:id="@+id/messageText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="debug text message"/>
+            tools:text="very long and important message. debug text message. foo bar foo bar foo bar. and so on."/>
 
     </LinearLayout>
 
