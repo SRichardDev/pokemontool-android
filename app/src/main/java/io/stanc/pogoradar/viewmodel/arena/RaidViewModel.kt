@@ -54,41 +54,31 @@ class RaidViewModel: ViewModel() {
         return participants.value?.firstOrNull { it.id == id }
     }
 
-    fun updateData(arena: FirebaseArena?, context: Context) {
+    fun updateData(arena: FirebaseArena, context: Context) {
         Log.d(TAG, "Debug:: updateData(arena: $arena)")
         this.arena = arena
 
-        arena?.let {
+        arena.raid?.let { raidStateViewModel.updateData(it) }
+        raidImage.value = imageDrawable(arena, context)
 
-            raidStateViewModel.updateData(arena.raid)
-            raidImage.value = imageDrawable(arena, context)
-
-            isRaidBossMissing.value = arena.raid?.let { raid ->
-                raidState.value == RaidState.RAID_RUNNING && raid.raidBossId == null
-            } ?: run {
-                false
-            }
-
+        isRaidBossMissing.value = arena.raid?.let { raid ->
+            raidState.value == RaidState.RAID_RUNNING && raid.raidBossId == null
         } ?: run {
-            reset()
+            false
         }
     }
 
     // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
-    fun updateData(raidMeetup: FirebaseRaidMeetup?) {
+    fun updateData(raidMeetup: FirebaseRaidMeetup) {
         Log.d(TAG, "Debug:: updateData(raidMeetup: $raidMeetup)")
         this.raidMeetup = raidMeetup
 
-        raidMeetup?.let {
-            changeMeetupData(raidMeetup)
-        } ?: run {
-            reset()
-        }
+        changeMeetupData(raidMeetup)
 //        Log.d(TAG, "Debug:: updateData(), numParticipants: ${numParticipants.get()}, participants: ${participants.get()}, isUserParticipate: ${isUserParticipate.get()}")
     }
 
     private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
-        isRaidMeetupAnnounced.value = raidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
+        isRaidMeetupAnnounced.value = raidMeetup.meetupTime != DEFAULT_MEETUP_TIME
         numParticipants.value = raidMeetup.participantUserIds.size.toString()
         isUserParticipate.value = raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id)
         meetupTime.value = raidMeetup.meetupTime
@@ -97,7 +87,7 @@ class RaidViewModel: ViewModel() {
     }
 
     fun reset() {
-        Log.d(TAG, "Debug:: reset()")
+        Log.w(TAG, "Debug:: reset()")
         isRaidBossMissing.value = false
         raidImage.value = null
         isChangingMeetupTime.value = false
@@ -162,6 +152,7 @@ class RaidViewModel: ViewModel() {
 
         removeParticipantsIfNecessary(raidMeetup)
         addParticipantsIfNecessary(raidMeetup)
+
     }
 
     private fun removeParticipantsIfNecessary(raidMeetup: FirebaseRaidMeetup) {

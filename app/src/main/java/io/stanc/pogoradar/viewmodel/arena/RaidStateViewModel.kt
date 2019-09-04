@@ -17,25 +17,18 @@ class RaidStateViewModel: ViewModel() {
     val raidTime = MutableLiveData<String?>(null)
     val isRaidAnnounced = MutableLiveData<Boolean>(false)
 
-    fun updateData(raid: FirebaseRaid?) {
+    fun updateData(raid: FirebaseRaid) {
         Log.d(TAG, "Debug:: updateData(raid: $raid)")
         this.raid = raid
 
-        raid?.let {
-
-            val currentRaidState = currentRaidState(it)
-            raidState.value = currentRaidState
-            raidTime.value = raidTime(it)
-            isRaidAnnounced.value = currentRaidState != RaidState.NONE
-
-        } ?: run {
-            reset()
-        }
-//        Log.d(TAG, "Debug:: updateData(), isRaidAnnounced: ${isRaidAnnounced.get()}, raidState: ${raidState.get()?.name}, raidTime: ${raidTime.get()}")
+        val currentRaidState = currentRaidState(raid)
+        raidState.value = currentRaidState
+        raidTime.value = raidTime(raid)
+        isRaidAnnounced.value = currentRaidState != RaidState.NONE
     }
 
     fun reset() {
-        Log.d(TAG, "Debug:: reset()")
+        Log.w(TAG, "Debug:: reset()")
         raidState.value = RaidState.NONE
         raidTime.value = null
         isRaidAnnounced.value = false

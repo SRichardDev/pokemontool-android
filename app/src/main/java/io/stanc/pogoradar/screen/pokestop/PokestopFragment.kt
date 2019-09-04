@@ -10,6 +10,7 @@ import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
+import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
@@ -61,9 +62,9 @@ class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
 
     private fun updateViewModel(pokestop: FirebasePokestop?) {
 
-        activity?.let {
-            ViewModelProviders.of(it).get(PokestopViewModel::class.java).updateData(pokestop, it)
-            ViewModelProviders.of(it).get(QuestViewModel::class.java).updateData(pokestop, it)
+        Kotlin.safeLet(activity, pokestop) { activity, pokestop ->
+            ViewModelProviders.of(activity).get(PokestopViewModel::class.java).updateData(pokestop, activity)
+            ViewModelProviders.of(activity).get(QuestViewModel::class.java).updateData(pokestop, activity)
         }
     }
 }

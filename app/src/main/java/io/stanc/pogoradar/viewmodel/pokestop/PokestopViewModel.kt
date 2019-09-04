@@ -16,26 +16,20 @@ class PokestopViewModel: ViewModel() {
     val geoHash = ObservableField<GeoHash>()
     val mapItemInfoViewModel = MapItemInfoViewModel()
 
-    fun updateData(pokestop: FirebasePokestop?, context: Context) {
+    fun updateData(pokestop: FirebasePokestop, context: Context) {
         this.pokestop = pokestop
 
-        pokestop?.let {
-
-            var visible = MapFilterSettings.enablePokestops.get() == true
-            if (visible) {
-                val viewModel = QuestViewModel.new(pokestop, context)
-                visible = !(viewModel.questExists.get() == false && MapFilterSettings.justQuestPokestops.get() == true)
-            }
-            isPokestopVisibleOnMap.set(visible)
-
-            name.set(pokestop.name)
-            geoHash.set(pokestop.geoHash)
-
-            mapItemInfoViewModel.updateData(pokestop.submitter, pokestop.geoHash)
-
-        } ?: run {
-            reset()
+        var visible = MapFilterSettings.enablePokestops.get() == true
+        if (visible) {
+            val viewModel = QuestViewModel.new(pokestop, context)
+            visible = !(viewModel.questExists.get() == false && MapFilterSettings.justQuestPokestops.get() == true)
         }
+        isPokestopVisibleOnMap.set(visible)
+
+        name.set(pokestop.name)
+        geoHash.set(pokestop.geoHash)
+
+        mapItemInfoViewModel.updateData(pokestop.submitter, pokestop.geoHash)
     }
 
     fun reset() {

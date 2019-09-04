@@ -28,40 +28,25 @@ class ChatViewModel: ViewModel() {
     var chatMessages: MutableList<ChatMessage> = mutableListOf()
     private var chatParticipants: List<FirebasePublicUser>? = null
 
-    fun updateUser(user: FirebaseUserNode?) {
+    fun updateUser(user: FirebaseUserNode) {
         Log.d(TAG, "Debug:: updateUser(user: $user)")
-        user?.let {
-
-            userId = user.id
-            userName = user.name
-
-        } ?: run {
-
-            userId = null
-            userName = null
-        }
+        userId = user.id
+        userName = user.name
     }
 
-    fun updateChatParticipants(chatParticipants: List<FirebasePublicUser>?) {
-        Log.d(TAG, "Debug:: updateChatParticipants(chats: $chatParticipants)")
+    fun updateChatParticipants(chatParticipants: List<FirebasePublicUser>) {
+        Log.d(TAG, "Debug:: updateChatParticipants(user: $chatParticipants)")
         this.chatParticipants = chatParticipants
     }
 
-    fun updateChatMessages(chats: List<FirebaseChat>?) {
+    fun updateChatMessages(chats: List<FirebaseChat>) {
         Log.d(TAG, "Debug:: updateChatMessages(chats: $chats)")
 
-        chats?.let {
-
-            chatMessages = chats.map { chat ->
-                chatParticipants?.firstOrNull { it.id == chat.senderId}?.let { publicUser ->
-                    ChatMessage.new(chat, publicUser)
-                }
-            }.filterNotNull().toMutableList()
-
-        } ?: run {
-
-            chatMessages = mutableListOf()
-        }
+        chatMessages = chats.map { chat ->
+            chatParticipants?.firstOrNull { it.id == chat.senderId}?.let { publicUser ->
+                ChatMessage.new(chat, publicUser)
+            }
+        }.filterNotNull().toMutableList()
 
         receiveMessageDelegate?.get()?.onUpdateMessageList(chatMessages)
     }
@@ -80,7 +65,7 @@ class ChatViewModel: ViewModel() {
     }
 
     fun reset() {
-        Log.d(TAG, "Debug:: reset()")
+        Log.w(TAG, "Debug:: reset()")
 
         userId = null
         userName = null

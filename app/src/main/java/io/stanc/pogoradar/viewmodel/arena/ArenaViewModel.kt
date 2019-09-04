@@ -18,18 +18,12 @@ class ArenaViewModel: ViewModel() {
     val isArenaVisibleOnMap = MutableLiveData<Boolean>()
     val arenaImage = MutableLiveData<Drawable?>()
 
-    fun updateData(arena: FirebaseArena?, context: Context) {
+    fun updateData(arena: FirebaseArena, context: Context) {
         this.arena = arena
 
-        arena?.let {
-
-            isArenaVisibleOnMap.value = isArenaVisibleOnMap(it)
-            arenaImage.value = imageDrawable(arena, context)
-            mapItemInfoViewModel.updateData(arena.submitter, arena.geoHash)
-
-        } ?: run {
-            reset()
-        }
+        isArenaVisibleOnMap.value = isArenaVisibleOnMap(arena)
+        arenaImage.value = imageDrawable(arena, context)
+        mapItemInfoViewModel.updateData(arena.submitter, arena.geoHash)
     }
 
     fun reset() {

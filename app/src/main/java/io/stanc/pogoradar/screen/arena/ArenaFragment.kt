@@ -14,6 +14,7 @@ import io.stanc.pogoradar.firebase.*
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebaseChat
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
+import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
@@ -58,12 +59,15 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
                 }
 
                 raidViewModel?.updateData(item)
-                chatViewModel?.updateChatParticipants(raidViewModel?.participants?.value)
+                Log.v(TAG, "Debug:: raidMeetup.onItemChanged() participants: ${raidViewModel?.participants?.value}")
+                raidViewModel?.participants?.value?.let { list ->
+                    chatViewModel?.updateChatParticipants(list)
+                }
             }
         }
 
         override fun onItemRemoved(itemId: String) {
-            Log.v(TAG, "Debug:: raidMeetup.onItemRemoved(itemId: $itemId)")
+            Log.w(TAG, "Debug:: raidMeetup.onItemRemoved(itemId: $itemId) -> reset viewModels")
             if (dataObject?.raid?.raidMeetupId == itemId) {
                 activity?.let {
                     firebase.removeChatObserver(chatObserver, itemId)
@@ -143,9 +147,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     }
 
     override fun onDataChanged(dataObject: FirebaseArena?) {
-        activity?.let {
-            arenaViewModel?.updateData(dataObject, it)
-            raidViewModel?.updateData(dataObject, it)
+
+        Kotlin.safeLet(activity, dataObject) { activity, arena ->
+            arenaViewModel?.updateData(arena, activity)
+            raidViewModel?.updateData(arena, activity)
         }
 
         tryAddingRaidMeetupObserver(dataObject)
@@ -161,16 +166,21 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
             chatViewModel = ViewModelProviders.of(it).get(ChatViewModel::class.java)
 
-            arenaViewModel?.updateData(dataObject, it)
-            raidViewModel?.updateData(dataObject, it)
+            dataObject?.let { arena ->
+                arenaViewModel?.updateData(arena, it)
+                raidViewModel?.updateData(arena, it)
+            }
 
             chatViewModel?.setDelegate(this)
-            chatViewModel?.updateUser(FirebaseUser.userData)
+            FirebaseUser.userData?.let { user ->
+                chatViewModel?.updateUser(user)
+            }
         }
     }
 
     private fun resetViewModels() {
         activity?.let {
+            Log.w(TAG, "Debug:: resetViewModels()")
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).reset()
             ViewModelProviders.of(it).get(RaidViewModel::class.java).reset()
             ViewModelProviders.of(it).get(ChatViewModel::class.java).reset()

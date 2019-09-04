@@ -26,10 +26,10 @@ class QuestViewModel : ViewModel() {
     val reward = ObservableField<String>(App.geString(R.string.pokestop_quest_none))
     val questImage = ObservableField<Drawable?>()
 
-    fun updateData(pokestop: FirebasePokestop?, context: Context) {
+    fun updateData(pokestop: FirebasePokestop, context: Context) {
         this.pokestop = pokestop
 
-        pokestop?.quest?.let { firebaseQuest ->
+        pokestop.quest?.let { firebaseQuest ->
 
             FirebaseDefinitions.quests.firstOrNull { it.id == firebaseQuest.definitionId }?.let { questDefinition ->
 
@@ -46,15 +46,15 @@ class QuestViewModel : ViewModel() {
 
             } ?: run {
                 Log.w(TAG, "Quest data exists but definitionsId ${firebaseQuest.definitionId} not found in local quests: ${FirebaseDefinitions.quests}")
-                resetData()
+                reset()
             }
 
         } ?: run {
-            resetData()
+            reset()
         }
     }
 
-    private fun resetData() {
+    private fun reset() {
         questExists.set(false)
         quest.set(App.geString(R.string.pokestop_quest_none))
         reward.set(App.geString(R.string.pokestop_quest_none))
