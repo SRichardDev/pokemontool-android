@@ -9,52 +9,47 @@
         android:layout_marginStart="@dimen/layout_padding_screen"
         android:layout_marginEnd="@dimen/layout_padding_screen">
 
-    <ImageView
-        android:id="@+id/messageUserAvatar"
-        android:layout_width="@dimen/chat_avatar_size"
-        android:layout_height="@dimen/chat_avatar_size"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="ContentDescription"
-        tools:src="@drawable/icon_star_gold_30dp"/>
-
-    <!--app:layout_constrainedWidth="true"-->
-    <!--app:layout_constraintWidth_default="wrap"-->
     <LinearLayout
-        android:id="@id/bubble"
-        android:layout_width="wrap_content"
-        app:layout_constrainedWidth="true"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/messageUserAvatar"
-        android:layout_marginStart="@dimen/chat_margin_default"
-        android:padding="@dimen/chat_margin_small"
-        android:orientation="vertical">
-
-        <TextView
-            style="@style/TextStyle_sub"
-            android:id="@+id/messageUserName"
+            android:id="@id/bubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="DebugUser"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:padding="@dimen/chat_margin_small"
+            android:orientation="vertical">
 
         <TextView
-            style="@style/TextStyle_bold"
-            android:id="@+id/messageText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="very long and important message. debug text message. foo bar foo bar foo bar. and so on."/>
+                style="@style/TextStyle_sub"
+                android:id="@+id/messageUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="DebugUser"/>
+
+        <TextView
+                style="@style/TextStyle_bold"
+                android:id="@+id/messageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chat_margin_small"
+                tools:text="Lorem ipsum dolor sit amet, ei mei legimus pertinacia elaboraret, eius inciderint no mea, audire offendit vim at. Usu id feugiat epicuri splendide. Cu mea saepe ridens comprehensam, possit noluisse id vix. Eum decore inermis cu."/>
+
+        <TextView
+                style="@style/TextStyle_sub"
+                android:id="@+id/messageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/chat_margin_small"
+                android:layout_gravity="end"
+                tools:text="24:00"/>
+
+        <ImageView
+                android:id="@+id/messageUserAvatar"
+                android:layout_width="@dimen/chat_avatar_size"
+                android:layout_height="@dimen/chat_avatar_size"
+                android:layout_gravity="start"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/icon_star_gold_30dp"/>
 
     </LinearLayout>
-
-    <TextView
-        style="@style/TextStyle_sub"
-        android:id="@+id/messageTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/bubble"
-        app:layout_constraintEnd_toEndOf="@id/bubble"
-        tools:text="24:00"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
