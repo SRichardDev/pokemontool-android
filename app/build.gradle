@@ -10,8 +10,8 @@ android {
         applicationId "io.stanc.pogoradar"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 105
-        versionName "0.1.5"
+        versionCode 106
+        versionName "0.1.6"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -27,12 +27,6 @@ android {
     lintOptions {
         disable 'LogNotTimber', 'StringFormatInTimber', 'ThrowableNotAtBeginning', 'BinaryOperationInTimber', 'TimberArgCount', 'TimberArgTypes', 'TimberTagLength'
     }
-
-//    // chat-sdk
-//    compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_8
-//        targetCompatibility JavaVersion.VERSION_1_8
-//    }
 }
 
 androidExtensions {
