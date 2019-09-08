@@ -23,9 +23,9 @@ object DatabaseKeys {
 
     // Raid Meetup
     const val RAID_MEETUPS = "raidMeetups"
-    const val CHAT = "chats"
+    const val CHAT = "chat"
     const val CHAT_MESSAGE = "message"
-    const val CHAT_SENDER_ID = "userId"
+    const val CHAT_SENDER_ID = "senderId"
     const val MEETUP_TIME = "meetupTime"
     const val DEFAULT_MEETUP_TIME = "--:--"
     const val PARTICIPANTS = "participants"

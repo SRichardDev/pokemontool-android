@@ -1,6 +1,8 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_MESSAGE
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_SENDER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
@@ -15,7 +17,7 @@ class FirebaseChat private constructor(
     val senderId: String,
     val timestamp: Number): FirebaseNode {
 
-    override fun databasePath(): String = "$RAID_MEETUPS/$raidMeetupId/chats"
+    override fun databasePath(): String = "$RAID_MEETUPS/$raidMeetupId/$CHAT"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -32,14 +34,14 @@ class FirebaseChat private constructor(
         private val TAG = javaClass.name
 
         fun new(raidMeetupId: String, dataSnapshot: DataSnapshot): FirebaseChat? {
-//            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
+            Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
             val message = dataSnapshot.child(CHAT_MESSAGE).value as? String
             val senderId = dataSnapshot.child(CHAT_SENDER_ID).value as? String
             val timestamp = dataSnapshot.child(TIMESTAMP).value as? Number
 
-//            Log.v(TAG, "raidMeetupId: $raidMeetupId, chatId: $id, message: $message, userId: $senderId, timestamp: $timestamp")
+            Log.v(TAG, "id: $id, message: $message, senderId: $senderId, timestamp: $timestamp")
 
             if (id != null && message != null && senderId != null && timestamp != null) {
                 return FirebaseChat(id, raidMeetupId, message, senderId, timestamp)

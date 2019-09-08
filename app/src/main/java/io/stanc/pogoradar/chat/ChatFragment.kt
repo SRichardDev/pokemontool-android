@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import com.stfalcon.chatkit.messages.MessagesList
 import com.stfalcon.chatkit.messages.MessagesListAdapter
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
-import kotlin.random.Random
 
 
 class ChatFragment: Fragment(),
@@ -61,7 +59,7 @@ class ChatFragment: Fragment(),
 
         val messageConfig = MessageHolders()
             .setIncomingTextConfig(IncomingTextMessageViewHolder::class.java, R.layout.chat_incoming_text_message)
-            .setOutcomingTextLayout(R.layout.chat_outgoing_text_message)
+            .setOutcomingTextConfig(OutgoingTextMessageViewHolder::class.java, R.layout.chat_outgoing_text_message)
             .setIncomingImageLayout(R.layout.chat_incoming_image_message)
             .setOutcomingImageLayout(R.layout.chat_outgoing_image_message)
 
@@ -95,11 +93,9 @@ class ChatFragment: Fragment(),
     }
 
     override fun onSubmit(input: CharSequence?): Boolean {
-        val id = if(Random.nextBoolean()) viewModel?.userId!! else "2uZhDGFm1wX6iFCSegjU9suFcfV2"
-
-        Log.i(TAG, "Debug:: onSubmit(input: $input for user: $id)")
-        viewModel?.writeNewMessage(id, input.toString())
-//        val id = viewModel?.writeNewMessage(viewModel?.userId!!, input.toString())
+        viewModel?.userId?.let { userId ->
+            viewModel?.writeNewMessage(userId, input.toString())
+        }
 
         return true
     }

@@ -1,49 +1,60 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/chat_margin_default"
-        android:layout_marginBottom="@dimen/chat_margin_default"
+        android:layout_marginTop="@dimen/chat_margin_small"
+        android:layout_marginBottom="@dimen/chat_margin_small"
         android:layout_marginStart="@dimen/layout_padding_screen"
         android:layout_marginEnd="@dimen/layout_padding_screen">
 
-    <LinearLayout
+    <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@id/bubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:padding="@dimen/chat_margin_small"
             android:orientation="vertical">
+
+        <TextView
+                style="@style/TextStyle_sub"
+                android:id="@+id/messageTime"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                app:layout_constraintWidth_default="wrap"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/chat_margin_small"
+                app:layout_constraintHorizontal_bias="1.0"
+                tools:text="24:00"/>
 
         <TextView
                 style="@style/TextStyle_bold"
                 android:id="@+id/messageText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/messageTime"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="@dimen/chat_margin_small"
-                tools:text="Lorem ipsum dolor sit amet, ei mei legimus pertinacia elaboraret, eius inciderint no mea, audire offendit vim at. Usu id feugiat epicuri splendide. Cu mea saepe ridens comprehensam, possit noluisse id vix. Eum decore inermis cu."/>
-
-        <TextView
-                style="@style/TextStyle_sub"
-                android:id="@+id/messageTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/chat_margin_small"
-                android:layout_gravity="start"
-                tools:text="24:00"/>
+                tools:text="Lorem"/>
+        <!--tools:text="Lorem ipsum dolor sit amet, ei mei legimus pertinacia elaboraret, eius inciderint no mea, audire offendit vim at. Usu id feugiat epicuri splendide. Cu mea saepe ridens comprehensam, possit noluisse id vix. Eum decore inermis cu."/>-->
 
         <!--<ImageView-->
                 <!--android:id="@+id/messageUserAvatar"-->
                 <!--android:layout_width="@dimen/chat_avatar_size"-->
                 <!--android:layout_height="@dimen/chat_avatar_size"-->
-                <!--android:layout_gravity="end"-->
+                <!--android:layout_gravity="start"-->
+                <!--app:layout_constraintTop_toBottomOf="@id/messageText"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--android:layout_marginTop="@dimen/chat_margin_small"-->
                 <!--tools:ignore="ContentDescription"-->
-                <!--tools:src="@drawable/icon_star_gold_30dp"-->
-                <!--tools:visibility="gone"/>-->
+                <!--tools:src="@drawable/icon_star_gold_30dp"/>-->
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

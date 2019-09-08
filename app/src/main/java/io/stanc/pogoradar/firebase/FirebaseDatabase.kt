@@ -101,7 +101,7 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
     }
 
     /**
-     * raids & meetups & chats
+     * raids & meetups & chat
      */
 
     fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup) {

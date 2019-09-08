@@ -38,7 +38,6 @@ class ArenaInfoFragment: Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = FragmentArenaInfoBinding.inflate(inflater, container, false)
-        Log.i(TAG, "Debug:: onCreateView()")
         activity?.let {
             arenaViewModel = ViewModelProviders.of(it).get(ArenaViewModel::class.java)
             raidViewModel = ViewModelProviders.of(it).get(RaidViewModel::class.java)
@@ -66,16 +65,12 @@ class ArenaInfoFragment: Fragment() {
      */
 
     private fun setupRaidButtons(rootLayout: View) {
-        Log.d(TAG, "Debug:: setupRaidButtons(), arenaViewModel?.arena: ${arenaViewModel?.arena}")
         Kotlin.safeLet(context, arenaViewModel?.arena) { context, arena ->
 
             rootLayout.findViewById<TextView>(R.id.raidbosses_title)?.text = getString(R.string.raid_raidboss_selection)
 
-            Log.d(TAG, "Debug:: setupRaidButtons(rootLayout: $rootLayout)")
             rootLayout.findViewById<Button>(R.id.arena_raid_button_new_raid)?.let {
-                Log.d(TAG, "Debug:: setupRaidButtons(), found layout arena_raid_button_new_raid")
                 it.setOnClickListener {
-                    Log.d(TAG, "Debug:: setupRaidButtons.onClick: authState: ${FirebaseUser.authState().name}")
 
                     if (FirebaseUser.authState() == FirebaseUser.AuthState.UserLoggedIn) {
                         ShowFragmentManager.showFragment(RaidFragment(), fragmentManager, R.id.arena_layout)
@@ -103,8 +98,6 @@ class ArenaInfoFragment: Fragment() {
             }
 
             rootLayout.findViewById<Button>(R.id.arena_raid_button_chat)?.setOnClickListener {
-//                Popup.showToast(context, R.string.dialog_info_coming_soon)
-                Log.i(TAG, "Debug:: start chat...")
                 activity?.let {
                     ShowFragmentManager.showFragment(ChatFragment(), fragmentManager, R.id.arena_layout)
                 }
@@ -154,7 +147,6 @@ class ArenaInfoFragment: Fragment() {
      * viewmodel
      */
     private fun updateLayout() {
-        Log.d(TAG, "Debug:: updateLayout()")
         viewBinding?.root?.apply {
             setupRaidButtons(this)
             setupTimePicker(this)

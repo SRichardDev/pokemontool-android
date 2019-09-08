@@ -62,13 +62,11 @@ class FirebaseNotificationService: FirebaseMessagingService() {
         super.onCreate()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         currentFirebaseNotificationId = sharedPreferences.getInt(latestFirebaseNotificationId, 0)
-        Log.i(TAG, "Debug:: onCreate()")
         instance = WeakReference(this)
     }
 
     override fun onDestroy() {
         instance = null
-        Log.i(TAG, "Debug:: onDestroy()")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         sharedPreferences.edit().putInt(latestFirebaseNotificationId, currentFirebaseNotificationId).apply()
         super.onDestroy()
@@ -102,22 +100,22 @@ class FirebaseNotificationService: FirebaseMessagingService() {
 
     override fun onDeletedMessages() {
         super.onDeletedMessages()
-        Log.i(TAG, "Debug:: onDeletedMessages()")
+        Log.i(TAG, "onDeletedMessages()")
     }
 
     override fun onMessageSent(var1: String) {
         super.onMessageSent(var1)
-        Log.i(TAG, "Debug:: onMessageSent(var1: $var1)")
+        Log.i(TAG, "onMessageSent(var1: $var1)")
     }
 
     override fun onSendError(var1: String, var2: Exception) {
         super.onSendError(var1, var2)
-        Log.i(TAG, "Debug:: onSendError(var1: $var1, var2: ${var2.message})")
+        Log.i(TAG, "onSendError(var1: $var1, var2: ${var2.message})")
     }
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.i(TAG, "Debug:: onNewToken(token: $token) for user: ${FirebaseUser.userData}")
+        Log.i(TAG, "onNewToken(token: $token) for user: ${FirebaseUser.userData}")
         FirebaseUser.updateNotificationToken(token)
     }
 
@@ -126,7 +124,7 @@ class FirebaseNotificationService: FirebaseMessagingService() {
      */
     
     fun postLocalNotification(title: String, description: String) {
-        Log.i(TAG, "Debug:: postLocalNotification($title)")
+        Log.i(TAG, "postLocalNotification($title)")
         val intent = Intent(this, StartActivity::class.java)
         postNotification(title, description, intent, NOTIFICATION_TYPE_LOCAL, NOTIFICATION_ID_LOCAL)
     }
@@ -210,7 +208,7 @@ class FirebaseNotificationService: FirebaseMessagingService() {
             manager.createNotificationChannel(channel)
         }
 
-        Log.i(TAG, "Debug:: postNotification($notificationType, title: $title, description: $description, intent: $intent)")
+        Log.i(TAG, "postNotification($notificationType, title: $title, description: $description, intent: $intent)")
         manager.notify(currentFirebaseNotificationId, notification)
     }
 

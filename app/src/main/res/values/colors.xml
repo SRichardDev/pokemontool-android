@@ -11,6 +11,11 @@
     <color name="colorText">#800000</color>
     <color name="redTransparent">#80CC0000</color>
 
+    <!-- chat -->
+    <color name="chatIncomingMessageBackground">#77C344</color>
+    <color name="chatIncomingMessageText">#000000</color>
+    <color name="chatOutgoingMessageBackground">#3DACF7</color>
+    <color name="chatOutgoingMessageText">#ffffff</color>
 
     <color name="white">#ffffff</color>
     <color name="whiteTransparent">#99ffffff</color>

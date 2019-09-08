@@ -11,7 +11,7 @@ data class FirebaseRaidMeetup(
     override val id: String,
     val meetupTime: String,
     var participantUserIds: MutableList<String>,
-    val chats: List<FirebaseChat>): FirebaseNode {
+    val chat: List<FirebaseChat>): FirebaseNode {
 
     override fun databasePath(): String = RAID_MEETUPS
 
@@ -24,7 +24,7 @@ data class FirebaseRaidMeetup(
         participantUserIds.forEach{ dataParticipants[it] = "" }
         data[PARTICIPANTS] = dataParticipants
 
-        data[CHAT] = chats
+        data[CHAT] = chat
 
         return data
     }
@@ -42,15 +42,15 @@ data class FirebaseRaidMeetup(
 
             val participantUserIds: List<String> = dataSnapshot.child(PARTICIPANTS).children.mapNotNull { it.key }
 
-            val chats = mutableListOf<FirebaseChat>()
+            val chat = mutableListOf<FirebaseChat>()
             for (chatSnapshot in dataSnapshot.child(CHAT).children) {
-                FirebaseChat.new(id, chatSnapshot)?.let { chats.add(it) }
+                FirebaseChat.new(id, chatSnapshot)?.let { chat.add(it) }
             }
 
-            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds, chats: $chats")
+            Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds, chat: $chat")
 
             return if (meetupTime != null) {
-                FirebaseRaidMeetup(id, meetupTime, participantUserIds.toMutableList(), chats)
+                FirebaseRaidMeetup(id, meetupTime, participantUserIds.toMutableList(), chat)
             } else {
                 null
             }
@@ -61,7 +61,7 @@ data class FirebaseRaidMeetup(
         }
 
         fun new(id: String, meetupTime: String): FirebaseRaidMeetup {
-            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = mutableListOf(), chats = emptyList())
+            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = mutableListOf(), chat = emptyList())
         }
     }
 }

@@ -55,6 +55,7 @@ class RaidViewModel: ViewModel() {
     }
 
     fun updateData(arena: FirebaseArena, context: Context) {
+        Log.w(TAG, "updateData(arena: $arena)")
         this.arena = arena
 
         arena.raid?.let { raidStateViewModel.updateData(it) }
@@ -69,6 +70,7 @@ class RaidViewModel: ViewModel() {
 
     // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
     fun updateData(raidMeetup: FirebaseRaidMeetup) {
+        Log.w(TAG, "updateData(raidMeetup: $raidMeetup)")
         this.raidMeetup = raidMeetup
 
         changeMeetupData(raidMeetup)

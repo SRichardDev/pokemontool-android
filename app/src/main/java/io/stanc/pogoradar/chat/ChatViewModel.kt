@@ -1,6 +1,5 @@
 package io.stanc.pogoradar.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseChat
@@ -64,13 +63,10 @@ class ChatViewModel: ViewModel() {
 
     private fun onMessageReceived(message: FirebaseChat) {
 
-        Log.d(TAG, "Debug:: onMessageReceived($message)")
         firebase.loadPublicUser(message.senderId, onCompletionCallback = { publicUser ->
 
-            Log.d(TAG, "Debug:: onMessageReceived(), found $publicUser")
             val chatMessage = ChatMessage.new(message, publicUser)
             if (!chatMessages.any { it.id == chatMessage.id }) {
-                Log.d(TAG, "Debug:: onMessageReceived() new => add to chat messages.")
                 chatMessages.add(chatMessage)
                 receiveMessageDelegate?.get()?.onReceivedMessage(chatMessage)
             }

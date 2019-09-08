@@ -99,7 +99,6 @@ object MapFilterSettings {
                                                 justRaidArenas.get() == true ||
                                                 justQuestPokestops.get() == true
 
-        Log.d(TAG, "Debug:: checkWhetherFilterIsActive($atLeastOnFilterIstActive), enableArenas: ${enableArenas.get()}, enablePokestops: ${enablePokestops.get()}, justEXArenas: ${justEXArenas.get()}, justRaidArenas: ${justRaidArenas.get()}, justQuestPokestops: ${justQuestPokestops.get()}")
         anyFilterIsActive.set(atLeastOnFilterIstActive)
     }
 

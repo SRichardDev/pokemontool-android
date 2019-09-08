@@ -38,12 +38,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
 
         override fun onItemChanged(item: FirebaseArena) {
-            Log.v(TAG, "Debug:: arena.onItemChanged(item: $item)")
             dataObject = item
         }
 
         override fun onItemRemoved(itemId: String) {
-            Log.v(TAG, "Debug:: arena.onItemRemoved(itemId: $itemId)")
             dataObject = null
         }
     }
@@ -51,11 +49,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
 
         override fun onItemChanged(item: FirebaseRaidMeetup) {
-            Log.v(TAG, "Debug:: raidMeetup.onItemChanged(item: $item)")
-            activity?.let {
-                raidViewModel?.updateData(item)
-                firebase.addChatObserver(chatObserver, item.id)
-            }
+            updateRaidMeetup(item)
         }
 
         override fun onItemRemoved(itemId: String) {}
@@ -64,7 +58,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private val chatObserver = object: FirebaseServer.OnChildDidChangeCallback {
 
         override fun childAdded(dataSnapshot: DataSnapshot) {
-            Log.d(TAG, "Debug:: childAdded($dataSnapshot)")
             dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
                 FirebaseChat.new(raidMeetupId, dataSnapshot)?.let { chat ->
                     chatViewModel?.receiveMessage(chat)
@@ -82,7 +75,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     }
 
     override fun onSendingMessage(senderId: String, text: String): String? {
-        Log.i(TAG, "Debug:: onSendingMessage(senderId: $senderId, text: $text)")
         return dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
 
             val firebaseChatMessage = FirebaseChat.new(raidMeetupId, senderId, text)
@@ -99,7 +91,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootLayout = inflater.inflate(R.layout.fragment_arena, container, false)
-        Log.i(TAG, "Debug:: onCreateView()")
         resetViewModels()
 
         setupViewModels()
@@ -123,7 +114,6 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         removeObservers()
         dataObject = null
         resetViewModels()
-        Log.i(TAG, "Debug:: onDestroyView()")
         super.onDestroyView()
     }
 
@@ -161,10 +151,21 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
     private fun resetViewModels() {
         activity?.let {
-            Log.w(TAG, "Debug:: resetViewModels()")
             ViewModelProviders.of(it).get(ArenaViewModel::class.java).reset()
             ViewModelProviders.of(it).get(RaidViewModel::class.java).reset()
             ViewModelProviders.of(it).get(ChatViewModel::class.java).reset()
+        }
+    }
+
+    private fun updateRaidMeetup(newRaidMeetup: FirebaseRaidMeetup) {
+        activity?.let {
+
+            raidViewModel?.raidMeetup?.id?.let { firebase.removeChatObserver(chatObserver, it) }
+            raidViewModel?.updateData(newRaidMeetup)
+
+            if (raidViewModel?.isRaidAnnounced?.value == true) {
+                firebase.addChatObserver(chatObserver, newRaidMeetup.id)
+            }
         }
     }
 
