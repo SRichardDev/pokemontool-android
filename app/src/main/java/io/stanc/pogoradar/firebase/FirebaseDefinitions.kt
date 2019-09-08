@@ -24,6 +24,10 @@ object FirebaseDefinitions {
         })
     }
 
+    fun raidBossName(raidBossId: String?): String? {
+        return raidBosses.firstOrNull {it.id == raidBossId}?.name
+    }
+
     // TODO: load optional sprites from: https://github.com/PokeAPI/sprites
     private fun loadRaidBosses(firebase: FirebaseDatabase, onCompletionCallback: () -> Unit = {}) {
 

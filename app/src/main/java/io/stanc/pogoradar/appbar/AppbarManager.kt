@@ -81,6 +81,14 @@ class AppbarManager {
          * Menu Icon
          */
 
+        fun showMenu(menuType: Toolbar.MenuType) {
+            toolbar?.get()?.showMenu(menuType)
+        }
+
+        fun hideMenu(menuType: Toolbar.MenuType) {
+            toolbar?.get()?.hideMenu(menuType)
+        }
+
         fun resetMenu() {
             toolbar?.get()?.hideMenu(Toolbar.MenuType.Button)
             toolbar?.get()?.hideMenu(Toolbar.MenuType.Icon)

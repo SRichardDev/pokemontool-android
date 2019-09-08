@@ -180,6 +180,8 @@
     <string name="arena_raid_chat">Chat</string>
     <string name="arena_raid_button_send_meetup_time">Bestätigen</string>
     <string name="arena_raid_button_change_meetup_time">Treffzeitpunkt ändern</string>
+    <string name="arena_raid_share_raid_header">Teile den Raid mit deinen Freunden</string>
+
 
     <!-- Pokestop -->
     <string name="pokestop_active_quest">Aktive Quest: </string>
@@ -191,6 +193,9 @@
     <string name="pokestop_quest_popup_title">Quest wirklich melden?</string>
     <string name="pokestop_quest_popup_button_send">Senden</string>
     <string name="pokestop_quest_popup_button_cancel">Abbrechen</string>
+
+    <!-- Chat -->
+    <string name="chat_input_type_hint">Tippe hier, um zu schreiben…</string>
 
     <!-- Commmon -->
     <string name="coordinates">Koordinaten: </string>

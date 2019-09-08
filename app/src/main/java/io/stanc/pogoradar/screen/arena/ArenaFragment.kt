@@ -19,6 +19,11 @@ import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
+import android.content.Intent
+import io.stanc.pogoradar.App
+import io.stanc.pogoradar.appbar.Toolbar
+import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
+import io.stanc.pogoradar.firebase.node.FirebaseRaid
 
 
 class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.SendMessageDelegate {
@@ -108,6 +113,46 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     override fun onStart() {
         super.onStart()
         dataObject?.let { AppbarManager.setTitle(it.name) }
+        AppbarManager.setMenuIcon(R.drawable.icon_menu_share) {
+            shareRaidMeetup()
+        }
+    }
+
+    override fun onStop() {
+        AppbarManager.resetMenu()
+        super.onStop()
+    }
+
+    private fun shareRaidMeetup() {
+
+        var shareText = ""
+
+        Kotlin.safeLet(dataObject, raidViewModel?.raidMeetup) { arena, raidMeetup ->
+            shareText = createRaidPlainText(arena, raidMeetup, raidViewModel?.participants?.value?.map { it.name })
+        }
+
+        val sharingIntent = Intent(Intent.ACTION_SEND)
+        sharingIntent.type = "text/plain"
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+        startActivity(Intent.createChooser(sharingIntent, App.geString(R.string.arena_raid_share_raid_header)))
+    }
+
+    private fun createRaidPlainText(arena: FirebaseArena, raidMeetup: FirebaseRaidMeetup, participants: List<String>?): String {
+
+        var participantsString = ""
+        if (participants != null) {
+            for (userName in participants) {
+                participantsString += "• $userName\n"
+            }
+        }
+
+        return "" +
+                "🐲: ${FirebaseDefinitions.raidBossName(arena.raid?.raidBossId) ?: "---"}, ⭐️: ${arena.raid?.level ?: 0}\n" +
+                "🏟: ${arena.name}\n" +
+                "⌚️: ${arena.raid?.timeEggHatches ?: DEFAULT_MEETUP_TIME} - ${arena.raid?.timeEnd ?: DEFAULT_MEETUP_TIME}\n" +
+                "👫: ${raidMeetup.meetupTime}\n" +
+                participantsString +
+                "📍: https://maps.google.com/?q=${arena.geoHash.toLatLng().latitude},${arena.geoHash.toLatLng().longitude}"
     }
 
     override fun onDestroyView() {
@@ -165,6 +210,9 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
             if (raidViewModel?.isRaidAnnounced?.value == true) {
                 firebase.addChatObserver(chatObserver, newRaidMeetup.id)
+                AppbarManager.showMenu(Toolbar.MenuType.Icon)
+            } else {
+                AppbarManager.hideMenu(Toolbar.MenuType.Icon)
             }
         }
     }
