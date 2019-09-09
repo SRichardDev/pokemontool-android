@@ -1,22 +1,18 @@
 package io.stanc.pogoradar.map
 
+//import com.arsy.maps_library.MapRipple
 import android.content.Context
 import android.view.View
-//import com.arsy.maps_library.MapRipple
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogoradar.MapFilterSettings
-import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.DelayedTrigger
-import java.lang.ref.WeakReference
-import io.stanc.pogoradar.utils.Kotlin
-import io.stanc.pogoradar.utils.RefreshTimer
-import io.stanc.pogoradar.utils.TimeCalculator
-import io.stanc.pogoradar.viewmodel.arena.*
+import io.stanc.pogoradar.viewmodel.arena.isArenaVisibleOnMap
 import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
+import java.lang.ref.WeakReference
 
 
 class ClusterManager(context: Context, googleMap: GoogleMap, private val delegate: MarkerDelegate) {
@@ -25,6 +21,9 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private val pokestopClusterManager: ClusterManager<ClusterPokestop> = ClusterManager(context, googleMap)
     private val arenaClusterManager: ClusterManager<ClusterArena> = ClusterManager(context, googleMap)
+
+    private val clusterPokestops: HashMap<String, WeakReference<ClusterPokestop>> = HashMap()
+    private val clusterArenas: HashMap<String, WeakReference<ClusterArena>> = HashMap()
     
     private val pokestopClustering = DelayedTrigger(0) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(0) { arenaClusterManager.cluster() }
@@ -86,6 +85,9 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     init {
         pokestopClusterManager.renderer = ClusterPokestopRenderer(context, googleMap, pokestopClusterManager)
         arenaClusterManager.renderer = ClusterArenaRenderer(context, googleMap, arenaClusterManager)
+        // cluster animation only
+        pokestopClusterManager.setAnimation(true)
+        arenaClusterManager.setAnimation(true)
 
         googleMap.setOnInfoWindowClickListener { this.onInfoWindowClicked(it) }
         googleMap.setInfoWindowAdapter(googleMapInfoWindowAdapter)
@@ -124,103 +126,48 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     /**
-     * firebase items
+     * map items
      */
 
-    val pokestopDelegate = object : FirebaseDatabase.Delegate<FirebasePokestop> {
+    fun showPokestops(pokestops: List<FirebasePokestop>) {
+        pokestops.forEach { pokestop ->
 
-        override fun onItemAdded(item: FirebasePokestop) {
-
-            if (!items.containsKey(item.id)) {
-                val clusterItem = ClusterPokestop.new(item)
+            if (!clusterPokestops.containsKey(pokestop.id)) {
+                val clusterItem = ClusterPokestop.new(pokestop)
                 pokestopClusterManager.addItem(clusterItem)
-                items[clusterItem.pokestop.id] = WeakReference(clusterItem)
+                clusterPokestops[clusterItem.pokestop.id] = WeakReference(clusterItem)
             }
         }
-
-        override fun onItemChanged(item: FirebasePokestop) {
-            onItemRemoved(item.id)
-            onItemAdded(item)
-            pokestopClustering.trigger()
-        }
-
-        override fun onItemRemoved(itemId: String) {
-
-            items[itemId]?.get()?.let {
-                pokestopClusterManager.removeItem(it)
-            }
-            items.remove(itemId)
-        }
-
-        private val items: HashMap<String, WeakReference<ClusterPokestop>> = HashMap()
+        pokestopClustering.trigger()
     }
 
-    val arenaDelegate = object : FirebaseDatabase.Delegate<FirebaseArena> {
+    fun showArenas(arenas: List<FirebaseArena>) {
+        arenas.forEach { arena ->
 
-        override fun onItemAdded(item: FirebaseArena) {
-
-            if (!items.containsKey(item.id)) {
-                val clusterItem = ClusterArena.new(item)
+            if (!clusterArenas.containsKey(arena.id)) {
+                val clusterItem = ClusterArena.new(arena)
                 arenaClusterManager.addItem(clusterItem)
-                items[clusterItem.arena.id] = WeakReference(clusterItem)
-
-                startArenaRefreshTimerIfRaidAnnounced(item)
+                clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
             }
         }
+        arenaClustering.trigger()
+    }
 
-        override fun onItemChanged(item: FirebaseArena) {
-            onItemRemoved(item.id)
-            onItemAdded(item)
-            arenaClustering.trigger()
-        }
+    fun removeAllPokestops() {
+        pokestopClusterManager.clearItems()
+        clusterPokestops.clear()
+        pokestopClustering.trigger()
+    }
 
-        override fun onItemRemoved(itemId: String) {
-
-            items[itemId]?.get()?.let {
-                arenaClusterManager.removeItem(it)
-                stopRefreshTimer(it.arena)
-            }
-            items.remove(itemId)
-        }
-
-        private val items: HashMap<String, WeakReference<ClusterArena>> = HashMap()
+    fun removeAllArenas() {
+        arenaClusterManager.clearItems()
+        clusterArenas.clear()
+        arenaClustering.trigger()
     }
 
     /**
-     * timer & animation
+     * animation
      */
-
-    private fun startArenaRefreshTimerIfRaidAnnounced(arena: FirebaseArena) {
-
-        arena.raid?.let { raid ->
-
-            if (currentRaidState(raid) != RaidState.NONE) {
-
-                Kotlin.safeLet(raidTime(raid), (raid.timestamp as? Long)) { raidTime, timestamp ->
-                    startRefreshTimer(arena, raidTime, timestamp)
-                }
-            }
-        }
-    }
-
-    private fun startRefreshTimer(arena: FirebaseArena, raidTime: String, timestamp: Long) {
-
-        TimeCalculator.minutesUntil(timestamp, raidTime)?.let { minutes ->
-
-            if (minutes > 0) {
-                startAnimation(arena)
-                RefreshTimer.run(minutes, arena.id, onFinished = {
-                    stopAnimation(arena)
-                    arenaDelegate.onItemChanged(arena)
-                })
-            }
-        }
-    }
-
-    private fun stopRefreshTimer(arena: FirebaseArena) {
-        stopAnimation(arena)
-        RefreshTimer.stop(arena.id)
-    }
 
     private fun startAnimation(arena: FirebaseArena) {
         // TODO: search for performant googlemap pulse animation

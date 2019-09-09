@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
+
 
 class BlankFragment : Fragment() {
 

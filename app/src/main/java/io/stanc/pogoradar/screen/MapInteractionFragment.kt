@@ -19,8 +19,10 @@ import com.google.android.gms.maps.model.Marker
 import io.stanc.pogoradar.MapFilterSettings
 import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
-import io.stanc.pogoradar.firebase.*
+import io.stanc.pogoradar.databinding.FragmentMapInteractionBinding
 import io.stanc.pogoradar.firebase.DatabaseKeys.MAX_SUBSCRIPTIONS
+import io.stanc.pogoradar.firebase.FirebaseDatabase
+import io.stanc.pogoradar.firebase.FirebaseDefinitions
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.firebase.notification.FirebaseNotification
@@ -33,7 +35,6 @@ import io.stanc.pogoradar.subscreen.BaseMapFragment
 import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.ParcelableDataFragment.Companion.PARCELABLE_EXTRA_DATA_OBJECT
 import io.stanc.pogoradar.utils.WaitingSpinner
-import io.stanc.pogoradar.databinding.FragmentMapInteractionBinding
 
 
 class MapInteractionFragment: Fragment() {
@@ -82,6 +83,8 @@ class MapInteractionFragment: Fragment() {
             pendingNotification =  notification
             tryToConsumeNotification()
         }
+
+        loadMapItems()
     }
 
     private fun tryToConsumeNotification() {
@@ -111,7 +114,9 @@ class MapInteractionFragment: Fragment() {
                 googleMap.uiSettings.setAllGesturesEnabled(true)
 
                 context?.let {
-                    ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
+
+                    clusterManager = ClusterManager(it, googleMap, object: ClusterManager.MarkerDelegate {
+
                         override fun onArenaInfoWindowClicked(arena: FirebaseArena) {
                             showArenaFragment(arena)
                         }
@@ -119,12 +124,10 @@ class MapInteractionFragment: Fragment() {
                         override fun onPokestopInfoWindowClicked(pokestop: FirebasePokestop) {
                             showPokestopFragment(pokestop)
                         }
+                    })
 
-                    }).let { manager ->
-                        firebase = FirebaseDatabase(manager.pokestopDelegate, manager.arenaDelegate)
-                        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
-                        clusterManager = manager
-                    }
+                    firebase = FirebaseDatabase()
+                    firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
 
                     mapGridProvider = MapGridProvider(googleMap, it)
                     mapGridProvider?.showGeoHashGridList()
@@ -167,7 +170,13 @@ class MapInteractionFragment: Fragment() {
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
         val zoomLevel = map?.cameraPosition?.zoom
-//        Log.w(TAG, "Debug:: current zoom level: $zoomLevel")
+        Log.d(TAG, "Debug:: current zoom level: $zoomLevel")
+
+        // TODO: loading bugs:
+        // 1. nachdem der User von einer Arena/einem Pokestop zurück auf die Karte navigiert (z.B. nachdem er einen raid erstellt hat) wird die Arena/Pokestop nicht aktualisiert. Weil hierfür ein "event" fehlt.
+        // 2. Wenn der User auf ein InfowWindow klickt, bewegt sich die Karte dort hin, was dazu führt, dass alle MapItems aktualisiert werden (InfoWindow verschwindet wieder dadurch)
+        // 3. wenn der User reinzoomt, sollen nicht alle MapItems neu geladen werden
+        // 4. wenn der User reinzoomt, sollen nur die neuen MapItems geladen werden (die allten sollen nicht entfernt und neu geladen werden -> UI-glitch)
 
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
@@ -179,23 +188,29 @@ class MapInteractionFragment: Fragment() {
     }
 
     private fun loadMapItems() {
+        Log.v(TAG, "Debug:: loadMapItems...")
 
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 
+                    Log.i(TAG, "Debug:: remove old map items and load new...")
+
+                    clusterManager?.removeAllPokestops()
+                    clusterManager?.removeAllArenas()
+
                     newGeoHashMatrix.forEach { geoHash ->
-                        firebase?.loadPokestops(geoHash)
-                        firebase?.loadArenas(geoHash)
+                        firebase?.loadPokestops(geoHash) { pokestopList ->
+                            pokestopList?.forEach { Log.v(TAG, "Debug:: load Pokestop: ${it.name}") }
+                            pokestopList?.let { clusterManager?.showPokestops(it) }
+                        }
+                        firebase?.loadArenas(geoHash) { arenaList ->
+                            arenaList?.forEach { Log.v(TAG, "Debug:: load Arena: ${it.name}") }
+                            arenaList?.let { clusterManager?.showArenas(it) }
+                        }
                     }
 
-//                    mapGridProvider?.clearGeoHashGridList()
-//                    newGeoHashMatrix.forEach { geoHash ->
-//                        mapGridProvider?.showGeoHashGrid(geoHash)
-//                    }
-//                    Log.d(TAG, "Debug:: lastGeoHashMatrix: $lastGeoHashMatrix")
-//                    Log.d(TAG, "Debug::  newGeoHashMatrix: $newGeoHashMatrix")
                     lastGeoHashMatrix = newGeoHashMatrix
                 }
 

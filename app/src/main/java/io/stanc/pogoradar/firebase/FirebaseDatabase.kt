@@ -24,49 +24,13 @@ import io.stanc.pogoradar.firebase.notification.FirebaseNotification
 import io.stanc.pogoradar.geohash.GeoHash
 import java.lang.ref.WeakReference
 
-class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
-                       arenaDelegate: Delegate<FirebaseArena>? = null) {
+class FirebaseDatabase {
 
     private val TAG = this.javaClass.name
 
-    private val arenasDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
-
-        private val arenaDelegate = WeakReference(arenaDelegate)
-
-        override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            dataSnapshot.children.forEach { child ->
-                FirebaseArena.new(child)?.let { this.arenaDelegate.get()?.onItemChanged(it) }
-            }
-        }
-
-        override fun nodeRemoved(key: String) {
-            this.arenaDelegate.get()?.onItemRemoved(key)
-        }
-    }
-
-    private val pokestopsDidChangeCallback = object: FirebaseServer.OnNodeDidChangeCallback {
-        private val pokestopDelegate = WeakReference(pokestopDelegate)
-
-        override fun nodeChanged(dataSnapshot: DataSnapshot) {
-            dataSnapshot.children.forEach { child ->
-                FirebasePokestop.new(child)?.let { this.pokestopDelegate.get()?.onItemChanged(it) }
-            }
-        }
-
-        override fun nodeRemoved(key: String) {
-            this.pokestopDelegate.get()?.onItemRemoved(key)
-        }
-    }
-
     /**
-     * delegation & observing
+     * observing
      */
-
-    interface Delegate<Item> {
-        fun onItemAdded(item: Item)
-        fun onItemChanged(item: Item)
-        fun onItemRemoved(itemId: String)
-    }
 
     private val arenaObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
         FirebaseArena.new(dataSnapshot)
@@ -82,8 +46,27 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * arenas
      */
 
-    fun loadArenas(geoHash: GeoHash) {
-        FirebaseServer.addNodeEventListener("$ARENAS/$geoHash", arenasDidChangeCallback)
+    fun loadArenas(geoHash: GeoHash, onCompletionCallback: (arenas: List<FirebaseArena>?) -> Unit) {
+        FirebaseServer.requestNode("$ARENAS/$geoHash", object: OnCompleteCallback<DataSnapshot> {
+
+            override fun onSuccess(data: DataSnapshot?) {
+
+                val arenas = mutableListOf<FirebaseArena>()
+
+                data?.children?.forEach { child ->
+                    FirebaseArena.new(child)?.let {
+                        arenas.add(it)
+                    }
+                }
+
+                onCompletionCallback(arenas)
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "loadArenas(geoHash: $geoHash) failed. Error: $message")
+                onCompletionCallback(null)
+            }
+        })
     }
 
     fun pushArena(arena: FirebaseArena) {
@@ -233,8 +216,27 @@ class FirebaseDatabase(pokestopDelegate: Delegate<FirebasePokestop>? = null,
      * pokestops
      */
 
-    fun loadPokestops(geoHash: GeoHash) {
-        FirebaseServer.addNodeEventListener("$POKESTOPS/$geoHash", pokestopsDidChangeCallback)
+    fun loadPokestops(geoHash: GeoHash, onCompletionCallback: (pokestops: List<FirebasePokestop>?) -> Unit) {
+        FirebaseServer.requestNode("$POKESTOPS/$geoHash", object: OnCompleteCallback<DataSnapshot> {
+
+            override fun onSuccess(data: DataSnapshot?) {
+
+                val pokestops = mutableListOf<FirebasePokestop>()
+
+                data?.children?.forEach { child ->
+                    FirebasePokestop.new(child)?.let {
+                        pokestops.add(it)
+                    }
+                }
+
+                onCompletionCallback(pokestops)
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "loadPokestops(geoHash: $geoHash) failed. Error: $message")
+                onCompletionCallback(null)
+            }
+        })
     }
 
     fun pushPokestop(pokestop: FirebasePokestop) {
