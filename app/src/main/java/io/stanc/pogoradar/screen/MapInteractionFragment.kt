@@ -174,9 +174,8 @@ class MapInteractionFragment: Fragment() {
 
         // TODO: loading bugs:
         // 1. nachdem der User von einer Arena/einem Pokestop zurück auf die Karte navigiert (z.B. nachdem er einen raid erstellt hat) wird die Arena/Pokestop nicht aktualisiert. Weil hierfür ein "event" fehlt.
-        // 2. Wenn der User auf ein InfowWindow klickt, bewegt sich die Karte dort hin, was dazu führt, dass alle MapItems aktualisiert werden (InfoWindow verschwindet wieder dadurch)
-        // 3. wenn der User reinzoomt, sollen nicht alle MapItems neu geladen werden
-        // 4. wenn der User reinzoomt, sollen nur die neuen MapItems geladen werden (die allten sollen nicht entfernt und neu geladen werden -> UI-glitch)
+        // 2. je nach zoom und bewegung auf der Karte werden sehr viele items auf einmal angezeigt -> performance problem
+
 
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
@@ -188,27 +187,18 @@ class MapInteractionFragment: Fragment() {
     }
 
     private fun loadMapItems() {
-        Log.v(TAG, "Debug:: loadMapItems...")
 
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 
-                    Log.i(TAG, "Debug:: remove old map items and load new...")
+                    firebase?.loadPokestops(newGeoHashMatrix) { pokestopList ->
+                        pokestopList?.let { clusterManager?.showNewAndRemoveOldPokestops(it) }
+                    }
 
-                    clusterManager?.removeAllPokestops()
-                    clusterManager?.removeAllArenas()
-
-                    newGeoHashMatrix.forEach { geoHash ->
-                        firebase?.loadPokestops(geoHash) { pokestopList ->
-                            pokestopList?.forEach { Log.v(TAG, "Debug:: load Pokestop: ${it.name}") }
-                            pokestopList?.let { clusterManager?.showPokestops(it) }
-                        }
-                        firebase?.loadArenas(geoHash) { arenaList ->
-                            arenaList?.forEach { Log.v(TAG, "Debug:: load Arena: ${it.name}") }
-                            arenaList?.let { clusterManager?.showArenas(it) }
-                        }
+                    firebase?.loadArenas(newGeoHashMatrix) { arenaList ->
+                        arenaList?.let { clusterManager?.showNewAndRemoveOldArenas(it) }
                     }
 
                     lastGeoHashMatrix = newGeoHashMatrix

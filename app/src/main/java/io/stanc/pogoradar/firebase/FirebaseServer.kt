@@ -108,6 +108,21 @@ object FirebaseServer {
             })
         }
 
+    private suspend fun awaitDataRequestCompletion(block: (ValueEventListener) -> Unit) : DataSnapshot? =
+        suspendCancellableCoroutine { cont ->
+            block(object : ValueEventListener{
+
+                override fun onCancelled(p0: DatabaseError) {
+                    Log.e(TAG, "awaitDataRequestCompletion failed with error: ${p0.message}")
+                    cont.resume(null)
+                }
+
+                override fun onDataChange(p0: DataSnapshot) {
+                    cont.resume(p0)
+                }
+            })
+        }
+
     /**
      * Node listener
      */
@@ -237,6 +252,15 @@ object FirebaseServer {
         })
     }
 
+    suspend fun requestNode(databaseNodePath: String): DataSnapshot? {
+
+        val data = awaitDataRequestCompletion {
+            FirebaseServer.databaseRef.child(databaseNodePath).addListenerForSingleValueEvent(it)
+        }
+
+        return data
+    }
+
     fun requestDataValue(databaseDataPath: String, onCompletionCallback: OnCompleteCallback<Any?>? = null) {
         FirebaseServer.databaseRef.child(databaseDataPath).addListenerForSingleValueEvent(object : ValueEventListener {
 
@@ -268,6 +292,15 @@ object FirebaseServer {
                 onCompletionCallback?.onSuccess(p0.children.toList())
             }
         })
+    }
+
+    suspend fun requestDataChilds(databaseChildPath: String): List<DataSnapshot>? {
+
+        val data = awaitDataRequestCompletion {
+            FirebaseServer.databaseRef.child(databaseChildPath).addListenerForSingleValueEvent(it)
+        }
+
+        return data?.children?.toList()
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!

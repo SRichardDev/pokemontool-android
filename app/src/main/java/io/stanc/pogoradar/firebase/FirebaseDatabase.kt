@@ -17,12 +17,13 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
+import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseServer.OnCompleteCallback
-import io.stanc.pogoradar.firebase.FirebaseServer.requestNode
 import io.stanc.pogoradar.firebase.node.*
 import io.stanc.pogoradar.firebase.notification.FirebaseNotification
 import io.stanc.pogoradar.geohash.GeoHash
-import java.lang.ref.WeakReference
+import kotlinx.coroutines.*
+
 
 class FirebaseDatabase {
 
@@ -45,6 +46,28 @@ class FirebaseDatabase {
     /**
      * arenas
      */
+
+    fun loadArenas(geoHashes: List<GeoHash>, onCompletionCallback: (arenas: List<FirebaseArena>?) -> Unit) {
+
+        GlobalScope.launch(Dispatchers.Default) {
+
+            val arenas = mutableListOf<FirebaseArena>()
+
+            geoHashes.forEach { geoHash ->
+                val result = async {
+                    FirebaseServer.requestNode("$ARENAS/$geoHash")
+                }
+
+                result.await()?.children?.forEach { child ->
+                    FirebaseArena.new(child)?.let {
+                        arenas.add(it)
+                    }
+                }
+            }
+
+            CoroutineScope(Dispatchers.Main).launch { onCompletionCallback(arenas) }
+        }
+    }
 
     fun loadArenas(geoHash: GeoHash, onCompletionCallback: (arenas: List<FirebaseArena>?) -> Unit) {
         FirebaseServer.requestNode("$ARENAS/$geoHash", object: OnCompleteCallback<DataSnapshot> {
@@ -196,7 +219,7 @@ class FirebaseDatabase {
 
     fun loadPublicUser(userId: String, onCompletionCallback: (publicUser: FirebasePublicUser) -> Unit) {
 
-        requestNode("$USERS/$userId/$USER_PUBLIC_DATA", object: OnCompleteCallback<DataSnapshot> {
+        FirebaseServer.requestNode("$USERS/$userId/$USER_PUBLIC_DATA", object: OnCompleteCallback<DataSnapshot> {
 
             override fun onSuccess(data: DataSnapshot?) {
 
@@ -215,6 +238,28 @@ class FirebaseDatabase {
     /**
      * pokestops
      */
+
+    fun loadPokestops(geoHashes: List<GeoHash>, onCompletionCallback: (pokestops: List<FirebasePokestop>?) -> Unit) {
+
+        GlobalScope.launch(Dispatchers.Default) {
+
+            val pokestops = mutableListOf<FirebasePokestop>()
+
+            geoHashes.forEach { geoHash ->
+                val result = async {
+                    FirebaseServer.requestNode("$POKESTOPS/$geoHash")
+                }
+
+                result.await()?.children?.forEach { child ->
+                    FirebasePokestop.new(child)?.let {
+                        pokestops.add(it)
+                    }
+                }
+            }
+
+            CoroutineScope(Dispatchers.Main).launch { onCompletionCallback(pokestops) }
+        }
+    }
 
     fun loadPokestops(geoHash: GeoHash, onCompletionCallback: (pokestops: List<FirebasePokestop>?) -> Unit) {
         FirebaseServer.requestNode("$POKESTOPS/$geoHash", object: OnCompleteCallback<DataSnapshot> {
