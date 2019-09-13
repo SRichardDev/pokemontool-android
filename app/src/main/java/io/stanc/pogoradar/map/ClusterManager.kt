@@ -109,10 +109,12 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         val tag = marker.tag
 
         (tag as? FirebaseArena)?.let {
+            Log.d(TAG, "Debug:: onInfoWindowClicked(arena: ${(marker.tag as? FirebaseArena)?.name})")
             delegate.onArenaInfoWindowClicked(it)
         }
 
         (tag as? FirebasePokestop)?.let {
+            Log.d(TAG, "Debug:: onInfoWindowClicked(pokestop: ${(marker.tag as? FirebasePokestop)?.name})")
             delegate.onPokestopInfoWindowClicked(it)
         }
     }
@@ -131,6 +133,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     fun showNewAndRemoveOldPokestops(pokestops: List<FirebasePokestop>) {
+        Log.d(TAG, "Debug:: showNewAndRemoveOldPokestops(${pokestops.map { it.name }})")
 
         val oldPokestopIds = clusterPokestops.keys.minus(pokestops.map { it.id })
 
@@ -155,6 +158,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     fun showPokestops(pokestops: List<FirebasePokestop>) {
+        Log.d(TAG, "Debug:: showPokestops(${pokestops.map { it.name }})")
         pokestops.forEach { pokestop ->
 
             if (!clusterPokestops.containsKey(pokestop.id)) {
@@ -177,6 +181,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      */
 
     fun showNewAndRemoveOldArenas(arenas: List<FirebaseArena>) {
+        Log.d(TAG, "Debug:: showNewAndRemoveOldArenas(${arenas.map { it.name }})")
 
         val oldArenaIds = clusterArenas.keys.minus(arenas.map { it.id })
 
@@ -201,6 +206,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     fun showArenas(arenas: List<FirebaseArena>) {
+        Log.d(TAG, "Debug:: showArenas(${arenas.map { it.name }})")
+
         arenas.forEach { arena ->
 
             if (!clusterArenas.containsKey(arena.id)) {

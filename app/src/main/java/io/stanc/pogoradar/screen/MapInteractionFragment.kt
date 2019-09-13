@@ -191,14 +191,17 @@ class MapInteractionFragment: Fragment() {
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
+                clusterManager?.removeAllArenas()
+                clusterManager?.removeAllPokestops()
+
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 
                     firebase?.loadPokestops(newGeoHashMatrix) { pokestopList ->
-                        pokestopList?.let { clusterManager?.showNewAndRemoveOldPokestops(it) }
+                        pokestopList?.let { clusterManager?.showPokestops(it) }
                     }
 
                     firebase?.loadArenas(newGeoHashMatrix) { arenaList ->
-                        arenaList?.let { clusterManager?.showNewAndRemoveOldArenas(it) }
+                        arenaList?.let { clusterManager?.showArenas(it) }
                     }
 
                     lastGeoHashMatrix = newGeoHashMatrix

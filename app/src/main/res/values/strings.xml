@@ -250,7 +250,7 @@
     <string name="policy_button_license">Open-Source-Lizenzen</string>
 
     <!-- App Update Info Texts -->
-    <string name="app_update_info_105_title">Neue Version (0.1.5)</string>
+    <string name="app_update_info_105_title">Neue Version</string>
     <string name="app_update_info_105_description">Bitte aktiviere deine Push Nachrichten unter \"Account\" und füge deine registrierten Gebiete neu hinzu.</string>
 
 </resources>
