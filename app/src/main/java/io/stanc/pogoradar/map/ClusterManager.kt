@@ -8,8 +8,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogoradar.MapFilterSettings
+import io.stanc.pogoradar.firebase.ArenaUpdateManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
+import io.stanc.pogoradar.firebase.FirebaseNodeObserver
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.DelayedTrigger
@@ -32,29 +33,29 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private val pokestopClustering = DelayedTrigger(0) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(0) { arenaClusterManager.cluster() }
 
-    private var database = FirebaseDatabase()
-
-    private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
+    private val arenaObserver = object: FirebaseNodeObserver<FirebaseArena> {
 
         override fun onItemChanged(item: FirebaseArena) {
-            dataObject = item
+            removeArena(item.id)
+            addArena(item)
         }
 
         override fun onItemRemoved(itemId: String) {
-            dataObject = null
+            Log.w(TAG, "Debug:: onItemRemoved(arenaId: $itemId)")
+            removeArena(itemId)
         }
     }
 
-    private val pokestopObserver = object: FirebaseNodeObserverManager.Observer<FirebasePokestop> {
-
-        override fun onItemChanged(item: FirebasePokestop) {
-            dataObject = item
-        }
-
-        override fun onItemRemoved(itemId: String) {
-            dataObject = null
-        }
-    }
+//    private val pokestopObserver = object: FirebaseNodeObserver<FirebasePokestop> {
+//
+//        override fun onItemChanged(item: FirebasePokestop) {
+//            dataObject = item
+//        }
+//
+//        override fun onItemRemoved(itemId: String) {
+//            dataObject = null
+//        }
+//    }
 
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
@@ -160,8 +161,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      * Pokestops
      */
 
-    fun showNewAndRemoveOldPokestops(pokestops: List<FirebasePokestop>) {
-        Log.d(TAG, "Debug:: showNewAndRemoveOldPokestops(${pokestops.map { it.name }})")
+    fun showPokestopsAndRemoveOldOnes(pokestops: List<FirebasePokestop>) {
+        Log.d(TAG, "Debug:: showPokestopsAndRemoveOldOnes(${pokestops.map { it.name }})")
 
         val oldPokestopIds = clusterPokestops.keys.minus(pokestops.map { it.id })
 
@@ -169,7 +170,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         pokestops.forEach { addObserver(it) }
 
         // remove old ones
-        oldPokestopIds.forEach { removeObserver(it) }
+//        oldPokestopIds.forEach { removeObserver(it) }
 
         pokestopClustering.trigger()
     }
@@ -182,11 +183,11 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     private fun addObserver(pokestop: FirebasePokestop) {
-        database.addObserver(pokestopObserver, pokestop)
+//        database.addObserver(pokestopObserver, pokestop)
     }
 
     private fun removeObserver(pokestop: FirebasePokestop) {
-        database.removeObserver(pokestopObserver, pokestop)
+//        database.removeObserver(pokestopObserver, pokestop)
     }
 
     private fun addPokestop(pokestop: FirebasePokestop) {
@@ -213,16 +214,16 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      * Arenas
      */
 
-    fun showNewAndRemoveOldArenas(arenas: List<FirebaseArena>) {
-        Log.d(TAG, "Debug:: showNewAndRemoveOldArenas(${arenas.map { it.name }})")
+    fun showArenasAndRemoveOldOnes(arenas: List<FirebaseArena>) {
+        Log.d(TAG, "Debug:: showArenasAndRemoveOldOnes(${arenas.map { it.name }})")
 
         val oldArenaIds = clusterArenas.keys.minus(arenas.map { it.id })
 
         // add new ones
-        arenas.forEach { addArena(it) }
+        arenas.forEach { ArenaUpdateManager.addObserver(arenaObserver, it) }
 
         // remove old ones
-        oldArenaIds.forEach { removeArena(it) }
+        oldArenaIds.forEach { ArenaUpdateManager.removeObserver(arenaObserver, it) }
 
         arenaClustering.trigger()
     }
@@ -230,15 +231,18 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     fun showArenas(arenas: List<FirebaseArena>) {
         Log.d(TAG, "Debug:: showArenas(${arenas.map { it.name }})")
 
-        arenas.forEach { addArena(it) }
-        arenaClustering.trigger()
+        arenas.forEach { ArenaUpdateManager.addObserver(arenaObserver, it) }
+//        arenaClustering.trigger()
     }
 
     private fun addArena(arena: FirebaseArena) {
+        Log.v(TAG, "Debug:: addArena(arena: $arena), alreadyAdded: ${clusterArenas.containsKey(arena.id)}")
         if (!clusterArenas.containsKey(arena.id)) {
             val clusterItem = ClusterArena.new(arena)
             arenaClusterManager.addItem(clusterItem)
             clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
+
+            arenaClustering.trigger()
         }
     }
 
@@ -249,35 +253,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     fun removeAllArenas() {
+        Log.w(TAG, "Debug:: removeAllArenas()")
         arenaClusterManager.clearItems()
         clusterArenas.clear()
         arenaClustering.trigger()
-    }
-
-    /**
-     * update
-     */
-
-    fun startRefreshTimer() {
-        Log.d(TAG, "Debug:: startRefreshTimer(minutes: 1, id: \"arenaRefreshTimer\")")
-        RefreshTimer.run(minutes = 1, id = "arenaRefreshTimer", onFinished = {
-            Log.d(TAG, "Debug:: RefreshTimer.onFinished")
-            // check all arenas
-            // check all pokestops
-            startRefreshTimer()
-        })
-    }
-
-    fun stopRefreshTimer() {
-        Log.d(TAG, "Debug:: stopRefreshTimer(id: \"arenaRefreshTimer\")")
-        RefreshTimer.stop("arenaRefreshTimer")
-    }
-
-    private fun updateArenas() {
-
-        clusterArenas.values.forEach {
-            it.get()?.arena.
-        }
     }
 
     /**

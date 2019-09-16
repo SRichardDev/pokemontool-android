@@ -18,6 +18,8 @@ import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.TimeCalculator
+import io.stanc.pogoradar.viewmodel.arena.RaidState
+import io.stanc.pogoradar.viewmodel.arena.currentRaidState
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -31,6 +33,8 @@ data class FirebaseRaid private constructor(override val id: String,
                                             val arenaId: String,
                                             var raidBossId: String? = null,
                                             var raidMeetupId: String? = null): FirebaseNode, Parcelable {
+
+    var latestRaidState: RaidState = currentRaidState(this)
 
     override fun databasePath(): String = "$ARENAS/${firebaseGeoHash(geoHash)}/$arenaId/$RAID"
 
@@ -77,7 +81,9 @@ data class FirebaseRaid private constructor(override val id: String,
             return null
         }
 
-        // Egg
+        /**
+         * Egg
+         */
 
         fun new(raidLevel: Int, timeEggHatchesHour: Int, timeEggHatchesMinutes: Int, geoHash: GeoHash, arenaId: String): FirebaseRaid {
 //            Log.i(TAG, "Debug:: new Raid() timeEggHatchesHour: $timeEggHatchesHour, timeEggHatchesMinutes: $timeEggHatchesMinutes")
@@ -108,7 +114,9 @@ data class FirebaseRaid private constructor(override val id: String,
             return FirebaseRaid("", raidLevel, formattedTimeEggHatches, formattedTimeRaidEnds, TIMESTAMP_SERVER, geoHash, arenaId)
         }
 
-        // Raid
+        /**
+         * Raid
+         */
 
         fun new(raidLevel: Int, timeRaidEndsHour: Int, timeRaidEndsMinutes: Int, geoHash: GeoHash, arenaId: String, raidBossId: String?): FirebaseRaid {
 

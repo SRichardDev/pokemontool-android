@@ -4,9 +4,10 @@ import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.node.FirebaseNode
 import io.stanc.pogoradar.utils.ObserverManager
 
+
 class FirebaseNodeObserverManager<FirebaseNodeType: FirebaseNode>(private val newFirebaseNode:(dataSnapshot: DataSnapshot) -> FirebaseNodeType?) {
 
-    private val nodeObserverManager = ObserverManager<Observer<FirebaseNodeType>>()
+    private val nodeObserverManager = ObserverManager<FirebaseNodeObserver<FirebaseNodeType>>()
 
     private val arenaDidChangeCallback = object : FirebaseServer.OnNodeDidChangeCallback {
         override fun nodeChanged(dataSnapshot: DataSnapshot) {
@@ -20,21 +21,24 @@ class FirebaseNodeObserverManager<FirebaseNodeType: FirebaseNode>(private val ne
         }
     }
 
-    interface Observer<FirebaseNodeType> {
-        fun onItemChanged(item: FirebaseNodeType)
-        fun onItemRemoved(itemId: String)
+    fun observers(nodeId: String): List<FirebaseNodeObserver<FirebaseNodeType>?> = nodeObserverManager.observers(subId = nodeId)
+
+    fun clear() = nodeObserverManager.clear()
+
+    fun addObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, node: FirebaseNode) {
+        addObserver(observer, node.databasePath(), node.id)
     }
 
-    fun addObserver(observer: Observer<FirebaseNodeType>, node: FirebaseNode) {
-        FirebaseServer.addNodeEventListener("${node.databasePath()}/${node.id}", arenaDidChangeCallback)
-        nodeObserverManager.addObserver(observer, subId = node.id)
+    fun addObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, databasePath: String, nodeId: String) {
+        FirebaseServer.addNodeEventListener("$databasePath/$nodeId", arenaDidChangeCallback)
+        nodeObserverManager.addObserver(observer, subId = nodeId)
     }
 
-    fun removeObserver(observer: Observer<FirebaseNodeType>, node: FirebaseNode) {
+    fun removeObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, node: FirebaseNode) {
         removeObserver(observer, node.databasePath(), node.id)
     }
 
-    fun removeObserver(observer: Observer<FirebaseNodeType>, databasePath: String, nodeId: String) {
+    fun removeObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, databasePath: String, nodeId: String) {
         FirebaseServer.removeNodeEventListener("$databasePath/$nodeId", arenaDidChangeCallback)
         nodeObserverManager.removeObserver(observer, subId = nodeId)
     }

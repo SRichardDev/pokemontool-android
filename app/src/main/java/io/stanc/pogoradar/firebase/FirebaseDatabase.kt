@@ -17,7 +17,6 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
-import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseServer.OnCompleteCallback
 import io.stanc.pogoradar.firebase.node.*
 import io.stanc.pogoradar.firebase.notification.FirebaseNotification
@@ -33,9 +32,6 @@ class FirebaseDatabase {
      * observing
      */
 
-    private val arenaObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
-        FirebaseArena.new(dataSnapshot)
-    })
     private val pokestopObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
         FirebasePokestop.new(dataSnapshot)
     })
@@ -98,16 +94,6 @@ class FirebaseDatabase {
         }
     }
 
-    //         FirebaseServer.addNodeEventListener("$ARENAS/$geoHash", arenasDidChangeCallback)
-
-    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
-        arenaObserverManager.addObserver(observer, arena)
-    }
-
-    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
-        arenaObserverManager.removeObserver(observer, arena)
-    }
-
     /**
      * raids & meetups & chat
      */
@@ -167,11 +153,11 @@ class FirebaseDatabase {
         FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS_ID", raidBoss.id)
     }
 
-    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
+    fun addObserver(observer: FirebaseNodeObserver<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
         raidMeetupObserverManager.addObserver(observer, raidMeetup)
     }
 
-    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
+    fun removeObserver(observer: FirebaseNodeObserver<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
         raidMeetupObserverManager.removeObserver(observer, raidMeetup)
     }
 
@@ -292,15 +278,11 @@ class FirebaseDatabase {
         }
     }
 
-    fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
+    fun addObserver(observer: FirebaseNodeObserver<FirebasePokestop>, pokestop: FirebasePokestop) {
         pokestopObserverManager.addObserver(observer, pokestop)
     }
 
-    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
-        pokestopObserverManager.removeObserver(observer, pokestop)
-    }
-
-    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestopId: String) {
+    fun removeObserver(observer: FirebaseNodeObserver<FirebasePokestop>, pokestop: FirebasePokestop) {
         pokestopObserverManager.removeObserver(observer, pokestop)
     }
 

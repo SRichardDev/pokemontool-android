@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.firebase.FirebaseDatabase
-import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
+import io.stanc.pogoradar.firebase.FirebaseNodeObserver
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ParcelableDataFragment
@@ -26,7 +26,7 @@ class PokestopFragment: ParcelableDataFragment<FirebasePokestop>() {
     override fun onDataChanged(dataObject: FirebasePokestop?) {
         updateViewModel(dataObject)
     }
-    private val pokestopObserver = object: FirebaseNodeObserverManager.Observer<FirebasePokestop> {
+    private val pokestopObserver = object: FirebaseNodeObserver<FirebasePokestop> {
 
         override fun onItemChanged(item: FirebasePokestop) {
             dataObject = item

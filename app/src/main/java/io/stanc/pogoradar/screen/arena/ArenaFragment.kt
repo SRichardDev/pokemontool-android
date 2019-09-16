@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.screen.arena
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,6 @@ import android.content.Intent
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.appbar.Toolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
-import io.stanc.pogoradar.firebase.node.FirebaseRaid
 
 
 class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.SendMessageDelegate {
@@ -37,10 +35,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private var chatViewModel: ChatViewModel? = null
 
     /**
-     * Observer
+     * FirebaseNodeObserver
      */
 
-    private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
+    private val arenaObserver = object: FirebaseNodeObserver<FirebaseArena> {
 
         override fun onItemChanged(item: FirebaseArena) {
             dataObject = item
@@ -51,7 +49,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         }
     }
 
-    private val raidMeetupObserver = object: FirebaseNodeObserverManager.Observer<FirebaseRaidMeetup> {
+    private val raidMeetupObserver = object: FirebaseNodeObserver<FirebaseRaidMeetup> {
 
         override fun onItemChanged(item: FirebaseRaidMeetup) {
             updateRaidMeetup(item)
@@ -101,7 +99,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         setupViewModels()
 
         dataObject?.let { arena ->
-            firebase.addObserver(arenaObserver, arena)
+            ArenaUpdateManager.addObserver(arenaObserver, arena)
             tryAddingRaidMeetupObserver(arena)
         }
 
@@ -229,7 +227,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
         dataObject?.let { arena ->
 
-            firebase.removeObserver(arenaObserver, arena)
+            ArenaUpdateManager.removeObserver(arenaObserver, arena)
 
             arena.raid?.raidMeetupId?.let { raidMeetupId ->
                 val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)

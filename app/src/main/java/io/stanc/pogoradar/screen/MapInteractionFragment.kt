@@ -190,17 +190,17 @@ class MapInteractionFragment: Fragment() {
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
-                clusterManager?.removeAllArenas()
-                clusterManager?.removeAllPokestops()
+//                clusterManager?.removeAllArenas()
+//                clusterManager?.removeAllPokestops()
 
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 
                     database.loadPokestops(newGeoHashMatrix) { pokestopList ->
-                        pokestopList?.let { clusterManager?.showPokestops(it) }
+                        pokestopList?.let { clusterManager?.showPokestopsAndRemoveOldOnes(it) }
                     }
 
                     database.loadArenas(newGeoHashMatrix) { arenaList ->
-                        arenaList?.let { clusterManager?.showArenas(it) }
+                        arenaList?.let { clusterManager?.showArenasAndRemoveOldOnes(it) }
                     }
 
                     lastGeoHashMatrix = newGeoHashMatrix
