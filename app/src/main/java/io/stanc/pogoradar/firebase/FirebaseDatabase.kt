@@ -98,6 +98,8 @@ class FirebaseDatabase {
         }
     }
 
+    //         FirebaseServer.addNodeEventListener("$ARENAS/$geoHash", arenasDidChangeCallback)
+
     fun addObserver(observer: FirebaseNodeObserverManager.Observer<FirebaseArena>, arena: FirebaseArena) {
         arenaObserverManager.addObserver(observer, arena)
     }
@@ -295,6 +297,10 @@ class FirebaseDatabase {
     }
 
     fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestop: FirebasePokestop) {
+        pokestopObserverManager.removeObserver(observer, pokestop)
+    }
+
+    fun removeObserver(observer: FirebaseNodeObserverManager.Observer<FirebasePokestop>, pokestopId: String) {
         pokestopObserverManager.removeObserver(observer, pokestop)
     }
 

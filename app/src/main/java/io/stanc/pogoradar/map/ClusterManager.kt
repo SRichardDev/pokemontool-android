@@ -8,9 +8,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogoradar.MapFilterSettings
+import io.stanc.pogoradar.firebase.FirebaseDatabase
+import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.DelayedTrigger
+import io.stanc.pogoradar.utils.RefreshTimer
 import io.stanc.pogoradar.viewmodel.arena.isArenaVisibleOnMap
 import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
 import java.lang.ref.WeakReference
@@ -28,6 +31,31 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     
     private val pokestopClustering = DelayedTrigger(0) { pokestopClusterManager.cluster() }
     private val arenaClustering = DelayedTrigger(0) { arenaClusterManager.cluster() }
+
+    private var database = FirebaseDatabase()
+
+    private val arenaObserver = object: FirebaseNodeObserverManager.Observer<FirebaseArena> {
+
+        override fun onItemChanged(item: FirebaseArena) {
+            dataObject = item
+        }
+
+        override fun onItemRemoved(itemId: String) {
+            dataObject = null
+        }
+    }
+
+    private val pokestopObserver = object: FirebaseNodeObserverManager.Observer<FirebasePokestop> {
+
+        override fun onItemChanged(item: FirebasePokestop) {
+            dataObject = item
+        }
+
+        override fun onItemRemoved(itemId: String) {
+            dataObject = null
+        }
+    }
+
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
 //    private val context = WeakReference(context)
@@ -137,37 +165,42 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         val oldPokestopIds = clusterPokestops.keys.minus(pokestops.map { it.id })
 
-        pokestops.forEach { pokestop ->
-
-            // add new pokestops
-            if (!clusterPokestops.containsKey(pokestop.id)) {
-                val clusterItem = ClusterPokestop.new(pokestop)
-                pokestopClusterManager.addItem(clusterItem)
-                clusterPokestops[clusterItem.pokestop.id] = WeakReference(clusterItem)
-            }
-        }
+        // add new ones
+        pokestops.forEach { addObserver(it) }
 
         // remove old ones
-        oldPokestopIds.forEach { pokestopId ->
-            clusterPokestops.remove(pokestopId)?.get()?.let { clusterPokestop ->
-                pokestopClusterManager.removeItem(clusterPokestop)
-            }
-        }
+        oldPokestopIds.forEach { removeObserver(it) }
 
         pokestopClustering.trigger()
     }
 
     fun showPokestops(pokestops: List<FirebasePokestop>) {
         Log.d(TAG, "Debug:: showPokestops(${pokestops.map { it.name }})")
-        pokestops.forEach { pokestop ->
 
-            if (!clusterPokestops.containsKey(pokestop.id)) {
-                val clusterItem = ClusterPokestop.new(pokestop)
-                pokestopClusterManager.addItem(clusterItem)
-                clusterPokestops[clusterItem.pokestop.id] = WeakReference(clusterItem)
-            }
-        }
+        pokestops.forEach { addObserver(it) }
         pokestopClustering.trigger()
+    }
+
+    private fun addObserver(pokestop: FirebasePokestop) {
+        database.addObserver(pokestopObserver, pokestop)
+    }
+
+    private fun removeObserver(pokestop: FirebasePokestop) {
+        database.removeObserver(pokestopObserver, pokestop)
+    }
+
+    private fun addPokestop(pokestop: FirebasePokestop) {
+        if (!clusterPokestops.containsKey(pokestop.id)) {
+            val clusterItem = ClusterPokestop.new(pokestop)
+            pokestopClusterManager.addItem(clusterItem)
+            clusterPokestops[clusterItem.pokestop.id] = WeakReference(clusterItem)
+        }
+    }
+
+    private fun removePokestop(pokestopId: String) {
+        clusterPokestops.remove(pokestopId)?.get()?.let { clusterPokestop ->
+            pokestopClusterManager.removeItem(clusterPokestop)
+        }
     }
 
     fun removeAllPokestops() {
@@ -185,22 +218,11 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
         val oldArenaIds = clusterArenas.keys.minus(arenas.map { it.id })
 
-        arenas.forEach { arena ->
-
-            // add new arenas
-            if (!clusterArenas.containsKey(arena.id)) {
-                val clusterItem = ClusterArena.new(arena)
-                arenaClusterManager.addItem(clusterItem)
-                clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
-            }
-        }
+        // add new ones
+        arenas.forEach { addArena(it) }
 
         // remove old ones
-        oldArenaIds.forEach { arenaId ->
-            clusterArenas.remove(arenaId)?.get()?.let { clusterArena ->
-                arenaClusterManager.removeItem(clusterArena)
-            }
-        }
+        oldArenaIds.forEach { removeArena(it) }
 
         arenaClustering.trigger()
     }
@@ -208,21 +230,54 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     fun showArenas(arenas: List<FirebaseArena>) {
         Log.d(TAG, "Debug:: showArenas(${arenas.map { it.name }})")
 
-        arenas.forEach { arena ->
-
-            if (!clusterArenas.containsKey(arena.id)) {
-                val clusterItem = ClusterArena.new(arena)
-                arenaClusterManager.addItem(clusterItem)
-                clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
-            }
-        }
+        arenas.forEach { addArena(it) }
         arenaClustering.trigger()
+    }
+
+    private fun addArena(arena: FirebaseArena) {
+        if (!clusterArenas.containsKey(arena.id)) {
+            val clusterItem = ClusterArena.new(arena)
+            arenaClusterManager.addItem(clusterItem)
+            clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
+        }
+    }
+
+    private fun removeArena(arenaId: String) {
+        clusterArenas.remove(arenaId)?.get()?.let { clusterArena ->
+            arenaClusterManager.removeItem(clusterArena)
+        }
     }
 
     fun removeAllArenas() {
         arenaClusterManager.clearItems()
         clusterArenas.clear()
         arenaClustering.trigger()
+    }
+
+    /**
+     * update
+     */
+
+    fun startRefreshTimer() {
+        Log.d(TAG, "Debug:: startRefreshTimer(minutes: 1, id: \"arenaRefreshTimer\")")
+        RefreshTimer.run(minutes = 1, id = "arenaRefreshTimer", onFinished = {
+            Log.d(TAG, "Debug:: RefreshTimer.onFinished")
+            // check all arenas
+            // check all pokestops
+            startRefreshTimer()
+        })
+    }
+
+    fun stopRefreshTimer() {
+        Log.d(TAG, "Debug:: stopRefreshTimer(id: \"arenaRefreshTimer\")")
+        RefreshTimer.stop("arenaRefreshTimer")
+    }
+
+    private fun updateArenas() {
+
+        clusterArenas.values.forEach {
+            it.get()?.arena.
+        }
     }
 
     /**

@@ -41,7 +41,7 @@ class MapInteractionFragment: Fragment() {
 
     private var mapGridProvider: MapGridProvider? = null
     private var clusterManager: ClusterManager? = null
-    private var firebase: FirebaseDatabase? = null
+    private val database = FirebaseDatabase()
 
     private var map: GoogleMap? = null
     private var poiImage: ImageView? = null
@@ -76,7 +76,7 @@ class MapInteractionFragment: Fragment() {
     override fun onResume() {
         super.onResume()
 
-        firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
+        FirebaseDefinitions.loadDefinitions(database)
 
         NotificationHolder.consumeNotification()?.let { notification ->
             Log.i(TAG, "onNotificationReceived: $notification")
@@ -126,8 +126,7 @@ class MapInteractionFragment: Fragment() {
                         }
                     })
 
-                    firebase = FirebaseDatabase()
-                    firebase?.let { FirebaseDefinitions.loadDefinitions(it) }
+                    FirebaseDefinitions.loadDefinitions(database)
 
                     mapGridProvider = MapGridProvider(googleMap, it)
                     mapGridProvider?.showGeoHashGridList()
@@ -196,11 +195,11 @@ class MapInteractionFragment: Fragment() {
 
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 
-                    firebase?.loadPokestops(newGeoHashMatrix) { pokestopList ->
+                    database.loadPokestops(newGeoHashMatrix) { pokestopList ->
                         pokestopList?.let { clusterManager?.showPokestops(it) }
                     }
 
-                    firebase?.loadArenas(newGeoHashMatrix) { arenaList ->
+                    database.loadArenas(newGeoHashMatrix) { arenaList ->
                         arenaList?.let { clusterManager?.showArenas(it) }
                     }
 
@@ -231,7 +230,7 @@ class MapInteractionFragment: Fragment() {
 
     private fun toggleSubscriptions(geoHash: GeoHash) {
 
-        firebase?.formattedFirebaseGeoHash(geoHash)?.let { geoHash ->
+        database.formattedFirebaseGeoHash(geoHash)?.let { geoHash ->
             mapGridProvider?.let {
                 if (it.geoHashExists(geoHash)) {
                     removeSubscription(it, geoHash)
@@ -443,7 +442,7 @@ class MapInteractionFragment: Fragment() {
 //                Log.i(TAG, "Debug:: resetModes ...")
 //                WaitingSpinner.showProgress(R.string.spinner_title_map_data)
 //
-//                firebase?.setSubscriptionsForPush(it.geoHashes()) { taskSuccessful ->
+//                database.setSubscriptionsForPush(it.geoHashes()) { taskSuccessful ->
 //                    Log.i(TAG, "Debug:: setSubscriptionsForPush finished, taskSuccessful: $taskSuccessful")
 //
 //                    mapGridProvider?.clearGeoHashGridList()

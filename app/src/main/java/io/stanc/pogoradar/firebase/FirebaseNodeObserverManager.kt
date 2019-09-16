@@ -31,7 +31,11 @@ class FirebaseNodeObserverManager<FirebaseNodeType: FirebaseNode>(private val ne
     }
 
     fun removeObserver(observer: Observer<FirebaseNodeType>, node: FirebaseNode) {
-        FirebaseServer.removeNodeEventListener("${node.databasePath()}/${node.id}", arenaDidChangeCallback)
-        nodeObserverManager.removeObserver(observer, subId = node.id)
+        removeObserver(observer, node.databasePath(), node.id)
+    }
+
+    fun removeObserver(observer: Observer<FirebaseNodeType>, databasePath: String, nodeId: String) {
+        FirebaseServer.removeNodeEventListener("$databasePath/$nodeId", arenaDidChangeCallback)
+        nodeObserverManager.removeObserver(observer, subId = nodeId)
     }
 }
