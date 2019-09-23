@@ -1,10 +1,13 @@
 package io.stanc.pogoradar.viewmodel.arena
 
+import android.os.Parcelable
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.TimeCalculator
+import kotlinx.android.parcel.Parcelize
 
-enum class RaidState {
+@Parcelize
+enum class RaidState: Parcelable {
     NONE,
     EGG_HATCHES,
     RAID_RUNNING

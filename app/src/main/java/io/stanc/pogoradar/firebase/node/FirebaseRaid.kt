@@ -32,9 +32,12 @@ data class FirebaseRaid private constructor(override val id: String,
                                             val geoHash: GeoHash,
                                             val arenaId: String,
                                             var raidBossId: String? = null,
-                                            var raidMeetupId: String? = null): FirebaseNode, Parcelable {
+                                            var raidMeetupId: String? = null,
+                                            var latestRaidState: RaidState = RaidState.NONE): FirebaseNode, Parcelable {
 
-    var latestRaidState: RaidState = currentRaidState(this)
+    init {
+        latestRaidState = currentRaidState(this)
+    }
 
     override fun databasePath(): String = "$ARENAS/${firebaseGeoHash(geoHash)}/$arenaId/$RAID"
 

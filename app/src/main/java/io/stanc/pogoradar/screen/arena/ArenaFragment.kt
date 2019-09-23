@@ -34,6 +34,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private var raidViewModel: RaidViewModel? = null
     private var chatViewModel: ChatViewModel? = null
 
+    private val arenaObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
+        FirebaseArena.new(dataSnapshot)
+    })
+
     /**
      * FirebaseNodeObserver
      */
@@ -99,7 +103,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         setupViewModels()
 
         dataObject?.let { arena ->
-            ArenaUpdateManager.addObserver(arenaObserver, arena)
+            arenaObserverManager.addObserver(arenaObserver, arena)
             tryAddingRaidMeetupObserver(arena)
         }
 
@@ -227,7 +231,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
         dataObject?.let { arena ->
 
-            ArenaUpdateManager.removeObserver(arenaObserver, arena)
+            arenaObserverManager.removeObserver(arenaObserver, arena)
 
             arena.raid?.raidMeetupId?.let { raidMeetupId ->
                 val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)

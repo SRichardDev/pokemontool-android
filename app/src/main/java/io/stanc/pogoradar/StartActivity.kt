@@ -10,7 +10,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.stanc.pogoradar.UpdateManager.showVersionInfoIfNotAlreadyShown
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.appbar.PoGoToolbar
-import io.stanc.pogoradar.firebase.ArenaUpdateManager
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_BODY
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
@@ -72,7 +71,6 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
         SystemUtils.addObserver(systemObserver, this)
         showPopupIfUserIsLoggedOut()
         UpdateManager.start()
-        ArenaUpdateManager.start()
     }
 
     override fun onResume() {
@@ -82,7 +80,6 @@ class StartActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItem
     }
 
     override fun onStop() {
-        ArenaUpdateManager.stop()
         UpdateManager.stop()
         FirebaseUser.stopAuthentication()
         SystemUtils.removeObserver(systemObserver)

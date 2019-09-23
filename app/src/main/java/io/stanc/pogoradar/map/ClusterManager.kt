@@ -8,13 +8,13 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterManager
 import io.stanc.pogoradar.MapFilterSettings
-import io.stanc.pogoradar.firebase.ArenaUpdateManager
-import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseNodeObserver
+import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.utils.DelayedTrigger
 import io.stanc.pogoradar.utils.RefreshTimer
+import io.stanc.pogoradar.viewmodel.arena.currentRaidState
 import io.stanc.pogoradar.viewmodel.arena.isArenaVisibleOnMap
 import io.stanc.pogoradar.viewmodel.pokestop.PokestopViewModel
 import java.lang.ref.WeakReference
@@ -36,6 +36,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private val arenaObserver = object: FirebaseNodeObserver<FirebaseArena> {
 
         override fun onItemChanged(item: FirebaseArena) {
+            Log.d(TAG, "Debug:: onItemChanged($item)")
             removeArena(item.id)
             addArena(item)
         }
@@ -214,30 +215,42 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
      * Arenas
      */
 
+    private val arenaObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
+        FirebaseArena.new(dataSnapshot)
+    })
+
     fun showArenasAndRemoveOldOnes(arenas: List<FirebaseArena>) {
         Log.d(TAG, "Debug:: showArenasAndRemoveOldOnes(${arenas.map { it.name }})")
 
         val oldArenaIds = clusterArenas.keys.minus(arenas.map { it.id })
+        val oldArenas = clusterArenas.filter { oldArenaIds.contains(it.key) }.mapNotNull { it.value.get() }
 
         // add new ones
         arenas.forEach { addArenaAndObserver(it) }
 
         // remove old ones
-        oldArenaIds.forEach { removeArenaAndObserver(it) }
-
-        arenaClustering.trigger()
+        oldArenas.forEach { removeArenaAndObserver(it.arena) }
     }
 
     fun showArenas(arenas: List<FirebaseArena>) {
         Log.d(TAG, "Debug:: showArenas(${arenas.map { it.name }})")
-
-        arenas.forEach { ArenaUpdateManager.addObserver(arenaObserver, it) }
-//        arenaClustering.trigger()
+        arenas.forEach { addArenaAndObserver(it) }
     }
 
     private fun addArenaAndObserver(arena: FirebaseArena) {
         addArena(arena)
-        ArenaUpdateManager.addObserver(arenaObserver, arena)
+        arenaObserverManager.addObserver(arenaObserver, arena)
+        if (!refreshTimerIsRunning) {
+            startRefreshTimer()
+        }
+    }
+
+    private fun removeArenaAndObserver(arena: FirebaseArena) {
+        removeArena(arena.id)
+        arenaObserverManager.removeObserver(arenaObserver, arena)
+        if (refreshTimerIsRunning && clusterArenas.size == 0) {
+            stopRefreshTimer()
+        }
     }
 
     private fun addArena(arena: FirebaseArena) {
@@ -246,17 +259,14 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val clusterItem = ClusterArena.new(arena)
             arenaClusterManager.addItem(clusterItem)
             clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
+            arenaClustering.trigger()
         }
-    }
-
-    private fun removeArenaAndObserver(arenaId: String) {
-        removeArena(arenaId)
-        ArenaUpdateManager.removeObserver(arenaObserver, arenaId)
     }
 
     private fun removeArena(arenaId: String) {
         clusterArenas.remove(arenaId)?.get()?.let { clusterArena ->
             arenaClusterManager.removeItem(clusterArena)
+            arenaClustering.trigger()
         }
     }
 
@@ -268,8 +278,44 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     }
 
     /**
-     * animation
+     * refresh & animation
      */
+
+    private val REFRESH_TIMER_ID = "arenaRefreshTimerId"
+    private var refreshTimerIsRunning = false
+
+    private fun startRefreshTimer() {
+        Log.d(TAG, "Debug:: startRefreshTimer(minutes: 1, id: \"arenaRefreshTimer\")")
+        refreshTimerIsRunning = true
+        RefreshTimer.run(minutes = 1, id = REFRESH_TIMER_ID, onFinished = {
+            Log.d(TAG, "Debug:: RefreshTimer.onFinished")
+            updateArenasRaidState()
+            startRefreshTimer()
+        })
+    }
+
+    private fun stopRefreshTimer() {
+        Log.d(TAG, "Debug:: stopRefreshTimer(id: \"arenaRefreshTimer\")")
+        refreshTimerIsRunning = false
+        RefreshTimer.stop(REFRESH_TIMER_ID)
+    }
+
+    private fun updateArenasRaidState() {
+        Log.d(TAG, "Debug:: updateArenasRaidState() arenas: ${clusterArenas.size}")
+
+        clusterArenas.values.mapNotNull { it.get()?.arena }.forEach { arena ->
+
+            val latestRaidState = arena.raid?.latestRaidState
+            arena.raid?.latestRaidState = currentRaidState(arena.raid)
+            val currentRaidState = arena.raid?.latestRaidState
+
+            Log.v(TAG, "Debug:: updateArenasRaidState(arena: $arena) latestRaidState: ${latestRaidState?.name}, currentRaidState: ${currentRaidState?.name}")
+
+            if (latestRaidState != currentRaidState) {
+                arenaObserver.onItemChanged(arena)
+            }
+        }
+    }
 
     private fun startAnimation(arena: FirebaseArena) {
         // TODO: search for performant googlemap pulse animation
