@@ -30,8 +30,8 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private val clusterPokestops: HashMap<String, WeakReference<ClusterPokestop>> = HashMap()
     private val clusterArenas: HashMap<String, WeakReference<ClusterArena>> = HashMap()
     
-    private val pokestopClustering = DelayedTrigger(0) { pokestopClusterManager.cluster() }
-    private val arenaClustering = DelayedTrigger(0) { arenaClusterManager.cluster() }
+    private val pokestopClustering = DelayedTrigger(200) { pokestopClusterManager.cluster() }
+    private val arenaClustering = DelayedTrigger(200) { arenaClusterManager.cluster() }
 
     private val arenaObserver = object: FirebaseNodeObserver<FirebaseArena> {
 
@@ -220,10 +220,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         val oldArenaIds = clusterArenas.keys.minus(arenas.map { it.id })
 
         // add new ones
-        arenas.forEach { ArenaUpdateManager.addObserver(arenaObserver, it) }
+        arenas.forEach { addArenaAndObserver(it) }
 
         // remove old ones
-        oldArenaIds.forEach { ArenaUpdateManager.removeObserver(arenaObserver, it) }
+        oldArenaIds.forEach { removeArenaAndObserver(it) }
 
         arenaClustering.trigger()
     }
@@ -235,15 +235,23 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 //        arenaClustering.trigger()
     }
 
+    private fun addArenaAndObserver(arena: FirebaseArena) {
+        addArena(arena)
+        ArenaUpdateManager.addObserver(arenaObserver, arena)
+    }
+
     private fun addArena(arena: FirebaseArena) {
-        Log.v(TAG, "Debug:: addArena(arena: $arena), alreadyAdded: ${clusterArenas.containsKey(arena.id)}")
+        Log.v(TAG, "Debug:: addArena(arena: $arena), alreadyAdded: ${clusterArenas.containsKey(arena.id)}, raidState: ${arena.raid?.latestRaidState}")
         if (!clusterArenas.containsKey(arena.id)) {
             val clusterItem = ClusterArena.new(arena)
             arenaClusterManager.addItem(clusterItem)
             clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
-
-            arenaClustering.trigger()
         }
+    }
+
+    private fun removeArenaAndObserver(arenaId: String) {
+        removeArena(arenaId)
+        ArenaUpdateManager.removeObserver(arenaObserver, arenaId)
     }
 
     private fun removeArena(arenaId: String) {

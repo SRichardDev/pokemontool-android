@@ -27,14 +27,13 @@ object ArenaUpdateManager {
     }
 
     fun removeObserver(observer: FirebaseNodeObserver<FirebaseArena>, arenaId: String) {
+        Log.d(TAG, "Debug:: removeObserver(observer: $observer, arenaId: $arenaId), arenas: $arenas")
 
         arenas.firstOrNull { it.id == arenaId }?.let { arenaToRemove ->
 
-            arenaObserverManager.removeObserver(observer, arenaToRemove)
+            Log.v(TAG, "Debug:: arenaObserverManager.removeObserver")
+            removeObserver(observer, arenaToRemove)
 
-            if (arenaObserverManager.observers(arenaId).isEmpty()) {
-                arenas.removeIf { it.id == arenaId }
-            }
         } ?: run {
             Log.w(TAG, "could not remove observer $observer for arena with id: $arenaId!")
         }
@@ -79,12 +78,15 @@ object ArenaUpdateManager {
     }
 
     private fun updateArenasRaidState() {
+        Log.d(TAG, "Debug:: updateArenasRaidState() arenas: $arenas")
 
         arenas.forEach { arena ->
 
             val latestRaidState = arena.raid?.latestRaidState
             arena.raid?.latestRaidState = currentRaidState(arena.raid)
             val currentRaidState = arena.raid?.latestRaidState
+
+            Log.v(TAG, "Debug:: updateArenasRaidState(arena: $arena) latestRaidState: ${latestRaidState?.name}, currentRaidState: ${currentRaidState?.name}")
 
             if (latestRaidState != currentRaidState) {
                 updateObserversAboutArenaDidChange(arena)
@@ -93,7 +95,9 @@ object ArenaUpdateManager {
     }
 
     private fun updateObserversAboutArenaDidChange(arena: FirebaseArena) {
+        Log.d(TAG, "Debug:: updateObserversAboutArenaDidChange(arena: $arena)")
         arenaObserverManager.observers(arena.id).forEach { observer ->
+            Log.d(TAG, "Debug:: updateObserversAboutArenaDidChange() for observer: $observer")
             observer?.onItemChanged(arena)
         }
     }
