@@ -59,6 +59,11 @@ data class FirebaseArena private constructor(
 
 //            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
 
+            // quickfix for bot
+            if (name == "unknown") {
+                return null
+            }
+
             if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
                 val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(RAID))
