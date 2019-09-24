@@ -164,12 +164,11 @@ class MapInteractionFragment: Fragment() {
         }
     }
 
-    private var lastGeoHashMatrix: List<GeoHash> = emptyList()
-
     private val onCameraIdleListener = GoogleMap.OnCameraIdleListener {
 
-        val zoomLevel = map?.cameraPosition?.zoom
-        Log.d(TAG, "Debug:: current zoom level: $zoomLevel")
+        map?.cameraPosition?.zoom?.let { zoomLevel ->
+            clusterManager?.onZoomingLevelChanged(zoomLevel)
+        }
 
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
@@ -185,17 +184,12 @@ class MapInteractionFragment: Fragment() {
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
 
-                if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
+                database.loadPokestops(newGeoHashMatrix) { pokestopList ->
+                    pokestopList?.let { clusterManager?.showPokestopsAndRemoveOldOnes(it) }
+                }
 
-                    database.loadPokestops(newGeoHashMatrix) { pokestopList ->
-                        pokestopList?.let { clusterManager?.showPokestopsAndRemoveOldOnes(it) }
-                    }
-
-                    database.loadArenas(newGeoHashMatrix) { arenaList ->
-                        arenaList?.let { clusterManager?.showArenasAndRemoveOldOnes(it) }
-                    }
-
-                    lastGeoHashMatrix = newGeoHashMatrix
+                database.loadArenas(newGeoHashMatrix) { arenaList ->
+                    arenaList?.let { clusterManager?.showArenasAndRemoveOldOnes(it) }
                 }
 
             } ?: run {

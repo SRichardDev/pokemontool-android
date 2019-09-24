@@ -12,6 +12,7 @@ import io.stanc.pogoradar.firebase.FirebaseNodeObserver
 import io.stanc.pogoradar.firebase.FirebaseNodeObserverManager
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
+import io.stanc.pogoradar.subscreen.ZoomLevel
 import io.stanc.pogoradar.utils.DelayedTrigger
 import io.stanc.pogoradar.utils.RefreshTimer
 import io.stanc.pogoradar.viewmodel.arena.currentRaidState
@@ -66,7 +67,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     // https://github.com/aarsy/GoogleMapsAnimations
 //    private val arenaRippleAnimations = HashMap<Any, WeakReference<MapRipple>>()
 //    private val context = WeakReference(context)
-//    private val map = WeakReference(googleMap)
+    private val map = WeakReference(googleMap)
 
     private val arenaInfoWindowAdapter = ClusterArenaRenderer.Companion.InfoWindowAdapter(context)
     private val pokestopInfoWindowAdapter = ClusterPokestopRenderer.Companion.InfoWindowAdapter(context)
@@ -163,6 +164,25 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
         arenaClusterManager.onCameraIdle()
     }
 
+    private var zoomingLevelForDetailedInformationReached: Boolean? = null
+
+    fun onZoomingLevelChanged(zoomingLevel: Float) {
+
+        val latestZoomingLevel = zoomingLevelForDetailedInformationReached
+        zoomingLevelForDetailedInformationReached = zoomingLevel >= ZoomLevel.NEIGHBORHOOD.value
+
+        if (latestZoomingLevel != zoomingLevelForDetailedInformationReached) {
+
+            pokestopClusterManager.clearItems()
+            clusterPokestops.clear()
+
+            arenaClusterManager.clearItems()
+            clusterArenas.clear()
+        }
+
+        Log.i(TAG, "Debug:: onZoomingLevelChanged($zoomingLevel) DetailedInformation: $zoomingLevelForDetailedInformationReached")
+    }
+
     /**
      * Pokestops
      */
@@ -195,7 +215,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
 
     private fun addPokestop(pokestop: FirebasePokestop) {
         if (!clusterPokestops.containsKey(pokestop.id)) {
-            val clusterItem = ClusterPokestop.new(pokestop)
+
+            val showPokestopName = zoomingLevelForDetailedInformationReached == true
+
+            val clusterItem = ClusterPokestop.new(pokestop, showPokestopName)
             pokestopClusterManager.addItem(clusterItem)
             clusterPokestops[clusterItem.pokestop.id] = WeakReference(clusterItem)
             pokestopClustering.trigger()
@@ -254,7 +277,10 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     private fun addArena(arena: FirebaseArena) {
 //        Log.v(TAG, "Debug:: addArena(arena: $arena), alreadyAdded: ${clusterArenas.containsKey(arena.id)}, raidState: ${arena.raid?.latestRaidState}")
         if (!clusterArenas.containsKey(arena.id)) {
-            val clusterItem = ClusterArena.new(arena)
+
+            val showArenaName = zoomingLevelForDetailedInformationReached == true
+
+            val clusterItem = ClusterArena.new(arena, showArenaName)
             arenaClusterManager.addItem(clusterItem)
             clusterArenas[clusterItem.arena.id] = WeakReference(clusterItem)
             arenaClustering.trigger()

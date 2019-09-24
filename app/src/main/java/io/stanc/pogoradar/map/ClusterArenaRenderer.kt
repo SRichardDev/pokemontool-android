@@ -31,7 +31,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
     override fun onBeforeClusterItemRendered(item: ClusterArena?, markerOptions: MarkerOptions?) {
         Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
-            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.arena, IconFactory.SizeMod.DEFAULT)).anchor(ANCHOR_X, ANCHOR_Y)
+            val bitmapDescriptor = getBitmapDescriptor(context, clusterItem.arena, IconFactory.SizeMod.DEFAULT, clusterItem.showName)
+            markerOptions.title(clusterItem.title).icon(bitmapDescriptor).anchor(ANCHOR_X, ANCHOR_Y)
         }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
@@ -52,8 +53,8 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun getBitmapDescriptor(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
-            val arenaIconBitmap = MapIconFactory.arenaIcon(context, arena, sizeMod)
+        private fun getBitmapDescriptor(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod, showName: Boolean): BitmapDescriptor {
+            val arenaIconBitmap = MapIconFactory.arenaIcon(context, arena, sizeMod, showFooterText = showName)
             return BitmapDescriptorFactory.fromBitmap(arenaIconBitmap)
         }
 

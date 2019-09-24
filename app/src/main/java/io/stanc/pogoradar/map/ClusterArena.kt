@@ -8,7 +8,8 @@ import io.stanc.pogoradar.firebase.node.FirebaseArena
 class ClusterArena(val arena: FirebaseArena,
                    private val position: LatLng,
                    private val title: String = "",
-                   private val snippet: String = "") : ClusterItem {
+                   private val snippet: String = "",
+                   val showName: Boolean = false) : ClusterItem {
 
         override fun getPosition(): LatLng {
             return position
@@ -24,13 +25,13 @@ class ClusterArena(val arena: FirebaseArena,
 
         companion object {
 
-            fun new(arena: FirebaseArena): ClusterArena {
+            fun new(arena: FirebaseArena, showName: Boolean = false): ClusterArena {
 
                 val position = LatLng(arena.geoHash.toLocation().latitude, arena.geoHash.toLocation().longitude)
                 val title = arena.name
                 val snippet = ""
 
-                return ClusterArena(arena, position, title, snippet)
+                return ClusterArena(arena, position, title, snippet, showName)
             }
         }
     }

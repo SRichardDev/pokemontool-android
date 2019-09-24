@@ -30,7 +30,8 @@ class ClusterPokestopRenderer(
 
     override fun onBeforeClusterItemRendered(item: ClusterPokestop?, markerOptions: MarkerOptions?) {
         Kotlin.safeLet(item, markerOptions) { clusterItem, markerOptions ->
-            markerOptions.title(clusterItem.title).icon(getBitmapDescriptor(context, clusterItem.pokestop, IconFactory.SizeMod.DEFAULT)).anchor(ANCHOR_X, ANCHOR_Y)
+            val bitmapDescriptor = getBitmapDescriptor(context, clusterItem.pokestop, IconFactory.SizeMod.DEFAULT, clusterItem.showName)
+            markerOptions.title(clusterItem.title).icon(bitmapDescriptor).anchor(ANCHOR_X, ANCHOR_Y)
         }
         super.onBeforeClusterItemRendered(item, markerOptions)
     }
@@ -50,8 +51,8 @@ class ClusterPokestopRenderer(
         private const val ANCHOR_X = 0.5f
         private const val ANCHOR_Y = 1.0f
 
-        private fun getBitmapDescriptor(context: Context, pokestop: FirebasePokestop, sizeMod: IconFactory.SizeMod): BitmapDescriptor {
-            val bm = MapIconFactory.pokestopIcon(context, pokestop, sizeMod)
+        private fun getBitmapDescriptor(context: Context, pokestop: FirebasePokestop, sizeMod: IconFactory.SizeMod, showPokestopName: Boolean): BitmapDescriptor {
+            val bm = MapIconFactory.pokestopIcon(context, pokestop, sizeMod, showFooterText = showPokestopName)
             return BitmapDescriptorFactory.fromBitmap(bm)
         }
 

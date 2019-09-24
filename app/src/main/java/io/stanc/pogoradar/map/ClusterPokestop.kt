@@ -8,7 +8,8 @@ import io.stanc.pogoradar.firebase.node.FirebasePokestop
 class ClusterPokestop(val pokestop: FirebasePokestop,
                       private val position: LatLng,
                       private val title: String = "",
-                      private val snippet: String = "") : ClusterItem {
+                      private val snippet: String = "",
+                      val showName: Boolean = false) : ClusterItem {
 
     override fun getPosition(): LatLng {
         return position
@@ -24,13 +25,13 @@ class ClusterPokestop(val pokestop: FirebasePokestop,
 
     companion object {
 
-        fun new(pokestop: FirebasePokestop): ClusterPokestop {
+        fun new(pokestop: FirebasePokestop, showName: Boolean = false): ClusterPokestop {
 
             val position = LatLng(pokestop.geoHash.toLocation().latitude, pokestop.geoHash.toLocation().longitude)
             val title = pokestop.name
             val snippet = ""
 
-            return ClusterPokestop(pokestop, position, title, snippet)
+            return ClusterPokestop(pokestop, position, title, snippet, showName)
         }
     }
 }

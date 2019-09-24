@@ -22,7 +22,7 @@ object MapIconFactory {
      * Arena Icon
      */
 
-    fun arenaIcon(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod): Bitmap? {
+    fun arenaIcon(context: Context, arena: FirebaseArena, sizeMod: IconFactory.SizeMod, showFooterText: Boolean = false): Bitmap? {
 
         return backgroundDrawable(context, arena.isEX)?.let { backgroundDrawable ->
 
@@ -38,7 +38,9 @@ object MapIconFactory {
                 }
             }
 
-//            iconConfig.footerText = arena.name
+            if (showFooterText) {
+                iconConfig.footerText = arena.name
+            }
             iconConfig.sizeMod = sizeMod
 
             IconFactory.bitmap(context, iconConfig)
@@ -73,7 +75,7 @@ object MapIconFactory {
      * Pokestop Icon
      */
 
-    fun pokestopIcon(context: Context, pokestop: FirebasePokestop, sizeMod: IconFactory.SizeMod): Bitmap? {
+    fun pokestopIcon(context: Context, pokestop: FirebasePokestop, sizeMod: IconFactory.SizeMod, showFooterText: Boolean = false): Bitmap? {
 
         return ContextCompat.getDrawable(context, R.drawable.icon_pstop_30dp)?.let { backgroundDrawable ->
 
@@ -87,7 +89,9 @@ object MapIconFactory {
                 }
             }
 
-//            iconConfig.footerText = pokestop.name
+            if (showFooterText) {
+                iconConfig.footerText = pokestop.name
+            }
             iconConfig.sizeMod = sizeMod
 
             IconFactory.bitmap(context, iconConfig)
