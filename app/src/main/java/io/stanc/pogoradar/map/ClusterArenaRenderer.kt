@@ -3,6 +3,7 @@ package io.stanc.pogoradar.map
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -17,6 +18,7 @@ import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.utils.IconFactory
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.viewmodel.arena.isArenaVisibleOnMap
+import java.lang.ref.WeakReference
 
 
 class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
@@ -65,8 +67,11 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
         }
 
         class InfoWindowAdapter(context: Context): GoogleMap.InfoWindowAdapter {
+            private val context = WeakReference(context)
 
             private val infoWindowView = LayoutInflater.from(context).inflate(R.layout.layout_info_window_arena, null, false)
+
+            private val arenaImage = infoWindowView.findViewById(R.id.info_window_arena_imageview) as ImageView
 
             private val header = infoWindowView.findViewById(R.id.info_window_arena_textview_header) as TextView
             private val subheader = infoWindowView.findViewById(R.id.info_window_arena_textview_subheader) as TextView
@@ -84,6 +89,12 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
 
                     (marker.tag as? FirebaseArena)?.let { arena ->
                         subheader.text = if (arena.isEX) subheaderTextEx else subheaderTextDefault
+
+                        if (arena.isEX) {
+                            context.get()?.let { context ->
+                                arenaImage.setImageDrawable(context.getDrawable(R.drawable.icon_arena_ex_30dp))
+                            }
+                        }
                     }
                 }
 

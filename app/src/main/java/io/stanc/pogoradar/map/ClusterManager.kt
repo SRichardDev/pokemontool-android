@@ -303,7 +303,6 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
             val currentRaidState = arena.raid?.latestRaidState
 
             if (latestRaidState != currentRaidState) {
-//                Log.d(TAG, "Debug:: updateArenasRaidState(arena: $arena) latestRaidState: ${latestRaidState?.name}, currentRaidState: ${currentRaidState?.name}")
                 arenaObserver.onItemChanged(arena)
             }
         }
