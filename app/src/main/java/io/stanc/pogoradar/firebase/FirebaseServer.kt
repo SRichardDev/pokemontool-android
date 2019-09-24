@@ -130,7 +130,6 @@ object FirebaseServer {
     private val nodeDidChangeListener = HashMap<Pair<Int, String>, NodeEventListener>()
 
     fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
-        Log.d(TAG, "Debug:: addNodeEventListener(callback: $callback, for: $databasePath), alreadyAddedToList: ${alreadyAddedToList(databasePath, callback)}")
         if (!alreadyAddedToList(databasePath, callback)) {
 
             val eventListener = NodeEventListener(callback)

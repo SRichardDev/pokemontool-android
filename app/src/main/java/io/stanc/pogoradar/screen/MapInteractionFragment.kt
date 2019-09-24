@@ -171,11 +171,6 @@ class MapInteractionFragment: Fragment() {
         val zoomLevel = map?.cameraPosition?.zoom
         Log.d(TAG, "Debug:: current zoom level: $zoomLevel")
 
-        // TODO: loading bugs:
-        // 1. nachdem der User von einer Arena/einem Pokestop zurück auf die Karte navigiert (z.B. nachdem er einen raid erstellt hat) wird die Arena/Pokestop nicht aktualisiert. Weil hierfür ein "event" fehlt.
-        // 2. je nach zoom und bewegung auf der Karte werden sehr viele items auf einmal angezeigt -> performance problem
-
-
         map?.cameraPosition?.zoom?.let { currentZoomValue ->
             if (currentZoomValue >= ZoomLevel.DISTRICT.value) {
                 loadMapItems()
@@ -189,9 +184,6 @@ class MapInteractionFragment: Fragment() {
 
         mapFragment?.visibleRegionBounds()?.let { bounds ->
             GeoHash.geoHashMatrix(bounds.northeast, bounds.southwest)?.let { newGeoHashMatrix ->
-
-//                clusterManager?.removeAllArenas()
-//                clusterManager?.removeAllPokestops()
 
                 if (!isSameGeoHashList(newGeoHashMatrix, lastGeoHashMatrix)) {
 

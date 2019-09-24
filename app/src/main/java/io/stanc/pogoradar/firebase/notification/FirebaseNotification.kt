@@ -59,7 +59,7 @@ object FirebaseNotification {
                     if (successful) {
 
                         FirebaseServer.subscribeToTopic(formattedGeoHash) { successful ->
-                            Log.v(TAG, "Debug:: subscribeToArea($geoHash), successful: $successful")
+//                            Log.v(TAG, "Debug:: subscribeToArea($geoHash), successful: $successful")
 
                             if (successful) {
                                 onCompletionCallback(true)
@@ -94,7 +94,7 @@ object FirebaseNotification {
                     if (successful) {
 
                         FirebaseServer.unsubscribeFromTopic(formattedGeoHash) { successful ->
-                            Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash), unsubscribeFromTopic: $successful")
+//                            Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash), unsubscribeFromTopic: $successful")
                             if (successful) {
                                 onCompletionCallback(true)
                             } else {
