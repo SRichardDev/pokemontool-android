@@ -40,13 +40,28 @@
             <TextView
                 android:id="@+id/list_item_participant_name"
                 style="@style/TextStyle_bold"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/layout_margin_small"
+                app:autoSizeTextType="uniform"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/list_item_participant_image"
-                tools:text="Participant name"/>
+                app:layout_constraintEnd_toStartOf="@id/list_item_participant_plus"
+                tools:text="Participant name adasdas asdadas adad adad"/>
+
+            <ImageView
+                android:id="@+id/list_item_participant_plus"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/ic_add_attachment"
+                android:tint="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:ignore="ContentDescription"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

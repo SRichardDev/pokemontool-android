@@ -2,7 +2,10 @@ package io.stanc.pogoradar.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Rect
 import android.util.Log
 import android.view.View
@@ -10,6 +13,7 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import java.lang.ref.WeakReference
 import android.view.Window
+import androidx.annotation.StringRes
 
 
 object SystemUtils {
@@ -35,6 +39,35 @@ object SystemUtils {
     fun hideKeyboardFrom(context: Context, view: View) {
         val inputMethodManager = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun copyTextToClipboard(context: Context, text: String, labelText: String) {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText(labelText, text)
+        clipboard.primaryClip = clipData
+    }
+
+    fun copyTextToClipboard(context: Context, @StringRes text: Int, @StringRes labelText: Int) {
+
+        try {
+            val textString = context.resources.getString(text)
+            val labelTextString = context.resources.getString(labelText)
+            copyTextToClipboard(context, textString, labelTextString)
+
+        } catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "could not copy to clipboard!\n${e.message}")
+        }
+    }
+
+    fun copyTextToClipboard(context: Context, text: String, @StringRes labelText: Int) {
+
+        try {
+            val labelTextString = context.resources.getString(labelText)
+            copyTextToClipboard(context, text, labelTextString)
+
+        } catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "could not copy to clipboard!\n${e.message}")
+        }
     }
 
     /**

@@ -234,6 +234,7 @@
     <string name="dialog_user_logged_out_message">Bitte logge dich erst ein, um die Features nutzen zu können.\n\nKlicke dazu auf \"Account\" auf dem unteren Teil des Screens.
     </string>
     <string name="dialog_info_coming_soon">Coming soon!</string>
+    <string name="popup_raid_participant_id_copied">Freundschaftscode kopiert!</string>
 
     <!-- App Info Label -->
     <string name="app_info_connection_lost">Verbindung zum Server ist abgebrochen.\nDaten könnten nicht aktuell

@@ -2,13 +2,16 @@ package io.stanc.pogoradar.recyclerviewadapter
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
+import android.view.View
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import io.stanc.pogoradar.FirebaseImageMapper.TEAM_COLOR
+import io.stanc.pogoradar.Popup
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.recyclerview.RecyclerViewAdapter
+import io.stanc.pogoradar.utils.SystemUtils
 
 
 class ParticipantAdapter(private val context: Context,
@@ -32,6 +35,25 @@ class ParticipantAdapter(private val context: Context,
             }
             holder.itemView.findViewById<TextView>(R.id.list_item_participant_level).text = participant.level.toString()
             holder.itemView.findViewById<TextView>(R.id.list_item_participant_name).text = participant.name
+
+            setupParticipantButton(holder, participant)
+        }
+    }
+
+    private fun setupParticipantButton(holder: Holder, participant: FirebasePublicUser) {
+        holder.itemView.findViewById<View>(R.id.list_item_participant_plus).let { copyButton ->
+
+            participant.code?.let { friendshipCode ->
+
+                copyButton.visibility = View.VISIBLE
+                copyButton.setOnClickListener {
+                    Popup.showToast(context, R.string.popup_raid_participant_id_copied)
+                    SystemUtils.copyTextToClipboard(context, friendshipCode, R.string.popup_raid_participant_id_copied)
+                }
+
+            } ?: run {
+                copyButton.visibility = View.INVISIBLE
+            }
         }
     }
 }
