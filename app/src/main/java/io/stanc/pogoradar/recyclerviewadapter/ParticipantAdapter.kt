@@ -2,6 +2,7 @@ package io.stanc.pogoradar.recyclerviewadapter
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -41,18 +42,14 @@ class ParticipantAdapter(private val context: Context,
     }
 
     private fun setupParticipantButton(holder: Holder, participant: FirebasePublicUser) {
-        holder.itemView.findViewById<View>(R.id.list_item_participant_plus).let { copyButton ->
 
+        val copyButton = holder.itemView.findViewById<View>(R.id.list_item_participant_plus)
+
+        copyButton.visibility = if (participant.code.isNullOrBlank()) View.INVISIBLE else View.VISIBLE
+        copyButton.setOnClickListener {
             participant.code?.let { friendshipCode ->
-
-                copyButton.visibility = View.VISIBLE
-                copyButton.setOnClickListener {
-                    Popup.showToast(context, R.string.popup_raid_participant_id_copied)
-                    SystemUtils.copyTextToClipboard(context, friendshipCode, R.string.popup_raid_participant_id_copied)
-                }
-
-            } ?: run {
-                copyButton.visibility = View.INVISIBLE
+                Popup.showToast(context, R.string.popup_raid_participant_id_copied)
+                SystemUtils.copyTextToClipboard(context, friendshipCode, R.string.popup_raid_participant_id_copied)
             }
         }
     }
