@@ -32,6 +32,7 @@ enum class ZoomLevel(val value: Float) {
     LANDMASS(5.0f),
     CITY(10.0f),
     DISTRICT(15.0f),
+    DETAILS(16.0f),
     NEIGHBORHOOD(17.0f),
     STREET(18.5f),
     BUILDING(20.0f)

@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.map
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -89,11 +90,14 @@ class ClusterArenaRenderer(private val context: Context, map: GoogleMap,
                     header.text = marker.title
 
                     (marker.tag as? FirebaseArena)?.let { arena ->
+
                         subheader.text = if (arena.isEX) subheaderTextEx else subheaderTextDefault
 
-                        if (arena.isEX) {
-                            context.get()?.let { context ->
+                        context.get()?.let { context ->
+                            if (arena.isEX) {
                                 arenaImage.setImageDrawable(context.getDrawable(R.drawable.icon_arena_ex_30dp))
+                            } else {
+                                arenaImage.setImageDrawable(context.getDrawable(R.drawable.icon_arena_30dp))
                             }
                         }
                     }

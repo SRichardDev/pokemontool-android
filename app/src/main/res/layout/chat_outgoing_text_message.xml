@@ -4,6 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="@dimen/chat_margin_small"
         android:layout_marginBottom="@dimen/chat_margin_small"
         android:layout_marginStart="@dimen/layout_padding_screen"
@@ -18,7 +19,6 @@
             android:id="@id/bubble"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/chat_margin_small"
             android:orientation="vertical">
 
         <TextView

@@ -169,7 +169,7 @@ class ClusterManager(context: Context, googleMap: GoogleMap, private val delegat
     fun onZoomingLevelChanged(zoomingLevel: Float) {
 
         val latestZoomingLevel = zoomingLevelForDetailedInformationReached
-        zoomingLevelForDetailedInformationReached = zoomingLevel >= ZoomLevel.NEIGHBORHOOD.value
+        zoomingLevelForDetailedInformationReached = zoomingLevel >= ZoomLevel.DETAILS.value
 
         if (latestZoomingLevel != zoomingLevelForDetailedInformationReached) {
 
