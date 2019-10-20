@@ -9,7 +9,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
 
 data class FirebaseRaidMeetup(
     override val id: String,
-    val meetupTime: String,
+    val meetupTime: Long,
     var participantUserIds: MutableList<String>,
     val chat: List<FirebaseChat>): FirebaseNode {
 
@@ -38,7 +38,7 @@ data class FirebaseRaidMeetup(
 
             val id = dataSnapshot.key ?: run { return null }
 
-            val meetupTime = dataSnapshot.child(MEETUP_TIME).value as? String
+            val meetupTime = dataSnapshot.child(MEETUP_TIME).value as? Long
 
             val participantUserIds: List<String> = dataSnapshot.child(PARTICIPANTS).children.mapNotNull { it.key }
 

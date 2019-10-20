@@ -3,6 +3,8 @@ package io.stanc.pogoradar.utils
 import android.annotation.SuppressLint
 import android.util.Log
 import com.google.common.math.LongMath
+import com.google.firebase.Timestamp
+import com.google.type.TimeOfDay
 import java.math.RoundingMode
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -74,6 +76,20 @@ object TimeCalculator {
         }
     }
 
+    fun timestamp(timeOfTodayHour: Int, timeOfTodayMinutes: Int): Long? {
+        dateOfToday(timeOfTodayHour, timeOfTodayMinutes)?.let { date ->
+            return date.time
+        }
+        return null
+    }
+
+    fun timestamp(timeOfTodayHour: Int, timeOfTodayMinutes: Int): Long? {
+        dateOfToday(timeOfTodayHour, timeOfTodayMinutes)?.let { date ->
+            return date.time
+        }
+        return null
+    }
+
     /**
      * time comparison
      */
@@ -105,6 +121,10 @@ object TimeCalculator {
 
         return  now.get(DAY_OF_YEAR) == timestampCalender.get(DAY_OF_YEAR) &&
                 now.get(YEAR) == timestampCalender.get(YEAR)
+    }
+
+    fun dateOfToday(timeHour: Int, timeMinutes: Int): Date? {
+        return dateOfToday(format(timeHour, timeMinutes))
     }
 
     fun dateOfToday(time: String): Date? {

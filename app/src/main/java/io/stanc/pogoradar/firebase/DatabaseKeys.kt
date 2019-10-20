@@ -68,6 +68,7 @@ object DatabaseKeys {
     const val NAME = "name"
     const val SUBMITTER = "submitter"
     const val TIMESTAMP = "timestamp"
+    const val TIMESTAMP_NONE: Long = 0
     const val GEO_HASH_AREA_PRECISION: Int = 6
     const val DATA_UNDEFINED = "---"
 
