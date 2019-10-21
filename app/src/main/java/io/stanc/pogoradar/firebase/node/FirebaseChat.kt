@@ -1,23 +1,24 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_MESSAGE
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_SENDER_ID
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 class FirebaseChat private constructor(
     override val id: String,
-    private val raidMeetupId: String,
+    private val parentDatabasePath: String,
     val message: String,
     val senderId: String,
-    val timestamp: Number): FirebaseNode {
+    val timestamp: Number): FirebaseNode, Parcelable {
 
-    override fun databasePath(): String = "$RAID_MEETUPS/$raidMeetupId/$CHAT"
+    override fun databasePath(): String = parentDatabasePath
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -33,7 +34,7 @@ class FirebaseChat private constructor(
 
         private val TAG = javaClass.name
 
-        fun new(raidMeetupId: String, dataSnapshot: DataSnapshot): FirebaseChat? {
+        fun new(parentDatabasePath: String, dataSnapshot: DataSnapshot): FirebaseChat? {
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key
@@ -44,14 +45,14 @@ class FirebaseChat private constructor(
             Log.v(TAG, "id: $id, message: $message, senderId: $senderId, timestamp: $timestamp")
 
             if (id != null && message != null && senderId != null && timestamp != null) {
-                return FirebaseChat(id, raidMeetupId, message, senderId, timestamp)
+                return FirebaseChat(id, parentDatabasePath, message, senderId, timestamp)
             }
 
             return null
         }
 
-        fun new(raidMeetupId: String, senderId: String, message: String): FirebaseChat {
-            return FirebaseChat("", raidMeetupId, message, senderId, TIMESTAMP_SERVER)
+        fun new(parentDatabasePath: String, senderId: String, message: String): FirebaseChat {
+            return FirebaseChat("", parentDatabasePath, message, senderId, TIMESTAMP_SERVER)
         }
     }
 }

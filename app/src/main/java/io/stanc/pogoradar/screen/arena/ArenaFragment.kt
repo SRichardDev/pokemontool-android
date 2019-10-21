@@ -233,7 +233,8 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
             arenaObserverManager.removeObserver(arenaObserver, arena)
 
-            arena.raid?.raidMeetupId?.let { raidMeetupId ->
+            arena.raid?.let { raid ->
+                val parentDatabasePath =
                 val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)
                 firebase.removeObserver(raidMeetupObserver, raidMeetup)
                 firebase.removeChatObserver(chatObserver, raidMeetupId)

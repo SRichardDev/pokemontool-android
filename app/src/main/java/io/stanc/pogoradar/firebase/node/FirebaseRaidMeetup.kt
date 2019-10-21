@@ -1,19 +1,22 @@
 package io.stanc.pogoradar.firebase.node
 
+import android.os.Parcelable
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT
 import io.stanc.pogoradar.firebase.DatabaseKeys.MEETUP_TIME
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class FirebaseRaidMeetup(
     override val id: String,
+    private val parentDatabasePath: String,
     val meetupTime: String,
     var participantUserIds: MutableList<String>,
-    val chat: List<FirebaseChat>): FirebaseNode {
+    val chat: List<FirebaseChat>): FirebaseNode, Parcelable {
 
-    override fun databasePath(): String = RAID_MEETUPS
+    override fun databasePath(): String = parentDatabasePath
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -33,35 +36,36 @@ data class FirebaseRaidMeetup(
 
         private val TAG = javaClass.name
 
-        fun new(dataSnapshot: DataSnapshot): FirebaseRaidMeetup? {
+        fun new(parentDatabasePath: String, dataSnapshot: DataSnapshot): FirebaseRaidMeetup? {
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
             val id = dataSnapshot.key ?: run { return null }
-
             val meetupTime = dataSnapshot.child(MEETUP_TIME).value as? String
-
             val participantUserIds: List<String> = dataSnapshot.child(PARTICIPANTS).children.mapNotNull { it.key }
 
             val chat = mutableListOf<FirebaseChat>()
             for (chatSnapshot in dataSnapshot.child(CHAT).children) {
-                FirebaseChat.new(id, chatSnapshot)?.let { chat.add(it) }
+                val databasePath = "$parentDatabasePath/$CHAT"
+                FirebaseChat.new(databasePath, chatSnapshot)?.let { chat.add(it) }
             }
 
             Log.v(TAG, "id: $id, meetupTime: $meetupTime, participantUserIds: $participantUserIds, chat: $chat")
 
             return if (meetupTime != null) {
-                FirebaseRaidMeetup(id, meetupTime, participantUserIds.toMutableList(), chat)
+                FirebaseRaidMeetup(id, parentDatabasePath, meetupTime, participantUserIds.toMutableList(), chat)
             } else {
                 null
             }
         }
 
-        fun new(meetupTime: String): FirebaseRaidMeetup {
-            return new("", meetupTime)
-        }
+        // TODO: new(...) { id: String = DatabaseKeys.RAID_MEETUP }
 
-        fun new(id: String, meetupTime: String): FirebaseRaidMeetup {
-            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = mutableListOf(), chat = emptyList())
-        }
+//        fun new(meetupTime: String): FirebaseRaidMeetup {
+//            return new("", meetupTime)
+//        }
+//
+//        fun new(id: String, meetupTime: String): FirebaseRaidMeetup {
+//            return FirebaseRaidMeetup(id, meetupTime, participantUserIds = mutableListOf(), chat = emptyList())
+//        }
     }
 }

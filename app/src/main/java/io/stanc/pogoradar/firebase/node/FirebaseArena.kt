@@ -66,7 +66,8 @@ data class FirebaseArena private constructor(
 
             if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(RAID))
+                val databasePath = "$ARENAS/${firebaseGeoHash(geoHash)}/$id/$RAID"
+                val raid = FirebaseRaid.new(databasePath, dataSnapshot.child(RAID))
                 return FirebaseArena(id, name, geoHash, submitter, isEX, raid)
             }
 
