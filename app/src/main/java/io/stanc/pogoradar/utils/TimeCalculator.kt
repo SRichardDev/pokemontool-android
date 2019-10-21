@@ -1,10 +1,7 @@
 package io.stanc.pogoradar.utils
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.google.common.math.LongMath
-import com.google.firebase.Timestamp
-import com.google.type.TimeOfDay
 import java.math.RoundingMode
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -25,6 +22,7 @@ object TimeCalculator {
     val clock = SimpleDateFormat("HH:mm")
 
     fun format(date: Date): String = clock.format(date)
+    fun format(timestamp: Long): String = clock.format(Date(timestamp))
     fun format(hours: Int, minutes: Int): String {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, hours)
@@ -76,18 +74,34 @@ object TimeCalculator {
         }
     }
 
-    fun timestamp(timeOfTodayHour: Int, timeOfTodayMinutes: Int): Long? {
-        dateOfToday(timeOfTodayHour, timeOfTodayMinutes)?.let { date ->
-            return date.time
+    fun timestampOfToday(formattedTime: String): Long? {
+        dateOfToday(formattedTime)?.let { date ->
+            return timestamp(date)
         }
         return null
     }
 
-    fun timestamp(timeOfTodayHour: Int, timeOfTodayMinutes: Int): Long? {
-        dateOfToday(timeOfTodayHour, timeOfTodayMinutes)?.let { date ->
-            return date.time
+    fun timestampOfToday(hour: Int, minutes: Int): Long? {
+        dateOfToday(hour, minutes)?.let { date ->
+            return timestamp(date)
         }
         return null
+    }
+
+    fun timestamp(date: Date, additionalMinutes: Int): Long? {
+        return timestamp(addTime(date, additionalMinutes))
+    }
+
+    fun timestamp(timestamp: Long, additionalMinutes: Int): Long? {
+        val date = Date(timestamp)
+        return timestamp(addTime(date, additionalMinutes))
+    }
+
+    private fun timestamp(date: Date): Long {
+        // just to be clear
+        // val timestampInMillisec = date.time
+        // val timestampInSec = Timestamp(date).seconds
+        return date.time
     }
 
     /**
@@ -108,6 +122,8 @@ object TimeCalculator {
             null
         }
     }
+
+    fun timeExpired(timestamp: Long): Boolean = currentDate().after(Date(timestamp))
 
     fun timeExpired(date: Date): Boolean = currentDate().after(date)
 

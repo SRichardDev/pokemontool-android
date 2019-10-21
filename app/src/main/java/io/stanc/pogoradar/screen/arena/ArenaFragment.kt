@@ -19,9 +19,14 @@ import io.stanc.pogoradar.utils.ShowFragmentManager
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
 import android.content.Intent
+import android.util.Log
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.appbar.Toolbar
 import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
+import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
+import io.stanc.pogoradar.firebase.node.FirebaseRaid
+import io.stanc.pogoradar.geohash.GeoHash
+import io.stanc.pogoradar.utils.TimeCalculator
 
 
 class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.SendMessageDelegate {
@@ -129,8 +134,10 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
         var shareText = ""
 
-        Kotlin.safeLet(dataObject, raidViewModel?.raidMeetup) { arena, raidMeetup ->
-            shareText = createRaidPlainText(arena, raidMeetup, raidViewModel?.participants?.value?.map { it.name })
+        Kotlin.safeLet(dataObject, dataObject?.raid, raidViewModel?.raidMeetup) { arena, raid, raidMeetup ->
+            shareText = createRaidPlainText(arena.name, arena.geoHash, raid, raidMeetup, raidViewModel?.participants?.value?.map { it.name })
+        } ?: run {
+            Log.e(TAG, "could not shared raid meetup, because arena: $dataObject, raid: ${dataObject?.raid} or raidMeetup: ${raidViewModel?.raidMeetup}")
         }
 
         val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -139,7 +146,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         startActivity(Intent.createChooser(sharingIntent, App.geString(R.string.arena_raid_share_raid_header)))
     }
 
-    private fun createRaidPlainText(arena: FirebaseArena, raidMeetup: FirebaseRaidMeetup, participants: List<String>?): String {
+    private fun createRaidPlainText(arenaName: String, ArenaLocation: GeoHash, raid: FirebaseRaid, raidMeetup: FirebaseRaidMeetup, participants: List<String>?): String {
 
         var participantsString = ""
         if (participants != null) {
@@ -148,13 +155,17 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             }
         }
 
+        val timeEggHatches = if(raid.timestampEggHatches != TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEggHatches) else DEFAULT_MEETUP_TIME
+        val timeEnd = if(raid.timestampEnd != TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEnd) else DEFAULT_MEETUP_TIME
+        val timeMeetup = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_MEETUP_TIME
+
         return "" +
-                "🐲: ${FirebaseDefinitions.raidBossName(arena.raid?.raidBossId) ?: "---"}, ⭐️: ${arena.raid?.level ?: 0}\n" +
-                "🏟: ${arena.name}\n" +
-                "⌚️: ${arena.raid?.timeEggHatches ?: DEFAULT_MEETUP_TIME} - ${arena.raid?.timeEnd ?: DEFAULT_MEETUP_TIME}\n" +
-                "👫: ${raidMeetup.meetupTime}\n" +
+                "🐲: ${FirebaseDefinitions.raidBossName(raid.raidBossId) ?: "---"}, ⭐️: ${raid.level}\n" +
+                "🏟: $arenaName\n" +
+                "⌚️: $timeEggHatches - $timeEnd\n" +
+                "👫: $timeMeetup\n" +
                 participantsString +
-                "📍: https://maps.google.com/?q=${arena.geoHash.toLatLng().latitude},${arena.geoHash.toLatLng().longitude}"
+                "📍: https://maps.google.com/?q=${ArenaLocation.toLatLng().latitude},${ArenaLocation.toLatLng().longitude}"
     }
 
     override fun onDestroyView() {
@@ -222,7 +233,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     private fun tryAddingRaidMeetupObserver(arena: FirebaseArena?) {
 
         arena?.raid?.raidMeetupId?.let { raidMeetupId ->
-            val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)
+            val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId)
             firebase.addObserver(raidMeetupObserver, raidMeetup)
         }
     }
@@ -234,7 +245,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             arenaObserverManager.removeObserver(arenaObserver, arena)
 
             arena.raid?.raidMeetupId?.let { raidMeetupId ->
-                val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_MEETUP_TIME)
+                val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId)
                 firebase.removeObserver(raidMeetupObserver, raidMeetup)
                 firebase.removeChatObserver(chatObserver, raidMeetupId)
             }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.FirebaseImageMapper
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
+import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseUser
 import io.stanc.pogoradar.firebase.node.FirebaseArena
@@ -78,10 +79,10 @@ class RaidViewModel: ViewModel() {
     }
 
     private fun changeMeetupData(raidMeetup: FirebaseRaidMeetup) {
-        isRaidMeetupAnnounced.value = raidMeetup.meetupTime != DEFAULT_MEETUP_TIME
+        isRaidMeetupAnnounced.value = raidMeetup.meetupTimestamp != TIMESTAMP_NONE
         numParticipants.value = raidMeetup.participantUserIds.size.toString()
         isUserParticipate.value = raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id)
-        meetupTime.value = raidMeetup.meetupTime
+        meetupTime.value = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_MEETUP_TIME
 
         updateParticipantsList(raidMeetup)
     }

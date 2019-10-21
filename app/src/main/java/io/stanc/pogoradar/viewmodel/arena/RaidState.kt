@@ -1,6 +1,7 @@
 package io.stanc.pogoradar.viewmodel.arena
 
 import android.os.Parcelable
+import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.TimeCalculator
@@ -23,14 +24,8 @@ fun currentRaidState(raid: FirebaseRaid?): RaidState {
 
 private fun eggIsHatching(raid: FirebaseRaid?): Boolean {
 
-    return Kotlin.safeLet(raid?.timestamp, raid?.timeEggHatches) { timestamp, timeEggHatches ->
-
-        TimeCalculator.timeExpired(timestamp, timeEggHatches)?.let { alreadyHatched ->
-            !alreadyHatched
-        } ?: run {
-            false
-        }
-
+    return raid?.timestampEggHatches?.let { timestampEggHatches ->
+        !TimeCalculator.timeExpired(timestampEggHatches)
     } ?: run {
         false
     }
@@ -38,13 +33,8 @@ private fun eggIsHatching(raid: FirebaseRaid?): Boolean {
 
 private fun raidIsExpired(raid: FirebaseRaid?): Boolean {
 
-    return Kotlin.safeLet(raid?.timestamp, raid?.timeEnd) { timestamp, timeEnd ->
-
-        TimeCalculator.timeExpired(timestamp, timeEnd)?.let {
-            it
-        } ?: run {
-            true
-        }
+    return raid?.timestampEnd?.let { timestampEnd ->
+        TimeCalculator.timeExpired(timestampEnd)
     } ?: run {
         true
     }
@@ -52,12 +42,16 @@ private fun raidIsExpired(raid: FirebaseRaid?): Boolean {
 
 fun raidTime(raid: FirebaseRaid?): String? {
 
+    if (raid == null) {
+        return null
+    }
+
     return when(currentRaidState(raid)) {
         RaidState.EGG_HATCHES -> {
-            raid?.timeEggHatches
+            if(raid.timestampEggHatches != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEggHatches) else DatabaseKeys.DEFAULT_MEETUP_TIME
         }
         RaidState.RAID_RUNNING -> {
-            raid?.timeEnd
+            if(raid.timestampEnd != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEnd) else DatabaseKeys.DEFAULT_MEETUP_TIME
         }
         else -> null
     }

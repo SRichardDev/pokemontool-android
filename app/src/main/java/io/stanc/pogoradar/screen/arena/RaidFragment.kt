@@ -14,6 +14,7 @@ import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
 import io.stanc.pogoradar.databinding.FragmentRaidBinding
 import io.stanc.pogoradar.firebase.DatabaseKeys
+import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
@@ -344,13 +345,13 @@ class RaidFragment: Fragment() {
 
     private fun pushRaidAndMeetup(raid: FirebaseRaid) {
 
-        val meetupTime = if (raidCreationViewModel?.isUserParticipate?.value == true) {
-            TimeCalculator.format(meetupTimeHour, meetupTimeMinutes)
+        val meetupTimestamp: Long = if (raidCreationViewModel?.isUserParticipate?.value == true) {
+            TimeCalculator.timestampOfToday(meetupTimeHour, meetupTimeMinutes) ?: TIMESTAMP_NONE
         } else {
-            DatabaseKeys.DEFAULT_MEETUP_TIME
+            TIMESTAMP_NONE
         }
 
-        val raidMeetup = FirebaseRaidMeetup.new(meetupTime)
+        val raidMeetup = FirebaseRaidMeetup.new(meetupTimestamp)
         firebase.pushRaid(raid, raidMeetup)
     }
 

@@ -14,6 +14,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSS_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.REGISTERED_USERS
+import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
@@ -102,7 +103,7 @@ class FirebaseDatabase {
         removeRaidMeetupIfExists(raid.databasePath()) {
 
             FirebaseUser.userData?.id?.let { userId ->
-                val userParticipants =  newRaidMeetup.meetupTime != DatabaseKeys.DEFAULT_MEETUP_TIME
+                val userParticipants =  newRaidMeetup.meetupTimestamp != TIMESTAMP_NONE
                 if (userParticipants && !newRaidMeetup.participantUserIds.contains(userId)) {
                     newRaidMeetup.participantUserIds.add(userId)
                 }
