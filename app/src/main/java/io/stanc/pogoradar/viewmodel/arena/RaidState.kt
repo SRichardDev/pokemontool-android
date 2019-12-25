@@ -3,7 +3,6 @@ package io.stanc.pogoradar.viewmodel.arena
 import android.os.Parcelable
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
-import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.TimeCalculator
 import kotlinx.android.parcel.Parcelize
 
@@ -24,7 +23,7 @@ fun currentRaidState(raid: FirebaseRaid?): RaidState {
 
 private fun eggIsHatching(raid: FirebaseRaid?): Boolean {
 
-    return raid?.timestampEggHatches?.let { timestampEggHatches ->
+    return raid?.eggHatchesTimestamp?.let { timestampEggHatches ->
         !TimeCalculator.timeExpired(timestampEggHatches)
     } ?: run {
         false
@@ -33,7 +32,7 @@ private fun eggIsHatching(raid: FirebaseRaid?): Boolean {
 
 private fun raidIsExpired(raid: FirebaseRaid?): Boolean {
 
-    return raid?.timestampEnd?.let { timestampEnd ->
+    return raid?.endTimestamp?.let { timestampEnd ->
         TimeCalculator.timeExpired(timestampEnd)
     } ?: run {
         true
@@ -48,10 +47,10 @@ fun raidTime(raid: FirebaseRaid?): String? {
 
     return when(currentRaidState(raid)) {
         RaidState.EGG_HATCHES -> {
-            if(raid.timestampEggHatches != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEggHatches) else DatabaseKeys.DEFAULT_MEETUP_TIME
+            if(raid.eggHatchesTimestamp != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.eggHatchesTimestamp) else DatabaseKeys.DEFAULT_TIME
         }
         RaidState.RAID_RUNNING -> {
-            if(raid.timestampEnd != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEnd) else DatabaseKeys.DEFAULT_MEETUP_TIME
+            if(raid.endTimestamp != DatabaseKeys.TIMESTAMP_NONE) TimeCalculator.format(raid.endTimestamp) else DatabaseKeys.DEFAULT_TIME
         }
         else -> null
     }

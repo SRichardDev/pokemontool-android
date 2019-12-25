@@ -5,7 +5,7 @@ import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST_ID
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
+import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.FirebaseServer
@@ -28,7 +28,7 @@ data class FirebaseQuest private constructor(
         val data = HashMap<String, Any>()
 
         data[QUEST_ID] = definitionId
-        data[SUBMITTER] = submitter
+        data[SUBMITTER_ID] = submitter
         data[TIMESTAMP] = if(timestamp == TIMESTAMP_SERVER) FirebaseServer.timestamp() else timestamp
 
         return data
@@ -43,10 +43,10 @@ data class FirebaseQuest private constructor(
 
             val id = dataSnapshot.key
             val definitionId = dataSnapshot.child(QUEST_ID).value as? String
-            val submitter = dataSnapshot.child(SUBMITTER).value as? String
+            val submitter = dataSnapshot.child(SUBMITTER_ID).value as? String
             val timestamp = dataSnapshot.child(TIMESTAMP).value as? Long
 
-//            Log.v(TAG, "id: $id, definitionId: $definitionId, submitter: $submitter, timestamp: $timestamp, pokestopId: $pokestopId, geoHash: $geoHash")
+//            Log.v(TAG, "id: $id, definitionId: $definitionId, submitterId: $submitterId, timestamp: $timestamp, pokestopId: $pokestopId, geoHash: $geoHash")
             if (id != null && definitionId != null && submitter != null && timestamp != null) {
                 return FirebaseQuest(id, definitionId, submitter, timestamp, geoHash, pokestopId)
             }

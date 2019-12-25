@@ -351,7 +351,8 @@ class RaidFragment: Fragment() {
             TIMESTAMP_NONE
         }
 
-        val raidMeetup = FirebaseRaidMeetup.new(meetupTimestamp)
+        val parentDatabasePath = DatabaseKeys.raidMeetupParentDatabasePath(geoHash, arenaId)
+        val raidMeetup = FirebaseRaidMeetup.new(parentDatabasePath, meetupTimestamp)
         firebase.pushRaid(raid, raidMeetup)
     }
 

@@ -8,7 +8,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LATITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
+import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.geohash.GeoHash
 import kotlinx.android.parcel.Parcelize
@@ -31,7 +31,7 @@ data class FirebaseArena private constructor(
         data[IS_EX] = isEX
         data[NOTIFICATION_LATITUDE] = geoHash.toLocation().latitude
         data[NOTIFICATION_LONGITUDE] = geoHash.toLocation().longitude
-        data[SUBMITTER] = submitter
+        data[SUBMITTER_ID] = submitter
 
         return data
     }
@@ -55,9 +55,9 @@ data class FirebaseArena private constructor(
             val longitude = (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? String)?.toDouble()
             }
-            val submitter = dataSnapshot.child(SUBMITTER).value as? String
+            val submitter = dataSnapshot.child(SUBMITTER_ID).value as? String
 
-//            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitter: $submitter")
+//            Log.v(TAG, "id: $id, name: $name, isEX: $isEX, latitude: $latitude, longitude: $longitude, submitterId: $submitterId")
 
             // quickfix for bot
             if (name == "unknown") {
@@ -66,7 +66,8 @@ data class FirebaseArena private constructor(
 
             if (id != null && name != null && isEX != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)
-                val raid = FirebaseRaid.new(id, geoHash, dataSnapshot.child(RAID))
+                val databasePath = "$ARENAS/${firebaseGeoHash(geoHash)}/$id/$RAID"
+                val raid = FirebaseRaid.new(databasePath, dataSnapshot.child(RAID))
                 return FirebaseArena(id, name, geoHash, submitter, isEX, raid)
             }
 

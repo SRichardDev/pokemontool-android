@@ -29,7 +29,7 @@ object FirebaseImageMapper {
 
                 RaidState.RAID_RUNNING -> {
 
-                    return arena.raid.raidBossId?.let { raidBossId ->
+                    return arena.raid.raidBoss?.let { raidBossId ->
                         raidBossDrawable(context, raidBossId)
                     } ?: run {
                         raidBossPlaceholerDrawable(context, raid.level)
@@ -66,7 +66,7 @@ object FirebaseImageMapper {
                 assetImageName = imageName
             )
         } ?: run {
-            Log.e(TAG, "could not determine raidBoss drawable for raidBossId: $raidBossId")
+            Log.e(TAG, "could not determine raidBoss drawable for raidBoss: $raidBossId")
             return null
         }
     }

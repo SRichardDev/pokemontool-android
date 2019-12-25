@@ -6,8 +6,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.FirebaseImageMapper
-import io.stanc.pogoradar.firebase.DatabaseKeys
-import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
+import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_TIME
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.FirebaseUser
@@ -36,7 +35,7 @@ class RaidViewModel: ViewModel() {
     val isChangingMeetupTime = MutableLiveData<Boolean>(false)
 
     val isRaidMeetupAnnounced = MutableLiveData<Boolean>(false)
-    val meetupTime = MutableLiveData<String>(DEFAULT_MEETUP_TIME)
+    val meetupTime = MutableLiveData<String>(DEFAULT_TIME)
     val numParticipants = MutableLiveData<String>("0")
     val participants = MutableLiveData<List<FirebasePublicUser>>(emptyList())
     val isUserParticipate = MutableLiveData<Boolean>(false)
@@ -63,7 +62,7 @@ class RaidViewModel: ViewModel() {
         raidImage.value = imageDrawable(arena, context)
 
         isRaidBossMissing.value = arena.raid?.let { raid ->
-            raidState.value == RaidState.RAID_RUNNING && raid.raidBossId == null
+            raidState.value == RaidState.RAID_RUNNING && raid.raidBoss == null
         } ?: run {
             false
         }
@@ -82,7 +81,7 @@ class RaidViewModel: ViewModel() {
         isRaidMeetupAnnounced.value = raidMeetup.meetupTimestamp != TIMESTAMP_NONE
         numParticipants.value = raidMeetup.participantUserIds.size.toString()
         isUserParticipate.value = raidMeetup.participantUserIds.contains(FirebaseUser.userData?.id)
-        meetupTime.value = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_MEETUP_TIME
+        meetupTime.value = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_TIME
 
         updateParticipantsList(raidMeetup)
     }
@@ -96,7 +95,7 @@ class RaidViewModel: ViewModel() {
         numParticipants.value = "0"
         participants.value = emptyList()
         isUserParticipate.value = false
-        meetupTime.value = DEFAULT_MEETUP_TIME
+        meetupTime.value = DEFAULT_TIME
 
         raidStateViewModel.reset()
     }

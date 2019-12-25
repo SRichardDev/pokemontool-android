@@ -5,7 +5,7 @@ import io.stanc.pogoradar.recyclerview.IdItem
 
 interface FirebaseNode: IdItem {
 
-    override val id: String
     fun databasePath(): String
+    override val id: String
     fun data(): Map<String, Any>
 }

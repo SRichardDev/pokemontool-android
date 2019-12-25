@@ -97,6 +97,10 @@ object TimeCalculator {
         return timestamp(addTime(date, additionalMinutes))
     }
 
+    fun currentTimestamp(): Long {
+        return timestamp(currentDate())
+    }
+
     private fun timestamp(date: Date): Long {
         // just to be clear
         // val timestampInMillisec = date.time

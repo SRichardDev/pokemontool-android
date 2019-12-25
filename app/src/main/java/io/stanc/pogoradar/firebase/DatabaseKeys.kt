@@ -8,27 +8,31 @@ object DatabaseKeys {
     const val ARENAS = "arenas"
 //    const val ARENAS = "test_arenas"
     const val IS_EX = "isEX"
-    const val RAID = "raid"
-    const val RAID_LEVEL = "level"
-    const val RAID_BOSS_ID = "raidBossId"
-    const val RAID_MEETUP_ID = "raidMeetupId"
-    const val RAID_TIME_END = "endTime"
-    const val RAID_TIME_EGG_HATCHES = "hatchTime"
-    const val RAID_DURATION = 45
 
     // Pokestops
     const val POKESTOPS = "pokestops"
 //    const val POKESTOPS = "test_pokestops"
     const val POKESTOP_QUEST_ID = "questId"
 
+    // Raid
+    const val RAID = "raid"
+    const val RAID_ID = "raidId"
+    const val RAID_LEVEL = "level"
+    const val RAID_BOSS = "raidBoss"
+    const val RAID_BOSS_DEFAULT = 0
+    const val RAID_TIME_END = "endTime"
+    const val RAID_TIME_EGG_HATCHES = "hatchTime"
+    const val RAID_DURATION = 45
+
     // Raid Meetup
-    const val RAID_MEETUPS = "raidMeetups"
-    const val CHAT = "chat"
+    const val RAID_MEETUP = "meetup"
+    const val CHAT_ID = "chatId"
+    const val MEETUP_TIME = "meetupTime"
+    const val PARTICIPANTS = "participants"
+
+    // Chat
     const val CHAT_MESSAGE = "message"
     const val CHAT_SENDER_ID = "senderId"
-    const val MEETUP_TIME = "meetupTime"
-    const val DEFAULT_MEETUP_TIME = "--:--"
-    const val PARTICIPANTS = "participants"
 
     // Raid Bosses
     const val RAID_BOSSES = "raidBosses"
@@ -66,11 +70,12 @@ object DatabaseKeys {
     // common
     const val REGISTERED_USERS = "registeredUsers"
     const val NAME = "name"
-    const val SUBMITTER = "submitter"
+    const val SUBMITTER_ID = "submitterId"
     const val TIMESTAMP = "timestamp"
     const val TIMESTAMP_NONE: Long = 0
     const val GEO_HASH_AREA_PRECISION: Int = 6
     const val DATA_UNDEFINED = "---"
+    const val DEFAULT_TIME = "--:--"
 
     // notifications
     const val NOTIFICATION_TYPE = "notificationType"

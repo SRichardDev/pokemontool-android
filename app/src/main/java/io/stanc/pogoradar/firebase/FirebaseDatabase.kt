@@ -10,7 +10,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUESTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSSES
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSS_ID
+import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSS
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUP_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.REGISTERED_USERS
@@ -151,7 +151,7 @@ class FirebaseDatabase {
     }
 
     fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidbossDefinition) {
-        FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS_ID", raidBoss.id)
+        FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS", raidBoss.id)
     }
 
     fun addObserver(observer: FirebaseNodeObserver<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {

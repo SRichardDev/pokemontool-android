@@ -7,7 +7,7 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_LONGITUDE
 import io.stanc.pogoradar.firebase.DatabaseKeys.NAME
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUEST
-import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER
+import io.stanc.pogoradar.firebase.DatabaseKeys.SUBMITTER_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.geohash.GeoHash
 import kotlinx.android.parcel.Parcelize
@@ -31,7 +31,7 @@ data class FirebasePokestop private constructor(
         data[NAME] = name
         data[NOTIFICATION_LATITUDE] = geoHash.toLocation().latitude
         data[NOTIFICATION_LONGITUDE] = geoHash.toLocation().longitude
-        data[SUBMITTER] = submitter
+        data[SUBMITTER_ID] = submitter
 
         return data
     }
@@ -54,9 +54,9 @@ data class FirebasePokestop private constructor(
             val longitude = (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? Number)?.toDouble() ?: run {
                 (dataSnapshot.child(NOTIFICATION_LONGITUDE).value as? String)?.toDouble()
             }
-            val submitter = dataSnapshot.child(SUBMITTER).value as? String
+            val submitter = dataSnapshot.child(SUBMITTER_ID).value as? String
 
-//            Log.v(TAG, "id: $id, name: $name, latitude: $latitude, longitude: $longitude, submitter: $submitter")
+//            Log.v(TAG, "id: $id, name: $name, latitude: $latitude, longitude: $longitude, submitterId: $submitterId")
 
             if (id != null && name != null && latitude != null && longitude != null && submitter != null) {
                 val geoHash = GeoHash(latitude, longitude)

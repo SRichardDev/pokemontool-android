@@ -22,7 +22,7 @@ import android.content.Intent
 import android.util.Log
 import io.stanc.pogoradar.App
 import io.stanc.pogoradar.appbar.Toolbar
-import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_MEETUP_TIME
+import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_TIME
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.node.FirebaseRaid
 import io.stanc.pogoradar.geohash.GeoHash
@@ -155,12 +155,12 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
             }
         }
 
-        val timeEggHatches = if(raid.timestampEggHatches != TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEggHatches) else DEFAULT_MEETUP_TIME
-        val timeEnd = if(raid.timestampEnd != TIMESTAMP_NONE) TimeCalculator.format(raid.timestampEnd) else DEFAULT_MEETUP_TIME
-        val timeMeetup = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_MEETUP_TIME
+        val timeEggHatches = if(raid.eggHatchesTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raid.eggHatchesTimestamp) else DEFAULT_TIME
+        val timeEnd = if(raid.endTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raid.endTimestamp) else DEFAULT_TIME
+        val timeMeetup = if(raidMeetup.meetupTimestamp != TIMESTAMP_NONE) TimeCalculator.format(raidMeetup.meetupTimestamp) else DEFAULT_TIME
 
         return "" +
-                "🐲: ${FirebaseDefinitions.raidBossName(raid.raidBossId) ?: "---"}, ⭐️: ${raid.level}\n" +
+                "🐲: ${FirebaseDefinitions.raidBossName(raid.raidBoss) ?: "---"}, ⭐️: ${raid.level}\n" +
                 "🏟: $arenaName\n" +
                 "⌚️: $timeEggHatches - $timeEnd\n" +
                 "👫: $timeMeetup\n" +
@@ -244,8 +244,9 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
             arenaObserverManager.removeObserver(arenaObserver, arena)
 
-            arena.raid?.raidMeetupId?.let { raidMeetupId ->
-                val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId)
+            arena.raid?.let { raid ->
+                val parentDatabasePath =
+                val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_TIME)
                 firebase.removeObserver(raidMeetupObserver, raidMeetup)
                 firebase.removeChatObserver(chatObserver, raidMeetupId)
             }
