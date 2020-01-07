@@ -101,7 +101,7 @@ object UpdateManager {
                     override fun onSuccess(data: List<DataSnapshot>?) {
 
                         val geoHashes = data?.mapNotNull { it.key?.let { GeoHash(it) } }?.toList()
-                        geoHashes?.forEach { FirebaseNotification.subscribeToArea(it) }
+                        geoHashes?.forEach { FirebaseNotification.subscribeToArena(it) }
 
                         // deprecated nodes: "subscribedGeohashArenas" and "subscribedGeohashPokestops"
                         FirebaseServer.removeNode("$USERS/${user.id}", SUBSCRIBED_GEOHASH_ARENAS)

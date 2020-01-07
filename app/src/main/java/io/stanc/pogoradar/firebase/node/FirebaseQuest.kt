@@ -20,9 +20,9 @@ data class FirebaseQuest private constructor(
     val submitter: String,
     val timestamp: Long,
     val geoHash: GeoHash,
-    val pokestopId: String): FirebaseNode, Parcelable {
+    val pokestopId: String): FirebaseDataNode, Parcelable {
 
-    override fun databasePath(): String = "$POKESTOPS/${firebaseGeoHash(geoHash)}/$pokestopId/$QUEST"
+    override fun databasePath(): String = "$POKESTOPS/${firebaseGeoHash(geoHash)}/$pokestopId"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()

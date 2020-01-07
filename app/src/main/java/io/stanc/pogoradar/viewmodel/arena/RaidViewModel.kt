@@ -15,6 +15,7 @@ import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
 import io.stanc.pogoradar.utils.TimeCalculator
+import kotlin.math.min
 
 class RaidViewModel: ViewModel() {
     private val TAG = javaClass.name
@@ -66,14 +67,15 @@ class RaidViewModel: ViewModel() {
         } ?: run {
             false
         }
-    }
 
-    // TODO: merge with other update method after RaidMeetup was moved to Arena in firebase database
-    fun updateData(raidMeetup: FirebaseRaidMeetup) {
-        Log.w(TAG, "updateData(raidMeetup: $raidMeetup)")
-        this.raidMeetup = raidMeetup
-
-        changeMeetupData(raidMeetup)
+        // raid meetup
+        arena.raid?.raidMeetup?.let {
+            this.raidMeetup = it
+            changeMeetupData(it)
+        } ?: run {
+            this.raidMeetup = null
+            resetMeetup()
+        }
 //        Log.d(TAG, "Debug:: updateData(), numParticipants: ${numParticipants.get()}, participants: ${participants.get()}, isUserParticipate: ${isUserParticipate.get()}")
     }
 
@@ -91,23 +93,27 @@ class RaidViewModel: ViewModel() {
         raidImage.value = null
         isChangingMeetupTime.value = false
 
+        resetMeetup()
+
+        raidStateViewModel.reset()
+    }
+
+    private fun resetMeetup() {
         isRaidMeetupAnnounced.value = false
         numParticipants.value = "0"
         participants.value = emptyList()
         isUserParticipate.value = false
         meetupTime.value = DEFAULT_TIME
-
-        raidStateViewModel.reset()
     }
 
     fun changeParticipation(participate: Boolean) {
 
-        raidMeetup?.id?.let {
+        arena?.raid?.raidMeetup?.let {
 
             if (participate) {
-                firebase.pushRaidMeetupParticipation(it)
+                firebase.pushRaidMeetupParticipation()
             } else {
-                firebase.cancelRaidMeetupParticipation(it)
+                firebase.cancelRaidMeetupParticipation()
             }
 
         } ?: run {
@@ -122,13 +128,16 @@ class RaidViewModel: ViewModel() {
     fun changeMeetupTime(hour: Int, minutes: Int) {
         isChangingMeetupTime.value = false
 
-        arena?.raid?.raidMeetupId?.let { raidMeetupId ->
+        arena?.raid?.raidMeetup?.let { raidMeetup ->
 
-            val meetupTime = TimeCalculator.format(hour, minutes)
-            firebase.changeRaidMeetupTime(raidMeetupId, meetupTime)
+            TimeCalculator.timestampOfToday(hour, minutes)?.let {  meetupTimestamp ->
+                firebase.changeRaidMeetupTime(raidMeetup, meetupTimestamp)
+            } ?: run {
+                Log.e(TAG, "Could not change raid meetup time, because timestamp creation failed for hour: $hour and minutes: $minutes!")
+            }
 
         } ?: run {
-            Log.e(TAG, "Could not push raid meetup, because raid is null of arena: $arena")
+            Log.e(TAG, "Could not change raid meetup time, because arena: $arena, raid: ${arena?.raid}, or raidMeetup: ${arena?.raid?.raidMeetup} is null!")
         }
     }
 

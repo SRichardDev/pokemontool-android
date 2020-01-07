@@ -3,16 +3,16 @@ package io.stanc.pogoradar.firebase
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import io.stanc.pogoradar.firebase.DatabaseKeys.ARENAS
-import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT
+import io.stanc.pogoradar.firebase.DatabaseKeys.CHATS
+import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_ID
 import io.stanc.pogoradar.firebase.DatabaseKeys.GEO_HASH_AREA_PRECISION
 import io.stanc.pogoradar.firebase.DatabaseKeys.MEETUP_TIME
 import io.stanc.pogoradar.firebase.DatabaseKeys.PARTICIPANTS
 import io.stanc.pogoradar.firebase.DatabaseKeys.POKESTOPS
 import io.stanc.pogoradar.firebase.DatabaseKeys.QUESTS
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSSES
 import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSS
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUPS
-import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUP_ID
+import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_BOSSES
+import io.stanc.pogoradar.firebase.DatabaseKeys.RAID_MEETUP
 import io.stanc.pogoradar.firebase.DatabaseKeys.REGISTERED_USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
 import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
@@ -37,7 +37,10 @@ class FirebaseDatabase {
         FirebasePokestop.new(dataSnapshot)
     })
     private val raidMeetupObserverManager = FirebaseNodeObserverManager(newFirebaseNode = { dataSnapshot ->
-        FirebaseRaidMeetup.new(dataSnapshot)
+        // TODO: move parent database path into new() and extract it form snapshot
+        val databasePath = FirebaseServer.parentDatabasePath(dataSnapshot)
+        Log.w(TAG, "Dbg:: databasePath of raidMeetup: $databasePath")
+        FirebaseRaidMeetup.new(databasePath, dataSnapshot)
     })
 
     /**
@@ -99,59 +102,36 @@ class FirebaseDatabase {
      * raids & meetups & chat
      */
 
-    fun pushRaid(raid: FirebaseRaid, newRaidMeetup: FirebaseRaidMeetup) {
-        removeRaidMeetupIfExists(raid.databasePath()) {
+    fun pushRaid(raid: FirebaseRaid) {
 
-            FirebaseUser.userData?.id?.let { userId ->
-                val userParticipants =  newRaidMeetup.meetupTimestamp != TIMESTAMP_NONE
-                if (userParticipants && !newRaidMeetup.participantUserIds.contains(userId)) {
-                    newRaidMeetup.participantUserIds.add(userId)
-                }
-            }
-
-            createRaidMeetup(newRaidMeetup)?.let { raidMeetupId ->
-                raid.raidMeetupId = raidMeetupId
-            }
+        removeChatIfExists("${raid.databasePath()}/${raid.id}") {
 
             FirebaseServer.setNode(raid)
             FirebaseUser.saveSubmittedRaids()
         }
     }
 
-    private fun createRaidMeetup(raidMeetup: FirebaseRaidMeetup): String? {
-        val raidMeetupId = FirebaseServer.createNodeByAutoId(raidMeetup.databasePath(), raidMeetup.data())
-        return raidMeetupId
-    }
+    /**
+     * meetup
+     */
 
-    fun changeRaidMeetupTime(raidMeetupId: String, time: String) {
-        FirebaseServer.setData("$RAID_MEETUPS/$raidMeetupId/$MEETUP_TIME", time)
-    }
+    fun pushRaidMeetup(raidMeetup: FirebaseRaidMeetup) {
 
-    private fun removeRaidMeetupIfExists(raidDatabasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        removeChatIfExists(raidMeetup.databasePath()) {
 
-        FirebaseServer.requestDataValue("$raidDatabasePath/$RAID_MEETUP_ID", object: OnCompleteCallback<Any?> {
-            override fun onSuccess(data: Any?) {
-
-                (data as? String)?.let { nodeId ->
-
-                    FirebaseServer.removeNode(RAID_MEETUPS, nodeId, onCompletionCallback)
-
-                } ?: run {
-                    onCompletionCallback(false)
+            FirebaseUser.userData?.id?.let { userId ->
+                val userParticipants =  raidMeetup.meetupTimestamp != TIMESTAMP_NONE
+                if (userParticipants && !raidMeetup.participantUserIds.contains(userId)) {
+                    raidMeetup.participantUserIds.add(userId)
                 }
             }
 
-            override fun onFailed(message: String?) {
-                Log.e(TAG, "requestDataValue($raidDatabasePath/$RAID_MEETUP_ID) onFailed. message: $message")
-                onCompletionCallback(false)
-            }
-        })
-
-
+            FirebaseServer.setNode(raidMeetup)
+        }
     }
 
-    fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidbossDefinition) {
-        FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS", raidBoss.id)
+    fun changeRaidMeetupTime(raidMeetup: FirebaseRaidMeetup, timestamp: Long) {
+        FirebaseServer.setData("${raidMeetup.databasePath()}/$RAID_MEETUP/$MEETUP_TIME", timestamp)
     }
 
     fun addObserver(observer: FirebaseNodeObserver<FirebaseRaidMeetup>, raidMeetup: FirebaseRaidMeetup) {
@@ -162,13 +142,12 @@ class FirebaseDatabase {
         raidMeetupObserverManager.removeObserver(observer, raidMeetup)
     }
 
-    fun pushRaidMeetupParticipation(raidMeetupId: String) {
-
+    fun pushRaidMeetupParticipation(raidMeetupDatabasePath: String, raidMeetupId: String) {
         FirebaseUser.userData?.id?.let { userId ->
             FirebaseNotification.subscribeToRaidMeetup(raidMeetupId) { successful ->
 
                 if (successful) {
-                    FirebaseServer.addData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS", userId, "")
+                    FirebaseServer.addData("$raidMeetupDatabasePath/$RAID_MEETUP/$PARTICIPANTS", userId, "")
                 } else {
                     Log.e(TAG, "could not push raidmeetup (with id: $raidMeetupId) participation, because subscribeToRaidMeetup failed.")
                 }
@@ -178,12 +157,12 @@ class FirebaseDatabase {
         }
     }
 
-    fun cancelRaidMeetupParticipation(raidMeetupId: String) {
+    fun cancelRaidMeetupParticipation(raidMeetupDatabasePath: String, raidMeetupId: String) {
         FirebaseUser.userData?.id?.let { userId ->
             FirebaseNotification.unsubscribeFromRaidMeetup(raidMeetupId) { successful ->
 
                 if (successful) {
-                    FirebaseServer.removeData("$RAID_MEETUPS/$raidMeetupId/$PARTICIPANTS/$userId")
+                    FirebaseServer.removeData("$raidMeetupDatabasePath/$RAID_MEETUP/$PARTICIPANTS/$userId")
                 } else {
                     Log.e(TAG, "could not cancel raidmeetup (with id: $raidMeetupId) participation, because unsubscribeFromRaidMeetup failed.")
                 }
@@ -193,17 +172,59 @@ class FirebaseDatabase {
         }
     }
 
-    fun pushChatMessage(message: FirebaseChat): String? {
+    /**
+     * chat
+     */
+
+    fun pushChatMessage(message: FirebaseChatMessage): String? {
         val chatMessageId = FirebaseServer.createNodeByAutoId(message.databasePath(), message.data())
         return chatMessageId
     }
 
-    fun addChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, raidMeetupId: String) {
-        FirebaseServer.addListEventListener("$RAID_MEETUPS/$raidMeetupId/$CHAT", observer)
+    fun createChat(): String? {
+        val chat = FirebaseChat.new()
+        val chatId = FirebaseServer.createNodeByAutoId(chat.databasePath())
+        return chatId
     }
 
-    fun removeChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, raidMeetupId: String) {
-        FirebaseServer.removeListEventListener("$RAID_MEETUPS/$raidMeetupId/$CHAT", observer)
+    fun addChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, chatId: String) {
+        FirebaseServer.addListEventListener("$CHATS/$chatId", observer)
+    }
+
+    fun removeChatObserver(observer: FirebaseServer.OnChildDidChangeCallback, chatId: String) {
+        FirebaseServer.removeListEventListener("$CHATS/$chatId", observer)
+    }
+
+    private fun removeChatIfExists(raidMeetupDatabasePath: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseServer.requestDataValue("$raidMeetupDatabasePath/$RAID_MEETUP/$CHAT_ID", object : OnCompleteCallback<Any?> {
+            override fun onSuccess(data: Any?) {
+                (data as? String)?.let { chatId ->
+                    removeChat(chatId, onCompletionCallback)
+                } ?: run {
+                    onCompletionCallback(false)
+                }
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "requestDataValue($raidMeetupDatabasePath/$RAID_MEETUP/$CHAT_ID) onFailed. message: $message")
+                onCompletionCallback(false)
+            }
+        })
+    }
+
+    private fun removeChat(chatId: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+
+        FirebaseServer.requestDataValue("$CHATS/$chatId", object: OnCompleteCallback<Any?> {
+            override fun onSuccess(data: Any?) {
+                FirebaseServer.removeNode(CHATS, chatId, onCompletionCallback)
+            }
+
+            override fun onFailed(message: String?) {
+                Log.e(TAG, "requestDataValue($CHATS/$chatId) onFailed. message: $message")
+                onCompletionCallback(false)
+            }
+        })
     }
 
     fun loadPublicUser(userId: String, onCompletionCallback: (publicUser: FirebasePublicUser) -> Unit) {
@@ -290,6 +311,10 @@ class FirebaseDatabase {
     /**
      * raid bosses
      */
+
+    fun pushRaidBoss(raidDatabasePath: String, raidBoss: FirebaseRaidbossDefinition) {
+        FirebaseServer.setData("$raidDatabasePath/$RAID_BOSS", raidBoss.id)
+    }
 
     fun loadRaidBosses(onCompletionCallback: (raidBosses: List<FirebaseRaidbossDefinition>?) -> Unit) {
 

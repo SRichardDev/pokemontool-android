@@ -3,7 +3,6 @@ package io.stanc.pogoradar.utils
 import java.lang.ref.WeakReference
 
 class ObserverManager<Observer> {
-    private val TAG = javaClass.name
 
     private val observerMap = HashMap<Pair<Int, Any?>, WeakReference<Observer>>()
 

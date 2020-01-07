@@ -8,13 +8,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import com.google.firebase.messaging.FirebaseMessaging
+import io.stanc.pogoradar.firebase.node.FirebaseDataNode
 import io.stanc.pogoradar.firebase.node.FirebaseNode
-import io.stanc.pogoradar.utils.Async
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.lang.ref.WeakReference
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 
 object FirebaseServer {
@@ -129,6 +127,11 @@ object FirebaseServer {
 
     private val nodeDidChangeListener = HashMap<Pair<Int, String>, NodeEventListener>()
 
+    fun addNodeEventListener(node: FirebaseNode, callback: OnNodeDidChangeCallback) {
+        val databasePath = "${node.databasePath()}/${node.id}"
+        addNodeEventListener(databasePath, callback)
+    }
+
     fun addNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
         if (!alreadyAddedToList(databasePath, callback)) {
 
@@ -136,6 +139,11 @@ object FirebaseServer {
             nodeDidChangeListener[Pair(callback.hashCode(), databasePath)] = eventListener
             databaseRef.child(databasePath).addValueEventListener(eventListener)
         }
+    }
+
+    fun removeNodeEventListener(node: FirebaseNode, callback: OnNodeDidChangeCallback) {
+        val databasePath = "${node.databasePath()}/${node.id}"
+        removeNodeEventListener(databasePath, callback)
     }
 
     fun removeNodeEventListener(databasePath: String, callback: OnNodeDidChangeCallback) {
@@ -204,7 +212,7 @@ object FirebaseServer {
     interface OnChildDidChangeCallback {
         fun childAdded(dataSnapshot: DataSnapshot)
         fun childChanged(dataSnapshot: DataSnapshot)
-        fun childRemoved(kdataSnapshot: DataSnapshot)
+        fun childRemoved(dataSnapshot: DataSnapshot)
     }
 
     private class ListEventListener(callback: OnChildDidChangeCallback): ChildEventListener {
@@ -304,23 +312,32 @@ object FirebaseServer {
     }
 
     // Hint: never use "setValue()" because this overwrites other child nodes!
-    fun updateNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        databaseRef.child(firebaseNode.databasePath()).updateChildren(firebaseNode.data()).addOnCompleteListener { task ->
+    fun updateNode(firebaseDataNode: FirebaseDataNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        databaseRef.child("${firebaseDataNode.databasePath()}/${firebaseDataNode.id}").updateChildren(firebaseDataNode.data()).addOnCompleteListener { task ->
             task.exception?.let {
-                Log.e(TAG, "updateNode '$firebaseNode' failed. Exception: [$it]")
+                Log.e(TAG, "updateNode '$firebaseDataNode' failed. Exception: [$it]")
             }
             onCompletionCallback(task.isSuccessful)
         }
     }
 
-    fun setNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        databaseRef.child(firebaseNode.databasePath()).setValue(firebaseNode.data()).addOnCompleteListener { task ->
+    fun setNode(firebaseDataNode: FirebaseDataNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        databaseRef.child("${firebaseDataNode.databasePath()}/${firebaseDataNode.id}").setValue(firebaseDataNode.data()).addOnCompleteListener { task ->
             task.exception?.let {
-                Log.e(TAG, "setNode '$firebaseNode' failed. Exception: [$it]")
+                Log.e(TAG, "setNode '$firebaseDataNode' failed. Exception: [$it]")
             }
             onCompletionCallback(task.isSuccessful)
         }
     }
+
+    // TODO: handle list nodes !
+//    fun setNode(firebaseListNode: FirebaseListNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+//
+//        firebaseListNode.list().forEach {
+//            setNode(it)
+//        }
+//        databaseRef.child(firebaseListNode.databasePath()).child()
+//    }
 
     fun setData(databasePath: String, data: Any, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
         databaseRef.child(databasePath).setValue(data).addOnCompleteListener { task ->
@@ -332,7 +349,7 @@ object FirebaseServer {
     }
 
     fun createNodeByAutoId(databasePath: String, data: Map<String, Any>, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
-        val newNode = databaseRef.child(databasePath).push()
+        val newNode = createNode(databasePath)
         newNode.setValue(data).addOnCompleteListener { task ->
             task.exception?.let {
                 Log.e(TAG, "createNodeByAutoId '$databasePath' with data: $data failed. Exception: [$it]")
@@ -340,6 +357,15 @@ object FirebaseServer {
             onCompletionCallback(task.isSuccessful)
         }
         return newNode.key
+    }
+
+    fun createNodeByAutoId(databasePath: String): String? {
+        val newNode = createNode(databasePath)
+        return newNode.key
+    }
+
+    private fun createNode(databasePath: String): DatabaseReference {
+        return databaseRef.child(databasePath).push()
     }
 
     fun setDataByAutoId(databasePath: String, data: Any, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}): String? {
@@ -371,8 +397,8 @@ object FirebaseServer {
         }
     }
 
-    fun removeNode(firebaseNode: FirebaseNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
-        removeNode(firebaseNode.databasePath(), firebaseNode.id, onCompletionCallback)
+    fun removeNode(firebaseDataNode: FirebaseDataNode, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+        removeNode(firebaseDataNode.databasePath(), firebaseDataNode.id, onCompletionCallback)
     }
 
     fun removeNode(noteDatabasePath: String, nodeId: String, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
@@ -435,5 +461,9 @@ object FirebaseServer {
         FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener { task ->
             callback<InstanceIdResult, String>(task, onCompletionCallback)
         }
+    }
+
+    fun parentDatabasePath(snapshot: DataSnapshot): String {
+        return snapshot.ref.toString().substring(snapshot.ref.root.toString().length - 1)
     }
 }

@@ -8,6 +8,7 @@ import io.stanc.pogoradar.firebase.FirebaseDefinitions.quests
 import io.stanc.pogoradar.firebase.node.FirebaseArena
 import io.stanc.pogoradar.firebase.node.FirebasePokestop
 import io.stanc.pogoradar.firebase.node.Team
+import io.stanc.pogoradar.utils.Asset
 import io.stanc.pogoradar.viewmodel.arena.RaidState
 import io.stanc.pogoradar.viewmodel.arena.currentRaidState
 import java.io.IOException
@@ -60,10 +61,11 @@ object FirebaseImageMapper {
 
     private fun raidBossDrawable(context: Context, raidBossId: String): Drawable? {
         raidBosses.find { it.id == raidBossId }?.imageName?.let { imageName ->
-            return assetDrawable(
+            return Asset.drawable(
                 context,
                 ASSETS_DIR_RAIDBOSSES,
-                assetImageName = imageName
+                imageName,
+                "png"
             )
         } ?: run {
             Log.e(TAG, "could not determine raidBoss drawable for raidBoss: $raidBossId")
@@ -84,18 +86,6 @@ object FirebaseImageMapper {
         }
     }
 
-    fun assetDrawable(context: Context, assetDir: String, assetImageName: String): Drawable? {
-
-        return try {
-            val inputStream = context.assets.open("$assetDir/$assetImageName.png")
-            Drawable.createFromStream(inputStream, null)
-
-        } catch (ex: IOException) {
-            Log.e(TAG, ex.toString())
-            null
-        }
-    }
-
     fun questDrawable(context: Context, pokestop: FirebasePokestop): Drawable? {
 
         return quests.find { it.id == pokestop.quest?.definitionId }?.let { questDefinition ->
@@ -108,9 +98,9 @@ object FirebaseImageMapper {
     fun questDrawable(context: Context, imageName: String): Drawable? {
 
         return when (imageName) {
-            "candy" -> assetDrawable(context, ASSETS_DIR_REWARDS, assetImageName = imageName)
-            "stardust" -> assetDrawable(context, ASSETS_DIR_REWARDS, assetImageName = imageName)
-            else -> assetDrawable(context, ASSETS_DIR_RAIDBOSSES, assetImageName = imageName)
+            "candy" -> Asset.drawable(context, ASSETS_DIR_REWARDS, imageName, "png")
+            "stardust" -> Asset.drawable(context, ASSETS_DIR_REWARDS, imageName, "png")
+            else -> Asset.drawable(context, ASSETS_DIR_RAIDBOSSES, imageName, "png")
         }
     }
 }

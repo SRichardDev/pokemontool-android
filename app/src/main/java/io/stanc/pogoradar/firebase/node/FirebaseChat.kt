@@ -3,63 +3,40 @@ package io.stanc.pogoradar.firebase.node
 import android.os.Parcelable
 import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_MESSAGE
-import io.stanc.pogoradar.firebase.DatabaseKeys.CHAT_SENDER_ID
-import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP
-import io.stanc.pogoradar.firebase.FirebaseServer
-import io.stanc.pogoradar.firebase.FirebaseServer.TIMESTAMP_SERVER
+import io.stanc.pogoradar.firebase.DatabaseKeys.CHATS
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class FirebaseChat private constructor(
     override val id: String,
-    private val parentDatabasePath: String,
-    val message: String,
-    val senderId: String,
-    val timestamp: Number): FirebaseNode, Parcelable {
+    val chat: MutableList<FirebaseChatMessage>): FirebaseListNode, Parcelable {
 
-    override fun databasePath(): String = parentDatabasePath
+    override fun databasePath(): String = CHATS
 
-    override fun data(): Map<String, Any> {
-        val data = HashMap<String, Any>()
-
-        data[CHAT_MESSAGE] = message
-        data[CHAT_SENDER_ID] = senderId
-        data[TIMESTAMP] = if(timestamp == TIMESTAMP_SERVER) FirebaseServer.timestamp() else timestamp
-
-        return data
-    }
-
-    // TODO: multiple messages within one chat node, this node will be addressed with "chatId"
-//    val chat = mutableListOf<FirebaseChat>()
-//    for (chatSnapshot in dataSnapshot.child(CHAT).children) {
-//        val databasePath = "$parentDatabasePath/$CHAT"
-//        FirebaseChat.new(databasePath, chatSnapshot)?.let { chat.add(it) }
-//    }
+    override fun list(): List<FirebaseNode> = chat.toList()
 
     companion object {
 
         private val TAG = javaClass.name
 
-        fun new(parentDatabasePath: String, dataSnapshot: DataSnapshot): FirebaseChat? {
+        fun new(dataSnapshot: DataSnapshot): FirebaseChat? {
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
-            val id = dataSnapshot.key
-            val message = dataSnapshot.child(CHAT_MESSAGE).value as? String
-            val senderId = dataSnapshot.child(CHAT_SENDER_ID).value as? String
-            val timestamp = dataSnapshot.child(TIMESTAMP).value as? Number
+            val id = dataSnapshot.key ?: return null
 
-            Log.v(TAG, "id: $id, message: $message, senderId: $senderId, timestamp: $timestamp")
-
-            if (id != null && message != null && senderId != null && timestamp != null) {
-                return FirebaseChat(id, parentDatabasePath, message, senderId, timestamp)
+            val chat = mutableListOf<FirebaseChatMessage>()
+            for (chatSnapshot in dataSnapshot.children) {
+                val databasePath = "$CHATS/$id"
+                FirebaseChatMessage.new(databasePath, chatSnapshot)?.let { chat.add(it) }
             }
 
-            return null
+            Log.v(TAG, "id: $id, chat: $chat")
+
+            return FirebaseChat(id, chat.toMutableList())
         }
 
-        fun new(parentDatabasePath: String, senderId: String, message: String): FirebaseChat {
-            return FirebaseChat("", parentDatabasePath, message, senderId, TIMESTAMP_SERVER)
+        fun new(): FirebaseChat {
+            return FirebaseChat("", mutableListOf())
         }
     }
 }

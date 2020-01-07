@@ -6,6 +6,13 @@ import io.stanc.pogoradar.firebase.node.FirebaseQuestDefinition
 import io.stanc.pogoradar.firebase.node.FirebaseRaidbossDefinition
 import io.stanc.pogoradar.utils.DelayedTrigger
 import io.stanc.pogoradar.utils.WaitingSpinner
+import android.R
+import android.app.PendingIntent.getActivity
+import android.content.Context
+import io.stanc.pogoradar.utils.Asset
+import org.json.JSONArray
+import java.io.IOException
+
 
 object FirebaseDefinitions {
 
@@ -24,8 +31,12 @@ object FirebaseDefinitions {
         })
     }
 
-    fun raidBossName(raidBossId: String?): String? {
-        return raidBosses.firstOrNull {it.id == raidBossId}?.name
+    fun raidBossName(context: Context, raidBossId: Int): String? {
+        // server info
+//        return raidBosses.firstOrNull {it.id == raidBossId}?.name
+        // local json info
+        val json = Asset.fileJsonArray(context, "", "pokemon-names-de")
+        return json?.getString(raidBossId)
     }
 
     // TODO: load optional sprites from: https://github.com/PokeAPI/sprites

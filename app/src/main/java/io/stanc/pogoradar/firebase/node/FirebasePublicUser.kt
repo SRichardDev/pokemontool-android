@@ -11,12 +11,13 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 
 data class FirebasePublicUser private constructor(
     override val id: String,
+    private val userId: String,
     var name: String,
     var team: Team,
     var level: Number,
-    var code: String? = null): FirebaseNode {
+    var code: String? = null): FirebaseDataNode {
 
-    override fun databasePath(): String = "$USERS/$id/$USER_PUBLIC_DATA"
+    override fun databasePath(): String = "$USERS/$userId"
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
@@ -37,17 +38,16 @@ data class FirebasePublicUser private constructor(
 
             Log.v(TAG, "dataSnapshot: ${dataSnapshot.value}")
 
+            val id = dataSnapshot.key
             val name = dataSnapshot.child(USER_NAME).value as? String
-            val team = (dataSnapshot.child(USER_TEAM).value as? Number)?.let { teamNumber ->
-                Team.valueOf(teamNumber)
-            }
+            val team = (dataSnapshot.child(USER_TEAM).value as? Number)?.let { teamNumber -> Team.valueOf(teamNumber) }
             val code = dataSnapshot.child(USER_CODE).value as? String
             val level = dataSnapshot.child(USER_LEVEL).value as? Number
 
             Log.v(TAG, "userId: $userId, id: ${dataSnapshot.key}, name: $name, team: $team, level: $level, code: $code")
 
-            if (name != null && team != null && level != null) {
-                return FirebasePublicUser(userId, name, team, level, code)
+            if (id != null && name != null && team != null && level != null) {
+                return FirebasePublicUser(id, userId, name, team, level, code)
             }
 
             return null

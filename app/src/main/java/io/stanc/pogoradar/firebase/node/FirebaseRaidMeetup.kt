@@ -14,16 +14,16 @@ import kotlinx.android.parcel.Parcelize
 data class FirebaseRaidMeetup private constructor(
     override val id: String,
     private val parentDatabasePath: String,
-    val chatId: String,
     val meetupTimestamp: Long,
-    var participantUserIds: MutableList<String>): FirebaseNode, Parcelable {
+    var participantUserIds: MutableList<String>,
+    val chatId: String? = null): FirebaseDataNode, Parcelable {
 
     override fun databasePath(): String = parentDatabasePath
 
     override fun data(): Map<String, Any> {
         val data = HashMap<String, Any>()
 
-        data[CHAT_ID] = chatId
+        chatId?.let { data[CHAT_ID] = it }
         data[MEETUP_TIME] = meetupTimestamp
 
         val dataParticipants = HashMap<String, String>()
@@ -53,15 +53,15 @@ data class FirebaseRaidMeetup private constructor(
             Log.v(TAG, "id: $id, meetupTimestamp: $meetupTimestamp, participantUserIds: $participantUserIds")
 
             return if (id != null && meetupTimestamp != null && chatId != null) {
-                FirebaseRaidMeetup(id, parentDatabasePath, chatId, meetupTimestamp, participantUserIds.toMutableList())
+                FirebaseRaidMeetup(id, parentDatabasePath, meetupTimestamp, participantUserIds.toMutableList(), chatId)
             } else {
                 null
             }
         }
 
-        fun new(parentDatabasePath: String, meetupTimestamp: Long, chatId: String): FirebaseRaidMeetup {
+        fun new(parentDatabasePath: String, meetupTimestamp: Long): FirebaseRaidMeetup {
             val id = DatabaseKeys.RAID_MEETUP
-            return FirebaseRaidMeetup(id, parentDatabasePath, chatId, meetupTimestamp, participantUserIds = mutableListOf())
+            return FirebaseRaidMeetup(id, parentDatabasePath, meetupTimestamp, participantUserIds = mutableListOf())
         }
     }
 }

@@ -3,6 +3,7 @@ package io.stanc.pogoradar.chat
 import androidx.lifecycle.ViewModel
 import io.stanc.pogoradar.firebase.FirebaseDatabase
 import io.stanc.pogoradar.firebase.node.FirebaseChat
+import io.stanc.pogoradar.firebase.node.FirebaseChatMessage
 import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import java.lang.ref.WeakReference
 
@@ -32,11 +33,20 @@ class ChatViewModel: ViewModel() {
         userName = user.name
     }
 
-    fun receiveMessage(message: FirebaseChat) {
+    fun updateChat(chat: FirebaseChat) {
+
+        chatMessages.removeIf { chatMessage ->
+            chat.chat.find { it.id == chatMessage.id } == null
+        }
+
+        chat.chat.forEach { onMessageReceived(it) }
+    }
+
+    fun receiveMessage(message: FirebaseChatMessage) {
         onMessageReceived(message)
     }
 
-    fun removeMessage(message: FirebaseChat) {
+    fun removeMessage(message: FirebaseChatMessage) {
         // TODO: ...
     }
 
@@ -61,7 +71,7 @@ class ChatViewModel: ViewModel() {
         sendMessageDelegate = null
     }
 
-    private fun onMessageReceived(message: FirebaseChat) {
+    private fun onMessageReceived(message: FirebaseChatMessage) {
 
         firebase.loadPublicUser(message.senderId, onCompletionCallback = { publicUser ->
 

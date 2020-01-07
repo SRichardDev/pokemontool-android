@@ -1,32 +1,29 @@
 package io.stanc.pogoradar.screen.arena
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.database.DataSnapshot
+import io.stanc.pogoradar.App
 import io.stanc.pogoradar.R
 import io.stanc.pogoradar.appbar.AppbarManager
+import io.stanc.pogoradar.appbar.Toolbar
 import io.stanc.pogoradar.chat.ChatViewModel
 import io.stanc.pogoradar.firebase.*
-import io.stanc.pogoradar.firebase.node.FirebaseArena
-import io.stanc.pogoradar.firebase.node.FirebaseChat
-import io.stanc.pogoradar.firebase.node.FirebaseRaidMeetup
+import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_TIME
+import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
+import io.stanc.pogoradar.firebase.node.*
+import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.Kotlin
 import io.stanc.pogoradar.utils.ParcelableDataFragment
 import io.stanc.pogoradar.utils.ShowFragmentManager
+import io.stanc.pogoradar.utils.TimeCalculator
 import io.stanc.pogoradar.viewmodel.arena.ArenaViewModel
 import io.stanc.pogoradar.viewmodel.arena.RaidViewModel
-import android.content.Intent
-import android.util.Log
-import io.stanc.pogoradar.App
-import io.stanc.pogoradar.appbar.Toolbar
-import io.stanc.pogoradar.firebase.DatabaseKeys.DEFAULT_TIME
-import io.stanc.pogoradar.firebase.DatabaseKeys.TIMESTAMP_NONE
-import io.stanc.pogoradar.firebase.node.FirebaseRaid
-import io.stanc.pogoradar.geohash.GeoHash
-import io.stanc.pogoradar.utils.TimeCalculator
 
 
 class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.SendMessageDelegate {
@@ -51,6 +48,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
         override fun onItemChanged(item: FirebaseArena) {
             dataObject = item
+
         }
 
         override fun onItemRemoved(itemId: String) {
@@ -58,22 +56,14 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         }
     }
 
-    private val raidMeetupObserver = object: FirebaseNodeObserver<FirebaseRaidMeetup> {
-
-        override fun onItemChanged(item: FirebaseRaidMeetup) {
-            updateRaidMeetup(item)
-        }
-
-        override fun onItemRemoved(itemId: String) {}
-    }
-
     private val chatObserver = object: FirebaseServer.OnChildDidChangeCallback {
 
         override fun childAdded(dataSnapshot: DataSnapshot) {
-            dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
-                FirebaseChat.new(raidMeetupId, dataSnapshot)?.let { chat ->
-                    chatViewModel?.receiveMessage(chat)
-                }
+            // TODO: move databse path into FirebaseChatMessage
+            val parentDatabasePath = FirebaseServer.parentDatabasePath(dataSnapshot)
+            Log.w(TAG, "Dbg:: parentDatabasePath of chat message: $parentDatabasePath")
+            FirebaseChatMessage.new(parentDatabasePath, dataSnapshot)?.let { chatMessage ->
+                chatViewModel?.receiveMessage(chatMessage)
             }
         }
 
@@ -87,12 +77,22 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
     }
 
     override fun onSendingMessage(senderId: String, text: String): String? {
-        return dataObject?.raid?.raidMeetupId?.let { raidMeetupId ->
 
-            val firebaseChatMessage = FirebaseChat.new(raidMeetupId, senderId, text)
-            firebase.pushChatMessage(firebaseChatMessage)
+        return dataObject?.raid?.raidMeetup?.let { raidMeetup ->
+
+            val chatId = raidMeetup.chatId ?: firebase.createChat()
+
+            if (chatId == null) {
+                Log.e(TAG, "could not sending chat message, because raidMeetup.chatId: ${raidMeetup.chatId} or new chat could not be created")
+                return null
+            }
+
+            val parentDatabasePath = FirebaseChatMessage.parentDatabasePath(chatId)
+            val firebaseChatMessage = FirebaseChatMessage.new(parentDatabasePath, senderId, text)
+            return firebase.pushChatMessage(firebaseChatMessage)
 
         } ?: run {
+            Log.e(TAG, "could not sending chat message, because there is not raidMeetup within arena: $dataObject")
             null
         }
     }
@@ -107,10 +107,7 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
         setupViewModels()
 
-        dataObject?.let { arena ->
-            arenaObserverManager.addObserver(arenaObserver, arena)
-            tryAddingRaidMeetupObserver(arena)
-        }
+        dataObject?.let { arenaObserverManager.addObserver(arenaObserver, it) }
 
         ShowFragmentManager.replaceFragment(ArenaInfoFragment(), childFragmentManager, R.id.arena_layout)
 
@@ -177,12 +174,19 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
 
     override fun onDataChanged(dataObject: FirebaseArena?) {
 
+        raidViewModel?.raidMeetup?.chatId?.let { firebase.removeChatObserver(chatObserver, it) }
+
         Kotlin.safeLet(activity, dataObject) { activity, arena ->
             arenaViewModel?.updateData(arena, activity)
             raidViewModel?.updateData(arena, activity)
         }
 
-        tryAddingRaidMeetupObserver(dataObject)
+        if (raidViewModel?.isRaidAnnounced?.value == true) {
+            raidViewModel?.raidMeetup?.chatId?.let { firebase.addChatObserver(chatObserver, it) }
+            AppbarManager.showMenu(Toolbar.MenuType.Icon)
+        } else {
+            AppbarManager.hideMenu(Toolbar.MenuType.Icon)
+        }
     }
 
     /**
@@ -215,41 +219,12 @@ class ArenaFragment: ParcelableDataFragment<FirebaseArena>(), ChatViewModel.Send
         }
     }
 
-    private fun updateRaidMeetup(newRaidMeetup: FirebaseRaidMeetup) {
-        activity?.let {
 
-            raidViewModel?.raidMeetup?.id?.let { firebase.removeChatObserver(chatObserver, it) }
-            raidViewModel?.updateData(newRaidMeetup)
-
-            if (raidViewModel?.isRaidAnnounced?.value == true) {
-                firebase.addChatObserver(chatObserver, newRaidMeetup.id)
-                AppbarManager.showMenu(Toolbar.MenuType.Icon)
-            } else {
-                AppbarManager.hideMenu(Toolbar.MenuType.Icon)
-            }
-        }
-    }
-
-    private fun tryAddingRaidMeetupObserver(arena: FirebaseArena?) {
-
-        arena?.raid?.raidMeetupId?.let { raidMeetupId ->
-            val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId)
-            firebase.addObserver(raidMeetupObserver, raidMeetup)
-        }
-    }
 
     private fun removeObservers() {
-
         dataObject?.let { arena ->
-
             arenaObserverManager.removeObserver(arenaObserver, arena)
-
-            arena.raid?.let { raid ->
-                val parentDatabasePath =
-                val raidMeetup = FirebaseRaidMeetup.new(raidMeetupId, DatabaseKeys.DEFAULT_TIME)
-                firebase.removeObserver(raidMeetupObserver, raidMeetup)
-                firebase.removeChatObserver(chatObserver, raidMeetupId)
-            }
+            arena.raid?.raidMeetup?.chatId?.let { firebase.removeChatObserver(chatObserver, it) }
         }
     }
 }

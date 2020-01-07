@@ -10,7 +10,7 @@ class FirebaseQuestDefinition(
     override val id: String,
     val questDescription: String,
     val imageName: String,
-    val reward: String): FirebaseNode {
+    val reward: String): FirebaseDataNode {
 
     override fun databasePath(): String = QUESTS
 

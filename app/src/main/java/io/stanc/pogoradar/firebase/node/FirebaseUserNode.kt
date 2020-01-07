@@ -1,9 +1,7 @@
 package io.stanc.pogoradar.firebase.node
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
-import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.DatabaseKeys.EMAIL
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOKEN
 import io.stanc.pogoradar.firebase.DatabaseKeys.NOTIFICATION_TOPIC_ANDROID
@@ -23,7 +21,6 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PLATFORM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_PUBLIC_DATA
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TEAM
 import io.stanc.pogoradar.firebase.DatabaseKeys.USER_TOPICS
-import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.geohash.GeoHash
 
 enum class Team {
@@ -55,10 +52,10 @@ data class FirebaseUserNode private constructor(override var id: String,
                                                 var notificationTopics: List<String>? = emptyList(),
                                                 var isNotificationActive: Boolean = true,
                                                 var timestampAppLastOpened: Number? = null,
-                                                var photoURL: Uri? = null): FirebaseNode {
+                                                var photoURL: Uri? = null): FirebaseDataNode {
 
     override fun databasePath(): String {
-        return "$USERS/$id"
+        return USERS
     }
 
     override fun data(): Map<String, Any> {

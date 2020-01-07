@@ -10,7 +10,7 @@ data class FirebaseRaidbossDefinition(
     override val id: String,
     val name: String,
     val level: String,
-    val imageName: String): FirebaseNode {
+    val imageName: String): FirebaseDataNode {
 
     override fun databasePath(): String = RAID_BOSSES
 

@@ -31,6 +31,7 @@ object DatabaseKeys {
     const val PARTICIPANTS = "participants"
 
     // Chat
+    const val CHATS = "chats"
     const val CHAT_MESSAGE = "message"
     const val CHAT_SENDER_ID = "senderId"
 

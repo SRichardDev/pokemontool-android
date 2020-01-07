@@ -26,20 +26,12 @@ class FirebaseNodeObserverManager<FirebaseNodeType: FirebaseNode>(private val ne
     fun clear() = nodeObserverManager.clear()
 
     fun addObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, node: FirebaseNode) {
-        addObserver(observer, node.databasePath(), node.id)
-    }
-
-    fun addObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, databasePath: String, nodeId: String) {
-        FirebaseServer.addNodeEventListener("$databasePath/$nodeId", arenaDidChangeCallback)
-        nodeObserverManager.addObserver(observer, subId = nodeId)
+        nodeObserverManager.addObserver(observer, subId = node.id)
+        FirebaseServer.addNodeEventListener(node, arenaDidChangeCallback)
     }
 
     fun removeObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, node: FirebaseNode) {
-        removeObserver(observer, node.databasePath(), node.id)
-    }
-
-    fun removeObserver(observer: FirebaseNodeObserver<FirebaseNodeType>, databasePath: String, nodeId: String) {
-        FirebaseServer.removeNodeEventListener("$databasePath/$nodeId", arenaDidChangeCallback)
-        nodeObserverManager.removeObserver(observer, subId = nodeId)
+        FirebaseServer.removeNodeEventListener(node, arenaDidChangeCallback)
+        nodeObserverManager.removeObserver(observer, subId = node.id)
     }
 }

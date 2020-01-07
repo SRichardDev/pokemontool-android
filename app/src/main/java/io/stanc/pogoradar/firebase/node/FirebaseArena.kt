@@ -20,7 +20,7 @@ data class FirebaseArena private constructor(
     val geoHash: GeoHash,
     val submitter: String,
     val isEX: Boolean = false,
-    val raid: FirebaseRaid? = null): FirebaseNode, Parcelable {
+    val raid: FirebaseRaid? = null): FirebaseDataNode, Parcelable {
 
     override fun databasePath() = "$ARENAS/${firebaseGeoHash(geoHash)}"
 

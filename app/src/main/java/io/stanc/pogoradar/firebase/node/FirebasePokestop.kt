@@ -19,7 +19,7 @@ data class FirebasePokestop private constructor(
     val name: String,
     val geoHash: GeoHash,
     val submitter: String,
-    val quest: FirebaseQuest? = null) : FirebaseNode, Parcelable {
+    val quest: FirebaseQuest? = null) : FirebaseDataNode, Parcelable {
 
     override fun databasePath(): String {
         return "$POKESTOPS/${firebaseGeoHash(geoHash)}"

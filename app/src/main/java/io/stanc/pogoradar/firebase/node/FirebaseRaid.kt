@@ -31,11 +31,11 @@ data class FirebaseRaid private constructor(override val id: String,
                                             val eggHatchesTimestamp: Long,
                                             val endTimestamp: Long,
                                             val raidId: String,
-                                            var raidBoss: Number,
-                                            var submitterId: String,
-                                            var timestamp: Long,
+                                            val raidBoss: Number,
+                                            val submitterId: String,
+                                            val timestamp: Long,
                                             var raidMeetup: FirebaseRaidMeetup? = null,
-                                            var latestRaidState: RaidState = RaidState.NONE): FirebaseNode, Parcelable {
+                                            var latestRaidState: RaidState = RaidState.NONE): FirebaseDataNode, Parcelable {
 
     init {
         latestRaidState = currentRaidState(this)
@@ -55,9 +55,7 @@ data class FirebaseRaid private constructor(override val id: String,
         data[SUBMITTER_ID] = submitterId
         data[TIMESTAMP] = timestamp
 
-        raidMeetup?.let {
-            data[RAID_MEETUP] = it.data()
-        }
+        data[RAID_MEETUP] = raidMeetup?.data() ?: FirebaseRaidMeetup.new("${databasePath()}/$id", TIMESTAMP_NONE)
 
         return data
     }

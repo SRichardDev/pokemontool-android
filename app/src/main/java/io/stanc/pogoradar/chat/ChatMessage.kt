@@ -3,6 +3,7 @@ package io.stanc.pogoradar.chat
 import com.stfalcon.chatkit.commons.models.IMessage
 import com.stfalcon.chatkit.commons.models.IUser
 import io.stanc.pogoradar.firebase.node.FirebaseChat
+import io.stanc.pogoradar.firebase.node.FirebaseChatMessage
 import io.stanc.pogoradar.firebase.node.FirebasePublicUser
 import io.stanc.pogoradar.utils.TimeCalculator
 import java.util.*
@@ -21,7 +22,7 @@ class ChatMessage private constructor(
 
     companion object {
 
-        fun new(firebaseChatMessage: FirebaseChat, publicUser: FirebasePublicUser): ChatMessage {
+        fun new(firebaseChatMessage: FirebaseChatMessage, publicUser: FirebasePublicUser): ChatMessage {
             val date = Date(firebaseChatMessage.timestamp as Long)
             val chatUser = ChatUser.new(publicUser.id, publicUser.name)
             return ChatMessage(firebaseChatMessage.id, date, chatUser, firebaseChatMessage.message)

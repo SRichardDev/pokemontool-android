@@ -1,7 +1,6 @@
 package io.stanc.pogoradar.firebase.notification
 
 import android.util.Log
-import io.stanc.pogoradar.UpdateManager
 import io.stanc.pogoradar.firebase.DatabaseKeys
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_GEOHASHES
 import io.stanc.pogoradar.firebase.DatabaseKeys.SUBSCRIBED_RAID_MEETUPS
@@ -9,7 +8,6 @@ import io.stanc.pogoradar.firebase.DatabaseKeys.USERS
 import io.stanc.pogoradar.firebase.DatabaseKeys.firebaseGeoHash
 import io.stanc.pogoradar.firebase.FirebaseServer
 import io.stanc.pogoradar.firebase.FirebaseUser
-import io.stanc.pogoradar.firebase.node.FirebaseUserNode
 import io.stanc.pogoradar.geohash.GeoHash
 import io.stanc.pogoradar.utils.Async.waitForCompletion
 import io.stanc.pogoradar.utils.TimeCalculator
@@ -46,7 +44,7 @@ object FirebaseNotification {
         }
     }
 
-    fun subscribeToArea(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun subscribeToArena(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         FirebaseUser.userData?.let { user ->
 
@@ -59,7 +57,7 @@ object FirebaseNotification {
                     if (successful) {
 
                         FirebaseServer.subscribeToTopic(formattedGeoHash) { successful ->
-//                            Log.v(TAG, "Debug:: subscribeToArea($geoHash), successful: $successful")
+//                            Log.v(TAG, "Debug:: subscribeToArena($geoHash), successful: $successful")
 
                             if (successful) {
                                 onCompletionCallback(true)
@@ -81,7 +79,7 @@ object FirebaseNotification {
         }
     }
 
-    fun unsubscribeFromArea(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
+    fun unsubscribeFromArena(geoHash: GeoHash, onCompletionCallback: (taskSuccessful: Boolean) -> Unit = {}) {
 
         FirebaseUser.userData?.let { user ->
 
@@ -94,7 +92,7 @@ object FirebaseNotification {
                     if (successful) {
 
                         FirebaseServer.unsubscribeFromTopic(formattedGeoHash) { successful ->
-//                            Log.v(TAG, "Debug:: unsubscribeFromArea($geoHash), unsubscribeFromTopic: $successful")
+//                            Log.v(TAG, "Debug:: unsubscribeFromArena($geoHash), unsubscribeFromTopic: $successful")
                             if (successful) {
                                 onCompletionCallback(true)
                             } else {
@@ -114,7 +112,7 @@ object FirebaseNotification {
         }
     }
 
-    suspend fun unsubscribeFromArea(geoHash: GeoHash): Boolean {
+    suspend fun unsubscribeFromArena(geoHash: GeoHash): Boolean {
 
         var successful = false
 
@@ -150,7 +148,7 @@ object FirebaseNotification {
 
                 user.subscribedGeohashes?.forEach { geoHash ->
                     val result = async {
-                        unsubscribeFromArea(
+                        unsubscribeFromArena(
                             geoHash
                         )
                     }

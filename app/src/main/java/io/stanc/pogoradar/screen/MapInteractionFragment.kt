@@ -231,7 +231,7 @@ class MapInteractionFragment: Fragment() {
     private fun addSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
         if (mapGridProvider.geoHashes().size < MAX_SUBSCRIPTIONS) {
-            FirebaseNotification.subscribeToArea(geoHash) { successful ->
+            FirebaseNotification.subscribeToArena(geoHash) { successful ->
                 if (!successful) {
                     Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
                 }
@@ -244,7 +244,7 @@ class MapInteractionFragment: Fragment() {
 
     private fun removeSubscription(mapGridProvider: MapGridProvider, geoHash: GeoHash) {
 
-        FirebaseNotification.unsubscribeFromArea(geoHash) { successful ->
+        FirebaseNotification.unsubscribeFromArena(geoHash) { successful ->
             if (!successful) {
                 Popup.showToast(context, R.string.exceptions_subscription_sending_failed)
             }
